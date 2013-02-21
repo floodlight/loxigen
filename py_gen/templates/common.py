@@ -39,41 +39,19 @@ import util
 common = sys.modules[__name__]
 
 def unpack_list_flow_stats_entry(buf):
-    entries = []
-    offset = 0
-    while offset < len(buf):
-        length, = struct.unpack_from("!H", buf, offset)
-        if length == 0: raise loxi.ProtocolError("entry length is 0")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
-        entries.append(flow_stats_entry.unpack(buffer(buf, offset, length)))
-        offset += length
-    return entries
+    return util.unpack_list(flow_stats_entry.unpack, "!H", buf)
 
 def unpack_list_queue_prop(buf):
-    entries = []
-    offset = 0
-    while offset < len(buf):
-        type, length, = struct.unpack_from("!HH", buf, offset)
-        if length == 0: raise loxi.ProtocolError("entry length is 0")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
+    def deserializer(buf):
+        type, = struct.unpack_from("!H", buf)
         if type == const.OFPQT_MIN_RATE:
-            entry = queue_prop_min_rate.unpack(buffer(buf, offset, length))
+            return queue_prop_min_rate.unpack(buf)
         else:
             raise loxi.ProtocolError("unknown queue prop %d" % type)
-        entries.append(entry)
-        offset += length
-    return entries
+    return util.unpack_list(deserializer, "!2xH", buf)
 
 def unpack_list_packet_queue(buf):
-    entries = []
-    offset = 0
-    while offset < len(buf):
-        _, length, = struct.unpack_from("!LH", buf, offset)
-        if length == 0: raise loxi.ProtocolError("entry length is 0")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
-        entries.append(packet_queue.unpack(buffer(buf, offset, length)))
-        offset += length
-    return entries
+    return util.unpack_list(packet_queue.unpack, "!4xH", buf)
 
 :: for ofclass in ofclasses:
 class ${ofclass.pyname}(object):

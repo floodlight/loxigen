@@ -153,7 +153,7 @@ class TestActionList(unittest.TestCase):
         import loxi.of10 as ofp
 
         buf = '\x00' * 8
-        with self.assertRaisesRegexp(ofp.ProtocolError, 'is 0'):
+        with self.assertRaisesRegexp(ofp.ProtocolError, 'is less than the header length'):
             ofp.action.unpack_list(buf)
 
         buf = '\x00\x00\x00\x04'

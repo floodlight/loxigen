@@ -37,18 +37,13 @@ import loxi
 
 def unpack_list(buf):
     if len(buf) % 8 != 0: raise loxi.ProtocolError("action list length not a multiple of 8")
-    actions = []
-    offset = 0
-    while offset < len(buf):
-        type, length = struct.unpack_from("!HH", buf, offset)
-        if length == 0: raise loxi.ProtocolError("action length is 0")
+    def deserializer(buf):
+        type, length = struct.unpack_from("!HH", buf)
         if length % 8 != 0: raise loxi.ProtocolError("action length not a multiple of 8")
-        if offset + length > len(buf): raise loxi.ProtocolError("action length overruns list length")
         parser = parsers.get(type)
         if not parser: raise loxi.ProtocolError("unknown action type %d" % type)
-        actions.append(parser(buffer(buf, offset, length)))
-        offset += length
-    return actions
+        return parser(buf)
+    return util.unpack_list(deserializer, "!2xH", buf)
 
 class Action(object):
     type = None # override in subclass
