@@ -33,6 +33,7 @@ Utility functions for OpenFlow class generation
 These may need to be sorted out into language specific functions
 """
 
+import sys
 import of_g
 import tenjin
 
@@ -502,7 +503,7 @@ def render_template(out, name, path, context):
     """
     pp = [ tenjin.PrefixedLinePreprocessor() ] # support "::" syntax
     template_globals = { "to_str": str, "escape": str } # disable HTML escaping
-    engine = tenjin.Engine(path=path, pp=pp)
+    engine = TemplateEngine(path=path, pp=pp)
     out.write(engine.render(name, context, template_globals))
 
 def render_static(out, name, path):
@@ -518,3 +519,18 @@ def render_static(out, name, path):
         raise ValueError("template %s not found" % name)
     with open(template_filename) as infile:
         out.write(infile.read())
+
+class TemplateEngine(tenjin.Engine):
+    def include(self, template_name, **kwargs):
+        """
+        Tenjin has an issue with nested includes that use the same local variable
+        names, because it uses the same context dict for each level of nesting.
+        The fix is to copy the context.
+        """
+        frame = sys._getframe(1)
+        locals  = frame.f_locals
+        globals = frame.f_globals
+        context = locals["_context"].copy()
+        context.update(kwargs)
+        template = self.get_template(template_name, context, globals)
+        return template.render(context, globals, _buf=locals["_buf"])
