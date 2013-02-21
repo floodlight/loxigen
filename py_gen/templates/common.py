@@ -54,50 +54,8 @@ def unpack_list_packet_queue(buf):
     return util.unpack_list(packet_queue.unpack, "!4xH", buf)
 
 :: for ofclass in ofclasses:
-class ${ofclass.pyname}(object):
-:: for m in ofclass.type_members:
-    ${m.name} = ${m.value}
+:: include('_ofclass.py', ofclass=ofclass, superclass="object")
+
 :: #endfor
 
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in ofclass.members])}):
-:: for m in ofclass.members:
-        if ${m.name} != None:
-            self.${m.name} = ${m.name}
-        else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
-:: #endfor
-
-    def pack(self):
-        packed = []
-:: include("_pack.py", ofclass=ofclass)
-        return ''.join(packed)
-
-    @staticmethod
-    def unpack(buf):
-        assert(len(buf) >= ${ofclass.min_length}) # Should be verified by caller
-        obj = ${ofclass.pyname}()
-:: include("_unpack.py", ofclass=ofclass)
-        return obj
-
-    def __eq__(self, other):
-        if type(self) != type(other): return False
-:: for m in ofclass.members:
-        if self.${m.name} != other.${m.name}: return False
-:: #endfor
-        return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def show(self):
-        import loxi.pp
-        return loxi.pp.pp(self)
-
-    def pretty_print(self, q):
-:: include('_pretty_print.py', ofclass=ofclass)
-
-:: if ofclass.name.startswith("of_match_v"):
-match = ${ofclass.pyname}
-
-:: #endif
-:: #endfor
+match = match_v1

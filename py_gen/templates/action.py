@@ -50,48 +50,7 @@ class Action(object):
     pass
 
 :: for ofclass in ofclasses:
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
-class ${ofclass.pyname}(Action):
-:: for m in ofclass.type_members:
-    ${m.name} = ${m.value}
-:: #endfor
-
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
-:: for m in nonskip_members:
-        if ${m.name} != None:
-            self.${m.name} = ${m.name}
-        else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
-:: #endfor
-
-    def pack(self):
-        packed = []
-:: include("_pack.py", ofclass=ofclass)
-        return ''.join(packed)
-
-    @staticmethod
-    def unpack(buf):
-        obj = ${ofclass.pyname}()
-:: include("_unpack.py", ofclass=ofclass)
-        return obj
-
-    def __eq__(self, other):
-        if type(self) != type(other): return False
-        if self.type != other.type: return False
-:: for m in nonskip_members:
-        if self.${m.name} != other.${m.name}: return False
-:: #endfor
-        return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def show(self):
-        import loxi.pp
-        return loxi.pp.pp(self)
-
-    def pretty_print(self, q):
-:: include('_pretty_print.py', ofclass=ofclass)
+:: include('_ofclass.py', ofclass=ofclass, superclass="Action")
 
 :: #endfor
 
