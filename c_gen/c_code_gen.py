@@ -894,11 +894,15 @@ typedef enum of_error_codes_e {
 
 extern const char *of_error_strings[];
 
+#ifndef NDEBUG
 /* #define ASSERT(val) assert(val) */
 #define FORCE_FAULT *(volatile int *)0 = 1
 #define ASSERT(val) if (!(val)) \\
     fprintf(stderr, "\\nASSERT %s. %s:%d\\n", #val, __FILE__, __LINE__), \\
     FORCE_FAULT
+#else
+#define ASSERT(val)
+#endif
 
 /*
  * Some LOCI object accessors can fail, and it's easy to forget to check.
