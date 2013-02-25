@@ -756,6 +756,8 @@ def top_c_gen(out, name):
  *
  ****************************************************************/
 
+#pragma GCC optimize ("s")
+
 #include <loci/loci.h>
 #include <loci/of_object.h>
 #include "loci_log.h"
