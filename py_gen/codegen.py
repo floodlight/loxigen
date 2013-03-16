@@ -92,6 +92,7 @@ def build_ofclasses(version):
 
         length_member = None
         type_members = []
+        pad_count = 0
 
         for member in unified_class['members']:
             if member['name'] in ['length', 'len']:
@@ -105,9 +106,12 @@ def build_ofclasses(version):
                                                value=type_values[member['name']]))
             else:
                 # HACK ensure member names are unique
-                if member['name'] == "pad" and \
-                [x for x in members if x.name == 'pad']:
-                    m_name = "pad2"
+                if member['name'].startswith("pad"):
+                    if pad_count == 0:
+                        m_name = 'pad'
+                    else:
+                        m_name = "pad%d" % pad_count
+                    pad_count += 1
                 else:
                     m_name = member['name']
                 members.append(Member(name=m_name,
