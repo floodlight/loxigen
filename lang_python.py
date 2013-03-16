@@ -65,7 +65,7 @@ versions = {
     1: "of10",
     2: "of11",
     3: "of12",
-    4: "of13"
+    4: "of13",
 }
 
 prefix = 'pyloxi/loxi'

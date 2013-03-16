@@ -74,7 +74,8 @@ def get_type_values(cls, version):
 # Create intermediate representation
 def build_ofclasses(version):
     blacklist = ["of_action", "of_action_header", "of_header", "of_queue_prop",
-                 "of_queue_prop_header", "of_experimenter", "of_action_experimenter"]
+                 "of_queue_prop_header", "of_experimenter", "of_action_experimenter",
+                 "of_oxm"]
     ofclasses = []
     for cls in of_g.standard_class_order:
         if version not in of_g.unified[cls] or cls in blacklist:
@@ -135,14 +136,14 @@ def generate_init(out, name, version):
 def generate_action(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if utils.class_is_action(x.name)]
-    util.render_template(out, 'action.py', ofclasses=ofclasses)
+    util.render_template(out, 'action.py', ofclasses=ofclasses, version=version)
 
 def generate_common(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if not utils.class_is_message(x.name)
                     and not utils.class_is_action(x.name)
                     and not utils.class_is_list(x.name)]
-    util.render_template(out, 'common.py', ofclasses=ofclasses)
+    util.render_template(out, 'common.py', ofclasses=ofclasses, version=version)
 
 def generate_const(out, name, version):
     groups = {}

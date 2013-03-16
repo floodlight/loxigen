@@ -58,4 +58,9 @@ def unpack_list_packet_queue(buf):
 
 :: #endfor
 
+:: if version == 1:
 match = match_v1
+:: elif version == 4:
+:: # HACK
+match = match_v3
+:: #endif

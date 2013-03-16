@@ -26,6 +26,7 @@
 :: # under the EPL.
 ::
 :: import itertools
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
@@ -128,6 +129,7 @@ def parse_flow_mod(buf):
     else:
         raise loxi.ProtocolError("unexpected flow mod cmd %u" % cmd)
 
+:: if version < of_g.VERSION_1_3:
 def parse_stats_reply(buf):
     if len(buf) < 8 + 2:
         raise loxi.ProtocolError("message too short")
@@ -145,8 +147,31 @@ def parse_stats_request(buf):
         return stats_request_parsers[stats_type](buf)
     else:
         raise loxi.ProtocolError("unexpected stats type %u" % stats_type)
+:: else:
+def parse_multipart_reply(buf):
+    if len(buf) < 8 + 2:
+        raise loxi.ProtocolError("message too short")
+    multipart_type, = struct.unpack_from("!H", buf, 8)
+    if multipart_type in multipart_reply_parsers:
+        return multipart_reply_parsers[multipart_type](buf)
+    else:
+        raise loxi.ProtocolError("unexpected multipart type %u" % multipart_type)
 
+def parse_multipart_request(buf):
+    if len(buf) < 8 + 2:
+        raise loxi.ProtocolError("message too short")
+    multipart_type, = struct.unpack_from("!H", buf, 8)
+    if multipart_type in multipart_request_parsers:
+        return multipart_request_parsers[multipart_type](buf)
+    else:
+        raise loxi.ProtocolError("unexpected multipart type %u" % multipart_type)
+:: #endif
+
+:: if version == of_g.VERSION_1_0:
 def parse_vendor(buf):
+:: else:
+def parse_experimenter(buf):
+:: #endif
     if len(buf) < 16:
         raise loxi.ProtocolError("experimenter message too short")
 
@@ -184,6 +209,7 @@ flow_mod_parsers = {
     const.OFPFC_DELETE_STRICT : flow_delete_strict.unpack,
 }
 
+:: if version < of_g.VERSION_1_3:
 stats_reply_parsers = {
     const.OFPST_DESC : desc_stats_reply.unpack,
     const.OFPST_FLOW : flow_stats_reply.unpack,
@@ -203,6 +229,9 @@ stats_request_parsers = {
     const.OFPST_QUEUE : queue_stats_request.unpack,
     const.OFPST_VENDOR : experimenter_stats_request.unpack,
 }
+:: else:
+
+:: #endif
 
 :: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 'const.OFPT_VENDOR']
 :: sort_key = lambda x: x.type_members[2].value
