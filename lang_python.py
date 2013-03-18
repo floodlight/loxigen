@@ -45,8 +45,8 @@ Target directory structure:
                 const.py        # OpenFlow constants
                 message.py      # Message classes
                 util.py         # Utility functions
-            of12: ...
             of13: ...
+                oxm.py          # OXM classes
 
 The user will add the pyloxi directory to PYTHONPATH. Then they can
 "import loxi" or "import loxi.of10". The idiomatic import is
@@ -70,7 +70,12 @@ versions = {
 
 prefix = 'pyloxi/loxi'
 
-modules = ["action", "common", "const", "message", "util"]
+modules = {
+    1: ["action", "common", "const", "message", "util"],
+    2: ["action", "common", "const", "message", "util"],
+    3: ["action", "common", "const", "message", "oxm", "util"],
+    4: ["action", "common", "const", "message", "oxm", "util"],
+}
 
 def make_gen(name, version):
     fn = getattr(py_gen.codegen, "generate_" + name)
@@ -86,6 +91,6 @@ targets = {
 
 for version, subdir in versions.items():
     targets['%s/%s/__init__.py' % (prefix, subdir)] = make_gen('init', version)
-    for module in modules:
+    for module in modules[version]:
         filename = '%s/%s/%s.py' % (prefix, subdir, module)
         targets[filename] = make_gen(module, version)

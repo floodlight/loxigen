@@ -68,6 +68,13 @@ def get_type_values(cls, version):
             type_values['subtype'] = type_maps.extension_action_to_subtype(cls, version)
     elif utils.class_is_queue_prop(cls):
         type_values['type'] = util.constant_for_value(version, "ofp_queue_properties", util.primary_wire_type(cls, version))
+    elif utils.class_is_oxm(cls):
+        oxm_class = 0x8000
+        oxm_type = util.primary_wire_type(cls, version)
+        oxm_masked = cls.find('masked') != -1 and 1 or 0
+        oxm_len = of_g.base_length[(cls, version)]
+        type_values['type_len'] = '%#x' % (oxm_class << 16 | oxm_type << 8 | \
+                                           oxm_masked << 8 | oxm_len)
 
     return type_values
 
@@ -75,7 +82,7 @@ def get_type_values(cls, version):
 def build_ofclasses(version):
     blacklist = ["of_action", "of_action_header", "of_header", "of_queue_prop",
                  "of_queue_prop_header", "of_experimenter", "of_action_experimenter",
-                 "of_oxm"]
+                 "of_oxm", "of_oxm_header", "of_oxm_experimenter_header"]
     ofclasses = []
     for cls in of_g.standard_class_order:
         if version not in of_g.unified[cls] or cls in blacklist:
@@ -85,6 +92,8 @@ def build_ofclasses(version):
         # Name for the generated Python class
         if utils.class_is_action(cls):
             pyname = cls[10:]
+        elif utils.class_is_oxm(cls):
+            pyname = cls[7:]
         else:
             pyname = cls[3:]
 
@@ -131,17 +140,23 @@ def build_ofclasses(version):
     return ofclasses
 
 def generate_init(out, name, version):
-    util.render_template(out, 'init.py')
+    util.render_template(out, 'init.py', version=version)
 
 def generate_action(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if utils.class_is_action(x.name)]
     util.render_template(out, 'action.py', ofclasses=ofclasses, version=version)
 
+def generate_oxm(out, name, version):
+    ofclasses = [x for x in build_ofclasses(version)
+                 if utils.class_is_oxm(x.name)]
+    util.render_template(out, 'oxm.py', ofclasses=ofclasses, version=version)
+
 def generate_common(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if not utils.class_is_message(x.name)
                     and not utils.class_is_action(x.name)
+                    and not utils.class_is_oxm(x.name)
                     and not utils.class_is_list(x.name)]
     util.render_template(out, 'common.py', ofclasses=ofclasses, version=version)
 

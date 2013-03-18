@@ -53,6 +53,30 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of13, "const"))
         self.assertTrue(hasattr(loxi.of13, "message"))
 
+class TestOXM(unittest.TestCase):
+    def test_oxm_in_phy_port_pack(self):
+        import loxi.of13 as ofp
+        obj = ofp.oxm.in_phy_port(value=42)
+        expected = ''.join([
+            '\x80\x00', # class
+            '\x02', # type/masked
+            '\x08', # length
+            '\x00\x00\x00\x2a' # value
+        ])
+        self.assertEquals(expected, obj.pack())
+
+    def test_oxm_in_phy_port_masked_pack(self):
+        import loxi.of13 as ofp
+        obj = ofp.oxm.in_phy_port_masked(value=42, value_mask=0xaabbccdd)
+        expected = ''.join([
+            '\x80\x00', # class
+            '\x03', # type/masked
+            '\x0c', # length
+            '\x00\x00\x00\x2a', # value
+            '\xaa\xbb\xcc\xdd' # mask
+        ])
+        self.assertEquals(expected, obj.pack())
+
 class TestAllOF13(unittest.TestCase):
     """
     Round-trips every class through serialization/deserialization.
@@ -61,7 +85,7 @@ class TestAllOF13(unittest.TestCase):
     """
 
     def setUp(self):
-        mods = [ofp.action,ofp.message,ofp.common]
+        mods = [ofp.action,ofp.message,ofp.common,ofp.oxm]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
                               if hasattr(klass, 'show')]
@@ -111,79 +135,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.meter_band_dscp_remark,
             ofp.common.meter_band_experimenter,
             ofp.common.meter_band_header,
-            ofp.common.oxm_arp_op,
-            ofp.common.oxm_arp_op_masked,
-            ofp.common.oxm_arp_sha,
-            ofp.common.oxm_arp_sha_masked,
-            ofp.common.oxm_arp_spa,
-            ofp.common.oxm_arp_spa_masked,
-            ofp.common.oxm_arp_tha,
-            ofp.common.oxm_arp_tha_masked,
-            ofp.common.oxm_arp_tpa,
-            ofp.common.oxm_arp_tpa_masked,
-            ofp.common.oxm_eth_dst,
-            ofp.common.oxm_eth_dst_masked,
-            ofp.common.oxm_eth_src,
-            ofp.common.oxm_eth_src_masked,
-            ofp.common.oxm_eth_type,
-            ofp.common.oxm_eth_type_masked,
-            ofp.common.oxm_header,
-            ofp.common.oxm_icmpv4_code,
-            ofp.common.oxm_icmpv4_code_masked,
-            ofp.common.oxm_icmpv4_type,
-            ofp.common.oxm_icmpv4_type_masked,
-            ofp.common.oxm_icmpv6_code,
-            ofp.common.oxm_icmpv6_code_masked,
-            ofp.common.oxm_icmpv6_type,
-            ofp.common.oxm_icmpv6_type_masked,
-            ofp.common.oxm_in_phy_port,
-            ofp.common.oxm_in_phy_port_masked,
-            ofp.common.oxm_in_port,
-            ofp.common.oxm_in_port_masked,
-            ofp.common.oxm_ip_dscp,
-            ofp.common.oxm_ip_dscp_masked,
-            ofp.common.oxm_ip_ecn,
-            ofp.common.oxm_ip_ecn_masked,
-            ofp.common.oxm_ip_proto,
-            ofp.common.oxm_ip_proto_masked,
-            ofp.common.oxm_ipv4_dst,
-            ofp.common.oxm_ipv4_dst_masked,
-            ofp.common.oxm_ipv4_src,
-            ofp.common.oxm_ipv4_src_masked,
-            ofp.common.oxm_ipv6_dst,
-            ofp.common.oxm_ipv6_dst_masked,
-            ofp.common.oxm_ipv6_flabel,
-            ofp.common.oxm_ipv6_flabel_masked,
-            ofp.common.oxm_ipv6_nd_sll,
-            ofp.common.oxm_ipv6_nd_sll_masked,
-            ofp.common.oxm_ipv6_nd_target,
-            ofp.common.oxm_ipv6_nd_target_masked,
-            ofp.common.oxm_ipv6_nd_tll,
-            ofp.common.oxm_ipv6_nd_tll_masked,
-            ofp.common.oxm_ipv6_src,
-            ofp.common.oxm_ipv6_src_masked,
-            ofp.common.oxm_metadata,
-            ofp.common.oxm_metadata_masked,
-            ofp.common.oxm_mpls_label,
-            ofp.common.oxm_mpls_label_masked,
-            ofp.common.oxm_mpls_tc,
-            ofp.common.oxm_mpls_tc_masked,
-            ofp.common.oxm_sctp_dst,
-            ofp.common.oxm_sctp_dst_masked,
-            ofp.common.oxm_sctp_src,
-            ofp.common.oxm_sctp_src_masked,
-            ofp.common.oxm_tcp_dst,
-            ofp.common.oxm_tcp_dst_masked,
-            ofp.common.oxm_tcp_src,
-            ofp.common.oxm_tcp_src_masked,
-            ofp.common.oxm_udp_dst,
-            ofp.common.oxm_udp_dst_masked,
-            ofp.common.oxm_udp_src,
-            ofp.common.oxm_udp_src_masked,
-            ofp.common.oxm_vlan_pcp,
-            ofp.common.oxm_vlan_pcp_masked,
-            ofp.common.oxm_vlan_vid,
-            ofp.common.oxm_vlan_vid_masked,
             ofp.common.table_feature_prop,
             ofp.common.table_feature_prop_apply_actions,
             ofp.common.table_feature_prop_apply_actions_miss,
@@ -274,79 +225,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.meter_band_dscp_remark,
             ofp.common.meter_band_experimenter,
             ofp.common.meter_band_header,
-            ofp.common.oxm_arp_op,
-            ofp.common.oxm_arp_op_masked,
-            ofp.common.oxm_arp_sha,
-            ofp.common.oxm_arp_sha_masked,
-            ofp.common.oxm_arp_spa,
-            ofp.common.oxm_arp_spa_masked,
-            ofp.common.oxm_arp_tha,
-            ofp.common.oxm_arp_tha_masked,
-            ofp.common.oxm_arp_tpa,
-            ofp.common.oxm_arp_tpa_masked,
-            ofp.common.oxm_eth_dst,
-            ofp.common.oxm_eth_dst_masked,
-            ofp.common.oxm_eth_src,
-            ofp.common.oxm_eth_src_masked,
-            ofp.common.oxm_eth_type,
-            ofp.common.oxm_eth_type_masked,
-            ofp.common.oxm_header,
-            ofp.common.oxm_icmpv4_code,
-            ofp.common.oxm_icmpv4_code_masked,
-            ofp.common.oxm_icmpv4_type,
-            ofp.common.oxm_icmpv4_type_masked,
-            ofp.common.oxm_icmpv6_code,
-            ofp.common.oxm_icmpv6_code_masked,
-            ofp.common.oxm_icmpv6_type,
-            ofp.common.oxm_icmpv6_type_masked,
-            ofp.common.oxm_in_phy_port,
-            ofp.common.oxm_in_phy_port_masked,
-            ofp.common.oxm_in_port,
-            ofp.common.oxm_in_port_masked,
-            ofp.common.oxm_ip_dscp,
-            ofp.common.oxm_ip_dscp_masked,
-            ofp.common.oxm_ip_ecn,
-            ofp.common.oxm_ip_ecn_masked,
-            ofp.common.oxm_ip_proto,
-            ofp.common.oxm_ip_proto_masked,
-            ofp.common.oxm_ipv4_dst,
-            ofp.common.oxm_ipv4_dst_masked,
-            ofp.common.oxm_ipv4_src,
-            ofp.common.oxm_ipv4_src_masked,
-            ofp.common.oxm_ipv6_dst,
-            ofp.common.oxm_ipv6_dst_masked,
-            ofp.common.oxm_ipv6_flabel,
-            ofp.common.oxm_ipv6_flabel_masked,
-            ofp.common.oxm_ipv6_nd_sll,
-            ofp.common.oxm_ipv6_nd_sll_masked,
-            ofp.common.oxm_ipv6_nd_target,
-            ofp.common.oxm_ipv6_nd_target_masked,
-            ofp.common.oxm_ipv6_nd_tll,
-            ofp.common.oxm_ipv6_nd_tll_masked,
-            ofp.common.oxm_ipv6_src,
-            ofp.common.oxm_ipv6_src_masked,
-            ofp.common.oxm_metadata,
-            ofp.common.oxm_metadata_masked,
-            ofp.common.oxm_mpls_label,
-            ofp.common.oxm_mpls_label_masked,
-            ofp.common.oxm_mpls_tc,
-            ofp.common.oxm_mpls_tc_masked,
-            ofp.common.oxm_sctp_dst,
-            ofp.common.oxm_sctp_dst_masked,
-            ofp.common.oxm_sctp_src,
-            ofp.common.oxm_sctp_src_masked,
-            ofp.common.oxm_tcp_dst,
-            ofp.common.oxm_tcp_dst_masked,
-            ofp.common.oxm_tcp_src,
-            ofp.common.oxm_tcp_src_masked,
-            ofp.common.oxm_udp_dst,
-            ofp.common.oxm_udp_dst_masked,
-            ofp.common.oxm_udp_src,
-            ofp.common.oxm_udp_src_masked,
-            ofp.common.oxm_vlan_pcp,
-            ofp.common.oxm_vlan_pcp_masked,
-            ofp.common.oxm_vlan_vid,
-            ofp.common.oxm_vlan_vid_masked,
             ofp.common.table_feature_prop,
             ofp.common.table_feature_prop_apply_actions,
             ofp.common.table_feature_prop_apply_actions_miss,
