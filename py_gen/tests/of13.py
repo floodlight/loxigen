@@ -77,6 +77,17 @@ class TestOXM(unittest.TestCase):
         ])
         self.assertEquals(expected, obj.pack())
 
+    def test_oxm_ipv6_dst_pack(self):
+        import loxi.of13 as ofp
+        obj = ofp.oxm.ipv6_dst(value='\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0d\x0f')
+        expected = ''.join([
+            '\x80\x00', # class
+            '\x36', # type/masked
+            '\x14', # length
+            '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0d\x0f', # value
+        ])
+        self.assertEquals(expected, obj.pack())
+
 class TestAllOF13(unittest.TestCase):
     """
     Round-trips every class through serialization/deserialization.

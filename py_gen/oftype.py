@@ -51,6 +51,8 @@ class OFType(object):
             v = "0"
         elif self.base == 'of_mac_addr_t':
             v = '[0,0,0,0,0,0]'
+        elif self.base == 'of_ipv6_t':
+            v = repr('\x00' * 16)
         elif self.base == 'of_wc_bmap_t':
             v = 'const.OFPFW_ALL'
         elif self.base in ['of_octets_t', 'of_port_name_t', 'of_table_name_t',
@@ -80,6 +82,8 @@ class OFType(object):
             return '"".join([x.pack() for x in %s])' % expr_expr
         elif self.base == 'of_mac_addr_t':
             return 'struct.pack("!6B", *%s)' % expr_expr
+        elif self.base == 'of_ipv6_t':
+            return 'struct.pack("!16s", %s)' % expr_expr
         elif self.base in ['of_match_t', 'of_port_desc_t']:
             return '%s.pack()' % expr_expr
         elif self.base == 'of_port_name_t':
@@ -104,6 +108,8 @@ class OFType(object):
             return "%s[%s:]" % (buf_expr, offset_expr)
         elif self.base == 'of_mac_addr_t':
             return "list(struct.unpack_from('!6B', %s, %s))" % (buf_expr, offset_expr)
+        elif self.base == 'of_ipv6_t':
+            return "struct.unpack_from('!16s', %s, %s)[0]" % (buf_expr, offset_expr)
         elif self.base == 'of_match_t':
             return 'common.match.unpack(buffer(%s, %s))' % (buf_expr, offset_expr)
         elif self.base == 'of_port_desc_t':
