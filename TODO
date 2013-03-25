@@ -1,0 +1,17 @@
+
+
+For lists of uint32 and uint8, the easy approach was taken which was to
+add OF types (wrappers) for instances of these types.  This makes some
+things much easier, but makes it awkward, for example, to simply append
+a 32-bit value to the end of a list.  Some helper functions should be
+added to make this easier.  (Maybe?  Seems to be working so far.)
+
+With the added support for auto declaring var len arrays indexed by
+version, lots of trailing commas have been added.
+
+Add type and length support for action_id classes.
+
+Table feature prop uses 0xfffe instead of 0xffff as the experimenter value.
+
+Support TABLE_FEATURE_PROP_EXPERIMENTER/_MISS
+

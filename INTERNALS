@@ -1,0 +1,76 @@
+
+Here are a few notes about the LOXI processing flow.
+
+Currently there are two pieces of input for each version to be supported.
+
+(1) The original openflow.h header file.  This is parsed to extract
+identifiers such as #defines and enum definitions.  These are in the
+'canonical' directory.
+
+(2) A specially processed list of structs derived from the original
+openflow.h header file.  These are the structs that represent the
+protocol on the wire with the following minor modifications:
+** ofp_header structures instances are replaced by their contents
+** Arrays are replaced with the syntax 'data_type[length] idenitifier'.
+** Lists of objects are called out explicitly as 'list(data_type) identifier'
+** Match structures are renamed to be version specific
+** Each flavors of a flow modify (add, modify, modify strict, delete
+and delete strict) are called out as different objects
+** Each action type (for instance) is called out as its own type.
+
+Copyright 2012, Big Switch Networks, Inc.
+
+Enumerations/defines give semantic values for two contexts:
+
+* Internal management of objects, for example, the particular values that
+indicate a message is an Echo message or an action is an output action.
+These values, like the wire format, are generally not of interest to 
+the users of LOXI.
+
+* External representation of information. These are values which users of
+LOXI need to know about, at least through an identifier.  Examples include
+OFP_TCP_PORT, OFP_MAX_TABLE_NAME_LEN or OFPP_MAX.  
+
+In general, processing proceeds by:
+
+(1) Extracting information from each version's input files.
+
+(2) Unifying the information across all versions, allowing the
+identification of commonalities and differnces.
+
+(3) Calling the language specific generation routines for each
+target file.  The list of files to generate and the map from 
+file to generating function is given in the language specific
+Python file such as lang_c.py at the top level.
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+The code layout is as follows (explanations below):
+
+BigCode/Modules/
+    LoxiGen/
+        Makefile
+        loxigen.py      Entry point executable
+        of_g.py         Global variables   
+        lang_c.py, ...  Language specific
+        loxi_front_end/ Python functions for processing input
+        loxi_utils/     General utility functions
+        canonical/      openflow.h header files
+            openflow.h-<of-version>
+        openflow_input/ pre-processed openflow.h input
+            structs-<of-version>
+        c_gen/          Python functions for C code generation
+        c_template/     Template including non-autogen files
+        utest/          Simple Python scripts to test functions
+
+For C code generation, the output is placed in the BigCode module format.
+First, the C template directory is copied over to a target directory.
+Then the automatically generated files are created and placed in the
+proper locations in the target directory.  Then the result is tarred
+up for overlay onto another location.
+
+To test the code locally, the target file is untarred into a local
+directory and a special make file (in c_gen/Makefile.local) is copied
+into the local directory.
+
+
