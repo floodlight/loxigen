@@ -1108,8 +1108,10 @@ def gen_top_static_functions(out):
 static inline void
 of_object_parent_length_update(of_object_t *obj, int delta)
 {
+#ifndef NDEBUG
     int count = 0;
     of_wire_buffer_t *wbuf;  /* For debug asserts only */
+#endif
 
     while (obj != NULL) {
         ASSERT(count++ < _MAX_PARENT_ITERATIONS);
@@ -1117,7 +1119,9 @@ of_object_parent_length_update(of_object_t *obj, int delta)
         if (obj->wire_length_set != NULL) {
             obj->wire_length_set(obj, obj->length);
         }
+#ifndef NDEBUG
         wbuf = obj->wire_object.wbuf;
+#endif
 
         /* Asserts for wire length checking */
         ASSERT(obj->length + obj->wire_object.obj_offset <=

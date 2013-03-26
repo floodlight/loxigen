@@ -50,8 +50,7 @@
 void
 of_object_message_wire_length_get(of_object_t *obj, int *bytes)
 {
-    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
     // ASSERT(obj is message)
     *bytes = of_message_length_get(OF_OBJECT_TO_MESSAGE(obj));
 }
@@ -65,9 +64,7 @@ of_object_message_wire_length_get(of_object_t *obj, int *bytes)
 void
 of_object_message_wire_length_set(of_object_t *obj, int bytes)
 {
-    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
-
+    ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
     // ASSERT(obj is message)
     of_message_length_set(OF_OBJECT_TO_MESSAGE(obj), bytes);
 }
