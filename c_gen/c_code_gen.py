@@ -757,6 +757,7 @@ def top_c_gen(out, name):
  ****************************************************************/
 
 #pragma GCC optimize ("s")
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 
 #include <loci/loci.h>
 #include <loci/of_object.h>
