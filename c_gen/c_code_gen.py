@@ -897,7 +897,7 @@ typedef enum of_error_codes_e {
     "init", \\
     "unknown"
 
-extern const char *of_error_strings[];
+extern const char *const of_error_strings[];
 
 #ifndef NDEBUG
 /* #define ASSERT(val) assert(val) */
@@ -1234,7 +1234,7 @@ typedef enum of_object_id_e {
     OF_OBJECT_COUNT = %d
 } of_object_id_t;
 
-extern const char *of_object_id_str[];
+extern const char *const of_object_id_str[];
 
 #define OF_MESSAGE_OBJECT_COUNT %d
 """ % ((last + 1), msg_count))
@@ -1295,7 +1295,7 @@ of_wire_id_valid(int object_id, int base_object_id) {
 """)
 
 def gen_object_enum_str(out):
-    out.write("\nconst char *of_object_id_str[] = {\n")
+    out.write("\nconst char *const of_object_id_str[] = {\n")
     out.write("    \"of_object\",\n")
     for cls in of_g.ordered_messages:
         out.write("    \"%s\",\n" % cls)
@@ -1312,7 +1312,7 @@ def gen_object_enum_str(out):
 
     # We'll do version strings while we're at it
     out.write("""
- const char *of_version_str[] = {
+ const char *const of_version_str[] = {
     "Unknown OpenFlow Version",
     "OpenFlow-1.0",
     "OpenFlow-1.1",
@@ -1348,7 +1348,7 @@ const of_ipv6_t of_ipv6_all_zeros = {
 /** @var of_error_strings
  * The error string map; use abs value to index
  */
-const char *of_error_strings[] = { OF_ERROR_STRINGS };
+const char *const of_error_strings[] = { OF_ERROR_STRINGS };
 """)
 
 ################################################################
@@ -2997,7 +2997,7 @@ static inline void
     out.write("""
 typedef void (*of_object_init_f)(of_object_t *obj, of_version_t version,
     int bytes, int clean_wire);
-extern of_object_init_f of_object_init_map[];
+extern const of_object_init_f of_object_init_map[];
 """)
 
     out.write("""
@@ -3125,7 +3125,7 @@ def gen_init_map(out):
 /**
  * Map from object ID to type coerce function
  */
-of_object_init_f of_object_init_map[] = {
+const of_object_init_f of_object_init_map[] = {
     (of_object_init_f)NULL,
 """)
     count = 1

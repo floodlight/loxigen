@@ -228,7 +228,7 @@ loci_dump_match(loci_writer_f writer, void* cookie, of_match_t *match)
     # Generate big table indexed by version and object
     for version in of_g.of_version_range:
         out.write("""
-static loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
+static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
 """ % dict(version=version))
         out.write("    unknown_dump, /* of_object, not a valid specific type */\n")
         for j, cls in enumerate(of_g.all_class_order):
@@ -245,7 +245,7 @@ static loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
         out.write("};\n\n")
 
     out.write("""
-static loci_obj_dump_f *dump_funs[5] = {
+static const loci_obj_dump_f *const dump_funs[5] = {
     NULL,
     dump_funs_v1,
     dump_funs_v2,

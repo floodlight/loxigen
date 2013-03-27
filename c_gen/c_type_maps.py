@@ -52,7 +52,7 @@ def gen_object_id_to_type(out):
  */
 """)
     for version in of_g.of_version_range:
-        out.write("static int\nof_object_to_type_map_v%d[OF_OBJECT_COUNT] = {\n"
+        out.write("static const int\nof_object_to_type_map_v%d[OF_OBJECT_COUNT] = {\n"
                   %version)
         out.write("    -1, /* of_object, not a valid specific type */\n")
         for j, cls in enumerate(of_g.all_class_order):
@@ -112,7 +112,7 @@ def gen_object_id_to_type(out):
 /**
  * Unified map, indexed by wire version which is 1-based.
  */
-int *of_object_to_type_map[OF_VERSION_ARRAY_MAX] = {
+const int *const of_object_to_type_map[OF_VERSION_ARRAY_MAX] = {
     NULL,
 """)
     for version in of_g.of_version_range:
@@ -130,7 +130,7 @@ def gen_object_id_to_extension_data(out):
 """)
     for version in of_g.of_version_range:
         out.write("""
-static of_experimenter_data_t
+static const of_experimenter_data_t
 of_object_to_extension_data_v%d[OF_OBJECT_COUNT] = {
 """ % version)
         out.write("    {0, 0, 0}, /* of_object, not a valid specific type */\n")
@@ -153,7 +153,7 @@ of_object_to_extension_data_v%d[OF_OBJECT_COUNT] = {
 /**
  * Unified map, indexed by wire version which is 1-based.
  */
-of_experimenter_data_t *of_object_to_extension_data[OF_VERSION_ARRAY_MAX] = {
+const of_experimenter_data_t *const of_object_to_extension_data[OF_VERSION_ARRAY_MAX] = {
     NULL,
 """)
     for version in of_g.of_version_range:
@@ -182,7 +182,7 @@ def gen_type_to_object_id(out, type_str, prefix, template,
 
     for i, ar in enumerate(all_ars):
         version = i + 1
-        out.write("static of_object_id_t\nof_%s_v%d[%s] = {\n" %
+        out.write("static const of_object_id_t\nof_%s_v%d[%s] = {\n" %
                   (type_str, version, len_name))
         for i in range(arr_len):
             comma = ""
@@ -210,7 +210,7 @@ def gen_type_to_object_id(out, type_str, prefix, template,
  * Indexed by wire version which is 1-based.
  */
 
-of_object_id_t *of_%(name)s[OF_VERSION_ARRAY_MAX] = {
+const of_object_id_t *const of_%(name)s[OF_VERSION_ARRAY_MAX] = {
     NULL,
 """ % dict(name=type_str, c_name=prefix.lower()))
     for version in of_g.of_version_range:
@@ -291,7 +291,7 @@ def gen_type_to_obj_map_functions(out):
  * Treat as private; use function accessor below
  */
 
-extern of_object_id_t *of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
 
 #define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
 
@@ -322,7 +322,7 @@ of_%(name)s_to_object_id(int %(name)s, of_version_t version)
  * Treat as private; use function accessor below
  */
 
-extern of_object_id_t *of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
 
 #define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
 
@@ -357,7 +357,7 @@ of_%(name)s_to_object_id(int %(name)s, of_version_t version)
  * Treat as private; use function accessor below
  */
 
-extern of_object_id_t *of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
 
 #define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
 
@@ -441,7 +441,7 @@ of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
  * Treat as private; use function accessor below
  */
 
-extern of_object_id_t *of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
 
 #define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
 
@@ -586,7 +586,7 @@ def gen_obj_to_type_map_functions(out):
     ################################################################
 
     out.write("""
-extern int *of_object_to_type_map[OF_VERSION_ARRAY_MAX];
+extern const int *const of_object_to_type_map[OF_VERSION_ARRAY_MAX];
 
 /**
  * Map an object ID to its primary wire type value
@@ -632,7 +632,7 @@ typedef struct of_experimenter_data_s {
 """)
 
     out.write("""
-extern of_experimenter_data_t *of_object_to_extension_data[OF_VERSION_ARRAY_MAX];
+extern const of_experimenter_data_t *const of_object_to_extension_data[OF_VERSION_ARRAY_MAX];
 
 /**
  * Map from the object ID of an extension to the experimenter ID
@@ -792,7 +792,7 @@ def gen_type_maps_header(out):
     gen_type_to_obj_map_functions(out)
     gen_obj_to_type_map_functions(out)
 
-    out.write("extern int *of_object_fixed_len[OF_VERSION_ARRAY_MAX];\n")
+    out.write("extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];\n")
 
     out.write("""
 /**
@@ -1038,7 +1038,7 @@ def gen_length_array(out):
 
     for version in of_g.of_version_range:
         out.write("""
-static int\nof_object_fixed_len_v%d[OF_OBJECT_COUNT] = {
+static const int\nof_object_fixed_len_v%d[OF_OBJECT_COUNT] = {
     -1,   /* of_object is not instantiable */
 """ % version)
         for i, cls in enumerate(of_g.all_class_order):
@@ -1055,7 +1055,7 @@ static int\nof_object_fixed_len_v%d[OF_OBJECT_COUNT] = {
 /**
  * Unified map of fixed length part of each object
  */
-int *of_object_fixed_len[OF_VERSION_ARRAY_MAX] = {
+const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX] = {
     NULL,
 """)
     for version in of_g.of_version_range:
@@ -1078,7 +1078,7 @@ def gen_object_id_to_stats_type(out):
  */
 """)
     for version in of_g.of_version_range:
-        out.write("int *of_object_to_stats_type_map_v%d = {\n" % (i+1))
+        out.write("const int *of_object_to_stats_type_map_v%d = {\n" % (i+1))
         out.write("    -1, /* of_object (invalid) */\n");
         for cls in of_g.ordered_messages:
             name = cls[3:]
@@ -1096,7 +1096,7 @@ def gen_object_id_to_stats_type(out):
 /**
  * Unified map, indexed by wire version which is 1-based.
  */
-int *of_object_to_stats_type_map[OF_VERSION_ARRAY_MAX] = {
+const int *of_object_to_stats_type_map[OF_VERSION_ARRAY_MAX] = {
     NULL,
 """)
     for version in of_g.of_version_range:
