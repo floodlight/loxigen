@@ -108,6 +108,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_u16_tcp_dst(writer, cookie, val)         LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u8_ip_proto(writer, cookie, val)         LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u64_metadata(writer, cookie, val)        LOCI_SHOW_x64(writer, cookie, val)
+#define LOCI_SHOW_u8_enabled(writer, cookie, val)          LOCI_SHOW_u8(writer, cookie, val)
 
 
 
