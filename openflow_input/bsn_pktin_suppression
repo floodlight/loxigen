@@ -51,6 +51,9 @@
 // The flows installed by this extension are not automatically deleted when the
 // extension is disabled. Similarly other configuration changes (cookie, etc) do
 // not affect already-installed flows.
+//
+// The switch should reject the message if both 'hard_timeout' and 'idle_timeout'
+// are zero, since the suppression flows would never expire.
 
 struct ofp_bsn_set_pktin_suppression {
     uint8_t version;
