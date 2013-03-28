@@ -31,11 +31,11 @@
 // The goal is to reduce the load on the controller, particularly in the case of
 // large UDP streams.
 //
-// When this extension is enabled (by sending the BSN_SET_DEDUPLICATION message
+// When this extension is enabled (by sending the bsn_set_pktin_suppression message
 // described below with enabled=1) the switch will install an exact-match drop
 // flow for each packet-in. This flow has the idle_timeout, hard_timeout,
 // priority, and cookie fields set to the values given in the
-// BSN_SET_DEDUPLICATION message.
+// bsn_set_pktin_suppression message.
 //
 // This extension does not affect packet-ins caused by an output to
 // OFPP_CONTROLLER.
@@ -52,7 +52,7 @@
 // extension is disabled. Similarly other configuration changes (cookie, etc) do
 // not affect already-installed flows.
 
-struct ofp_bsn_set_deduplication {
+struct ofp_bsn_set_pktin_suppression {
     uint8_t version;
     uint8_t type;
     uint16_t length;
