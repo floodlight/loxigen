@@ -756,9 +756,17 @@ def top_c_gen(out, name):
  *
  ****************************************************************/
 
-#if __GNUC__ >= 3
+#ifdef __GNUC__
+#include <features.h>
+
+#if __GNUC_PREREQ(4,4)
 #pragma GCC optimize ("s")
+#endif
+
+#if __GNUC_PREREQ(4,6)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
 #endif
 
 #include <loci/loci.h>
