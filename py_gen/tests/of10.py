@@ -28,8 +28,7 @@
 import unittest
 
 try:
-    import loxi
-    del loxi
+    import loxi.of10 as ofp
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
@@ -45,7 +44,6 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(ofp, "message"))
 
     def test_version(self):
-        import loxi.of10
         self.assertTrue(hasattr(loxi.of10, "ProtocolError"))
         self.assertTrue(hasattr(loxi.of10, "OFP_VERSION"))
         self.assertEquals(loxi.of10.OFP_VERSION, 1)
@@ -56,14 +54,11 @@ class TestImports(unittest.TestCase):
 
 class TestActions(unittest.TestCase):
     def test_output_pack(self):
-        import loxi.of10 as ofp
         expected = "\x00\x00\x00\x08\xff\xf8\xff\xff"
         action = ofp.action.output(port=ofp.OFPP_IN_PORT, max_len=0xffff)
         self.assertEquals(expected, action.pack())
 
     def test_output_unpack(self):
-        import loxi.of10 as ofp
-
         # Normal case
         buf = "\x00\x00\x00\x08\xff\xf8\xff\xff"
         action = ofp.action.output.unpack(buf)
@@ -76,7 +71,6 @@ class TestActions(unittest.TestCase):
             ofp.action.output.unpack(buf)
 
     def test_output_equality(self):
-        import loxi.of10 as ofp
         action = ofp.action.output(port=1, max_len=0x1234)
         action2 = ofp.action.output(port=1, max_len=0x1234)
         self.assertEquals(action, action2)
@@ -90,13 +84,11 @@ class TestActions(unittest.TestCase):
         action2.max_len = 0x1234
 
     def test_output_show(self):
-        import loxi.of10 as ofp
         action = ofp.action.output(port=1, max_len=0x1234)
         expected = "output { port = 1, max_len = 0x1234 }"
         self.assertEquals(expected, action.show())
 
     def test_bsn_set_tunnel_dst_pack(self):
-        import loxi.of10 as ofp
         expected = ''.join([
             "\xff\xff", "\x00\x10", # type/length
             "\x00\x5c\x16\xc7", # experimenter
@@ -107,7 +99,6 @@ class TestActions(unittest.TestCase):
         self.assertEquals(expected, action.pack())
 
     def test_bsn_set_tunnel_dst_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             "\xff\xff", "\x00\x10", # type/length
             "\x00\x5c\x16\xc7", # experimenter
@@ -121,8 +112,6 @@ class TestActions(unittest.TestCase):
 # Assumes action serialization/deserialization works
 class TestActionList(unittest.TestCase):
     def test_normal(self):
-        import loxi.of10 as ofp
-
         expected = []
         bufs = []
 
@@ -140,18 +129,14 @@ class TestActionList(unittest.TestCase):
         self.assertEquals(actions, expected)
 
     def test_empty_list(self):
-        import loxi.of10 as ofp
         self.assertEquals(ofp.action.unpack_list(''), [])
 
     def test_invalid_list_length(self):
-        import loxi.of10 as ofp
         buf = '\x00' * 9
         with self.assertRaisesRegexp(ofp.ProtocolError, 'not a multiple of 8'):
             ofp.action.unpack_list(buf)
 
     def test_invalid_action_length(self):
-        import loxi.of10 as ofp
-
         buf = '\x00' * 8
         with self.assertRaisesRegexp(ofp.ProtocolError, 'is less than the header length'):
             ofp.action.unpack_list(buf)
@@ -165,23 +150,19 @@ class TestActionList(unittest.TestCase):
             ofp.action.unpack_list(buf)
 
     def test_invalid_action_type(self):
-        import loxi.of10 as ofp
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action type'):
             ofp.action.unpack_list(buf)
 
 class TestConstants(unittest.TestCase):
     def test_ports(self):
-        import loxi.of10 as ofp
         self.assertEquals(0xffff, ofp.OFPP_NONE)
 
     def test_wildcards(self):
-        import loxi.of10 as ofp
         self.assertEquals(0xfc000, ofp.OFPFW_NW_DST_MASK)
 
 class TestCommon(unittest.TestCase):
     def test_port_desc_pack(self):
-        import loxi.of10 as ofp
         obj = ofp.port_desc(port_no=ofp.OFPP_CONTROLLER,
                             hw_addr=[1,2,3,4,5,6],
                             name="foo",
@@ -205,7 +186,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(expected, obj.pack())
 
     def test_port_desc_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\xff\xfd', # port_no
             '\x01\x02\x03\x04\x05\x06', # hw_addr
@@ -223,7 +203,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(ofp.OFPPF_PAUSE_ASYM, obj.peer)
 
     def test_table_stats_entry_pack(self):
-        import loxi.of10 as ofp
         obj = ofp.table_stats_entry(table_id=3,
                                     name="foo",
                                     wildcards=ofp.OFPFW_ALL,
@@ -244,7 +223,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(expected, obj.pack())
 
     def test_table_stats_entry_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\x03', # table_id
             '\x00\x00\x00', # pad
@@ -261,7 +239,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(9300233470495232273L, obj.matched_count)
 
     def test_flow_stats_entry_pack(self):
-        import loxi.of10 as ofp
         obj = ofp.flow_stats_entry(table_id=3,
                                    match=ofp.match(),
                                    duration_sec=1,
@@ -301,7 +278,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(expected, obj.pack())
 
     def test_flow_stats_entry_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\x00\x68', # length
             '\x03', # table_id
@@ -334,7 +310,6 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(2, obj.actions[1].port)
 
     def test_match(self):
-        import loxi.of10 as ofp
         match = ofp.match()
         self.assertEquals(match.wildcards, ofp.OFPFW_ALL)
         self.assertEquals(match.tcp_src, 0)
@@ -344,8 +319,6 @@ class TestCommon(unittest.TestCase):
 
 class TestMessages(unittest.TestCase):
     def test_hello_construction(self):
-        import loxi.of10 as ofp
-
         msg = ofp.message.hello()
         self.assertEquals(msg.version, ofp.OFP_VERSION)
         self.assertEquals(msg.type, ofp.OFPT_HELLO)
@@ -359,8 +332,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(msg.xid, 0)
 
     def test_hello_unpack(self):
-        import loxi.of10 as ofp
-
         # Normal case
         buf = "\x01\x00\x00\x08\x12\x34\x56\x78"
         msg = ofp.message.hello(xid=0x12345678)
@@ -372,13 +343,10 @@ class TestMessages(unittest.TestCase):
             ofp.message.hello.unpack(buf)
 
     def test_echo_request_construction(self):
-        import loxi.of10 as ofp
         msg = ofp.message.echo_request(data="abc")
         self.assertEquals(msg.data, "abc")
 
     def test_echo_request_pack(self):
-        import loxi.of10 as ofp
-
         msg = ofp.message.echo_request(xid=0x12345678, data="abc")
         buf = msg.pack()
         self.assertEquals(buf, "\x01\x02\x00\x0b\x12\x34\x56\x78\x61\x62\x63")
@@ -387,8 +355,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(msg, msg2)
 
     def test_echo_request_unpack(self):
-        import loxi.of10 as ofp
-
         # Normal case
         buf = "\x01\x02\x00\x0b\x12\x34\x56\x78\x61\x62\x63"
         msg = ofp.message.echo_request(xid=0x12345678, data="abc")
@@ -400,8 +366,6 @@ class TestMessages(unittest.TestCase):
             ofp.message.echo_request.unpack(buf)
 
     def test_echo_request_equality(self):
-        import loxi.of10 as ofp
-
         msg = ofp.message.echo_request(xid=0x12345678, data="abc")
         msg2 = ofp.message.echo_request(xid=0x12345678, data="abc")
         #msg2 = ofp.message.echo_request.unpack(msg.pack())
@@ -416,13 +380,11 @@ class TestMessages(unittest.TestCase):
         msg2.data = msg.data
 
     def test_echo_request_show(self):
-        import loxi.of10 as ofp
         expected = "echo_request { xid = 0x12345678, data = 'ab\\x01' }"
         msg = ofp.message.echo_request(xid=0x12345678, data="ab\x01")
         self.assertEquals(msg.show(), expected)
 
     def test_flow_add(self):
-        import loxi.of10 as ofp
         match = ofp.match()
         msg = ofp.message.flow_add(xid=1,
                                    match=match,
@@ -439,7 +401,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(msg, msg2)
 
     def test_port_mod_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.port_mod(xid=2,
                                    port_no=ofp.OFPP_CONTROLLER,
                                    hw_addr=[1,2,3,4,5,6],
@@ -450,7 +411,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(expected, msg.pack())
 
     def test_desc_stats_reply_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.desc_stats_reply(xid=3,
                                            flags=ofp.OFPSF_REPLY_MORE,
                                            mfr_desc="The Indigo-2 Community",
@@ -473,7 +433,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(expected, msg.pack())
 
     def test_desc_stats_reply_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\x01', '\x11', # version/type
             '\x04\x2c', # length
@@ -493,8 +452,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(ofp.OFPSF_REPLY_MORE, msg.flags)
 
     def test_port_status_pack(self):
-        import loxi.of10 as ofp
-
         desc = ofp.port_desc(port_no=ofp.OFPP_CONTROLLER,
                              hw_addr=[1,2,3,4,5,6],
                              name="foo",
@@ -527,7 +484,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(expected, msg.pack())
 
     def test_port_status_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\x01', '\x0c', # version/type
             '\x00\x40', # length
@@ -549,7 +505,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(ofp.OFPPF_PAUSE_ASYM, msg.desc.peer)
 
     def test_port_stats_reply_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.port_stats_reply(xid=5, flags=0, entries=[
             ofp.port_stats_entry(port_no=1, rx_packets=56, collisions=5),
             ofp.port_stats_entry(port_no=ofp.OFPP_LOCAL, rx_packets=1, collisions=1)])
@@ -591,7 +546,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(expected, msg.pack())
 
     def test_port_stats_reply_unpack(self):
-        import loxi.of10 as ofp
         buf = ''.join([
             '\x01', '\x11', # version/type
             '\x00\xdc', # length
@@ -688,7 +642,6 @@ class TestMessages(unittest.TestCase):
     ])
 
     def test_flow_stats_reply_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.flow_stats_reply(xid=6, flags=0, entries=[
             ofp.flow_stats_entry(table_id=3,
                                  match=ofp.match(),
@@ -718,7 +671,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(self.sample_flow_stats_reply_buf, msg.pack())
 
     def test_flow_stats_reply_unpack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.flow_stats_reply.unpack(self.sample_flow_stats_reply_buf)
         self.assertEquals(ofp.OFPST_FLOW, msg.stats_type)
         self.assertEquals(2, len(msg.entries))
@@ -726,7 +678,6 @@ class TestMessages(unittest.TestCase):
         self.assertEquals(3, len(msg.entries[1].actions))
 
     def test_flow_add_show(self):
-        import loxi.of10 as ofp
         expected = """\
 flow_add {
   xid = None,
@@ -793,7 +744,6 @@ flow_add {
     ])
 
     def test_packet_out_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.packet_out(
             xid=0x12345678,
             buffer_id=0xabcdef01,
@@ -805,7 +755,6 @@ flow_add {
         self.assertEquals(self.sample_packet_out_buf, msg.pack())
 
     def test_packet_out_unpack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.packet_out.unpack(self.sample_packet_out_buf)
         self.assertEquals(0x12345678, msg.xid)
         self.assertEquals(0xabcdef01, msg.buffer_id)
@@ -828,7 +777,6 @@ flow_add {
     ])
 
     def test_packet_in_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.packet_in(
             xid=0x12345678,
             buffer_id=0xabcdef01,
@@ -839,7 +787,6 @@ flow_add {
         self.assertEquals(self.sample_packet_in_buf, msg.pack())
 
     def test_packet_in_unpack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.packet_in.unpack(self.sample_packet_in_buf)
         self.assertEquals(0x12345678, msg.xid)
         self.assertEquals(0xabcdef01, msg.buffer_id)
@@ -878,7 +825,6 @@ flow_add {
     ])
 
     def test_queue_get_config_reply_pack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.queue_get_config_reply(
             xid=0x12345678,
             port=ofp.OFPP_LOCAL,
@@ -891,7 +837,6 @@ flow_add {
         self.assertEquals(self.sample_queue_get_config_reply_buf, msg.pack())
 
     def test_queue_get_config_reply_unpack(self):
-        import loxi.of10 as ofp
         msg = ofp.message.queue_get_config_reply.unpack(self.sample_queue_get_config_reply_buf)
         self.assertEquals(ofp.OFPP_LOCAL, msg.port)
         self.assertEquals(msg.queues[0].queue_id, 1)
@@ -903,7 +848,6 @@ flow_add {
 class TestParse(unittest.TestCase):
     def test_parse_header(self):
         import loxi
-        import loxi.of10 as ofp
 
         msg_ver, msg_type, msg_len, msg_xid = ofp.message.parse_header("\x01\x04\xAF\xE8\x12\x34\x56\x78")
         self.assertEquals(1, msg_ver)
@@ -943,7 +887,6 @@ class TestUtils(unittest.TestCase):
             util.unpack_array(str, 3, "abcdefgh")
 
     def test_pretty_wildcards(self):
-        import loxi.of10 as ofp
         self.assertEquals("OFPFW_ALL", ofp.util.pretty_wildcards(ofp.OFPFW_ALL))
         self.assertEquals("0", ofp.util.pretty_wildcards(0))
         self.assertEquals("OFPFW_DL_SRC|OFPFW_DL_DST",
@@ -963,7 +906,6 @@ class TestAll(unittest.TestCase):
     """
 
     def setUp(self):
-        import loxi.of10 as ofp
         mods = [ofp.action,ofp.message,ofp.common]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
@@ -971,7 +913,6 @@ class TestAll(unittest.TestCase):
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
-        import loxi.of10 as ofp
         expected_failures = []
         for klass in self.klasses:
             def fn():
@@ -986,7 +927,6 @@ class TestAll(unittest.TestCase):
                 fn()
 
     def test_show(self):
-        import loxi.of10 as ofp
         expected_failures = []
         for klass in self.klasses:
             def fn():
