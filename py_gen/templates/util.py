@@ -52,7 +52,8 @@ def unpack_list(deserializer, length_fmt, buf):
     entries = []
     offset = 0
     length_struct = struct.Struct(length_fmt)
-    while offset < len(buf):
+    n = len(buf)
+    while offset < n:
         if offset + length_struct.size > len(buf): raise loxi.ProtocolError("entry header overruns list length")
         length, = length_struct.unpack_from(buf, offset)
         if length < length_struct.size: raise loxi.ProtocolError("entry length is less than the header length")
