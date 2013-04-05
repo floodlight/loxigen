@@ -44,6 +44,7 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(ofp, "message"))
 
     def test_version(self):
+        import loxi
         self.assertTrue(hasattr(loxi.of10, "ProtocolError"))
         self.assertTrue(hasattr(loxi.of10, "OFP_VERSION"))
         self.assertEquals(loxi.of10.OFP_VERSION, 1)
