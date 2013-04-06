@@ -53,6 +53,35 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of13, "const"))
         self.assertTrue(hasattr(loxi.of13, "message"))
 
+class TestCommon(unittest.TestCase):
+    sample_hello_elem_buf = ''.join([
+        '\x00\x01', # type
+        '\x00\x0c', # length
+        '\x01\x23\x45\x67', # bitmaps[0]
+        '\x89\xab\xcd\xef', # bitmaps[1]
+    ])
+
+    def test_hello_elem_versionbitmap_pack(self):
+        obj = ofp.hello_elem_versionbitmap(bitmaps=[ofp.uint32(0x01234567),ofp.uint32(0x89abcdef)])
+        self.assertEquals(self.sample_hello_elem_buf, obj.pack())
+
+    def test_hello_elem_versionbitmap_unpack(self):
+        obj = ofp.hello_elem_versionbitmap.unpack(self.sample_hello_elem_buf)
+        self.assertEquals(len(obj.bitmaps), 2)
+        self.assertEquals(obj.bitmaps[0], ofp.uint32(0x01234567))
+        self.assertEquals(obj.bitmaps[1], ofp.uint32(0x89abcdef))
+
+    def test_list_hello_elem_unpack(self):
+        buf = ''.join([
+            '\x00\x01\x00\x04', # versionbitmap
+            '\x00\x00\x00\x04', # unknown type
+            '\x00\x01\x00\x04', # versionbitmap
+        ])
+        l = ofp.unpack_list_hello_elem(buf)
+        self.assertEquals(len(l), 2)
+        self.assertTrue(isinstance(l[0], ofp.hello_elem_versionbitmap))
+        self.assertTrue(isinstance(l[1], ofp.hello_elem_versionbitmap))
+
 class TestOXM(unittest.TestCase):
     def test_oxm_in_phy_port_pack(self):
         import loxi.of13 as ofp
@@ -128,9 +157,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.action_id_set_queue,
             ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
-            ofp.common.hello_elem,
-            ofp.common.hello_elem_header,
-            ofp.common.hello_elem_versionbitmap,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
             ofp.common.instruction_clear_actions,
@@ -218,9 +244,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.action_id_set_queue,
             ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
-            ofp.common.hello_elem,
-            ofp.common.hello_elem_header,
-            ofp.common.hello_elem_versionbitmap,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
             ofp.common.instruction_clear_actions,

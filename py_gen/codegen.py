@@ -68,6 +68,8 @@ def get_type_values(cls, version):
             type_values['subtype'] = type_maps.extension_action_to_subtype(cls, version)
     elif utils.class_is_queue_prop(cls):
         type_values['type'] = util.constant_for_value(version, "ofp_queue_properties", util.primary_wire_type(cls, version))
+    elif utils.class_is_hello_elem(cls):
+        type_values['type'] = util.constant_for_value(version, "ofp_hello_elem_type", util.primary_wire_type(cls, version))
     elif utils.class_is_oxm(cls):
         oxm_class = 0x8000
         oxm_type = util.primary_wire_type(cls, version)
@@ -82,7 +84,8 @@ def get_type_values(cls, version):
 def build_ofclasses(version):
     blacklist = ["of_action", "of_action_header", "of_header", "of_queue_prop",
                  "of_queue_prop_header", "of_experimenter", "of_action_experimenter",
-                 "of_oxm", "of_oxm_header", "of_oxm_experimenter_header"]
+                 "of_oxm", "of_oxm_header", "of_oxm_experimenter_header",
+                 "of_hello_elem", "of_hello_elem_header"]
     ofclasses = []
     for cls in of_g.standard_class_order:
         if version not in of_g.unified[cls] or cls in blacklist:

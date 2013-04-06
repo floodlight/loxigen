@@ -53,6 +53,15 @@ def unpack_list_queue_prop(buf):
 def unpack_list_packet_queue(buf):
     return util.unpack_list(packet_queue.unpack, "!4xH", buf)
 
+def unpack_list_hello_elem(buf):
+    def deserializer(buf):
+        type, = struct.unpack_from("!H", buf)
+        if type == const.OFPHET_VERSIONBITMAP:
+            return hello_elem_versionbitmap.unpack(buf)
+        else:
+            return None
+    return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
+
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
 
