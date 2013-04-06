@@ -36,6 +36,15 @@ def protocol(ver):
     if ver == 1:
         import of10
         return of10
+    elif ver == 2:
+        import of11
+        return of11
+    elif ver == 3:
+        import of12
+        return of12
+    elif ver == 4:
+        import of13
+        return of13
     else:
         raise ValueError
 

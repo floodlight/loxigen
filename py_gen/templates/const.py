@@ -37,7 +37,7 @@
 OFP_VERSION = ${version}
 
 :: for (group, idents) in sorted(groups.items()):
-::    idents.sort(key=lambda (ident, value): eval(value))
+::    idents.sort(key=lambda (ident, value): eval(value) if value != 'OFPVID_NONE' else 0)
 # Identifiers from group ${group}
 ::    for (ident, value) in idents:
 ::        if version == 1 and ident.startswith('OFPP_'):

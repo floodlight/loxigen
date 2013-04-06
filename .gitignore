@@ -4,3 +4,5 @@ target_code
 local
 .loxi_ts.*
 .loxi_gen_files
+loxi_output
+loxigen.log
