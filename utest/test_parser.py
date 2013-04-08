@@ -83,6 +83,46 @@ struct foo {
         self.assertEquals(ast.asList(),
             [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
 
+class EnumTests(unittest.TestCase):
+    def test_empty(self):
+        src = """\
+enum foo {
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast.asList(), [['enum', 'foo', []]])
+
+    def test_one(self):
+        src = """\
+enum foo {
+    BAR = 1
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', '1']]]])
+
+    def test_multiple(self):
+        src = """\
+enum foo {
+    OFP_A = 1,
+    OFP_B = 2,
+    OFP_C = 3
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', '1'], ['OFP_B', '2'], ['OFP_C', '3']]]])
+
+    def test_trailing_comma(self):
+        src = """\
+enum foo {
+    OFP_A = 1,
+    OFP_B = 2,
+    OFP_C = 3,
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', '1'], ['OFP_B', '2'], ['OFP_C', '3']]]])
+
 class TestMetadata(unittest.TestCase):
     def test_version(self):
         src = """\

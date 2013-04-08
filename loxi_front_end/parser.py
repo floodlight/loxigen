@@ -51,11 +51,19 @@ struct = kw('struct') - identifier - s('{') + \
          P.Group(P.ZeroOrMore(struct_member)) + \
          s('}') - s(';')
 
+# Enums
+enum_member = P.Group(identifier + s('=') + P.Word(P.alphanums + '_'))
+enum_list = P.Forward()
+enum_list << enum_member + P.Optional(s(',') + P.Optional(enum_list))
+enum = kw('enum') - identifier - s('{') + \
+         P.Group(P.Optional(enum_list)) + \
+         s('}') - s(';')
+
 # Metadata
 metadata_key = P.Or(kw("version")).setName("metadata key")
 metadata = tag('metadata') + s('#') - metadata_key - word
 
-grammar = P.ZeroOrMore(P.Group(struct) | P.Group(metadata))
+grammar = P.ZeroOrMore(P.Group(struct) | P.Group(enum) | P.Group(metadata))
 grammar.ignore(P.cppStyleComment)
 
 def parse(src):
