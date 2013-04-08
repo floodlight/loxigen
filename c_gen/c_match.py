@@ -338,7 +338,7 @@ def gen_incompat_members(out=sys.stdout):
     out.write(""")
 
 /* Indexed by version number */
-extern uint64_t of_match_incompat[4];
+extern const uint64_t of_match_incompat[4];
 """)
 
 
@@ -387,7 +387,7 @@ _COUNT_BITS(unsigned int val)
 }
 
 /* Indexed by version number */
-uint64_t of_match_incompat[4] = {
+const uint64_t of_match_incompat[4] = {
     -1,
     OF_MATCH_V1_INCOMPAT,
     OF_MATCH_V2_INCOMPAT,

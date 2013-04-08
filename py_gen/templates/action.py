@@ -37,66 +37,20 @@ import loxi
 
 def unpack_list(buf):
     if len(buf) % 8 != 0: raise loxi.ProtocolError("action list length not a multiple of 8")
-    actions = []
-    offset = 0
-    while offset < len(buf):
-        type, length = struct.unpack_from("!HH", buf, offset)
-        if length == 0: raise loxi.ProtocolError("action length is 0")
+    def deserializer(buf):
+        type, length = struct.unpack_from("!HH", buf)
         if length % 8 != 0: raise loxi.ProtocolError("action length not a multiple of 8")
-        if offset + length > len(buf): raise loxi.ProtocolError("action length overruns list length")
         parser = parsers.get(type)
         if not parser: raise loxi.ProtocolError("unknown action type %d" % type)
-        actions.append(parser(buffer(buf, offset, length)))
-        offset += length
-    return actions
+        return parser(buf)
+    return util.unpack_list(deserializer, "!2xH", buf)
 
 class Action(object):
     type = None # override in subclass
     pass
 
 :: for ofclass in ofclasses:
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
-class ${ofclass.pyname}(Action):
-:: for m in ofclass.type_members:
-    ${m.name} = ${m.value}
-:: #endfor
-
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
-:: for m in nonskip_members:
-        if ${m.name} != None:
-            self.${m.name} = ${m.name}
-        else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
-:: #endfor
-
-    def pack(self):
-        packed = []
-:: include("_pack.py", ofclass=ofclass)
-        return ''.join(packed)
-
-    @staticmethod
-    def unpack(buf):
-        obj = ${ofclass.pyname}()
-:: include("_unpack.py", ofclass=ofclass)
-        return obj
-
-    def __eq__(self, other):
-        if type(self) != type(other): return False
-        if self.type != other.type: return False
-:: for m in nonskip_members:
-        if self.${m.name} != other.${m.name}: return False
-:: #endfor
-        return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def show(self):
-        import loxi.pp
-        return loxi.pp.pp(self)
-
-    def pretty_print(self, q):
-:: include('_pretty_print.py', ofclass=ofclass)
+:: include('_ofclass.py', ofclass=ofclass, superclass="Action")
 
 :: #endfor
 

@@ -795,6 +795,7 @@ extension_message_subtype = {
             "of_bsn_shell_status"            : 8,
             "of_bsn_get_interfaces_request"  : 9,
             "of_bsn_get_interfaces_reply"    : 10,
+            "of_bsn_set_pktin_suppression"   : 11,
             },
         nicira = {   # Nicira extensions, value is subtype
             "of_nicira_controller_role_request"      : 10,
@@ -808,6 +809,7 @@ extension_message_subtype = {
             "of_bsn_get_mirroring_reply"     : 5,
             "of_bsn_get_interfaces_request"  : 9,
             "of_bsn_get_interfaces_reply"    : 10,
+            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
     of_g.VERSION_1_2:dict(  # Version 1.0 extensions
@@ -817,6 +819,7 @@ extension_message_subtype = {
             "of_bsn_get_mirroring_reply"     : 5,
             "of_bsn_get_interfaces_request"  : 9,
             "of_bsn_get_interfaces_reply"    : 10,
+            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
     of_g.VERSION_1_3:dict(  # Version 1.0 extensions
@@ -826,6 +829,7 @@ extension_message_subtype = {
             "of_bsn_get_mirroring_reply"     : 5,
             "of_bsn_get_interfaces_request"  : 9,
             "of_bsn_get_interfaces_reply"    : 10,
+            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
 }

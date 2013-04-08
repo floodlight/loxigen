@@ -65,6 +65,9 @@ def fixup_values(ident, value, version, ident_list):
     if ident.find("OFPP_") == 0 and version == of_g.VERSION_1_0:
         value_string = "0x%x" % (int(value, 0) + 0xffff0000)
 
+    if ident == 'OFP_VLAN_NONE' and version > of_g.VERSION_1_0:
+        value_string = '0'
+
     # Otherwise, if no reference to a wildcard value, all done
     if value_string.find("OFPFW") < 0:
         return value_string

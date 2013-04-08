@@ -756,6 +756,19 @@ def top_c_gen(out, name):
  *
  ****************************************************************/
 
+#ifdef __GNUC__
+#include <features.h>
+
+#if __GNUC_PREREQ(4,4)
+#pragma GCC optimize ("s")
+#endif
+
+#if __GNUC_PREREQ(4,6)
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
+
+#endif
+
 #include <loci/loci.h>
 #include <loci/of_object.h>
 #include "loci_log.h"
@@ -892,13 +905,17 @@ typedef enum of_error_codes_e {
     "init", \\
     "unknown"
 
-extern const char *of_error_strings[];
+extern const char *const of_error_strings[];
 
+#ifndef NDEBUG
 /* #define ASSERT(val) assert(val) */
 #define FORCE_FAULT *(volatile int *)0 = 1
 #define ASSERT(val) if (!(val)) \\
     fprintf(stderr, "\\nASSERT %s. %s:%d\\n", #val, __FILE__, __LINE__), \\
     FORCE_FAULT
+#else
+#define ASSERT(val)
+#endif
 
 /*
  * Some LOCI object accessors can fail, and it's easy to forget to check.
@@ -1101,8 +1118,10 @@ def gen_top_static_functions(out):
 static inline void
 of_object_parent_length_update(of_object_t *obj, int delta)
 {
+#ifndef NDEBUG
     int count = 0;
     of_wire_buffer_t *wbuf;  /* For debug asserts only */
+#endif
 
     while (obj != NULL) {
         ASSERT(count++ < _MAX_PARENT_ITERATIONS);
@@ -1110,7 +1129,9 @@ of_object_parent_length_update(of_object_t *obj, int delta)
         if (obj->wire_length_set != NULL) {
             obj->wire_length_set(obj, obj->length);
         }
+#ifndef NDEBUG
         wbuf = obj->wire_object.wbuf;
+#endif
 
         /* Asserts for wire length checking */
         ASSERT(obj->length + obj->wire_object.obj_offset <=
@@ -1221,7 +1242,7 @@ typedef enum of_object_id_e {
     OF_OBJECT_COUNT = %d
 } of_object_id_t;
 
-extern const char *of_object_id_str[];
+extern const char *const of_object_id_str[];
 
 #define OF_MESSAGE_OBJECT_COUNT %d
 """ % ((last + 1), msg_count))
@@ -1282,7 +1303,7 @@ of_wire_id_valid(int object_id, int base_object_id) {
 """)
 
 def gen_object_enum_str(out):
-    out.write("\nconst char *of_object_id_str[] = {\n")
+    out.write("\nconst char *const of_object_id_str[] = {\n")
     out.write("    \"of_object\",\n")
     for cls in of_g.ordered_messages:
         out.write("    \"%s\",\n" % cls)
@@ -1299,7 +1320,7 @@ def gen_object_enum_str(out):
 
     # We'll do version strings while we're at it
     out.write("""
- const char *of_version_str[] = {
+ const char *const of_version_str[] = {
     "Unknown OpenFlow Version",
     "OpenFlow-1.0",
     "OpenFlow-1.1",
@@ -1335,7 +1356,7 @@ const of_ipv6_t of_ipv6_all_zeros = {
 /** @var of_error_strings
  * The error string map; use abs value to index
  */
-const char *of_error_strings[] = { OF_ERROR_STRINGS };
+const char *const of_error_strings[] = { OF_ERROR_STRINGS };
 """)
 
 ################################################################
@@ -2984,7 +3005,7 @@ static inline void
     out.write("""
 typedef void (*of_object_init_f)(of_object_t *obj, of_version_t version,
     int bytes, int clean_wire);
-extern of_object_init_f of_object_init_map[];
+extern const of_object_init_f of_object_init_map[];
 """)
 
     out.write("""
@@ -3112,7 +3133,7 @@ def gen_init_map(out):
 /**
  * Map from object ID to type coerce function
  */
-of_object_init_f of_object_init_map[] = {
+const of_object_init_f of_object_init_map[] = {
     (of_object_init_f)NULL,
 """)
     count = 1
