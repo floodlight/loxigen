@@ -101,9 +101,9 @@ def get_enum_dict(version, contents):
     for enum in enum_list:
         (name, values) = c_parse_utils.extract_enum_vals(enum)
         for (ident, value) in values:
-            full_ident_list[ident] = str(value).strip()
+            full_ident_list[ident] = value
     for ident, value in defines_list:
-        full_ident_list[ident] = str(value).strip()
+        full_ident_list[ident] = value
 
     # Process enum idents
     for enum in enum_list:
@@ -123,7 +123,7 @@ def get_enum_dict(version, contents):
             rv_list[loxi_name] = py_utils.DotDict(dict(
                 ofp_name = ident,
                 ofp_group = name,
-                value = value_str))
+                value = eval(value_str)))
 
     for ident, value in defines_list:
         loxi_name = translation.loxi_name(ident)
@@ -133,7 +133,7 @@ def get_enum_dict(version, contents):
 
         value_str = fixup_values(ident, value, version, full_ident_list)
         if loxi_name in rv_list:
-            if value_str != rv_list[loxi_name].value:
+            if eval(value_str) != rv_list[loxi_name].value:
                 sys.stderr.write("""
 ERROR: IDENT COLLISION.  Version %s, LOXI Ident %s.
 New ofp_name %s, value %s.
@@ -148,7 +148,7 @@ Previous ofp_name %s, value %s,
         rv_list[loxi_name] = py_utils.DotDict(dict(
                 ofp_name = ident,
                 ofp_group = "macro_definitions",
-                value = value_str))
+                value = eval(value_str)))
 
     return rv_list
 

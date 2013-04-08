@@ -36,6 +36,10 @@ lit = P.Literal
 tag = lambda name: P.Empty().setParseAction(P.replaceWith(name))
 
 word = P.Word(P.alphanums + '_')
+integer = (
+            P.Combine('0x' - P.Word('0123456789abcdefABCDEF') |
+            P.Word('0123456789'))
+          ).setParseAction(lambda x: int(x[0], 0))
 
 identifier = word.copy().setName("identifier")
 
@@ -52,7 +56,7 @@ struct = kw('struct') - identifier - s('{') + \
          s('}') - s(';')
 
 # Enums
-enum_member = P.Group(identifier + s('=') + P.Word(P.alphanums + '_'))
+enum_member = P.Group(identifier + s('=') + integer)
 enum_list = P.Forward()
 enum_list << enum_member + P.Optional(s(',') + P.Optional(enum_list))
 enum = kw('enum') - identifier - s('{') + \

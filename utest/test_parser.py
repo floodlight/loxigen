@@ -99,7 +99,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', '1']]]])
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', 1]]]])
 
     def test_multiple(self):
         src = """\
@@ -110,7 +110,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', '1'], ['OFP_B', '2'], ['OFP_C', '3']]]])
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
     def test_trailing_comma(self):
         src = """\
@@ -121,7 +121,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', '1'], ['OFP_B', '2'], ['OFP_C', '3']]]])
+        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
 class TestMetadata(unittest.TestCase):
     def test_version(self):

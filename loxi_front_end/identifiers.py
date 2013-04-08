@@ -56,6 +56,7 @@ def add_identifiers(all_idents, idents_by_group, version, contents):
                        version, all_idents, idents_by_group)
 
 def add_identifier(name, ofp_name, ofp_group, value, version, all_idents, idents_by_group):
+    assert(isinstance(value, int))
     if name in all_idents:
         all_idents[name]["values_by_version"][version] = value
         if ((all_idents[name]["ofp_name"] != ofp_name or
