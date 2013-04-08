@@ -52,34 +52,36 @@ def add_identifiers(all_idents, idents_by_group, version, contents):
     enum_dict = of_h_utils.get_enum_dict(version,
                                          contents)
     for name, info in enum_dict.items():
+        add_identifier(name, info.ofp_name, info.ofp_group, info.value,
+                       version, all_idents, idents_by_group)
 
-        # info is a DotDict w/ keys ofp_name, ofp_group and value.
-        if name in all_idents:
-            all_idents[name]["values_by_version"][version] = info.value
-            if ((all_idents[name]["ofp_name"] != info.ofp_name or 
-                all_idents[name]["ofp_group"] != info.ofp_group) and
-                info.ofp_name.find("OFPP_") != 0):
-                log("""
+def add_identifier(name, ofp_name, ofp_group, value, version, all_idents, idents_by_group):
+    if name in all_idents:
+        all_idents[name]["values_by_version"][version] = value
+        if ((all_idents[name]["ofp_name"] != ofp_name or
+            all_idents[name]["ofp_group"] != ofp_group) and
+            ofp_name.find("OFPP_") != 0):
+            log("""
 NOTE: Identifier %s has different ofp name or group in version %s
 From ofp name %s, group %s to name %s, group %s.
 This could indicate a name collision in LOXI identifier translation.
 """ % (name, str(version), all_idents[name]["ofp_name"],
-       all_idents[name]["ofp_group"], info.ofp_name, info.ofp_group))
-                # Update stuff assuming newer versions processed later
-                all_idents[name]["ofp_name"] = info.ofp_name
-                all_idents[name]["ofp_group"] = info.ofp_group
+    all_idents[name]["ofp_group"], ofp_name, ofp_group))
+            # Update stuff assuming newer versions processed later
+            all_idents[name]["ofp_name"] = ofp_name
+            all_idents[name]["ofp_group"] = ofp_group
 
-        else: # New name
-            all_idents[name] = dict(
-                values_by_version = {version:info.value},
-                common_value = info["value"],
-                ofp_name = info["ofp_name"],
-                ofp_group = info["ofp_group"]
-                )
-            if info["ofp_group"] not in idents_by_group:
-                idents_by_group[info["ofp_group"]] = []
-            if name not in idents_by_group[info["ofp_group"]]:
-                idents_by_group[info["ofp_group"]].append(name)
+    else: # New name
+        all_idents[name] = dict(
+            values_by_version = {version:value},
+            common_value = value,
+            ofp_name = ofp_name,
+            ofp_group = ofp_group
+            )
+        if ofp_group not in idents_by_group:
+            idents_by_group[ofp_group] = []
+        if name not in idents_by_group[ofp_group]:
+            idents_by_group[ofp_group].append(name)
 
 def all_versions_agree(all_idents, version_list, name):
     val_list = all_idents[name]["values_by_version"]
