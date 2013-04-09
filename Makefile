@@ -40,7 +40,7 @@ LOXI_PY_FILES=$(shell find \( -name loxi_output -prune \
                            \) -a -name '*.py')
 LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
-INPUT_FILES = $(wildcard openflow_input/*) $(wildcard canonical/*)
+INPUT_FILES = $(wildcard openflow_input/*)
 
 all: c python
 
@@ -70,11 +70,6 @@ debug:
 	@echo "INPUT_FILES=\"${INPUT_FILES}\""
 
 check:
-	@echo Sending output to loxigen-test.log
-	cd utest && \
-		./identifiers_test.py > ../loxigen-test.log && \
-		./c_utils_test.py >> ../loxigen-test.log && \
-		./of_h_utils_test.py >> ../loxigen-test.log
 	PYTHONPATH=. ./utest/test_parser.py
 
 pylint:

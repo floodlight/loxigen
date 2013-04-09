@@ -30,30 +30,12 @@
 #
 
 import sys
-import of_h_utils
 from generic_utils import *
 import of_g
 
 ##
 # The value to use when an identifier is not defined for a version
 UNDEFINED_IDENT_VALUE = 0
-
-def add_identifiers(all_idents, idents_by_group, version, contents):
-    """
-    Update all_idents with identifiers from an openflow.h header file
-    @param all_idents A dict, usually of_g.identifiers
-    @param idents_by_group A dict for mapping LOXI idents to groups,
-    usually of_g.identifiers_by_group
-    @param version The OF wire version
-    @param contents The contents of an openflow.h file
-    """
-
-    # Get the dictionary of enums from the file text
-    enum_dict = of_h_utils.get_enum_dict(version,
-                                         contents)
-    for name, info in enum_dict.items():
-        add_identifier(name, info.ofp_name, info.ofp_group, info.value,
-                       version, all_idents, idents_by_group)
 
 def add_identifier(name, ofp_name, ofp_group, value, version, all_idents, idents_by_group):
     assert(isinstance(value, int))
