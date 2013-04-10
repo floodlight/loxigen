@@ -80,11 +80,11 @@ import of_g
 import loxi_front_end.oxm as oxm
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.of_h_utils as of_h_utils
 import loxi_front_end.c_parse_utils as c_parse_utils
 import loxi_front_end.identifiers as identifiers
 import pyparsing
 import loxi_front_end.parser as parser
+import loxi_front_end.translation as translation
 
 from generic_utils import *
 
@@ -319,8 +319,6 @@ def process_input_file(filename):
     @returns (wire_version, classes), where wire_version is the integer wire
     protocol number and classes is the dict of all classes processed from the
     file.
-
-    @todo Add support for parsing enums like we do structs
     """
 
     # Parse the input file
@@ -343,6 +341,10 @@ def process_input_file(filename):
                 # Clone class into header class and add to list
                 ofinput.classes[name + "_header"] = members[:]
                 ofinput.ordered_classes.append(name + "_header")
+        if s[0] == 'enum':
+            name = s[1]
+            members = s[2]
+            ofinput.enums[name] = [(x[0], x[1]) for x in members]
         elif s[0] == 'metadata':
             if s[1] == 'version':
                 log("Found version: wire version " + s[2])
@@ -414,21 +416,6 @@ def order_and_assign_object_ids():
         of_g.unified[cls]["object_id"] = of_g.object_id
         of_g.object_id += 1
 
-def process_canonical_file(version, filename):
-    """
-    Read in contents of openflow.h file filename and process it
-    @param version The wire version number
-    @param filename The name of the openflow header file for this version
-
-    Updates of_g.identifiers dictionary.  See of_g.py
-    """
-    log("Processing canonical file %s, version %d" % (filename, version))
-    f = open(filename, 'r')
-    all_lines = f.readlines()
-    contents = " ".join(all_lines)
-    identifiers.add_identifiers(of_g.identifiers, of_g.identifiers_by_group,
-                                version, contents)
-
 
 def initialize_versions():
     """
@@ -463,6 +450,13 @@ def read_input():
             version_name = of_g.of_version_wire2name[wire_version]
             versions[version_name]['classes'].update(copy.deepcopy(ofinput.classes))
             of_g.ordered_classes[wire_version].extend(ofinput.ordered_classes)
+
+            for enum_name, members in ofinput.enums.items():
+                for member_name, value in members:
+                    identifiers.add_identifier(
+                        translation.loxi_name(member_name),
+                        member_name, enum_name, value, wire_version,
+                        of_g.identifiers, of_g.identifiers_by_group)
 
 def add_extra_classes():
     """
@@ -583,12 +577,6 @@ if __name__ == '__main__':
         sys.exit(0)
 
     log("\nGenerating files for target language %s\n" % of_g.options.lang)
-
-    # Generate identifier code
-    for version in of_g.target_version_list:
-        version_tag = of_g.param_version_names[version]
-        filename = "%s/canonical/openflow.h-%s" % (root_dir, version_tag)
-        process_canonical_file(version, filename)
 
     initialize_versions()
     read_input()

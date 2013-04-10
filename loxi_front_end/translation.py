@@ -116,6 +116,7 @@ def loxi_name(ident):
         dict(OFPMP_ = "OF_MULTIPART_"),
         dict(OFPMPF_ = "OF_MULTIPART_FLAG_"),
         dict(OFPTFPT_ = "OF_TABLE_FEATURE_"),
+        dict(NX_ROLE_ = "OF_NICIRA_CONTROLLER_ROLE_"),
         ]
 
     for entry in rules:

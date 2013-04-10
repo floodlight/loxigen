@@ -37,12 +37,12 @@
 OFP_VERSION = ${version}
 
 :: for (group, idents) in sorted(groups.items()):
-::    idents.sort(key=lambda (ident, value): eval(value) if value != 'OFPVID_NONE' else 0)
+::    idents.sort(key=lambda (ident, value): value)
 # Identifiers from group ${group}
 ::    for (ident, value) in idents:
 ::        if version == 1 and ident.startswith('OFPP_'):
 ::        # HACK loxi converts these to 32-bit
-${ident} = ${"%#x" % (int(value, 16) & 0xffff)}
+${ident} = ${"%#x" % (value & 0xffff)}
 ::        else:
 ${ident} = ${value}
 ::        #endif
@@ -55,7 +55,7 @@ ${group}_map = {
 ::                pass
 ::            elif version == 1 and ident.startswith('OFPP_'):
 ::                # HACK loxi converts these to 32-bit
-    ${"%#x" % (int(value, 16) & 0xffff)}: ${repr(ident)},
+    ${"%#x" % (value & 0xffff)}: ${repr(ident)},
 ::        else:
     ${value}: ${repr(ident)},
 ::            #endif
