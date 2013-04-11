@@ -522,3 +522,4 @@ class OFInput(object):
         self.wire_versions = set()
         self.classes = {}
         self.ordered_classes = []
+        self.enums = {}
