@@ -76,4 +76,4 @@ def primary_wire_type(cls, version):
 def constant_for_value(version, group, value):
     return (["const." + v["ofp_name"] for k, v in of_g.identifiers.items()
              if k in of_g.identifiers_by_group[group] and
-                eval(v["values_by_version"].get(version, "None")) == value] or [value])[0]
+                v["values_by_version"].get(version, None) == value] or [value])[0]
