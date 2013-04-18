@@ -56,6 +56,8 @@ def primary_wire_type(cls, version):
         return type_maps.type_val[("of_stats_request", version)]
     elif cls in type_maps.flow_mod_list:
         return type_maps.type_val[("of_flow_mod", version)]
+    elif cls in type_maps.group_mod_list:
+        return type_maps.type_val[("of_group_mod", version)]
     elif (cls, version) in type_maps.type_val:
         return type_maps.type_val[(cls, version)]
     elif type_maps.message_is_extension(cls, version):

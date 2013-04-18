@@ -569,6 +569,20 @@ flow_mod_types = {
     of_g.VERSION_1_3:common_flow_mod_types
     }
 
+common_group_mod_types = dict(
+    add = 0,
+    modify = 1,
+    delete = 2
+    )
+
+group_mod_types = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:common_group_mod_types,
+    of_g.VERSION_1_2:common_group_mod_types,
+    of_g.VERSION_1_3:common_group_mod_types
+    } 
+
 # These do not translate to objects (yet)
 error_types = {
     # version 1.0
@@ -754,6 +768,12 @@ flow_mod_list = [
     "of_flow_delete",
     "of_flow_delete_strict"
 ]
+
+group_mod_list = [
+    "of_group_add",
+    "of_group_delete",
+    "of_group_modify"
+    ]
 
 def sub_class_map(base_type, version):
     """
