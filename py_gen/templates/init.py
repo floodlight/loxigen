@@ -30,6 +30,9 @@
 :: include('_autogen.py')
 
 import action, common, const, message
+:: if version >= 4:
+import oxm
+:: #endif
 from const import *
 from common import *
 from loxi import ProtocolError
