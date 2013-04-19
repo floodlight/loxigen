@@ -24,8 +24,388 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // EPL for the specific language governing permissions and limitations
 // under the EPL.
+//
+// Also derived from the OpenFlow header files which have these copyrights:
+// Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior University
+// Copyright (c) 2011, 2012 Open Networking Foundation
 
 #version 2
+
+enum macro_definitions {
+    OFP_MAX_TABLE_NAME_LEN = 32,
+    OFP_MAX_PORT_NAME_LEN = 16,
+
+    OFP_TCP_PORT = 6633,
+    OFP_SSL_PORT = 6633,
+
+    OFP_ETH_ALEN = 6,
+
+    OFP_DEFAULT_MISS_SEND_LEN = 128,
+
+    OFPFW_ICMP_TYPE = 0x40,
+    OFPFW_ICMP_CODE = 0x80,
+
+    OFP_DL_TYPE_ETH2_CUTOFF = 0x600,
+    OFP_DL_TYPE_NOT_ETH_TYPE = 0x5ff,
+
+    OFP_VLAN_NONE = 0,
+
+    OFPMT_STANDARD_LENGTH = 88,
+
+    OFP_FLOW_PERMANENT = 0,
+
+    OFP_DEFAULT_PRIORITY = 0x8000,
+
+    DESC_STR_LEN = 256,
+    SERIAL_NUM_LEN = 32,
+
+    OFPQ_ALL = 0xffffffff,
+    OFPQ_MIN_RATE_UNCFG = 0xffff,
+};
+
+enum ofp_port {
+    OFPP_MAX = 0xffffff00,
+    OFPP_IN_PORT = 0xfffffff8,
+    OFPP_TABLE = 0xfffffff9,
+    OFPP_NORMAL = 0xfffffffa,
+    OFPP_FLOOD = 0xfffffffb,
+    OFPP_ALL = 0xfffffffc,
+    OFPP_CONTROLLER = 0xfffffffd,
+    OFPP_LOCAL = 0xfffffffe,
+};
+
+enum ofp_port_no {
+    OFPP_ANY = 0xffffffff,
+};
+
+enum ofp_type {
+    OFPT_HELLO = 0,
+    OFPT_ERROR = 1,
+    OFPT_ECHO_REQUEST = 2,
+    OFPT_ECHO_REPLY = 3,
+    OFPT_EXPERIMENTER = 4,
+    OFPT_FEATURES_REQUEST = 5,
+    OFPT_FEATURES_REPLY = 6,
+    OFPT_GET_CONFIG_REQUEST = 7,
+    OFPT_GET_CONFIG_REPLY = 8,
+    OFPT_SET_CONFIG = 9,
+    OFPT_PACKET_IN = 10,
+    OFPT_FLOW_REMOVED = 11,
+    OFPT_PORT_STATUS = 12,
+    OFPT_PACKET_OUT = 13,
+    OFPT_FLOW_MOD = 14,
+    OFPT_GROUP_MOD = 15,
+    OFPT_PORT_MOD = 16,
+    OFPT_TABLE_MOD = 17,
+    OFPT_STATS_REQUEST = 18,
+    OFPT_STATS_REPLY = 19,
+    OFPT_BARRIER_REQUEST = 20,
+    OFPT_BARRIER_REPLY = 21,
+    OFPT_QUEUE_GET_CONFIG_REQUEST = 22,
+    OFPT_QUEUE_GET_CONFIG_REPLY = 23,
+};
+
+enum ofp_config_flags {
+    OFPC_FRAG_NORMAL = 0,
+    OFPC_FRAG_DROP = 1,
+    OFPC_FRAG_REASM = 2,
+    OFPC_FRAG_MASK = 3,
+    OFPC_INVALID_TTL_TO_CONTROLLER = 4,
+};
+
+enum ofp_table_config {
+    OFPTC_TABLE_MISS_CONTROLLER = 0,
+    OFPTC_TABLE_MISS_CONTINUE = 1,
+    OFPTC_TABLE_MISS_DROP = 2,
+    OFPTC_TABLE_MISS_MASK = 3,
+};
+
+enum ofp_capabilities {
+    OFPC_FLOW_STATS = 0x1,
+    OFPC_TABLE_STATS = 0x2,
+    OFPC_PORT_STATS = 0x4,
+    OFPC_GROUP_STATS = 0x8,
+    OFPC_IP_REASM = 0x20,
+    OFPC_QUEUE_STATS = 0x40,
+    OFPC_ARP_MATCH_IP = 0x80,
+};
+
+enum ofp_port_config {
+    OFPPC_PORT_DOWN = 0x1,
+    OFPPC_NO_RECV = 0x4,
+    OFPPC_NO_FWD = 0x20,
+    OFPPC_NO_PACKET_IN = 0x40,
+};
+
+enum ofp_port_state {
+    OFPPS_LINK_DOWN = 0x1,
+    OFPPS_BLOCKED = 0x2,
+    OFPPS_LIVE = 0x4,
+};
+
+enum ofp_port_features {
+    OFPPF_10MB_HD = 0x1,
+    OFPPF_10MB_FD = 0x2,
+    OFPPF_100MB_HD = 0x4,
+    OFPPF_100MB_FD = 0x8,
+    OFPPF_1GB_HD = 0x10,
+    OFPPF_1GB_FD = 0x20,
+    OFPPF_10GB_FD = 0x40,
+    OFPPF_40GB_FD = 0x80,
+    OFPPF_100GB_FD = 0x100,
+    OFPPF_1TB_FD = 0x200,
+    OFPPF_OTHER = 0x400,
+    OFPPF_COPPER = 0x800,
+    OFPPF_FIBER = 0x1000,
+    OFPPF_AUTONEG = 0x2000,
+    OFPPF_PAUSE = 0x4000,
+    OFPPF_PAUSE_ASYM = 0x8000,
+};
+
+enum ofp_port_reason {
+    OFPPR_ADD = 0,
+    OFPPR_DELETE = 1,
+    OFPPR_MODIFY = 2,
+};
+
+enum ofp_packet_in_reason {
+    OFPR_NO_MATCH = 0,
+    OFPR_ACTION = 1,
+};
+
+enum ofp_action_type {
+    OFPAT_OUTPUT = 0,
+    OFPAT_SET_VLAN_VID = 1,
+    OFPAT_SET_VLAN_PCP = 2,
+    OFPAT_SET_DL_SRC = 3,
+    OFPAT_SET_DL_DST = 4,
+    OFPAT_SET_NW_SRC = 5,
+    OFPAT_SET_NW_DST = 6,
+    OFPAT_SET_NW_TOS = 7,
+    OFPAT_SET_NW_ECN = 8,
+    OFPAT_SET_TP_SRC = 9,
+    OFPAT_SET_TP_DST = 10,
+    OFPAT_COPY_TTL_OUT = 11,
+    OFPAT_COPY_TTL_IN = 12,
+    OFPAT_SET_MPLS_LABEL = 13,
+    OFPAT_SET_MPLS_TC = 14,
+    OFPAT_SET_MPLS_TTL = 15,
+    OFPAT_DEC_MPLS_TTL = 16,
+    OFPAT_PUSH_VLAN = 17,
+    OFPAT_POP_VLAN = 18,
+    OFPAT_PUSH_MPLS = 19,
+    OFPAT_POP_MPLS = 20,
+    OFPAT_SET_QUEUE = 21,
+    OFPAT_GROUP = 22,
+    OFPAT_SET_NW_TTL = 23,
+    OFPAT_DEC_NW_TTL = 24,
+    OFPAT_EXPERIMENTER = 0xffff,
+};
+
+enum ofp_flow_mod_command {
+    OFPFC_ADD = 0,
+    OFPFC_MODIFY = 1,
+    OFPFC_MODIFY_STRICT = 2,
+    OFPFC_DELETE = 3,
+    OFPFC_DELETE_STRICT = 4,
+};
+
+enum ofp_group_mod_command {
+    OFPGC_ADD = 0,
+    OFPGC_MODIFY = 1,
+    OFPGC_DELETE = 2,
+};
+
+enum ofp_flow_wildcards {
+    OFPFW_IN_PORT = 0x1,
+    OFPFW_DL_VLAN = 0x2,
+    OFPFW_DL_VLAN_PCP = 0x4,
+    OFPFW_DL_TYPE = 0x8,
+    OFPFW_NW_TOS = 0x10,
+    OFPFW_NW_PROTO = 0x20,
+    OFPFW_TP_SRC = 0x40,
+    OFPFW_TP_DST = 0x80,
+    OFPFW_MPLS_LABEL = 0x100,
+    OFPFW_MPLS_TC = 0x200,
+    OFPFW_ALL = 0x3ff,
+};
+
+enum ofp_vlan_id {
+    OFPVID_ANY = 0xfffe,
+    OFPVID_NONE = 0xffff,
+};
+
+enum ofp_match_type {
+    OFPMT_STANDARD = 0,
+};
+
+enum ofp_instruction_type {
+    OFPIT_GOTO_TABLE = 0x1,
+    OFPIT_WRITE_METADATA = 0x2,
+    OFPIT_WRITE_ACTIONS = 0x3,
+    OFPIT_APPLY_ACTIONS = 0x4,
+    OFPIT_CLEAR_ACTIONS = 0x5,
+    OFPIT_EXPERIMENTER = 0xffff,
+};
+
+enum ofp_flow_mod_flags {
+    OFPFF_SEND_FLOW_REM = 0x1,
+    OFPFF_CHECK_OVERLAP = 0x2,
+};
+
+enum ofp_group {
+    OFPG_MAX = 0xffffff00,
+    OFPG_ALL = 0xfffffffc,
+    OFPG_ANY = 0xffffffff,
+};
+
+enum ofp_group_type {
+    OFPGT_ALL = 0,
+    OFPGT_SELECT = 1,
+    OFPGT_INDIRECT = 2,
+    OFPGT_FF = 3,
+};
+
+enum ofp_flow_removed_reason {
+    OFPRR_IDLE_TIMEOUT = 0,
+    OFPRR_HARD_TIMEOUT = 1,
+    OFPRR_DELETE = 2,
+    OFPRR_GROUP_DELETE = 3,
+};
+
+enum ofp_error_type {
+    OFPET_HELLO_FAILED = 0,
+    OFPET_BAD_REQUEST = 1,
+    OFPET_BAD_ACTION = 2,
+    OFPET_BAD_INSTRUCTION = 3,
+    OFPET_BAD_MATCH = 4,
+    OFPET_FLOW_MOD_FAILED = 5,
+    OFPET_GROUP_MOD_FAILED = 6,
+    OFPET_PORT_MOD_FAILED = 7,
+    OFPET_TABLE_MOD_FAILED = 8,
+    OFPET_QUEUE_OP_FAILED = 9,
+    OFPET_SWITCH_CONFIG_FAILED = 10,
+};
+
+enum ofp_hello_failed_code {
+    OFPHFC_INCOMPATIBLE = 0,
+    OFPHFC_EPERM = 1,
+};
+
+enum ofp_bad_request_code {
+    OFPBRC_BAD_VERSION = 0,
+    OFPBRC_BAD_TYPE = 1,
+    OFPBRC_BAD_STAT = 2,
+    OFPBRC_BAD_EXPERIMENTER = 3,
+    OFPBRC_BAD_SUBTYPE = 4,
+    OFPBRC_EPERM = 5,
+    OFPBRC_BAD_LEN = 6,
+    OFPBRC_BUFFER_EMPTY = 7,
+    OFPBRC_BUFFER_UNKNOWN = 8,
+    OFPBRC_BAD_TABLE_ID = 9,
+};
+
+enum ofp_bad_action_code {
+    OFPBAC_BAD_TYPE = 0,
+    OFPBAC_BAD_LEN = 1,
+    OFPBAC_BAD_EXPERIMENTER = 2,
+    OFPBAC_BAD_EXPERIMENTER_TYPE = 3,
+    OFPBAC_BAD_OUT_PORT = 4,
+    OFPBAC_BAD_ARGUMENT = 5,
+    OFPBAC_EPERM = 6,
+    OFPBAC_TOO_MANY = 7,
+    OFPBAC_BAD_QUEUE = 8,
+    OFPBAC_BAD_OUT_GROUP = 9,
+    OFPBAC_MATCH_INCONSISTENT = 10,
+    OFPBAC_UNSUPPORTED_ORDER = 11,
+    OFPBAC_BAD_TAG = 12,
+};
+
+enum ofp_bad_instruction_code {
+    OFPBIC_UNKNOWN_INST = 0,
+    OFPBIC_UNSUP_INST = 1,
+    OFPBIC_BAD_TABLE_ID = 2,
+    OFPBIC_UNSUP_METADATA = 3,
+    OFPBIC_UNSUP_METADATA_MASK = 4,
+    OFPBIC_UNSUP_EXP_INST = 5,
+};
+
+enum ofp_bad_match_code {
+    OFPBMC_BAD_TYPE = 0,
+    OFPBMC_BAD_LEN = 1,
+    OFPBMC_BAD_TAG = 2,
+    OFPBMC_BAD_DL_ADDR_MASK = 3,
+    OFPBMC_BAD_NW_ADDR_MASK = 4,
+    OFPBMC_BAD_WILDCARDS = 5,
+    OFPBMC_BAD_FIELD = 6,
+    OFPBMC_BAD_VALUE = 7,
+};
+
+enum ofp_flow_mod_failed_code {
+    OFPFMFC_UNKNOWN = 0,
+    OFPFMFC_TABLE_FULL = 1,
+    OFPFMFC_BAD_TABLE_ID = 2,
+    OFPFMFC_OVERLAP = 3,
+    OFPFMFC_EPERM = 4,
+    OFPFMFC_BAD_TIMEOUT = 5,
+    OFPFMFC_BAD_COMMAND = 6,
+};
+
+enum ofp_group_mod_failed_code {
+    OFPGMFC_GROUP_EXISTS = 0,
+    OFPGMFC_INVALID_GROUP = 1,
+    OFPGMFC_WEIGHT_UNSUPPORTED = 2,
+    OFPGMFC_OUT_OF_GROUPS = 3,
+    OFPGMFC_OUT_OF_BUCKETS = 4,
+    OFPGMFC_CHAINING_UNSUPPORTED = 5,
+    OFPGMFC_WATCH_UNSUPPORTED = 6,
+    OFPGMFC_LOOP = 7,
+    OFPGMFC_UNKNOWN_GROUP = 8,
+};
+
+enum ofp_port_mod_failed_code {
+    OFPPMFC_BAD_PORT = 0,
+    OFPPMFC_BAD_HW_ADDR = 1,
+    OFPPMFC_BAD_CONFIG = 2,
+    OFPPMFC_BAD_ADVERTISE = 3,
+};
+
+enum ofp_table_mod_failed_code {
+    OFPTMFC_BAD_TABLE = 0,
+    OFPTMFC_BAD_CONFIG = 1,
+};
+
+enum ofp_queue_op_failed_code {
+    OFPQOFC_BAD_PORT = 0,
+    OFPQOFC_BAD_QUEUE = 1,
+    OFPQOFC_EPERM = 2,
+};
+
+enum ofp_switch_config_failed_code {
+    OFPSCFC_BAD_FLAGS = 0,
+    OFPSCFC_BAD_LEN = 1,
+};
+
+enum ofp_stats_types {
+    OFPST_DESC = 0,
+    OFPST_FLOW = 1,
+    OFPST_AGGREGATE = 2,
+    OFPST_TABLE = 3,
+    OFPST_PORT = 4,
+    OFPST_QUEUE = 5,
+    OFPST_GROUP = 6,
+    OFPST_GROUP_DESC = 7,
+    OFPST_EXPERIMENTER = 0xffff,
+};
+
+enum ofp_stats_reply_flags {
+    OFPSF_REPLY_MORE = 0x1,
+};
+
+enum ofp_queue_properties {
+    OFPQT_NONE = 0,
+    OFPQT_MIN_RATE = 1,
+};
 
 struct ofp_header {
     uint8_t version;
