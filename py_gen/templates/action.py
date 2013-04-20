@@ -26,6 +26,7 @@
 :: # under the EPL.
 ::
 :: import itertools
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
@@ -54,7 +55,11 @@ class Action(object):
 
 :: #endfor
 
+:: if version == of_g.VERSION_1_0:
 def parse_vendor(buf):
+:: else:
+def parse_experimenter(buf):
+:: #endif
     if len(buf) < 16:
         raise loxi.ProtocolError("experimenter action too short")
 

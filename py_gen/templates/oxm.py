@@ -25,51 +25,69 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
+:: import itertools
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
 
-import sys
 import struct
-import action
 import const
 import util
+import loxi
 
-# HACK make this module visible as 'common' to simplify code generation
-common = sys.modules[__name__]
-
-def unpack_list_flow_stats_entry(buf):
-    return util.unpack_list(flow_stats_entry.unpack, "!H", buf)
-
-def unpack_list_queue_prop(buf):
-    def deserializer(buf):
-        type, = struct.unpack_from("!H", buf)
-        if type == const.OFPQT_MIN_RATE:
-            return queue_prop_min_rate.unpack(buf)
-        else:
-            raise loxi.ProtocolError("unknown queue prop %d" % type)
-    return util.unpack_list(deserializer, "!2xH", buf)
-
-def unpack_list_packet_queue(buf):
-    return util.unpack_list(packet_queue.unpack, "!4xH", buf)
-
-def unpack_list_hello_elem(buf):
-    def deserializer(buf):
-        type, = struct.unpack_from("!H", buf)
-        if type == const.OFPHET_VERSIONBITMAP:
-            return hello_elem_versionbitmap.unpack(buf)
-        else:
-            return None
-    return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
+class OXM(object):
+    type_len = None # override in subclass
+    pass
 
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="object")
+:: nonskip_members = [m for m in ofclass.members if not m.skip]
+class ${ofclass.pyname}(OXM):
+:: for m in ofclass.type_members:
+    ${m.name} = ${m.value}
+:: #endfor
+
+    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
+:: for m in nonskip_members:
+        if ${m.name} != None:
+            self.${m.name} = ${m.name}
+        else:
+            self.${m.name} = ${m.oftype.gen_init_expr()}
+:: #endfor
+
+    def pack(self):
+        packed = []
+:: include("_pack.py", ofclass=ofclass)
+        return ''.join(packed)
+
+    @staticmethod
+    def unpack(buf):
+        obj = ${ofclass.pyname}()
+:: include("_unpack.py", ofclass=ofclass)
+        return obj
+
+    def __eq__(self, other):
+        if type(self) != type(other): return False
+:: for m in nonskip_members:
+        if self.${m.name} != other.${m.name}: return False
+:: #endfor
+        return True
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def show(self):
+        import loxi.pp
+        return loxi.pp.pp(self)
+
+    def pretty_print(self, q):
+:: include('_pretty_print.py', ofclass=ofclass)
 
 :: #endfor
 
-:: if version == 1:
-match = match_v1
-:: elif version == 4:
-:: # HACK
-match = match_v3
-:: #endif
+parsers = {
+:: key = lambda x: int(x.type_members[0].value, 16)
+:: for ofclass in sorted(ofclasses, key=key):
+    ${key(ofclass)} : ${ofclass.pyname}.unpack,
+:: #endfor
+}

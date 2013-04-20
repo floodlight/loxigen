@@ -544,6 +544,10 @@ enum ofp_controller_role {
     OFPCR_ROLE_SLAVE = 3,
 };
 
+enum ofp_hello_elem_type {
+    OFPHET_VERSIONBITMAP = 1,
+};
+
 struct ofp_header {
     uint8_t version;
     uint8_t type;
