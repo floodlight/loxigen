@@ -30,7 +30,7 @@
 :: include('_autogen.py')
 
 import action, common, const, message
-:: if version >= 4:
+:: if version >= 3:
 import oxm
 :: #endif
 from const import *

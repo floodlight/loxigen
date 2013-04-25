@@ -45,8 +45,10 @@ Target directory structure:
                 const.py        # OpenFlow constants
                 message.py      # Message classes
                 util.py         # Utility functions
-            of13: ...
+            of11: ...           # (code generation incomplete)
+            of12: ...           # (code generation incomplete)
                 oxm.py          # OXM classes
+            of13: ...           # (code generation incomplete)
 
 The user will add the pyloxi directory to PYTHONPATH. Then they can
 "import loxi" or "import loxi.of10". The idiomatic import is

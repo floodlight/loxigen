@@ -42,6 +42,7 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(ofp, "common"))
         self.assertTrue(hasattr(ofp, "const"))
         self.assertTrue(hasattr(ofp, "message"))
+        self.assertTrue(hasattr(ofp, "oxm"))
 
     def test_version(self):
         import loxi
@@ -52,6 +53,7 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of13, "common"))
         self.assertTrue(hasattr(loxi.of13, "const"))
         self.assertTrue(hasattr(loxi.of13, "message"))
+        self.assertTrue(hasattr(loxi.of13, "oxm"))
 
 class TestCommon(unittest.TestCase):
     sample_hello_elem_buf = ''.join([
