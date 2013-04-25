@@ -34,7 +34,9 @@
 ::     unpack_expr = m.oftype.gen_unpack_expr('buf', m.offset)
 ::     if m == ofclass.length_member:
         _length = ${unpack_expr}
+:: if ofclass.name != 'of_match_v3':
         assert(_length == len(buf))
+:: #endif
 :: if ofclass.is_fixed_length:
         if _length != ${ofclass.min_length}: raise loxi.ProtocolError("${ofclass.pyname} length is %d, should be ${ofclass.min_length}" % _length)
 :: else:

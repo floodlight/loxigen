@@ -62,6 +62,10 @@ def unpack_list_hello_elem(buf):
             return None
     return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
 
+def unpack_list_oxm(buf):
+    # TODO
+    return []
+
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
 

@@ -77,6 +77,8 @@ def get_type_values(cls, version):
         oxm_len = of_g.base_length[(cls, version)]
         type_values['type_len'] = '%#x' % (oxm_class << 16 | oxm_type << 8 | \
                                            oxm_masked << 8 | oxm_len)
+    elif cls == "of_match_v3":
+        type_values['type'] = 1
 
     return type_values
 

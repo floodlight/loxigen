@@ -56,6 +56,21 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of12, "message"))
         self.assertTrue(hasattr(loxi.of12, "oxm"))
 
+class TestCommon(unittest.TestCase):
+    sample_empty_match_buf = ''.join([
+        '\x00\x01', # type
+        '\x00\x04', # length
+        '\x00\x00\x00\x00', # padding
+    ])
+
+    def test_empty_match_pack(self):
+        obj = ofp.match()
+        self.assertEquals(self.sample_empty_match_buf, obj.pack())
+
+    def test_empty_match_unpack(self):
+        obj = ofp.match.unpack(self.sample_empty_match_buf)
+        self.assertEquals(len(obj.oxm_list), 0)
+
 class TestOXM(unittest.TestCase):
     def test_oxm_in_phy_port_pack(self):
         import loxi.of12 as ofp
@@ -117,16 +132,12 @@ class TestAllOF12(unittest.TestCase):
             ofp.common.instruction_header,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.table_stats_entry,
-            ofp.message.aggregate_stats_request,
             ofp.message.flow_add,
             ofp.message.flow_delete,
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
@@ -146,7 +157,6 @@ class TestAllOF12(unittest.TestCase):
 
     def test_show(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
@@ -156,17 +166,7 @@ class TestAllOF12(unittest.TestCase):
             ofp.common.instruction_header,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.table_stats_entry,
-            ofp.message.aggregate_stats_request,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
-            ofp.message.packet_in,
         ]
         for klass in self.klasses:
             def fn():

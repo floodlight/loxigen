@@ -45,3 +45,6 @@
         length = sum([len(x) for x in packed])
         packed[${length_member_index}] = ${ofclass.length_member.oftype.gen_pack_expr('length')}
 :: #endif
+:: if ofclass.name == 'of_match_v3':
+        packed.append('\x00' * ((length + 7)/8*8 - length))
+:: #endif
