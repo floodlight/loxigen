@@ -36,6 +36,7 @@ class TestImports(unittest.TestCase):
     def test_toplevel(self):
         import loxi
         self.assertTrue(hasattr(loxi, "ProtocolError"))
+        self.assertEquals(loxi.version_names[2], "1.1")
         ofp = loxi.protocol(2)
         self.assertEquals(ofp.OFP_VERSION, 2)
         self.assertTrue(hasattr(ofp, "action"))

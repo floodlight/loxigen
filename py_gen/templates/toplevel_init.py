@@ -25,9 +25,12 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
+
+version_names = ${repr(of_g.param_version_names)}
 
 def protocol(ver):
     """
