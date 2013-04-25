@@ -69,6 +69,10 @@ def unpack_list_hello_elem(buf):
 
 :: if version == 1:
 match = match_v1
+:: elif version == 2:
+match = match_v2
+:: elif version == 3:
+match = match_v3
 :: elif version == 4:
 :: # HACK
 match = match_v3
