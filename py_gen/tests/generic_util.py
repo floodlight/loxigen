@@ -30,6 +30,7 @@ import unittest
 try:
     import loxi
     import loxi.generic_util
+    from loxi.generic_util import OFReader
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
@@ -45,6 +46,70 @@ class TestUnpackList(unittest.TestCase):
     def test_simple(self):
         a = loxi.generic_util.unpack_list(str, '!B', "\x04abc\x03de\x02f\x01")
         self.assertEquals(['\x04abc', '\x03de', '\x02f', '\x01'], a)
+
+class TestOFReader(unittest.TestCase):
+    def test_empty(self):
+        reader = OFReader("")
+        self.assertEquals(str(reader.read('')), "")
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.read_buf(1)
+
+    def test_simple(self):
+        reader = OFReader("abcdefg")
+        self.assertEquals(reader.read('2s')[0], "ab")
+        self.assertEquals(reader.read('2s')[0], "cd")
+        self.assertEquals(reader.read('3s')[0], "efg")
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.read('s')
+
+    def test_skip(self):
+        reader = OFReader("abcdefg")
+        reader.skip(4)
+        self.assertEquals(reader.read('s')[0], "e")
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.skip(3)
+
+    def test_empty(self):
+        reader = OFReader("abcdefg")
+        self.assertEquals(reader.is_empty(), False)
+        reader.skip(6)
+        self.assertEquals(reader.is_empty(), False)
+        reader.skip(1)
+        self.assertEquals(reader.is_empty(), True)
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.skip(1)
+
+    def test_exception_effect(self):
+        reader = OFReader("abcdefg")
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.skip(8)
+        self.assertEquals(reader.is_empty(), False)
+        reader.skip(7)
+        self.assertEquals(reader.is_empty(), True)
+
+    def test_peek(self):
+        reader = OFReader("abcdefg")
+        self.assertEquals(reader.peek('2s')[0], "ab")
+        self.assertEquals(reader.peek('2s')[0], "ab")
+        self.assertEquals(reader.read('2s')[0], "ab")
+        self.assertEquals(reader.peek('2s')[0], "cd")
+        reader.skip(2)
+        self.assertEquals(reader.read('3s')[0], "efg")
+        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
+            reader.peek('s')
+
+    def test_read_all(self):
+        reader = OFReader("abcdefg")
+        reader.skip(2)
+        self.assertEquals(reader.read_all(), "cdefg")
+        self.assertEquals(reader.read_all(), "")
+
+    def test_slice(self):
+        reader = OFReader("abcdefg")
+        reader.skip(2)
+        self.assertEquals(reader.slice(3).read_all(), "cde")
+        self.assertEquals(reader.slice(2).read_all(), "fg")
+        self.assertEquals(reader.is_empty(), True)
 
 if __name__ == '__main__':
     unittest.main()

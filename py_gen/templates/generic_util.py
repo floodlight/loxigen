@@ -64,3 +64,54 @@ def unpack_list(deserializer, length_fmt, buf, extra_len=0):
         entries.append(deserializer(buffer(buf, offset, length)))
         offset += length
     return entries
+
+class OFReader(object):
+    """
+    Cursor over a read-only buffer
+
+    OpenFlow messages are best thought of as a sequence of elements of
+    variable size, rather than a C-style struct with fixed offsets and
+    known field lengths. This class supports efficiently reading
+    fields sequentially and is intended to be used recursively by the
+    parsers of child objects which will implicitly update the offset.
+    """
+    def __init__(self, buf):
+        self.buf = buf
+        self.offset = 0
+
+    def read(self, fmt):
+        st = struct.Struct(fmt)
+        if self.offset + st.size > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        result = st.unpack_from(self.buf, self.offset)
+        self.offset += st.size
+        return result
+
+    def read_all(self):
+        buf = buffer(self.buf, self.offset)
+        self.offset += len(buf)
+        return str(buf)
+
+    def peek(self, fmt):
+        st = struct.Struct(fmt)
+        if self.offset + st.size > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        result = st.unpack_from(self.buf, self.offset)
+        return result
+
+    def skip(self, length):
+        if self.offset + length > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        self.offset += length
+
+    def is_empty(self):
+        return self.offset == len(self.buf)
+
+    # Used when parsing variable length objects which have external length
+    # fields (e.g. the actions list in an OF 1.0 packet-out message).
+    def slice(self, length):
+        if self.offset + length > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        buf = OFReader(buffer(self.buf, self.offset, length))
+        self.offset += length
+        return buf
