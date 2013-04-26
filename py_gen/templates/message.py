@@ -37,6 +37,7 @@ import const
 import common
 import action # for unpack_list
 import util
+import loxi.generic_util
 
 class Message(object):
     version = const.OFP_VERSION

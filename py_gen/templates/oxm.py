@@ -34,6 +34,7 @@
 import struct
 import const
 import util
+import loxi.generic_util
 import loxi
 
 class OXM(object):

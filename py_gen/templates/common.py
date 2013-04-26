@@ -34,12 +34,13 @@ import struct
 import action
 import const
 import util
+import loxi.generic_util
 
 # HACK make this module visible as 'common' to simplify code generation
 common = sys.modules[__name__]
 
 def unpack_list_flow_stats_entry(buf):
-    return util.unpack_list(flow_stats_entry.unpack, "!H", buf)
+    return loxi.generic_util.unpack_list(flow_stats_entry.unpack, "!H", buf)
 
 def unpack_list_queue_prop(buf):
     def deserializer(buf):
@@ -48,10 +49,10 @@ def unpack_list_queue_prop(buf):
             return queue_prop_min_rate.unpack(buf)
         else:
             raise loxi.ProtocolError("unknown queue prop %d" % type)
-    return util.unpack_list(deserializer, "!2xH", buf)
+    return loxi.generic_util.unpack_list(deserializer, "!2xH", buf)
 
 def unpack_list_packet_queue(buf):
-    return util.unpack_list(packet_queue.unpack, "!4xH", buf)
+    return loxi.generic_util.unpack_list(packet_queue.unpack, "!4xH", buf)
 
 def unpack_list_hello_elem(buf):
     def deserializer(buf):
@@ -60,7 +61,7 @@ def unpack_list_hello_elem(buf):
             return hello_elem_versionbitmap.unpack(buf)
         else:
             return None
-    return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
+    return [x for x in loxi.generic_util.unpack_list(deserializer, "!2xH", buf) if x != None]
 
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")

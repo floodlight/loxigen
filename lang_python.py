@@ -89,6 +89,7 @@ def static(template_name):
 targets = {
     prefix+'/__init__.py': static('toplevel_init.py'),
     prefix+'/pp.py': static('pp.py'),
+    prefix+'/generic_util.py': static('generic_util.py'),
 }
 
 for version, subdir in versions.items():

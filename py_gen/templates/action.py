@@ -34,6 +34,7 @@
 import struct
 import const
 import util
+import loxi.generic_util
 import loxi
 
 def unpack_list(buf):
@@ -44,7 +45,7 @@ def unpack_list(buf):
         parser = parsers.get(type)
         if not parser: raise loxi.ProtocolError("unknown action type %d" % type)
         return parser(buf)
-    return util.unpack_list(deserializer, "!2xH", buf)
+    return loxi.generic_util.unpack_list(deserializer, "!2xH", buf)
 
 class Action(object):
     type = None # override in subclass

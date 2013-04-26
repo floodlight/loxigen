@@ -135,7 +135,7 @@ class OFType(object):
             if ((element_cls, self.version) in of_g.is_fixed_length):
                 klass_name = self.base[8:-2]
                 element_size, = of_g.base_length[(element_cls, self.version)],
-                return 'util.unpack_array(common.%s.unpack, %d, buffer(%s, %s))' % (klass_name, element_size, buf_expr, offset_expr)
+                return 'loxi.generic_util.unpack_array(common.%s.unpack, %d, buffer(%s, %s))' % (klass_name, element_size, buf_expr, offset_expr)
             else:
                 return "None # TODO unpack list %s" % self.base
         else:

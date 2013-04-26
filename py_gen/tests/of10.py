@@ -876,16 +876,6 @@ class TestParse(unittest.TestCase):
             self.assertIsInstance(ofp.message.parse_message(klass(xid=1).pack()), klass)
 
 class TestUtils(unittest.TestCase):
-    def test_unpack_array(self):
-        import loxi
-        import loxi.of10.util as util
-
-        a = util.unpack_array(str, 3, "abcdefghi")
-        self.assertEquals(['abc', 'def', 'ghi'], a)
-
-        with self.assertRaisesRegexp(loxi.ProtocolError, "invalid array length"):
-            util.unpack_array(str, 3, "abcdefgh")
-
     def test_pretty_wildcards(self):
         self.assertEquals("OFPFW_ALL", ofp.util.pretty_wildcards(ofp.OFPFW_ALL))
         self.assertEquals("0", ofp.util.pretty_wildcards(0))
