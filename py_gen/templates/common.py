@@ -35,6 +35,10 @@ import action
 import const
 import util
 
+:: if version >= 3:
+import oxm
+:: #endif
+
 # HACK make this module visible as 'common' to simplify code generation
 common = sys.modules[__name__]
 
@@ -61,10 +65,6 @@ def unpack_list_hello_elem(buf):
         else:
             return None
     return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
-
-def unpack_list_oxm(buf):
-    # TODO
-    return []
 
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")

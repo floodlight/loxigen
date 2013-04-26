@@ -71,6 +71,42 @@ class TestCommon(unittest.TestCase):
         obj = ofp.match.unpack(self.sample_empty_match_buf)
         self.assertEquals(len(obj.oxm_list), 0)
 
+    sample_match_buf = ''.join([
+        '\x00\x01', # type
+        '\x00\x3C', # length
+        '\x80\x00', # oxm_list[0].class
+        '\x20\x02', # oxm_list[0].type_len
+        '\x00\x35', # oxm_list[0].value
+        '\x80\x00', # oxm_list[1].class
+        '\x05\x10', # oxm_list[1].type_len
+        '\xFE\xDC\xBA\x98\x76\x54\x32\x10', # oxm_list[1].value
+        '\xFF\xFF\xFF\xFF\x12\x34\x56\x78', # oxm_list[1].mask
+        '\x80\x00', # oxm_list[2].class
+        '\x08\x06', # oxm_list[2].type_len
+        '\x01\x02\x03\x04\x05\x06', # oxm_list[2].value
+        '\x80\x00', # oxm_list[3].class
+        '\x36\x10', # oxm_list[3].type_len
+        '\x12' * 16, # oxm_list[3].value
+        '\x00' * 4, # padding
+    ])
+
+    def test_match_pack(self):
+        obj = ofp.match([
+            ofp.oxm.udp_dst(53),
+            ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678),
+            ofp.oxm.eth_src([1,2,3,4,5,6]),
+            ofp.oxm.ipv6_dst("\x12" * 16),
+        ])
+        self.assertEquals(self.sample_match_buf, obj.pack())
+
+    def test_match_unpack(self):
+        obj = ofp.match.unpack(self.sample_match_buf)
+        self.assertEquals(len(obj.oxm_list), 4)
+        self.assertEquals(obj.oxm_list[0], ofp.oxm.udp_dst(53))
+        self.assertEquals(obj.oxm_list[1], ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678))
+        self.assertEquals(obj.oxm_list[2], ofp.oxm.eth_src([1,2,3,4,5,6]))
+        self.assertEquals(obj.oxm_list[3], ofp.oxm.ipv6_dst("\x12" * 16))
+
 class TestOXM(unittest.TestCase):
     def test_oxm_in_phy_port_pack(self):
         import loxi.of12 as ofp

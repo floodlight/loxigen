@@ -36,6 +36,16 @@ import const
 import util
 import loxi
 
+def unpack_list(buf):
+    def deserializer(buf):
+        type_len, = struct.unpack_from("!L", buf)
+        if type_len in parsers:
+            return parsers[type_len](buf)
+        else:
+            raise loxi.ProtocolError("unknown OXM cls=%#x type/masked=%#x len=%d" % \
+                ((type_len >> 16) & 0xffff, (type_len >> 8) & 0xff, type_len & 0xff))
+    return util.unpack_list(deserializer, "!3xB", buf, extra_len=4)
+
 class OXM(object):
     type_len = None # override in subclass
     pass
