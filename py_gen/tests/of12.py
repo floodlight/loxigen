@@ -78,7 +78,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x02', # type/masked
-            '\x08', # length
+            '\x04', # length
             '\x00\x00\x00\x2a' # value
         ])
         self.assertEquals(expected, obj.pack())
@@ -89,7 +89,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x03', # type/masked
-            '\x0c', # length
+            '\x08', # length
             '\x00\x00\x00\x2a', # value
             '\xaa\xbb\xcc\xdd' # mask
         ])
@@ -101,7 +101,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x36', # type/masked
-            '\x14', # length
+            '\x10', # length
             '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0d\x0f', # value
         ])
         self.assertEquals(expected, obj.pack())
