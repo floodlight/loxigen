@@ -42,11 +42,11 @@ def unpack_array(deserializer, element_size, buf):
     n = len(buf) / element_size
     return [deserializer(buffer(buf, i*element_size, element_size)) for i in range(n)]
 
-def unpack_list(deserializer, length_fmt, buf):
+def unpack_list(deserializer, length_fmt, buf, extra_len=0):
     """
     Deserialize a list of variable-length entries.
     'length_fmt' is a struct format string with exactly one non-padding format
-    character that returns the length of the given element.
+    character that returns the length of the given element, minus extra_len.
     The deserializer function should take a buffer and return the new object.
     """
     entries = []
@@ -56,6 +56,7 @@ def unpack_list(deserializer, length_fmt, buf):
     while offset < n:
         if offset + length_struct.size > len(buf): raise loxi.ProtocolError("entry header overruns list length")
         length, = length_struct.unpack_from(buf, offset)
+        length += extra_len
         if length < length_struct.size: raise loxi.ProtocolError("entry length is less than the header length")
         if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
         entries.append(deserializer(buffer(buf, offset, length)))

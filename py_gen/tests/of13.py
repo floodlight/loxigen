@@ -92,7 +92,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x02', # type/masked
-            '\x08', # length
+            '\x04', # length
             '\x00\x00\x00\x2a' # value
         ])
         self.assertEquals(expected, obj.pack())
@@ -103,7 +103,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x03', # type/masked
-            '\x0c', # length
+            '\x08', # length
             '\x00\x00\x00\x2a', # value
             '\xaa\xbb\xcc\xdd' # mask
         ])
@@ -115,7 +115,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x36', # type/masked
-            '\x14', # length
+            '\x10', # length
             '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0d\x0f', # value
         ])
         self.assertEquals(expected, obj.pack())
@@ -169,7 +169,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.instruction_meter,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.meter_band,
             ofp.common.meter_band_drop,
             ofp.common.meter_band_dscp_remark,
@@ -192,14 +191,11 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.table_feature_prop_write_actions_miss,
             ofp.common.table_feature_prop_write_setfield,
             ofp.common.table_feature_prop_write_setfield_miss,
-            ofp.message.aggregate_stats_request,
             ofp.message.flow_add,
             ofp.message.flow_delete,
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
@@ -245,7 +241,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.action_id_set_mpls_ttl,
             ofp.common.action_id_set_nw_ttl,
             ofp.common.action_id_set_queue,
-            ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
@@ -256,7 +251,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.instruction_meter,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.meter_band,
             ofp.common.meter_band_drop,
             ofp.common.meter_band_dscp_remark,
@@ -279,15 +273,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.common.table_feature_prop_write_actions_miss,
             ofp.common.table_feature_prop_write_setfield,
             ofp.common.table_feature_prop_write_setfield_miss,
-            ofp.message.aggregate_stats_request,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
-            ofp.message.packet_in,
         ]
         for klass in self.klasses:
             def fn():

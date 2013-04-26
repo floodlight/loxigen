@@ -56,6 +56,57 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of12, "message"))
         self.assertTrue(hasattr(loxi.of12, "oxm"))
 
+class TestCommon(unittest.TestCase):
+    sample_empty_match_buf = ''.join([
+        '\x00\x01', # type
+        '\x00\x04', # length
+        '\x00\x00\x00\x00', # padding
+    ])
+
+    def test_empty_match_pack(self):
+        obj = ofp.match()
+        self.assertEquals(self.sample_empty_match_buf, obj.pack())
+
+    def test_empty_match_unpack(self):
+        obj = ofp.match.unpack(self.sample_empty_match_buf)
+        self.assertEquals(len(obj.oxm_list), 0)
+
+    sample_match_buf = ''.join([
+        '\x00\x01', # type
+        '\x00\x3C', # length
+        '\x80\x00', # oxm_list[0].class
+        '\x20\x02', # oxm_list[0].type_len
+        '\x00\x35', # oxm_list[0].value
+        '\x80\x00', # oxm_list[1].class
+        '\x05\x10', # oxm_list[1].type_len
+        '\xFE\xDC\xBA\x98\x76\x54\x32\x10', # oxm_list[1].value
+        '\xFF\xFF\xFF\xFF\x12\x34\x56\x78', # oxm_list[1].mask
+        '\x80\x00', # oxm_list[2].class
+        '\x08\x06', # oxm_list[2].type_len
+        '\x01\x02\x03\x04\x05\x06', # oxm_list[2].value
+        '\x80\x00', # oxm_list[3].class
+        '\x36\x10', # oxm_list[3].type_len
+        '\x12' * 16, # oxm_list[3].value
+        '\x00' * 4, # padding
+    ])
+
+    def test_match_pack(self):
+        obj = ofp.match([
+            ofp.oxm.udp_dst(53),
+            ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678),
+            ofp.oxm.eth_src([1,2,3,4,5,6]),
+            ofp.oxm.ipv6_dst("\x12" * 16),
+        ])
+        self.assertEquals(self.sample_match_buf, obj.pack())
+
+    def test_match_unpack(self):
+        obj = ofp.match.unpack(self.sample_match_buf)
+        self.assertEquals(len(obj.oxm_list), 4)
+        self.assertEquals(obj.oxm_list[0], ofp.oxm.udp_dst(53))
+        self.assertEquals(obj.oxm_list[1], ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678))
+        self.assertEquals(obj.oxm_list[2], ofp.oxm.eth_src([1,2,3,4,5,6]))
+        self.assertEquals(obj.oxm_list[3], ofp.oxm.ipv6_dst("\x12" * 16))
+
 class TestOXM(unittest.TestCase):
     def test_oxm_in_phy_port_pack(self):
         import loxi.of12 as ofp
@@ -63,7 +114,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x02', # type/masked
-            '\x08', # length
+            '\x04', # length
             '\x00\x00\x00\x2a' # value
         ])
         self.assertEquals(expected, obj.pack())
@@ -74,7 +125,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x03', # type/masked
-            '\x0c', # length
+            '\x08', # length
             '\x00\x00\x00\x2a', # value
             '\xaa\xbb\xcc\xdd' # mask
         ])
@@ -86,7 +137,7 @@ class TestOXM(unittest.TestCase):
         expected = ''.join([
             '\x80\x00', # class
             '\x36', # type/masked
-            '\x14', # length
+            '\x10', # length
             '\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0d\x0f', # value
         ])
         self.assertEquals(expected, obj.pack())
@@ -117,16 +168,12 @@ class TestAllOF12(unittest.TestCase):
             ofp.common.instruction_header,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.table_stats_entry,
-            ofp.message.aggregate_stats_request,
             ofp.message.flow_add,
             ofp.message.flow_delete,
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
@@ -146,7 +193,6 @@ class TestAllOF12(unittest.TestCase):
 
     def test_show(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
@@ -156,17 +202,7 @@ class TestAllOF12(unittest.TestCase):
             ofp.common.instruction_header,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.table_stats_entry,
-            ofp.message.aggregate_stats_request,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
-            ofp.message.packet_in,
         ]
         for klass in self.klasses:
             def fn():

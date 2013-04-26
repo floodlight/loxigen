@@ -124,6 +124,9 @@ class OFType(object):
             return 'common.unpack_list_packet_queue(buffer(%s, %s))' % (buf_expr, offset_expr)
         elif self.base == 'of_list_hello_elem_t':
             return 'common.unpack_list_hello_elem(buffer(%s, %s))' % (buf_expr, offset_expr)
+        elif self.base == 'of_list_oxm_t':
+            # HACK need the match_v3 length field
+            return 'oxm.unpack_list(buffer(%s, %s, _length-%s))' % (buf_expr, offset_expr, offset_expr)
         elif self.base == 'of_port_name_t':
             return self._gen_string_unpack_expr(16, buf_expr, offset_expr)
         elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
