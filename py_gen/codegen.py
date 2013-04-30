@@ -32,8 +32,7 @@ import loxi_utils.loxi_utils as utils
 import util
 import oftype
 
-OFClass = namedtuple('OFClass', ['name', 'pyname',
-                                 'members', 'length_member', 'type_members',
+OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
                                  'min_length', 'is_fixed_length'])
 Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
 LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
@@ -102,23 +101,22 @@ def build_ofclasses(version):
 
         type_values = get_type_values(cls, version)
         members = []
-
-        length_member = None
         type_members = []
+
         pad_count = 0
 
         for member in unified_class['members']:
             if member['name'] in ['length', 'len']:
-                length_member = LengthMember(name=member['name'],
-                                             offset=member['offset'],
-                                             oftype=oftype.OFType(member['m_type'], version))
+                members.append(LengthMember(name=member['name'],
+                                            offset=member['offset'],
+                                            oftype=oftype.OFType(member['m_type'], version)))
             elif member['name'] in type_values:
-                type_members.append(TypeMember(name=member['name'],
-                                               offset=member['offset'],
-                                               oftype=oftype.OFType(member['m_type'], version),
-                                               value=type_values[member['name']]))
-            else:
-                # HACK ensure member names are unique
+                members.append(TypeMember(name=member['name'],
+                                          offset=member['offset'],
+                                          oftype=oftype.OFType(member['m_type'], version),
+                                          value=type_values[member['name']]))
+                type_members.append(members[-1])
+            else: # HACK ensure member names are unique
                 if member['name'].startswith("pad"):
                     if pad_count == 0:
                         m_name = 'pad'
@@ -136,7 +134,6 @@ def build_ofclasses(version):
             OFClass(name=cls,
                     pyname=pyname,
                     members=members,
-                    length_member=length_member,
                     type_members=type_members,
                     min_length=of_g.base_length[(cls, version)],
                     is_fixed_length=(cls, version) in of_g.is_fixed_length))

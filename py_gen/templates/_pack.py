@@ -26,14 +26,13 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: all_members = ofclass.members[:]
-:: if ofclass.length_member: all_members.append(ofclass.length_member)
-:: all_members.extend(ofclass.type_members)
-:: all_members.sort(key=lambda x: x.offset)
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: length_member = None
 :: length_member_index = None
 :: index = 0
-:: for m in all_members:
-::     if m == ofclass.length_member:
+:: for m in ofclass.members:
+::     if type(m) == LengthMember:
+::         length_member = m
 ::         length_member_index = index
         packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${length_member_index}
 ::     else:
@@ -43,5 +42,5 @@
 :: #endfor
 :: if length_member_index != None:
         length = sum([len(x) for x in packed])
-        packed[${length_member_index}] = ${ofclass.length_member.oftype.gen_pack_expr('length')}
+        packed[${length_member_index}] = ${length_member.oftype.gen_pack_expr('length')}
 :: #endif

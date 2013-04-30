@@ -41,14 +41,16 @@ class OXM(object):
     pass
 
 :: for ofclass in ofclasses:
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: normal_members = [m for m in ofclass.members if type(m) == Member and not m.skip]
+:: type_members = [m for m in ofclass.members if type(m) == TypeMember]
 class ${ofclass.pyname}(OXM):
-:: for m in ofclass.type_members:
+:: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
 
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
-:: for m in nonskip_members:
+    def __init__(self, ${', '.join(["%s=None" % m.name for m in normal_members])}):
+:: for m in normal_members:
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
@@ -68,7 +70,7 @@ class ${ofclass.pyname}(OXM):
 
     def __eq__(self, other):
         if type(self) != type(other): return False
-:: for m in nonskip_members:
+:: for m in normal_members:
         if self.${m.name} != other.${m.name}: return False
 :: #endfor
         return True

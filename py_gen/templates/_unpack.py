@@ -26,13 +26,10 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: all_members = ofclass.members[:]
-:: if ofclass.length_member: all_members.append(ofclass.length_member)
-:: all_members.extend(ofclass.type_members)
-:: all_members.sort(key=lambda x: x.offset)
-:: for m in all_members:
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: for m in ofclass.members:
 ::     unpack_expr = m.oftype.gen_unpack_expr('buf', m.offset)
-::     if m == ofclass.length_member:
+::     if type(m) == LengthMember:
         _length = ${unpack_expr}
         assert(_length == len(buf))
 :: if ofclass.is_fixed_length:
@@ -40,7 +37,7 @@
 :: else:
         if _length < ${ofclass.min_length}: raise loxi.ProtocolError("${ofclass.pyname} length is %d, should be at least ${ofclass.min_length}" % _length)
 :: #endif
-::     elif m in ofclass.type_members:
+::     elif type(m) == TypeMember:
         ${m.name} = ${unpack_expr}
         assert(${m.name} == ${m.value})
 ::     else:

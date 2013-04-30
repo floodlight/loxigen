@@ -44,15 +44,17 @@ class Message(object):
     xid = None
 
 :: for ofclass in ofclasses:
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: normal_members = [m for m in ofclass.members if type(m) == Member and not m.skip]
+:: type_members = [m for m in ofclass.members if type(m) == TypeMember]
 class ${ofclass.pyname}(Message):
-:: for m in ofclass.type_members:
+:: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
 
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
+    def __init__(self, ${', '.join(["%s=None" % m.name for m in normal_members])}):
         self.xid = xid
-:: for m in [x for x in nonskip_members if x.name != 'xid']:
+:: for m in [x for x in normal_members if x.name != 'xid']:
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
@@ -83,7 +85,7 @@ class ${ofclass.pyname}(Message):
         if type(self) != type(other): return False
         if self.version != other.version: return False
         if self.type != other.type: return False
-:: for m in nonskip_members:
+:: for m in normal_members:
         if self.${m.name} != other.${m.name}: return False
 :: #endfor
         return True

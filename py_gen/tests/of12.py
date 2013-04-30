@@ -147,16 +147,6 @@ class TestAllOF12(unittest.TestCase):
     def test_show(self):
         expected_failures = [
             ofp.common.flow_stats_entry,
-            ofp.common.group_desc_stats_entry,
-            ofp.common.instruction,
-            ofp.common.instruction_apply_actions,
-            ofp.common.instruction_clear_actions,
-            ofp.common.instruction_experimenter,
-            ofp.common.instruction_goto_table,
-            ofp.common.instruction_header,
-            ofp.common.instruction_write_actions,
-            ofp.common.instruction_write_metadata,
-            ofp.common.match_v3,
             ofp.common.table_stats_entry,
             ofp.message.aggregate_stats_request,
             ofp.message.flow_add,
