@@ -26,8 +26,11 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: from py_gen.codegen import Member, LengthMember, TypeMember, PadMember
 :: for m in ofclass.members:
+::     if type(m) == PadMember:
+::         continue
+::     #endif
 ::     unpack_expr = m.oftype.gen_unpack_expr('buf', m.offset)
 ::     if type(m) == LengthMember:
         _length = ${unpack_expr}

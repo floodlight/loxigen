@@ -690,11 +690,9 @@ flow_add {
     eth_dst = cd:ef:01:23:45:67,
     vlan_vid = 0x0,
     vlan_pcp = 0x0,
-    pad = 0x0,
     eth_type = 0x0,
     ip_dscp = 0x0,
     ip_proto = 0x0,
-    pad1 = [ 0, 0 ],
     ipv4_src = 192.168.3.127,
     ipv4_dst = 255.255.255.255,
     tcp_src = 0x0,
@@ -709,7 +707,7 @@ flow_add {
   flags = 0x0,
   actions = [
     output { port = OFPP_FLOOD, max_len = 0x0 },
-    nicira_dec_ttl { pad = 0x0, pad1 = 0x0 },
+    nicira_dec_ttl {  },
     bsn_set_tunnel_dst { dst = 0x0 }
   ]
 }"""

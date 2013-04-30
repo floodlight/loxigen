@@ -26,7 +26,7 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: from py_gen.codegen import Member, LengthMember, TypeMember, PadMember
 :: length_member = None
 :: length_member_index = None
 :: index = 0
@@ -35,6 +35,8 @@
 ::         length_member = m
 ::         length_member_index = index
         packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${length_member_index}
+::     elif type(m) == PadMember:
+        packed.append('\x00' * ${m.length})
 ::     else:
         packed.append(${m.oftype.gen_pack_expr('self.' + m.name)})
 ::     #endif

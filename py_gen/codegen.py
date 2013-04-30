@@ -26,6 +26,7 @@
 # under the EPL.
 
 from collections import namedtuple
+import struct
 import of_g
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as utils
@@ -37,6 +38,7 @@ OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
 Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
 LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
 TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
+PadMember = namedtuple('PadMember', ['offset', 'length'])
 
 def get_type_values(cls, version):
     """
@@ -116,16 +118,14 @@ def build_ofclasses(version):
                                           oftype=oftype.OFType(member['m_type'], version),
                                           value=type_values[member['name']]))
                 type_members.append(members[-1])
-            else: # HACK ensure member names are unique
-                if member['name'].startswith("pad"):
-                    if pad_count == 0:
-                        m_name = 'pad'
-                    else:
-                        m_name = "pad%d" % pad_count
-                    pad_count += 1
-                else:
-                    m_name = member['name']
-                members.append(Member(name=m_name,
+            elif member['name'].startswith("pad"):
+                # HACK this should be moved to the frontend
+                pad_oftype = oftype.OFType(member['m_type'], version)
+                length = struct.calcsize("!" + pad_oftype._pack_fmt())
+                if pad_oftype.is_array: length *= pad_oftype.array_length
+                members.append(PadMember(offset=member['offset'], length=length))
+            else:
+                members.append(Member(name=member['name'],
                                       oftype=oftype.OFType(member['m_type'], version),
                                       offset=member['offset'],
                                       skip=member['name'] in of_g.skip_members))
