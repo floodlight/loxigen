@@ -52,6 +52,9 @@ def get_type_values(cls, version):
         if cls in type_maps.flow_mod_list:
             type_values['_command'] = util.constant_for_value(version, "ofp_flow_mod_command",
                                                               type_maps.flow_mod_types[version][cls[8:]])
+        if cls in type_maps.group_mod_list:
+            type_values['_command'] = util.constant_for_value(version, "ofp_group_mod_command",
+                                                              type_maps.group_mod_types[version][cls[9:]])
         if cls in type_maps.stats_request_list:
             type_values['stats_type'] = util.constant_for_value(version, "ofp_stats_types",
                                                                 type_maps.stats_types[version][cls[3:-14]])

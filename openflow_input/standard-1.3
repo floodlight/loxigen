@@ -1026,12 +1026,36 @@ struct ofp_bucket {
     list(of_action_t) actions;
 };
 
-struct ofp_group_mod {
+struct ofp_group_modify	{
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
+    uint16_t _command;
+    uint8_t group_type;
+    uint8_t pad;
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct ofp_group_add {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t _command;
+    uint8_t group_type;
+    uint8_t pad;
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct ofp_group_delete {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t _command;
     uint8_t group_type;
     uint8_t pad;
     uint32_t group_id;
