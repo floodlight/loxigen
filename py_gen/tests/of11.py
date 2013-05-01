@@ -70,7 +70,6 @@ class TestAllOF11(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
             ofp.common.instruction,
             ofp.common.instruction_apply_actions,
@@ -80,16 +79,7 @@ class TestAllOF11(unittest.TestCase):
             ofp.common.instruction_header,
             ofp.common.instruction_write_actions,
             ofp.common.instruction_write_metadata,
-            ofp.common.match_v2,
             ofp.common.table_stats_entry,
-            ofp.message.aggregate_stats_request,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
