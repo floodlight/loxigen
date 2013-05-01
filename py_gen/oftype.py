@@ -93,7 +93,7 @@ class OFType(object):
         elif self.base == 'of_desc_str_t':
             return self._gen_string_pack_expr(256, expr_expr)
         else:
-            return "'TODO pack %s'" % self.base
+            return "loxi.unimplemented('pack %s')" % self.base
 
     def _gen_string_pack_expr(self, length, expr_expr):
         return 'struct.pack("!%ds", %s)' % (length, expr_expr)
@@ -140,9 +140,9 @@ class OFType(object):
                 element_size, = of_g.base_length[(element_cls, self.version)],
                 return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)
             else:
-                return "None # TODO unpack list %s" % self.base
+                return "loxi.unimplemented('unpack list %s')" % self.base
         else:
-            return "None # TODO unpack %s" % self.base
+            return "loxi.unimplemented('unpack %s')" % self.base
 
     def _gen_string_unpack_expr(self, reader_expr, length):
         return '%s.read("!%ds")[0].rstrip("\\x00")' % (reader_expr, length)

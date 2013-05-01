@@ -142,6 +142,7 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
             ofp.message.meter_stats_reply,
+            ofp.message.meter_features_stats_reply,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]
