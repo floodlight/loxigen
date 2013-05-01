@@ -71,14 +71,6 @@ class TestAllOF11(unittest.TestCase):
     def test_serialization(self):
         expected_failures = [
             ofp.common.group_desc_stats_entry,
-            ofp.common.instruction,
-            ofp.common.instruction_apply_actions,
-            ofp.common.instruction_clear_actions,
-            ofp.common.instruction_experimenter,
-            ofp.common.instruction_goto_table,
-            ofp.common.instruction_header,
-            ofp.common.instruction_write_actions,
-            ofp.common.instruction_write_metadata,
             ofp.common.table_stats_entry,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,

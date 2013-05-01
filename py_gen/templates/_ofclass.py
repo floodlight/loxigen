@@ -1,5 +1,5 @@
 :: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member and not m.skip]
+:: normal_members = [m for m in ofclass.members if type(m) == Member]
 class ${ofclass.pyname}(${superclass}):
 :: for m in ofclass.type_members:
     ${m.name} = ${m.value}

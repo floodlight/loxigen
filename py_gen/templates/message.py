@@ -46,7 +46,7 @@ class Message(object):
 
 :: for ofclass in ofclasses:
 :: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member and not m.skip]
+:: normal_members = [m for m in ofclass.members if type(m) == Member]
 :: type_members = [m for m in ofclass.members if type(m) == TypeMember]
 class ${ofclass.pyname}(Message):
 :: for m in type_members:

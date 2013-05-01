@@ -35,7 +35,7 @@ import oftype
 
 OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
                                  'min_length', 'is_fixed_length'])
-Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
+Member = namedtuple('Member', ['name', 'oftype', 'offset'])
 LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
 FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'offset', 'field_name'])
 TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
@@ -146,8 +146,7 @@ def build_ofclasses(version):
             else:
                 members.append(Member(name=member['name'],
                                       oftype=oftype.OFType(member['m_type'], version),
-                                      offset=member['offset'],
-                                      skip=member['name'] in of_g.skip_members))
+                                      offset=member['offset']))
 
         ofclasses.append(
             OFClass(name=cls,

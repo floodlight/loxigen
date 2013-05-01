@@ -30,7 +30,7 @@
             with q.indent(2):
                 q.breakable()
 :: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member and not m.skip]
+:: normal_members = [m for m in ofclass.members if type(m) == Member]
 :: first = True
 :: for m in normal_members:
 :: if not first:
