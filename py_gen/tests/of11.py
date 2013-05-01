@@ -108,15 +108,6 @@ class TestAllOF11(unittest.TestCase):
 
     def test_show(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
-            ofp.message.aggregate_stats_request,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-            ofp.message.flow_removed,
-            ofp.message.flow_stats_request,
         ]
         for klass in self.klasses:
             def fn():
