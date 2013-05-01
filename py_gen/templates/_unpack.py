@@ -26,23 +26,29 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: from py_gen.codegen import Member, LengthMember, TypeMember, PadMember
+:: from py_gen.codegen import Member, LengthMember, FieldLengthMember, TypeMember, PadMember
         if type(buf) == loxi.generic_util.OFReader:
             reader = buf
         else:
             reader = loxi.generic_util.OFReader(buf)
+:: field_length_members = {}
 :: for m in ofclass.members:
 ::     if type(m) == PadMember:
         reader.skip(${m.length})
-::         continue
-::     #endif
-::     unpack_expr = m.oftype.gen_unpack_expr('reader')
-::     if type(m) == LengthMember:
-        _${m.name} = ${unpack_expr}
+::     elif type(m) == LengthMember:
+        _${m.name} = ${m.oftype.gen_unpack_expr('reader')}
+::     elif type(m) == FieldLengthMember:
+::         field_length_members[m.field_name] = m
+        _${m.name} = ${m.oftype.gen_unpack_expr('reader')}
 ::     elif type(m) == TypeMember:
-        _${m.name} = ${unpack_expr}
+        _${m.name} = ${m.oftype.gen_unpack_expr('reader')}
         assert(_${m.name} == ${m.value})
-::     else:
-        obj.${m.name} = ${unpack_expr}
+::     elif type(m) == Member:
+::         if m.name in field_length_members:
+::             reader_expr = 'reader.slice(_%s)' % field_length_members[m.name].name
+::         else:
+::             reader_expr = 'reader'
+::         #endif
+        obj.${m.name} = ${m.oftype.gen_unpack_expr(reader_expr)}
 ::     #endif
 :: #endfor

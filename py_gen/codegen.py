@@ -37,8 +37,17 @@ OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
                                  'min_length', 'is_fixed_length'])
 Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
 LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
+FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'offset', 'field_name'])
 TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
 PadMember = namedtuple('PadMember', ['offset', 'length'])
+
+# XXX move to frontend
+field_length_members = {
+    ('of_packet_out', 1, 'actions_len') : 'actions',
+    ('of_packet_out', 2, 'actions_len') : 'actions',
+    ('of_packet_out', 3, 'actions_len') : 'actions',
+    ('of_packet_out', 4, 'actions_len') : 'actions',
+}
 
 def get_type_values(cls, version):
     """
@@ -112,6 +121,12 @@ def build_ofclasses(version):
                 members.append(LengthMember(name=member['name'],
                                             offset=member['offset'],
                                             oftype=oftype.OFType(member['m_type'], version)))
+            elif (cls, version, member['name']) in field_length_members:
+                field_name = field_length_members[(cls, version, member['name'])]
+                members.append(FieldLengthMember(name=member['name'],
+                                                 offset=member['offset'],
+                                                 oftype=oftype.OFType(member['m_type'], version),
+                                                 field_name=field_name))
             elif member['name'] in type_values:
                 members.append(TypeMember(name=member['name'],
                                           offset=member['offset'],

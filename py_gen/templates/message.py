@@ -64,22 +64,14 @@ class ${ofclass.pyname}(Message):
 
     def pack(self):
         packed = []
-:: if ofclass.name == 'of_packet_out':
-:: include('_pack_packet_out.py', ofclass=ofclass)
-:: else:
 :: include('_pack.py', ofclass=ofclass)
-:: #endif
         return ''.join(packed)
 
     @staticmethod
     def unpack(buf):
         if len(buf) < 8: raise loxi.ProtocolError("buffer too short to contain an OpenFlow message")
         obj = ${ofclass.pyname}()
-:: if ofclass.name == 'of_packet_out':
-:: include('_unpack_packet_out.py', ofclass=ofclass)
-:: else:
 :: include('_unpack.py', ofclass=ofclass)
-:: #endif
         return obj
 
     def __eq__(self, other):
