@@ -52,3 +52,6 @@
         obj.${m.name} = ${m.oftype.gen_unpack_expr(reader_expr)}
 ::     #endif
 :: #endfor
+:: if ofclass.name == 'of_match_v3':
+        reader.skip((_length + 7)/8*8 - _length)
+:: #endif

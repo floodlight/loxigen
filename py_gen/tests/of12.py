@@ -158,18 +158,11 @@ class TestAllOF12(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
             ofp.common.group_desc_stats_entry,
             ofp.common.table_stats_entry,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
-            ofp.message.packet_in,
         ]
         for klass in self.klasses:
             def fn():
