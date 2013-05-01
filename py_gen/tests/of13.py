@@ -363,8 +363,33 @@ class TestMessages(unittest.TestCase):
         test_serialization(obj, buf)
 
     def test_packet_out(self):
-        # TODO
-        pass
+        obj = ofp.message.packet_out(
+            xid=0x12345678,
+            buffer_id=100,
+            in_port=4,
+            actions=[
+                ofp.action.output(port=2, max_len=0xffff),
+                ofp.action.dec_nw_ttl()],
+            data="abc")
+        buf = ''.join([
+            '\x04', '\x0d', # version, type
+            '\x00\x33', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x00\x00\x64', # buffer_id
+            '\x00\x00\x00\x04', # in_port
+            '\x00\x18', # actions_len
+            '\x00' * 6, # pad
+            '\x00\x00', # actions[0].type
+            '\x00\x10', # actions[0].length
+            '\x00\x00\x00\x02', # actions[0].port
+            '\xff\xff', # actions[0].max_len
+            '\x00' * 6, # pad
+            '\x00\x18', # actions[1].type
+            '\x00\x08', # actions[1].length
+            '\x00' * 4, # pad
+            'abc', # data
+        ])
+        test_serialization(obj, buf)
 
 
     ## Flow-mods
