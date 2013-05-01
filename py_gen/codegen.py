@@ -35,11 +35,11 @@ import oftype
 
 OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
                                  'min_length', 'is_fixed_length'])
-Member = namedtuple('Member', ['name', 'oftype', 'offset'])
-LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
-FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'offset', 'field_name'])
-TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
-PadMember = namedtuple('PadMember', ['offset', 'length'])
+Member = namedtuple('Member', ['name', 'oftype'])
+LengthMember = namedtuple('LengthMember', ['name', 'oftype'])
+FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'field_name'])
+TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'value'])
+PadMember = namedtuple('PadMember', ['length'])
 
 # XXX move to frontend
 field_length_members = {
@@ -123,17 +123,14 @@ def build_ofclasses(version):
         for member in unified_class['members']:
             if member['name'] in ['length', 'len']:
                 members.append(LengthMember(name=member['name'],
-                                            offset=member['offset'],
                                             oftype=oftype.OFType(member['m_type'], version)))
             elif (cls, version, member['name']) in field_length_members:
                 field_name = field_length_members[(cls, version, member['name'])]
                 members.append(FieldLengthMember(name=member['name'],
-                                                 offset=member['offset'],
                                                  oftype=oftype.OFType(member['m_type'], version),
                                                  field_name=field_name))
             elif member['name'] in type_values:
                 members.append(TypeMember(name=member['name'],
-                                          offset=member['offset'],
                                           oftype=oftype.OFType(member['m_type'], version),
                                           value=type_values[member['name']]))
                 type_members.append(members[-1])
@@ -142,11 +139,10 @@ def build_ofclasses(version):
                 pad_oftype = oftype.OFType(member['m_type'], version)
                 length = struct.calcsize("!" + pad_oftype._pack_fmt())
                 if pad_oftype.is_array: length *= pad_oftype.array_length
-                members.append(PadMember(offset=member['offset'], length=length))
+                members.append(PadMember(length=length))
             else:
                 members.append(Member(name=member['name'],
-                                      oftype=oftype.OFType(member['m_type'], version),
-                                      offset=member['offset']))
+                                      oftype=oftype.OFType(member['m_type'], version)))
 
         ofclasses.append(
             OFClass(name=cls,
