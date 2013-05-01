@@ -36,6 +36,10 @@ import const
 import util
 import loxi.generic_util
 
+:: if version >= 3:
+import oxm
+:: #endif
+
 # HACK make this module visible as 'common' to simplify code generation
 common = sys.modules[__name__]
 
@@ -63,10 +67,6 @@ def unpack_list_hello_elem(reader):
         else:
             return None
     return [x for x in loxi.generic_util.unpack_list_tlv16(reader, deserializer) if x != None]
-
-def unpack_list_oxm(buf):
-    # TODO
-    return []
 
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")

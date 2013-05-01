@@ -125,8 +125,8 @@ class OFType(object):
         elif self.base == 'of_list_hello_elem_t':
             return 'common.unpack_list_hello_elem(%s)' % (reader_expr)
         elif self.base == 'of_list_oxm_t':
-            # TODO
-            return '[]'
+            # HACK need the match_v3 length field
+            return 'oxm.unpack_list(%s.slice(_length-4))' % (reader_expr)
         elif self.base == 'of_port_name_t':
             return self._gen_string_unpack_expr(reader_expr, 16)
         elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
