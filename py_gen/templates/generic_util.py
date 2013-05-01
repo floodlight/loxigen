@@ -35,35 +35,33 @@ Utility functions independent of the protocol version
 import loxi
 import struct
 
-def unpack_array(deserializer, element_size, buf):
+def unpack_list(reader, deserializer):
     """
-    Deserialize an array of fixed length elements.
-    The deserializer function should take a buffer and return the new object.
-    """
-    if len(buf) % element_size != 0: raise loxi.ProtocolError("invalid array length")
-    n = len(buf) / element_size
-    return [deserializer(buffer(buf, i*element_size, element_size)) for i in range(n)]
-
-def unpack_list(deserializer, length_fmt, buf, extra_len=0):
-    """
-    Deserialize a list of variable-length entries.
-    'length_fmt' is a struct format string with exactly one non-padding format
-    character that returns the length of the given element, minus extra_len.
-    The deserializer function should take a buffer and return the new object.
+    The deserializer function should take an OFReader and return the new object.
     """
     entries = []
-    offset = 0
-    length_struct = struct.Struct(length_fmt)
-    n = len(buf)
-    while offset < n:
-        if offset + length_struct.size > len(buf): raise loxi.ProtocolError("entry header overruns list length")
-        length, = length_struct.unpack_from(buf, offset)
-        length += extra_len
-        if length < length_struct.size: raise loxi.ProtocolError("entry length is less than the header length")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
-        entries.append(deserializer(buffer(buf, offset, length)))
-        offset += length
+    while not reader.is_empty():
+        entries.append(deserializer(reader))
     return entries
+
+def unpack_list_lv16(reader, deserializer):
+    """
+    The deserializer function should take an OFReader and return the new object.
+    """
+    def wrapper(reader):
+        length, = reader.peek('!H')
+        return deserializer(reader.slice(length))
+    return unpack_list(reader, wrapper)
+
+def unpack_list_tlv16(reader, deserializer):
+    """
+    The deserializer function should take an OFReader and an integer type
+    and return the new object.
+    """
+    def wrapper(reader):
+        typ, length, = reader.peek('!HH')
+        return deserializer(reader.slice(length), typ)
+    return unpack_list(reader, wrapper)
 
 class OFReader(object):
     """

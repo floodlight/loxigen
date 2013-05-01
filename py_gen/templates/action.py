@@ -37,15 +37,12 @@ import util
 import loxi.generic_util
 import loxi
 
-def unpack_list(buf):
-    if len(buf) % 8 != 0: raise loxi.ProtocolError("action list length not a multiple of 8")
-    def deserializer(buf):
-        type, length = struct.unpack_from("!HH", buf)
-        if length % 8 != 0: raise loxi.ProtocolError("action length not a multiple of 8")
-        parser = parsers.get(type)
-        if not parser: raise loxi.ProtocolError("unknown action type %d" % type)
-        return parser(buf)
-    return loxi.generic_util.unpack_list(deserializer, "!2xH", buf)
+def unpack_list(reader):
+    def deserializer(reader, typ):
+        parser = parsers.get(typ)
+        if not parser: raise loxi.ProtocolError("unknown action type %d" % typ)
+        return parser(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
 
 class Action(object):
     type = None # override in subclass
@@ -57,23 +54,21 @@ class Action(object):
 :: #endfor
 
 :: if version == of_g.VERSION_1_0:
-def parse_vendor(buf):
+def parse_vendor(reader):
 :: else:
-def parse_experimenter(buf):
+def parse_experimenter(reader):
 :: #endif
-    if len(buf) < 16:
-        raise loxi.ProtocolError("experimenter action too short")
 
-    experimenter, = struct.unpack_from("!L", buf, 4)
+    experimenter, = reader.peek("!4xL")
     if experimenter == 0x005c16c7: # Big Switch Networks
-        subtype, = struct.unpack_from("!L", buf, 8)
+        subtype, = reader.peek("!8xL")
     elif experimenter == 0x00002320: # Nicira
-        subtype, = struct.unpack_from("!H", buf, 8)
+        subtype, = reader.peek("!8xH")
     else:
         raise loxi.ProtocolError("unexpected experimenter id %#x" % experimenter)
 
     if subtype in experimenter_parsers[experimenter]:
-        return experimenter_parsers[experimenter][subtype](buf)
+        return experimenter_parsers[experimenter][subtype](reader)
     else:
         raise loxi.ProtocolError("unexpected BSN experimenter subtype %#x" % subtype)
 

@@ -25,16 +25,18 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-        version = struct.unpack_from('!B', buf, 0)[0]
-        assert(version == const.OFP_VERSION)
-        type = struct.unpack_from('!B', buf, 1)[0]
-        assert(type == const.OFPT_PACKET_OUT)
-        _length = struct.unpack_from('!H', buf, 2)[0]
-        assert(_length == len(buf))
-        if _length < 16: raise loxi.ProtocolError("packet_out length is %d, should be at least 16" % _length)
-        obj.xid = struct.unpack_from('!L', buf, 4)[0]
-        obj.buffer_id = struct.unpack_from('!L', buf, 8)[0]
-        obj.in_port = struct.unpack_from('!H', buf, 12)[0]
-        actions_len = struct.unpack_from('!H', buf, 14)[0]
-        obj.actions = action.unpack_list(buffer(buf, 16, actions_len))
-        obj.data = str(buffer(buf, 16+actions_len))
+        if type(buf) == loxi.generic_util.OFReader:
+            reader = buf
+        else:
+            reader = loxi.generic_util.OFReader(buf)
+        _version = reader.read('!B')[0]
+        assert(_version == const.OFP_VERSION)
+        _type = reader.read('!B')[0]
+        assert(_type == const.OFPT_PACKET_OUT)
+        _length = reader.read('!H')[0]
+        obj.xid = reader.read('!L')[0]
+        obj.buffer_id = reader.read('!L')[0]
+        obj.in_port = reader.read('!H')[0]
+        _actions_len = reader.read('!H')[0]
+        obj.actions = action.unpack_list(reader.slice(_actions_len))
+        obj.data = str(reader.read_all())

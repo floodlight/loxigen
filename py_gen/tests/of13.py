@@ -29,6 +29,7 @@ import unittest
 
 try:
     import loxi.of13 as ofp
+    from loxi.generic_util import OFReader
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
@@ -80,7 +81,7 @@ class TestCommon(unittest.TestCase):
             '\x00\x00\x00\x04', # unknown type
             '\x00\x01\x00\x04', # versionbitmap
         ])
-        l = ofp.unpack_list_hello_elem(buf)
+        l = ofp.unpack_list_hello_elem(OFReader(buf))
         self.assertEquals(len(l), 2)
         self.assertTrue(isinstance(l[0], ofp.hello_elem_versionbitmap))
         self.assertTrue(isinstance(l[1], ofp.hello_elem_versionbitmap))
@@ -203,7 +204,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.group_desc_stats_reply,
             ofp.message.group_mod,
             ofp.message.group_stats_reply,
-            ofp.message.meter_features_stats_reply,
             ofp.message.meter_stats_reply,
             ofp.message.packet_in,
             ofp.message.table_features_stats_reply,

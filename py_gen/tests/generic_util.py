@@ -34,18 +34,23 @@ try:
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
-class TestUnpackArray(unittest.TestCase):
-    def test_simple(self):
-        a = loxi.generic_util.unpack_array(str, 3, "abcdefghi")
-        self.assertEquals(['abc', 'def', 'ghi'], a)
-
-        with self.assertRaisesRegexp(loxi.ProtocolError, "invalid array length"):
-            loxi.generic_util.unpack_array(str, 3, "abcdefgh")
-
 class TestUnpackList(unittest.TestCase):
     def test_simple(self):
-        a = loxi.generic_util.unpack_list(str, '!B', "\x04abc\x03de\x02f\x01")
+        def deserializer(reader):
+            length, = reader.peek("!B")
+            return reader.read('!%ds' % length)[0]
+        reader = loxi.generic_util.OFReader("\x04abc\x03de\x02f\x01")
+        a = loxi.generic_util.unpack_list(reader, deserializer)
         self.assertEquals(['\x04abc', '\x03de', '\x02f', '\x01'], a)
+
+class TestUnpackListLV16(unittest.TestCase):
+    def test_simple(self):
+        def deserializer(reader):
+            reader.skip(2)
+            return reader.read_all()
+        reader = loxi.generic_util.OFReader("\x00\x05abc\x00\x04de\x00\x03f\x00\x02")
+        a = loxi.generic_util.unpack_list_lv16(reader, deserializer)
+        self.assertEquals(['abc', 'de', 'f', ''], a)
 
 class TestOFReader(unittest.TestCase):
     def test_empty(self):
