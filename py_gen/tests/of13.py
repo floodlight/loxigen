@@ -541,8 +541,76 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_group_desc_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.group_desc_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.group_desc_stats_entry(
+                    type=ofp.OFPGT_FF,
+                    group_id=1,
+                    buckets=[
+                        ofp.bucket(
+                            weight=1,
+                            watch_port=5,
+                            watch_group=0xffffffff,
+                            actions=[
+                                ofp.action.output(port=5, max_len=0),
+                                ofp.action.output(port=6, max_len=0)]),
+                        ofp.bucket(
+                            weight=1,
+                            watch_port=6,
+                            watch_group=0xffffffff,
+                            actions=[
+                                ofp.action.output(port=5, max_len=0),
+                                ofp.action.output(port=6, max_len=0)])]),
+                ofp.group_desc_stats_entry(type=ofp.OFPGT_FF, group_id=2, buckets=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x07', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x68', # entries[0].length
+            '\x03', # entries[0].group_type
+            '\x00', # entries[0].pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x30', # entries[0].buckets[0].len
+            '\x00\x01', # entries[0].buckets[0].weight
+            '\x00\x00\x00\x05', # entries[0].buckets[0].watch_port
+            '\xff\xff\xff\xff', # entries[0].buckets[0].watch_group
+            '\x00' * 4, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[0].actions[0].type
+            '\x00\x10', # entries[0].buckets[0].actions[0].len
+            '\x00\x00\x00\x05', # entries[0].buckets[0].actions[0].port
+            '\x00\x00', # entries[0].buckets[0].actions[0].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[0].actions[1].type
+            '\x00\x10', # entries[0].buckets[0].actions[1].len
+            '\x00\x00\x00\x06', # entries[0].buckets[0].actions[1].port
+            '\x00\x00', # entries[0].buckets[0].actions[1].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x30', # entries[0].buckets[1].len
+            '\x00\x01', # entries[0].buckets[1].weight
+            '\x00\x00\x00\x06', # entries[0].buckets[1].watch_port
+            '\xff\xff\xff\xff', # entries[0].buckets[1].watch_group
+            '\x00' * 4, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[1].actions[0].type
+            '\x00\x10', # entries[0].buckets[1].actions[0].len
+            '\x00\x00\x00\x05', # entries[0].buckets[1].actions[0].port
+            '\x00\x00', # entries[0].buckets[1].actions[0].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[1].actions[1].type
+            '\x00\x10', # entries[0].buckets[1].actions[1].len
+            '\x00\x00\x00\x06', # entries[0].buckets[1].actions[1].port
+            '\x00\x00', # entries[0].buckets[1].actions[1].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x08', # entries[1].length
+            '\x03', # entries[1].group_type
+            '\x00', # entries[1].pad
+            '\x00\x00\x00\x02', # entries[1].group_id
+        ])
+        test_serialization(obj, buf)
 
     def test_group_features_stats_request(self):
         # TODO
@@ -701,7 +769,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.group_desc_stats_reply,
             ofp.message.group_stats_reply,
             ofp.message.meter_config_stats_reply,
             ofp.message.meter_features_stats_reply,

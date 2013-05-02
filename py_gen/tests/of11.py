@@ -77,7 +77,6 @@ class TestAllOF11(unittest.TestCase):
             ofp.message.flow_modify_strict,
             ofp.message.flow_delete,
             ofp.message.flow_delete_strict,
-            ofp.message.group_desc_stats_reply,
             ofp.message.group_stats_reply,
         ]
         for klass in self.klasses:
