@@ -136,6 +136,8 @@ class OFType(object):
             return 'common.unpack_list_group_stats_entry(%s)' % (reader_expr)
         elif self.base == 'of_list_meter_band_t':
             return 'meter_band.unpack_list(%s)' % (reader_expr)
+        elif self.base == 'of_list_meter_stats_t':
+            return 'common.unpack_list_meter_stats(%s)' % (reader_expr)
         elif self.base == 'of_port_name_t':
             return self._gen_string_unpack_expr(reader_expr, 16)
         elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':

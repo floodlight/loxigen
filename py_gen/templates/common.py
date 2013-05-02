@@ -80,6 +80,12 @@ def unpack_list_group_desc_stats_entry(reader):
 def unpack_list_group_stats_entry(reader):
     return loxi.generic_util.unpack_list_lv16(reader, group_stats_entry.unpack)
 
+def unpack_list_meter_stats(reader):
+    def wrapper(reader):
+        length, = reader.peek('!4xH')
+        return meter_stats.unpack(reader.slice(length))
+    return loxi.generic_util.unpack_list(reader, wrapper)
+
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
 

@@ -676,8 +676,57 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_meter_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.meter_stats(
+                    meter_id=1,
+                    flow_count=8,
+                    packet_in_count=16,
+                    byte_in_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    band_stats=[
+                        ofp.meter_band_stats(packet_band_count=1, byte_band_count=2),
+                        ofp.meter_band_stats(packet_band_count=3, byte_band_count=4)]),
+                ofp.meter_stats(
+                    meter_id=2,
+                    flow_count=8,
+                    packet_in_count=16,
+                    byte_in_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    band_stats=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x09', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x01', # entries[0].meter_id
+            '\x00\x48', # entries[0].len
+            '\x00' * 6, # pad
+            '\x00\x00\x00\x08', # entries[0].flow_count
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_in_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_in_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+            '\x00\x00\x00\x00\x00\x00\x00\x01', # entries[0].band_stats[0].packet_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x02', # entries[0].band_stats[0].byte_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x03', # entries[0].band_stats[1].packet_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x04', # entries[0].band_stats[1].byte_band_count
+            '\x00\x00\x00\x02', # entries[1].meter_id
+            '\x00\x28', # entries[1].len
+            '\x00' * 6, # pad
+            '\x00\x00\x00\x08', # entries[1].flow_count
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[1].packet_in_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[1].byte_in_count
+            '\x00\x00\x00\x14', # entries[1].duration_sec
+            '\x00\x00\x00\x64', # entries[1].duration_nsec
+        ])
+        test_serialization(obj, buf)
 
     def test_meter_config_stats_request(self):
         # TODO
@@ -844,7 +893,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
             ofp.message.meter_features_stats_reply,
-            ofp.message.meter_stats_reply,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]
