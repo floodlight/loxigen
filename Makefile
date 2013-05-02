@@ -36,6 +36,7 @@ LOXI_OUTPUT_DIR = loxi_output
 # Generated files depend on all Loxi code and input files
 LOXI_PY_FILES=$(shell find \( -name loxi_output -prune \
                              -o -name templates -prune \
+                             -o -name tests -prune \
                              -o -true \
                            \) -a -name '*.py')
 LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
