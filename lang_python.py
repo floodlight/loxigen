@@ -46,6 +46,7 @@ Target directory structure:
                 message.py      # Message classes
                 util.py         # Utility functions
             of11: ...           # (code generation incomplete)
+                instruction.py  # Instruction classes
             of12: ...           # (code generation incomplete)
                 oxm.py          # OXM classes
             of13: ...           # (code generation incomplete)
@@ -75,9 +76,9 @@ prefix = 'pyloxi/loxi'
 
 modules = {
     1: ["action", "common", "const", "message", "util"],
-    2: ["action", "common", "const", "message", "util"],
-    3: ["action", "common", "const", "message", "oxm", "util"],
-    4: ["action", "common", "const", "message", "meter_band", "oxm", "util"],
+    2: ["action", "common", "const", "instruction", "message", "util"],
+    3: ["action", "common", "const", "instruction", "message", "oxm", "util"],
+    4: ["action", "common", "const", "instruction", "message", "meter_band", "oxm", "util"],
 }
 
 def make_gen(name, version):

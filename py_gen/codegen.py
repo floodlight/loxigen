@@ -93,6 +93,8 @@ def get_type_values(cls, version):
         type_values['type'] = 1
     elif utils.class_is_meter_band(cls):
         type_values['type'] = util.constant_for_value(version, "ofp_meter_band_type", util.primary_wire_type(cls, version))
+    elif utils.class_is_instruction(cls):
+        type_values['type'] = util.constant_for_value(version, "ofp_instruction_type", util.primary_wire_type(cls, version))
 
     return type_values
 
@@ -117,6 +119,8 @@ def build_ofclasses(version):
             pyname = cls[7:]
         elif utils.class_is_meter_band(cls):
             pyname = cls[14:]
+        elif utils.class_is_instruction(cls):
+            pyname = cls[15:]
         else:
             pyname = cls[3:]
 
@@ -176,6 +180,7 @@ def generate_common(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if not utils.class_is_message(x.name)
                     and not utils.class_is_action(x.name)
+                    and not utils.class_is_instruction(x.name)
                     and not utils.class_is_meter_band(x.name)
                     and not utils.class_is_oxm(x.name)
                     and not utils.class_is_list(x.name)]
@@ -192,6 +197,11 @@ def generate_const(out, name, version):
         if items:
             groups[group] = items
     util.render_template(out, 'const.py', version=version, groups=groups)
+
+def generate_instruction(out, name, version):
+    ofclasses = [x for x in build_ofclasses(version)
+                 if utils.class_is_instruction(x.name)]
+    util.render_template(out, 'instruction.py', ofclasses=ofclasses, version=version)
 
 def generate_message(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)

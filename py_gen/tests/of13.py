@@ -885,6 +885,39 @@ class TestOXM(unittest.TestCase):
         ])
         self.assertEquals(expected, obj.pack())
 
+class TestInstructions(unittest.TestCase):
+    def test_goto_table(self):
+        obj = ofp.instruction.goto_table(table_id=5)
+        buf = ''.join([
+            '\x00\x01', # type
+            '\x00\x08', # length
+            '\x05', # table_id
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
+
+    def test_write_metadata(self):
+        # TODO
+        pass
+
+    def test_write_actions(self):
+        # TODO
+        pass
+
+    def test_apply_actions(self):
+        # TODO
+        pass
+
+    def test_clear_actions(self):
+        # TODO
+        pass
+
+    def test_meter(self):
+        # TODO
+        pass
+
+    # TODO test experimenter instructions
+
 class TestAllOF13(unittest.TestCase):
     """
     Round-trips every class through serialization/deserialization.
