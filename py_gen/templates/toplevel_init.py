@@ -56,3 +56,12 @@ class ProtocolError(Exception):
     Raised when failing to deserialize an invalid OpenFlow message.
     """
     pass
+
+class Unimplemented(Exception):
+    """
+    Raised when an OpenFlow feature is not yet implemented in PyLoxi.
+    """
+    pass
+
+def unimplemented(msg):
+    raise Unimplemented(msg)

@@ -93,56 +93,59 @@ class OFType(object):
         elif self.base == 'of_desc_str_t':
             return self._gen_string_pack_expr(256, expr_expr)
         else:
-            return "'TODO pack %s'" % self.base
+            return "loxi.unimplemented('pack %s')" % self.base
 
     def _gen_string_pack_expr(self, length, expr_expr):
         return 'struct.pack("!%ds", %s)' % (length, expr_expr)
 
-    def gen_unpack_expr(self, buf_expr, offset_expr):
+    def gen_unpack_expr(self, reader_expr):
         pack_fmt = self._pack_fmt()
         if pack_fmt and not self.is_array:
-            return "struct.unpack_from('!%s', %s, %s)[0]" % (pack_fmt, buf_expr, offset_expr)
+            return "%s.read('!%s')[0]" % (reader_expr, pack_fmt)
         elif pack_fmt and self.is_array:
-            return "list(struct.unpack_from('!%d%s', %s, %s))" % (self.array_length, pack_fmt, buf_expr, offset_expr)
+            return "list(%s.read('!%d%s'))" % (self.array_length, pack_fmt)
         elif self.base == 'of_octets_t':
-            return "%s[%s:]" % (buf_expr, offset_expr)
+            return "str(%s.read_all())" % (reader_expr)
         elif self.base == 'of_mac_addr_t':
-            return "list(struct.unpack_from('!6B', %s, %s))" % (buf_expr, offset_expr)
+            return "list(%s.read('!6B'))" % (reader_expr)
         elif self.base == 'of_ipv6_t':
-            return "struct.unpack_from('!16s', %s, %s)[0]" % (buf_expr, offset_expr)
+            return "%s.read('!16s')[0]" % (reader_expr)
         elif self.base == 'of_match_t':
-            return 'common.match.unpack(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.match.unpack(%s)' % (reader_expr)
         elif self.base == 'of_port_desc_t':
-            return 'common.port_desc.unpack(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.port_desc.unpack(%s)' % (reader_expr)
         elif self.base == 'of_list_action_t':
-            return 'action.unpack_list(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'action.unpack_list(%s)' % (reader_expr)
         elif self.base == 'of_list_flow_stats_entry_t':
-            return 'common.unpack_list_flow_stats_entry(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.unpack_list_flow_stats_entry(%s)' % (reader_expr)
         elif self.base == 'of_list_queue_prop_t':
-            return 'common.unpack_list_queue_prop(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.unpack_list_queue_prop(%s)' % (reader_expr)
         elif self.base == 'of_list_packet_queue_t':
-            return 'common.unpack_list_packet_queue(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.unpack_list_packet_queue(%s)' % (reader_expr)
         elif self.base == 'of_list_hello_elem_t':
-            return 'common.unpack_list_hello_elem(buffer(%s, %s))' % (buf_expr, offset_expr)
+            return 'common.unpack_list_hello_elem(%s)' % (reader_expr)
+        elif self.base == 'of_list_oxm_t':
+            # HACK need the match_v3 length field
+            return 'oxm.unpack_list(%s.slice(_length-4))' % (reader_expr)
         elif self.base == 'of_port_name_t':
-            return self._gen_string_unpack_expr(16, buf_expr, offset_expr)
+            return self._gen_string_unpack_expr(reader_expr, 16)
         elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
-            return self._gen_string_unpack_expr(32, buf_expr, offset_expr)
+            return self._gen_string_unpack_expr(reader_expr, 32)
         elif self.base == 'of_desc_str_t':
-            return self._gen_string_unpack_expr(256, buf_expr, offset_expr)
+            return self._gen_string_unpack_expr(reader_expr, 256)
         elif utils.class_is_list(self.base):
             element_cls = utils.list_to_entry_type(self.base)[:-2]
             if ((element_cls, self.version) in of_g.is_fixed_length):
                 klass_name = self.base[8:-2]
                 element_size, = of_g.base_length[(element_cls, self.version)],
-                return 'util.unpack_array(common.%s.unpack, %d, buffer(%s, %s))' % (klass_name, element_size, buf_expr, offset_expr)
+                return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)
             else:
-                return "None # TODO unpack list %s" % self.base
+                return "loxi.unimplemented('unpack list %s')" % self.base
         else:
-            return "None # TODO unpack %s" % self.base
+            return "loxi.unimplemented('unpack %s')" % self.base
 
-    def _gen_string_unpack_expr(self, length, buf_expr, offset_expr):
-        return 'str(buffer(%s, %s, %d)).rstrip("\\x00")' % (buf_expr, offset_expr, length)
+    def _gen_string_unpack_expr(self, reader_expr, length):
+        return '%s.read("!%ds")[0].rstrip("\\x00")' % (reader_expr, length)
 
     def _pack_fmt(self):
         if self.base == "char":

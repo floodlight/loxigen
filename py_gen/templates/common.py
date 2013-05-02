@@ -34,33 +34,39 @@ import struct
 import action
 import const
 import util
+import loxi.generic_util
+
+:: if version >= 3:
+import oxm
+:: #endif
 
 # HACK make this module visible as 'common' to simplify code generation
 common = sys.modules[__name__]
 
-def unpack_list_flow_stats_entry(buf):
-    return util.unpack_list(flow_stats_entry.unpack, "!H", buf)
+def unpack_list_flow_stats_entry(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, flow_stats_entry.unpack)
 
-def unpack_list_queue_prop(buf):
-    def deserializer(buf):
-        type, = struct.unpack_from("!H", buf)
-        if type == const.OFPQT_MIN_RATE:
-            return queue_prop_min_rate.unpack(buf)
+def unpack_list_queue_prop(reader):
+    def deserializer(reader, typ):
+        if typ == const.OFPQT_MIN_RATE:
+            return queue_prop_min_rate.unpack(reader)
         else:
-            raise loxi.ProtocolError("unknown queue prop %d" % type)
-    return util.unpack_list(deserializer, "!2xH", buf)
+            raise loxi.ProtocolError("unknown queue prop %d" % typ)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
 
-def unpack_list_packet_queue(buf):
-    return util.unpack_list(packet_queue.unpack, "!4xH", buf)
+def unpack_list_packet_queue(reader):
+    def wrapper(reader):
+        length, = reader.peek('!4xH')
+        return packet_queue.unpack(reader.slice(length))
+    return loxi.generic_util.unpack_list(reader, wrapper)
 
-def unpack_list_hello_elem(buf):
-    def deserializer(buf):
-        type, = struct.unpack_from("!H", buf)
-        if type == const.OFPHET_VERSIONBITMAP:
-            return hello_elem_versionbitmap.unpack(buf)
+def unpack_list_hello_elem(reader):
+    def deserializer(reader, typ):
+        if typ == const.OFPHET_VERSIONBITMAP:
+            return hello_elem_versionbitmap.unpack(reader)
         else:
             return None
-    return [x for x in util.unpack_list(deserializer, "!2xH", buf) if x != None]
+    return [x for x in loxi.generic_util.unpack_list_tlv16(reader, deserializer) if x != None]
 
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
@@ -69,6 +75,10 @@ def unpack_list_hello_elem(buf):
 
 :: if version == 1:
 match = match_v1
+:: elif version == 2:
+match = match_v2
+:: elif version == 3:
+match = match_v3
 :: elif version == 4:
 :: # HACK
 match = match_v3
