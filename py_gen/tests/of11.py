@@ -70,10 +70,8 @@ class TestAllOF11(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.group_desc_stats_entry,
             ofp.common.table_stats_entry,
             ofp.message.group_desc_stats_reply,
-            ofp.message.group_mod,
             ofp.message.group_stats_reply,
         ]
         for klass in self.klasses:

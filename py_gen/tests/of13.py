@@ -416,8 +416,66 @@ class TestMessages(unittest.TestCase):
 
 
     def test_group_mod(self):
-        # TODO
-        pass
+        obj = ofp.message.group_mod(
+            xid=0x12345678,
+            command=ofp.OFPGC_MODIFY,
+            group_type=ofp.OFPGT_FF,
+            group_id=5,
+            buckets=[
+                ofp.bucket(
+                    weight=1,
+                    watch_port=5,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)]),
+                ofp.bucket(
+                    weight=1,
+                    watch_port=6,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)])])
+        buf = ''.join([
+            '\x04', '\x0f', # version, type
+            '\x00\x70', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x01', # command
+            '\x03', # group_type
+            '\x00', # pad
+            '\x00\x00\x00\x05', # group_id
+            '\x00\x30', # buckets[0].len
+            '\x00\x01', # buckets[0].weight
+            '\x00\x00\x00\x05', # buckets[0].watch_port
+            '\xff\xff\xff\xff', # buckets[0].watch_group
+            '\x00' * 4, # pad
+            '\x00\x00', # buckets[0].actions[0].type
+            '\x00\x10', # buckets[0].actions[0].len
+            '\x00\x00\x00\x05', # buckets[0].actions[0].port
+            '\x00\x00', # buckets[0].actions[0].max_len
+            '\x00' * 6, # pad
+            '\x00\x00', # buckets[0].actions[1].type
+            '\x00\x10', # buckets[0].actions[1].len
+            '\x00\x00\x00\x06', # buckets[0].actions[1].port
+            '\x00\x00', # buckets[0].actions[1].max_len
+            '\x00' * 6, # pad
+            '\x00\x30', # buckets[1].len
+            '\x00\x01', # buckets[1].weight
+            '\x00\x00\x00\x06', # buckets[1].watch_port
+            '\xff\xff\xff\xff', # buckets[1].watch_group
+            '\x00' * 4, # pad
+            '\x00\x00', # buckets[1].actions[0].type
+            '\x00\x10', # buckets[1].actions[0].len
+            '\x00\x00\x00\x05', # buckets[1].actions[0].port
+            '\x00\x00', # buckets[1].actions[0].max_len
+            '\x00' * 6, # pad
+            '\x00\x00', # buckets[1].actions[1].type
+            '\x00\x10', # buckets[1].actions[1].len
+            '\x00\x00\x00\x06', # buckets[1].actions[1].port
+            '\x00\x00', # buckets[1].actions[1].max_len
+            '\x00' * 6, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_port_mod(self):
         # TODO
@@ -629,9 +687,7 @@ class TestAllOF13(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.group_desc_stats_entry,
             ofp.message.group_desc_stats_reply,
-            ofp.message.group_mod,
             ofp.message.group_stats_reply,
             ofp.message.meter_stats_reply,
             ofp.message.meter_features_stats_reply,

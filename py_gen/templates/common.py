@@ -68,6 +68,9 @@ def unpack_list_hello_elem(reader):
             return None
     return [x for x in loxi.generic_util.unpack_list_tlv16(reader, deserializer) if x != None]
 
+def unpack_list_bucket(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, bucket.unpack)
+
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
 
