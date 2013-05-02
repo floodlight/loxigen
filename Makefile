@@ -73,6 +73,7 @@ check:
 	PYTHONPATH=. ./utest/test_parser.py
 
 check-py: python
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi python py_gen/tests/generic_util.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi python py_gen/tests/of10.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi python py_gen/tests/of11.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi python py_gen/tests/of12.py

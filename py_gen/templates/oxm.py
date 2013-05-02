@@ -34,21 +34,34 @@
 import struct
 import const
 import util
+import loxi.generic_util
 import loxi
+
+def unpack_list(reader):
+    def deserializer(reader):
+        type_len, = reader.peek('!L')
+        if type_len in parsers:
+            return parsers[type_len](reader)
+        else:
+            raise loxi.ProtocolError("unknown OXM cls=%#x type=%#x masked=%d len=%d (%#x)" % \
+                ((type_len >> 16) & 0xffff, (type_len >> 9) & 0x7f, (type_len >> 8) & 1, type_len & 0xff, type_len))
+    return loxi.generic_util.unpack_list(reader, deserializer)
 
 class OXM(object):
     type_len = None # override in subclass
     pass
 
 :: for ofclass in ofclasses:
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: normal_members = [m for m in ofclass.members if type(m) == Member]
+:: type_members = [m for m in ofclass.members if type(m) == TypeMember]
 class ${ofclass.pyname}(OXM):
-:: for m in ofclass.type_members:
+:: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
 
-    def __init__(self, ${', '.join(["%s=None" % m.name for m in nonskip_members])}):
-:: for m in nonskip_members:
+    def __init__(self, ${', '.join(["%s=None" % m.name for m in normal_members])}):
+:: for m in normal_members:
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
@@ -68,7 +81,7 @@ class ${ofclass.pyname}(OXM):
 
     def __eq__(self, other):
         if type(self) != type(other): return False
-:: for m in nonskip_members:
+:: for m in normal_members:
         if self.${m.name} != other.${m.name}: return False
 :: #endfor
         return True

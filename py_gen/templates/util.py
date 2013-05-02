@@ -33,35 +33,6 @@ import loxi
 import const
 import struct
 
-def unpack_array(deserializer, element_size, buf):
-    """
-    Deserialize an array of fixed length elements.
-    The deserializer function should take a buffer and return the new object.
-    """
-    if len(buf) % element_size != 0: raise loxi.ProtocolError("invalid array length")
-    n = len(buf) / element_size
-    return [deserializer(buffer(buf, i*element_size, element_size)) for i in range(n)]
-
-def unpack_list(deserializer, length_fmt, buf):
-    """
-    Deserialize a list of variable-length entries.
-    'length_fmt' is a struct format string with exactly one non-padding format
-    character that returns the length of the given element.
-    The deserializer function should take a buffer and return the new object.
-    """
-    entries = []
-    offset = 0
-    length_struct = struct.Struct(length_fmt)
-    n = len(buf)
-    while offset < n:
-        if offset + length_struct.size > len(buf): raise loxi.ProtocolError("entry header overruns list length")
-        length, = length_struct.unpack_from(buf, offset)
-        if length < length_struct.size: raise loxi.ProtocolError("entry length is less than the header length")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
-        entries.append(deserializer(buffer(buf, offset, length)))
-        offset += length
-    return entries
-
 def pretty_mac(mac):
     return ':'.join(["%02x" % x for x in mac])
 

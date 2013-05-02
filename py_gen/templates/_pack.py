@@ -26,22 +26,37 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: all_members = ofclass.members[:]
-:: if ofclass.length_member: all_members.append(ofclass.length_member)
-:: all_members.extend(ofclass.type_members)
-:: all_members.sort(key=lambda x: x.offset)
+:: from py_gen.codegen import Member, LengthMember, FieldLengthMember, TypeMember, PadMember
+:: length_member = None
 :: length_member_index = None
+:: field_length_members = {}
+:: field_length_indexes = {}
 :: index = 0
-:: for m in all_members:
-::     if m == ofclass.length_member:
+:: for m in ofclass.members:
+::     if type(m) == LengthMember:
+::         length_member = m
 ::         length_member_index = index
-        packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${length_member_index}
+        packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${index}
+::     elif type(m) == FieldLengthMember:
+::         field_length_members[m.field_name] = m
+::         field_length_indexes[m.field_name] = index
+        packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${index}
+::     elif type(m) == PadMember:
+        packed.append('\x00' * ${m.length})
 ::     else:
         packed.append(${m.oftype.gen_pack_expr('self.' + m.name)})
+::         if m.name in field_length_members:
+::             field_length_member = field_length_members[m.name]
+::             field_length_index = field_length_indexes[m.name]
+        packed[${field_length_index}] = ${field_length_member.oftype.gen_pack_expr('len(packed[-1])')}
+::         #endif
 ::     #endif
 ::     index += 1
 :: #endfor
 :: if length_member_index != None:
         length = sum([len(x) for x in packed])
-        packed[${length_member_index}] = ${ofclass.length_member.oftype.gen_pack_expr('length')}
+        packed[${length_member_index}] = ${length_member.oftype.gen_pack_expr('length')}
+:: #endif
+:: if ofclass.name == 'of_match_v3':
+        packed.append('\x00' * ((length + 7)/8*8 - length))
 :: #endif

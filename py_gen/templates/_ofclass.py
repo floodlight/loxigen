@@ -1,11 +1,12 @@
-:: nonskip_members = [m for m in ofclass.members if not m.skip]
+:: from py_gen.codegen import Member, LengthMember, TypeMember
+:: normal_members = [m for m in ofclass.members if type(m) == Member]
 class ${ofclass.pyname}(${superclass}):
 :: for m in ofclass.type_members:
     ${m.name} = ${m.value}
 :: #endfor
 
-    def __init__(${', '.join(['self'] + ["%s=None" % m.name for m in nonskip_members])}):
-:: for m in nonskip_members:
+    def __init__(${', '.join(['self'] + ["%s=None" % m.name for m in normal_members])}):
+:: for m in normal_members:
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
@@ -26,7 +27,7 @@ class ${ofclass.pyname}(${superclass}):
 
     def __eq__(self, other):
         if type(self) != type(other): return False
-:: for m in nonskip_members:
+:: for m in normal_members:
         if self.${m.name} != other.${m.name}: return False
 :: #endfor
         return True

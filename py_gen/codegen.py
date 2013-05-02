@@ -26,18 +26,28 @@
 # under the EPL.
 
 from collections import namedtuple
+import struct
 import of_g
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as utils
 import util
 import oftype
 
-OFClass = namedtuple('OFClass', ['name', 'pyname',
-                                 'members', 'length_member', 'type_members',
+OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
                                  'min_length', 'is_fixed_length'])
-Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
-LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
-TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
+Member = namedtuple('Member', ['name', 'oftype'])
+LengthMember = namedtuple('LengthMember', ['name', 'oftype'])
+FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'field_name'])
+TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'value'])
+PadMember = namedtuple('PadMember', ['length'])
+
+# XXX move to frontend
+field_length_members = {
+    ('of_packet_out', 1, 'actions_len') : 'actions',
+    ('of_packet_out', 2, 'actions_len') : 'actions',
+    ('of_packet_out', 3, 'actions_len') : 'actions',
+    ('of_packet_out', 4, 'actions_len') : 'actions',
+}
 
 def get_type_values(cls, version):
     """
@@ -74,9 +84,13 @@ def get_type_values(cls, version):
         oxm_class = 0x8000
         oxm_type = util.primary_wire_type(cls, version)
         oxm_masked = cls.find('masked') != -1 and 1 or 0
-        oxm_len = of_g.base_length[(cls, version)]
+        oxm_len = of_g.base_length[(cls, version)] - 4
         type_values['type_len'] = '%#x' % (oxm_class << 16 | oxm_type << 8 | \
                                            oxm_masked << 8 | oxm_len)
+    elif cls == "of_match_v2":
+        type_values['type'] = 0
+    elif cls == "of_match_v3":
+        type_values['type'] = 1
 
     return type_values
 
@@ -102,41 +116,38 @@ def build_ofclasses(version):
 
         type_values = get_type_values(cls, version)
         members = []
-
-        length_member = None
         type_members = []
+
         pad_count = 0
 
         for member in unified_class['members']:
             if member['name'] in ['length', 'len']:
-                length_member = LengthMember(name=member['name'],
-                                             offset=member['offset'],
-                                             oftype=oftype.OFType(member['m_type'], version))
+                members.append(LengthMember(name=member['name'],
+                                            oftype=oftype.OFType(member['m_type'], version)))
+            elif (cls, version, member['name']) in field_length_members:
+                field_name = field_length_members[(cls, version, member['name'])]
+                members.append(FieldLengthMember(name=member['name'],
+                                                 oftype=oftype.OFType(member['m_type'], version),
+                                                 field_name=field_name))
             elif member['name'] in type_values:
-                type_members.append(TypeMember(name=member['name'],
-                                               offset=member['offset'],
-                                               oftype=oftype.OFType(member['m_type'], version),
-                                               value=type_values[member['name']]))
+                members.append(TypeMember(name=member['name'],
+                                          oftype=oftype.OFType(member['m_type'], version),
+                                          value=type_values[member['name']]))
+                type_members.append(members[-1])
+            elif member['name'].startswith("pad"):
+                # HACK this should be moved to the frontend
+                pad_oftype = oftype.OFType(member['m_type'], version)
+                length = struct.calcsize("!" + pad_oftype._pack_fmt())
+                if pad_oftype.is_array: length *= pad_oftype.array_length
+                members.append(PadMember(length=length))
             else:
-                # HACK ensure member names are unique
-                if member['name'].startswith("pad"):
-                    if pad_count == 0:
-                        m_name = 'pad'
-                    else:
-                        m_name = "pad%d" % pad_count
-                    pad_count += 1
-                else:
-                    m_name = member['name']
-                members.append(Member(name=m_name,
-                                      oftype=oftype.OFType(member['m_type'], version),
-                                      offset=member['offset'],
-                                      skip=member['name'] in of_g.skip_members))
+                members.append(Member(name=member['name'],
+                                      oftype=oftype.OFType(member['m_type'], version)))
 
         ofclasses.append(
             OFClass(name=cls,
                     pyname=pyname,
                     members=members,
-                    length_member=length_member,
                     type_members=type_members,
                     min_length=of_g.base_length[(cls, version)],
                     is_fixed_length=(cls, version) in of_g.is_fixed_length))
