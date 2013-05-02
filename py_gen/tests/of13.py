@@ -533,8 +533,59 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_group_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.group_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.group_stats_entry(
+                    group_id=1,
+                    ref_count=8,
+                    packet_count=16,
+                    byte_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    bucket_stats=[
+                        ofp.bucket_counter(packet_count=1, byte_count=2),
+                        ofp.bucket_counter(packet_count=3, byte_count=4)]),
+                ofp.group_stats_entry(
+                    group_id=1,
+                    ref_count=8,
+                    packet_count=16,
+                    byte_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    bucket_stats=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x06', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x48', # entries[0].length
+            '\x00' * 2, # pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x00\x00\x08', # entries[0].ref_count
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+            '\x00\x00\x00\x00\x00\x00\x00\x01', # entries[0].bucket_stats[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x02', # entries[0].bucket_stats[0].byte_count
+            '\x00\x00\x00\x00\x00\x00\x00\x03', # entries[0].bucket_stats[1].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x04', # entries[0].bucket_stats[1].byte_count
+            '\x00\x28', # entries[0].length
+            '\x00' * 2, # pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x00\x00\x08', # entries[0].ref_count
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+        ])
+        test_serialization(obj, buf)
 
     def test_group_desc_stats_request(self):
         # TODO
@@ -769,7 +820,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.group_stats_reply,
             ofp.message.meter_config_stats_reply,
             ofp.message.meter_features_stats_reply,
             ofp.message.meter_mod,

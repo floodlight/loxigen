@@ -74,6 +74,9 @@ def unpack_list_bucket(reader):
 def unpack_list_group_desc_stats_entry(reader):
     return loxi.generic_util.unpack_list_lv16(reader, group_desc_stats_entry.unpack)
 
+def unpack_list_group_stats_entry(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, group_stats_entry.unpack)
+
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass, superclass="object")
 
