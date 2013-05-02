@@ -25,17 +25,43 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
+:: import itertools
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
 
-import action, common, const, message
-:: if version >= 3:
-import oxm
+import struct
+import const
+import util
+import loxi.generic_util
+import loxi
+
+def unpack_list(reader):
+    def deserializer(reader, typ):
+        parser = parsers.get(typ)
+        if not parser: raise loxi.ProtocolError("unknown meter band type %d" % typ)
+        return parser(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
+
+class MeterBand(object):
+    type = None # override in subclass
+    pass
+
+:: for ofclass in ofclasses:
+:: include('_ofclass.py', ofclass=ofclass, superclass="MeterBand")
+
+:: #endfor
+
+parsers = {
+:: sort_key = lambda x: x.type_members[0].value
+:: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
+:: for (k, v) in msgtype_groups:
+:: v = list(v)
+:: if len(v) == 1:
+    ${k} : ${v[0].pyname}.unpack,
+:: else:
+    ${k} : parse_${k[12:].lower()},
 :: #endif
-:: if version >= 4:
-import meter_band
-:: #endif
-from const import *
-from common import *
-from loxi import ProtocolError
+:: #endfor
+}

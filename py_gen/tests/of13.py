@@ -684,8 +684,32 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_meter_config_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_config_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.meter_band.drop(rate=1, burst_size=2),
+                ofp.meter_band.dscp_remark(rate=3, burst_size=4, prec_level=5)])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x30', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x0a', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x01', # entries[0].type
+            '\x00\x10', # entries[0].length
+            '\x00\x00\x00\x01', # entries[0].rate
+            '\x00\x00\x00\x02', # entries[0].burst_size
+            '\x00' * 4, # pad
+            '\x00\x02', # entries[1].type
+            '\x00\x10', # entries[1].length
+            '\x00\x00\x00\x03', # entries[1].rate
+            '\x00\x00\x00\x04', # entries[1].burst_size
+            '\x05', # entries[1].prec_level
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_meter_features_stats_request(self):
         # TODO
@@ -807,7 +831,6 @@ class TestAllOF13(unittest.TestCase):
     def test_serialization(self):
         expected_failures = [
             ofp.common.flow_stats_entry,
-            ofp.common.meter_config,
             ofp.common.table_feature_prop_apply_actions,
             ofp.common.table_feature_prop_apply_actions_miss,
             ofp.common.table_feature_prop_instructions,
@@ -820,9 +843,7 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.meter_config_stats_reply,
             ofp.message.meter_features_stats_reply,
-            ofp.message.meter_mod,
             ofp.message.meter_stats_reply,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,

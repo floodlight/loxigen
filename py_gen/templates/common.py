@@ -32,6 +32,9 @@
 import sys
 import struct
 import action
+:: if version >= 4:
+import meter_band # for unpack_list
+:: #endif
 import const
 import util
 import loxi.generic_util

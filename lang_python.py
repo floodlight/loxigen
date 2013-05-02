@@ -49,6 +49,7 @@ Target directory structure:
             of12: ...           # (code generation incomplete)
                 oxm.py          # OXM classes
             of13: ...           # (code generation incomplete)
+                meter_band.py   # Meter band classes
 
 The user will add the pyloxi directory to PYTHONPATH. Then they can
 "import loxi" or "import loxi.of10". The idiomatic import is
@@ -76,7 +77,7 @@ modules = {
     1: ["action", "common", "const", "message", "util"],
     2: ["action", "common", "const", "message", "util"],
     3: ["action", "common", "const", "message", "oxm", "util"],
-    4: ["action", "common", "const", "message", "oxm", "util"],
+    4: ["action", "common", "const", "message", "meter_band", "oxm", "util"],
 }
 
 def make_gen(name, version):

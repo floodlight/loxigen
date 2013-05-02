@@ -36,6 +36,9 @@ import loxi
 import const
 import common
 import action # for unpack_list
+:: if version >= 4:
+import meter_band # for unpack_list
+:: #endif
 import util
 import loxi.generic_util
 
