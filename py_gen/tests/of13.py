@@ -765,8 +765,30 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_meter_features_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_features_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            features=ofp.meter_features(
+                max_meter=5,
+                band_types=ofp.OFPMBT_DROP|ofp.OFPMBT_DSCP_REMARK,
+                capabilities=ofp.OFPMF_KBPS|ofp.OFPMF_STATS,
+                max_bands=10,
+                max_color=7))
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x20', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x0b', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x05', # max_meter
+            '\x00\x00\x00\x03', # band_types
+            '\x00\x00\x00\x09', # capabilities
+            '\x0a', # max_bands
+            '\x07', # max_color
+            '\x00' * 2, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_table_features_stats_request(self):
         # TODO
@@ -892,7 +914,6 @@ class TestAllOF13(unittest.TestCase):
             ofp.message.flow_delete_strict,
             ofp.message.flow_modify,
             ofp.message.flow_modify_strict,
-            ofp.message.meter_features_stats_reply,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]
