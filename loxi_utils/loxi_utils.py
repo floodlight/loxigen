@@ -28,7 +28,7 @@
 """
 @brief Utilities involving LOXI naming conventions
 
-Utility functions for OpenFlow class generation 
+Utility functions for OpenFlow class generation
 
 These may need to be sorted out into language specific functions
 """
@@ -256,7 +256,7 @@ def list_to_entry_type(cls):
     Return the entry type for a list
     """
     slen = len("of_list_")
-    return "of_" + cls[slen:] 
+    return "of_" + cls[slen:]
 
 def type_to_short_name(m_type):
     if m_type in of_g.of_base_types:
@@ -323,11 +323,11 @@ def member_returns_val(cls, m_name):
     Should get accessor return a value rather than void
     @param cls The class name
     @param m_name The member name
-    @return True if of_g config and the specific member allow a 
+    @return True if of_g config and the specific member allow a
     return value.  Otherwise False
     """
     m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and 
+    return (config_check("get_returns") =="value" and
             m_type in of_g.of_scalar_types)
 
 def config_check(str, dictionary = of_g.code_gen_config):
@@ -356,7 +356,7 @@ def type_to_cof_type(m_type):
             return of_g.of_base_types[m_type]["cof_type"]
     return m_type
 
-            
+
 def member_is_scalar(cls, m_name):
     return of_g.unified[cls]["union"][m_name]["m_type"] in of_g.of_scalar_types
 

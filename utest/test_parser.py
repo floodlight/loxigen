@@ -146,7 +146,7 @@ struct bar { };
 // comment 1
 struct foo { //comment 2
 // comment 3
-   uint32_t a; //comment 5 
+   uint32_t a; //comment 5
 // comment 6
 };
 // comment 4
