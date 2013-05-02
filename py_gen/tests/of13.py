@@ -687,10 +687,26 @@ class TestAllOF13(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
+            ofp.common.flow_stats_entry,
+            ofp.common.meter_config,
+            ofp.common.table_feature_prop_apply_actions,
+            ofp.common.table_feature_prop_apply_actions_miss,
+            ofp.common.table_feature_prop_instructions,
+            ofp.common.table_feature_prop_instructions_miss,
+            ofp.common.table_feature_prop_write_actions,
+            ofp.common.table_feature_prop_write_actions_miss,
+            ofp.common.table_features,
+            ofp.message.flow_add,
+            ofp.message.flow_delete,
+            ofp.message.flow_delete_strict,
+            ofp.message.flow_modify,
+            ofp.message.flow_modify_strict,
             ofp.message.group_desc_stats_reply,
             ofp.message.group_stats_reply,
-            ofp.message.meter_stats_reply,
+            ofp.message.meter_config_stats_reply,
             ofp.message.meter_features_stats_reply,
+            ofp.message.meter_mod,
+            ofp.message.meter_stats_reply,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]

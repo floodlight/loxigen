@@ -27,6 +27,7 @@
 
 import of_g
 import loxi_utils.loxi_utils as utils
+import loxi_front_end.type_maps
 import unittest
 
 class OFType(object):
@@ -137,7 +138,8 @@ class OFType(object):
             return self._gen_string_unpack_expr(reader_expr, 256)
         elif utils.class_is_list(self.base):
             element_cls = utils.list_to_entry_type(self.base)[:-2]
-            if ((element_cls, self.version) in of_g.is_fixed_length):
+            if ((element_cls, self.version) in of_g.is_fixed_length) \
+               and not element_cls in loxi_front_end.type_maps.inheritance_map:
                 klass_name = self.base[8:-2]
                 element_size, = of_g.base_length[(element_cls, self.version)],
                 return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)
