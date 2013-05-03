@@ -30,8 +30,14 @@
 :: include('_autogen.py')
 
 import action, common, const, message
+:: if version >= 2:
+import instruction
+:: #endif
 :: if version >= 3:
 import oxm
+:: #endif
+:: if version >= 4:
+import meter_band
 :: #endif
 from const import *
 from common import *

@@ -395,8 +395,59 @@ class TestMessages(unittest.TestCase):
     ## Flow-mods
 
     def test_flow_add(self):
-        # TODO
-        pass
+        obj = ofp.message.flow_add(
+            xid=0x12345678,
+            cookie=0xFEDCBA9876543210,
+            cookie_mask=0xFF00FF00FF00FF00,
+            table_id=3,
+            idle_timeout=5,
+            hard_timeout=10,
+            priority=6000,
+            buffer_id=50,
+            out_port=6,
+            out_group=8,
+            flags=0,
+            match=ofp.match(oxm_list=[]),
+            instructions=[
+                ofp.instruction.goto_table(table_id=4),
+                ofp.instruction.goto_table(table_id=7)])
+        buf = ''.join([
+            '\x04', '\x0e', # version, type
+            '\x00\x48', # length
+            '\x12\x34\x56\x78', # xid
+
+            '\xfe\xdc\xba\x98\x76\x54\x32\x10', # cookie
+
+            '\xff\x00\xff\x00\xff\x00\xff\x00', # cookie_mask
+
+            '\x03', # table_id
+            '\x00', # _command
+            '\x00\x05', # idle_timeout
+            '\x00\x0a', # hard_timeout
+            '\x17\x70', # priority
+
+            '\x00\x00\x00\x32', # buffer_id
+            '\x00\x00\x00\x06', # out_port
+
+            '\x00\x00\x00\x08', # out_group
+            '\x00\x00', # flags
+            '\x00' * 2, # pad
+
+            '\x00\x01', # match.type
+            '\x00\x04', # match.length
+            '\x00' * 4, # pad
+
+            '\x00\x01', # instructions[0].type
+            '\x00\x08', # instructions[0].length
+            '\x04', # instructions[0].table_id
+            '\x00' * 3, # pad
+
+            '\x00\x01', # instructions[1].type
+            '\x00\x08', # instructions[1].length
+            '\x07', # instructions[1].table_id
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_flow_modify(self):
         # TODO
@@ -416,8 +467,66 @@ class TestMessages(unittest.TestCase):
 
 
     def test_group_mod(self):
-        # TODO
-        pass
+        obj = ofp.message.group_mod(
+            xid=0x12345678,
+            command=ofp.OFPGC_MODIFY,
+            group_type=ofp.OFPGT_FF,
+            group_id=5,
+            buckets=[
+                ofp.bucket(
+                    weight=1,
+                    watch_port=5,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)]),
+                ofp.bucket(
+                    weight=1,
+                    watch_port=6,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)])])
+        buf = ''.join([
+            '\x04', '\x0f', # version, type
+            '\x00\x70', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x01', # command
+            '\x03', # group_type
+            '\x00', # pad
+            '\x00\x00\x00\x05', # group_id
+            '\x00\x30', # buckets[0].len
+            '\x00\x01', # buckets[0].weight
+            '\x00\x00\x00\x05', # buckets[0].watch_port
+            '\xff\xff\xff\xff', # buckets[0].watch_group
+            '\x00' * 4, # pad
+            '\x00\x00', # buckets[0].actions[0].type
+            '\x00\x10', # buckets[0].actions[0].len
+            '\x00\x00\x00\x05', # buckets[0].actions[0].port
+            '\x00\x00', # buckets[0].actions[0].max_len
+            '\x00' * 6, # pad
+            '\x00\x00', # buckets[0].actions[1].type
+            '\x00\x10', # buckets[0].actions[1].len
+            '\x00\x00\x00\x06', # buckets[0].actions[1].port
+            '\x00\x00', # buckets[0].actions[1].max_len
+            '\x00' * 6, # pad
+            '\x00\x30', # buckets[1].len
+            '\x00\x01', # buckets[1].weight
+            '\x00\x00\x00\x06', # buckets[1].watch_port
+            '\xff\xff\xff\xff', # buckets[1].watch_group
+            '\x00' * 4, # pad
+            '\x00\x00', # buckets[1].actions[0].type
+            '\x00\x10', # buckets[1].actions[0].len
+            '\x00\x00\x00\x05', # buckets[1].actions[0].port
+            '\x00\x00', # buckets[1].actions[0].max_len
+            '\x00' * 6, # pad
+            '\x00\x00', # buckets[1].actions[1].type
+            '\x00\x10', # buckets[1].actions[1].len
+            '\x00\x00\x00\x06', # buckets[1].actions[1].port
+            '\x00\x00', # buckets[1].actions[1].max_len
+            '\x00' * 6, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_port_mod(self):
         # TODO
@@ -475,16 +584,135 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_group_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.group_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.group_stats_entry(
+                    group_id=1,
+                    ref_count=8,
+                    packet_count=16,
+                    byte_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    bucket_stats=[
+                        ofp.bucket_counter(packet_count=1, byte_count=2),
+                        ofp.bucket_counter(packet_count=3, byte_count=4)]),
+                ofp.group_stats_entry(
+                    group_id=1,
+                    ref_count=8,
+                    packet_count=16,
+                    byte_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    bucket_stats=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x06', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x48', # entries[0].length
+            '\x00' * 2, # pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x00\x00\x08', # entries[0].ref_count
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+            '\x00\x00\x00\x00\x00\x00\x00\x01', # entries[0].bucket_stats[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x02', # entries[0].bucket_stats[0].byte_count
+            '\x00\x00\x00\x00\x00\x00\x00\x03', # entries[0].bucket_stats[1].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x04', # entries[0].bucket_stats[1].byte_count
+            '\x00\x28', # entries[0].length
+            '\x00' * 2, # pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x00\x00\x08', # entries[0].ref_count
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+        ])
+        test_serialization(obj, buf)
 
     def test_group_desc_stats_request(self):
         # TODO
         pass
 
     def test_group_desc_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.group_desc_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.group_desc_stats_entry(
+                    type=ofp.OFPGT_FF,
+                    group_id=1,
+                    buckets=[
+                        ofp.bucket(
+                            weight=1,
+                            watch_port=5,
+                            watch_group=0xffffffff,
+                            actions=[
+                                ofp.action.output(port=5, max_len=0),
+                                ofp.action.output(port=6, max_len=0)]),
+                        ofp.bucket(
+                            weight=1,
+                            watch_port=6,
+                            watch_group=0xffffffff,
+                            actions=[
+                                ofp.action.output(port=5, max_len=0),
+                                ofp.action.output(port=6, max_len=0)])]),
+                ofp.group_desc_stats_entry(type=ofp.OFPGT_FF, group_id=2, buckets=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x07', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x68', # entries[0].length
+            '\x03', # entries[0].group_type
+            '\x00', # entries[0].pad
+            '\x00\x00\x00\x01', # entries[0].group_id
+            '\x00\x30', # entries[0].buckets[0].len
+            '\x00\x01', # entries[0].buckets[0].weight
+            '\x00\x00\x00\x05', # entries[0].buckets[0].watch_port
+            '\xff\xff\xff\xff', # entries[0].buckets[0].watch_group
+            '\x00' * 4, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[0].actions[0].type
+            '\x00\x10', # entries[0].buckets[0].actions[0].len
+            '\x00\x00\x00\x05', # entries[0].buckets[0].actions[0].port
+            '\x00\x00', # entries[0].buckets[0].actions[0].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[0].actions[1].type
+            '\x00\x10', # entries[0].buckets[0].actions[1].len
+            '\x00\x00\x00\x06', # entries[0].buckets[0].actions[1].port
+            '\x00\x00', # entries[0].buckets[0].actions[1].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x30', # entries[0].buckets[1].len
+            '\x00\x01', # entries[0].buckets[1].weight
+            '\x00\x00\x00\x06', # entries[0].buckets[1].watch_port
+            '\xff\xff\xff\xff', # entries[0].buckets[1].watch_group
+            '\x00' * 4, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[1].actions[0].type
+            '\x00\x10', # entries[0].buckets[1].actions[0].len
+            '\x00\x00\x00\x05', # entries[0].buckets[1].actions[0].port
+            '\x00\x00', # entries[0].buckets[1].actions[0].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x00', # entries[0].buckets[1].actions[1].type
+            '\x00\x10', # entries[0].buckets[1].actions[1].len
+            '\x00\x00\x00\x06', # entries[0].buckets[1].actions[1].port
+            '\x00\x00', # entries[0].buckets[1].actions[1].max_len
+            '\x00' * 6, # entries[0].pad
+            '\x00\x08', # entries[1].length
+            '\x03', # entries[1].group_type
+            '\x00', # entries[1].pad
+            '\x00\x00\x00\x02', # entries[1].group_id
+        ])
+        test_serialization(obj, buf)
 
     def test_group_features_stats_request(self):
         # TODO
@@ -499,24 +727,119 @@ class TestMessages(unittest.TestCase):
         pass
 
     def test_meter_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.meter_stats(
+                    meter_id=1,
+                    flow_count=8,
+                    packet_in_count=16,
+                    byte_in_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    band_stats=[
+                        ofp.meter_band_stats(packet_band_count=1, byte_band_count=2),
+                        ofp.meter_band_stats(packet_band_count=3, byte_band_count=4)]),
+                ofp.meter_stats(
+                    meter_id=2,
+                    flow_count=8,
+                    packet_in_count=16,
+                    byte_in_count=32,
+                    duration_sec=20,
+                    duration_nsec=100,
+                    band_stats=[])])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x80', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x09', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x01', # entries[0].meter_id
+            '\x00\x48', # entries[0].len
+            '\x00' * 6, # pad
+            '\x00\x00\x00\x08', # entries[0].flow_count
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[0].packet_in_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[0].byte_in_count
+            '\x00\x00\x00\x14', # entries[0].duration_sec
+            '\x00\x00\x00\x64', # entries[0].duration_nsec
+            '\x00\x00\x00\x00\x00\x00\x00\x01', # entries[0].band_stats[0].packet_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x02', # entries[0].band_stats[0].byte_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x03', # entries[0].band_stats[1].packet_band_count
+            '\x00\x00\x00\x00\x00\x00\x00\x04', # entries[0].band_stats[1].byte_band_count
+            '\x00\x00\x00\x02', # entries[1].meter_id
+            '\x00\x28', # entries[1].len
+            '\x00' * 6, # pad
+            '\x00\x00\x00\x08', # entries[1].flow_count
+            '\x00\x00\x00\x00\x00\x00\x00\x10', # entries[1].packet_in_count
+            '\x00\x00\x00\x00\x00\x00\x00\x20', # entries[1].byte_in_count
+            '\x00\x00\x00\x14', # entries[1].duration_sec
+            '\x00\x00\x00\x64', # entries[1].duration_nsec
+        ])
+        test_serialization(obj, buf)
 
     def test_meter_config_stats_request(self):
         # TODO
         pass
 
     def test_meter_config_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_config_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            entries=[
+                ofp.meter_band.drop(rate=1, burst_size=2),
+                ofp.meter_band.dscp_remark(rate=3, burst_size=4, prec_level=5)])
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x30', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x0a', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x01', # entries[0].type
+            '\x00\x10', # entries[0].length
+            '\x00\x00\x00\x01', # entries[0].rate
+            '\x00\x00\x00\x02', # entries[0].burst_size
+            '\x00' * 4, # pad
+            '\x00\x02', # entries[1].type
+            '\x00\x10', # entries[1].length
+            '\x00\x00\x00\x03', # entries[1].rate
+            '\x00\x00\x00\x04', # entries[1].burst_size
+            '\x05', # entries[1].prec_level
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_meter_features_stats_request(self):
         # TODO
         pass
 
     def test_meter_features_stats_reply(self):
-        # TODO
-        pass
+        obj = ofp.message.meter_features_stats_reply(
+            xid=0x12345678,
+            flags=0,
+            features=ofp.meter_features(
+                max_meter=5,
+                band_types=ofp.OFPMBT_DROP|ofp.OFPMBT_DSCP_REMARK,
+                capabilities=ofp.OFPMF_KBPS|ofp.OFPMF_STATS,
+                max_bands=10,
+                max_color=7))
+        buf = ''.join([
+            '\x04', '\x13', # version, type
+            '\x00\x20', # length
+            '\x12\x34\x56\x78', # xid
+            '\x00\x0b', # stats_type
+            '\x00\x00', # flags
+            '\x00' * 4, # pad
+            '\x00\x00\x00\x05', # max_meter
+            '\x00\x00\x00\x03', # band_types
+            '\x00\x00\x00\x09', # capabilities
+            '\x0a', # max_bands
+            '\x07', # max_color
+            '\x00' * 2, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_table_features_stats_request(self):
         # TODO
@@ -613,6 +936,39 @@ class TestOXM(unittest.TestCase):
         ])
         self.assertEquals(expected, obj.pack())
 
+class TestInstructions(unittest.TestCase):
+    def test_goto_table(self):
+        obj = ofp.instruction.goto_table(table_id=5)
+        buf = ''.join([
+            '\x00\x01', # type
+            '\x00\x08', # length
+            '\x05', # table_id
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
+
+    def test_write_metadata(self):
+        # TODO
+        pass
+
+    def test_write_actions(self):
+        # TODO
+        pass
+
+    def test_apply_actions(self):
+        # TODO
+        pass
+
+    def test_clear_actions(self):
+        # TODO
+        pass
+
+    def test_meter(self):
+        # TODO
+        pass
+
+    # TODO test experimenter instructions
+
 class TestAllOF13(unittest.TestCase):
     """
     Round-trips every class through serialization/deserialization.
@@ -629,12 +985,11 @@ class TestAllOF13(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.group_desc_stats_entry,
-            ofp.message.group_desc_stats_reply,
-            ofp.message.group_mod,
-            ofp.message.group_stats_reply,
-            ofp.message.meter_stats_reply,
-            ofp.message.meter_features_stats_reply,
+            ofp.common.table_feature_prop_apply_actions,
+            ofp.common.table_feature_prop_apply_actions_miss,
+            ofp.common.table_feature_prop_write_actions,
+            ofp.common.table_feature_prop_write_actions_miss,
+            ofp.common.table_features,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]
