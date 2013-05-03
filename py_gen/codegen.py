@@ -91,6 +91,10 @@ def get_type_values(cls, version):
         type_values['type'] = 0
     elif cls == "of_match_v3":
         type_values['type'] = 1
+    elif utils.class_is_meter_band(cls):
+        type_values['type'] = util.constant_for_value(version, "ofp_meter_band_type", util.primary_wire_type(cls, version))
+    elif utils.class_is_instruction(cls):
+        type_values['type'] = util.constant_for_value(version, "ofp_instruction_type", util.primary_wire_type(cls, version))
 
     return type_values
 
@@ -102,6 +106,8 @@ def build_ofclasses(version):
                  "of_hello_elem", "of_hello_elem_header"]
     ofclasses = []
     for cls in of_g.standard_class_order:
+        if type_maps.class_is_virtual(cls):
+            continue
         if version not in of_g.unified[cls] or cls in blacklist:
             continue
         unified_class = util.lookup_unified_class(cls, version)
@@ -111,6 +117,10 @@ def build_ofclasses(version):
             pyname = cls[10:]
         elif utils.class_is_oxm(cls):
             pyname = cls[7:]
+        elif utils.class_is_meter_band(cls):
+            pyname = cls[14:]
+        elif utils.class_is_instruction(cls):
+            pyname = cls[15:]
         else:
             pyname = cls[3:]
 
@@ -170,6 +180,8 @@ def generate_common(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if not utils.class_is_message(x.name)
                     and not utils.class_is_action(x.name)
+                    and not utils.class_is_instruction(x.name)
+                    and not utils.class_is_meter_band(x.name)
                     and not utils.class_is_oxm(x.name)
                     and not utils.class_is_list(x.name)]
     util.render_template(out, 'common.py', ofclasses=ofclasses, version=version)
@@ -186,13 +198,23 @@ def generate_const(out, name, version):
             groups[group] = items
     util.render_template(out, 'const.py', version=version, groups=groups)
 
+def generate_instruction(out, name, version):
+    ofclasses = [x for x in build_ofclasses(version)
+                 if utils.class_is_instruction(x.name)]
+    util.render_template(out, 'instruction.py', ofclasses=ofclasses, version=version)
+
 def generate_message(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
                  if utils.class_is_message(x.name)]
     util.render_template(out, 'message.py', ofclasses=ofclasses, version=version)
 
+def generate_meter_band(out, name, version):
+    ofclasses = [x for x in build_ofclasses(version)
+                 if utils.class_is_meter_band(x.name)]
+    util.render_template(out, 'meter_band.py', ofclasses=ofclasses, version=version)
+
 def generate_pp(out, name, version):
     util.render_template(out, 'pp.py')
 
 def generate_util(out, name, version):
-    util.render_template(out, 'util.py')
+    util.render_template(out, 'util.py', version=version)
