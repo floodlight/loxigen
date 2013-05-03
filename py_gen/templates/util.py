@@ -52,6 +52,7 @@ def pretty_flags(v, flag_names):
         set_flags.append("%#x" % v)
     return '|'.join(set_flags) or '0'
 
+:: if version in [1,2]:
 def pretty_wildcards(v):
     if v == const.OFPFW_ALL:
         return 'OFPFW_ALL'
@@ -60,6 +61,7 @@ def pretty_wildcards(v):
                   'OFPFW_NW_SRC_MASK', 'OFPFW_NW_DST_MASK', 'OFPFW_DL_VLAN_PCP',
                   'OFPFW_NW_TOS']
     return pretty_flags(v, flag_names)
+:: #endif
 
 def pretty_port(v):
     named_ports = [(k,v2) for (k,v2) in const.__dict__.iteritems() if k.startswith('OFPP_')]

@@ -217,4 +217,4 @@ def generate_pp(out, name, version):
     util.render_template(out, 'pp.py')
 
 def generate_util(out, name, version):
-    util.render_template(out, 'util.py')
+    util.render_template(out, 'util.py', version=version)

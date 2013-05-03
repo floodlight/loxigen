@@ -55,7 +55,15 @@ class OFType(object):
         elif self.base == 'of_ipv6_t':
             v = repr('\x00' * 16)
         elif self.base == 'of_wc_bmap_t':
-            v = 'const.OFPFW_ALL'
+            if self.version in [1,2]:
+                v = 'const.OFPFW_ALL'
+            else:
+                v = 0
+        elif self.base == "of_match_bmap_t":
+            if self.version in [1,2]:
+                v = 'const.OFPFW_ALL'
+            else:
+                v = 0
         elif self.base in ['of_octets_t', 'of_port_name_t', 'of_table_name_t',
                            'of_desc_str_t', 'of_serial_num_t']:
             v = '""'
