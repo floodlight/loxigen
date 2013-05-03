@@ -148,6 +148,8 @@ class OFType(object):
             return self._gen_string_unpack_expr(reader_expr, 256)
         elif self.base == 'of_meter_features_t':
             return 'common.meter_features.unpack(%s)' % (reader_expr)
+        elif self.base == 'of_list_instruction_t':
+            return 'instruction.unpack_list(%s)' % (reader_expr)
         elif utils.class_is_list(self.base):
             element_cls = utils.list_to_entry_type(self.base)[:-2]
             if ((element_cls, self.version) in of_g.is_fixed_length) \

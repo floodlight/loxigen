@@ -395,8 +395,59 @@ class TestMessages(unittest.TestCase):
     ## Flow-mods
 
     def test_flow_add(self):
-        # TODO
-        pass
+        obj = ofp.message.flow_add(
+            xid=0x12345678,
+            cookie=0xFEDCBA9876543210,
+            cookie_mask=0xFF00FF00FF00FF00,
+            table_id=3,
+            idle_timeout=5,
+            hard_timeout=10,
+            priority=6000,
+            buffer_id=50,
+            out_port=6,
+            out_group=8,
+            flags=0,
+            match=ofp.match(oxm_list=[]),
+            instructions=[
+                ofp.instruction.goto_table(table_id=4),
+                ofp.instruction.goto_table(table_id=7)])
+        buf = ''.join([
+            '\x04', '\x0e', # version, type
+            '\x00\x48', # length
+            '\x12\x34\x56\x78', # xid
+
+            '\xfe\xdc\xba\x98\x76\x54\x32\x10', # cookie
+
+            '\xff\x00\xff\x00\xff\x00\xff\x00', # cookie_mask
+
+            '\x03', # table_id
+            '\x00', # _command
+            '\x00\x05', # idle_timeout
+            '\x00\x0a', # hard_timeout
+            '\x17\x70', # priority
+
+            '\x00\x00\x00\x32', # buffer_id
+            '\x00\x00\x00\x06', # out_port
+
+            '\x00\x00\x00\x08', # out_group
+            '\x00\x00', # flags
+            '\x00' * 2, # pad
+
+            '\x00\x01', # match.type
+            '\x00\x04', # match.length
+            '\x00' * 4, # pad
+
+            '\x00\x01', # instructions[0].type
+            '\x00\x08', # instructions[0].length
+            '\x04', # instructions[0].table_id
+            '\x00' * 3, # pad
+
+            '\x00\x01', # instructions[1].type
+            '\x00\x08', # instructions[1].length
+            '\x07', # instructions[1].table_id
+            '\x00' * 3, # pad
+        ])
+        test_serialization(obj, buf)
 
     def test_flow_modify(self):
         # TODO
@@ -934,19 +985,11 @@ class TestAllOF13(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
-            ofp.common.flow_stats_entry,
             ofp.common.table_feature_prop_apply_actions,
             ofp.common.table_feature_prop_apply_actions_miss,
-            ofp.common.table_feature_prop_instructions,
-            ofp.common.table_feature_prop_instructions_miss,
             ofp.common.table_feature_prop_write_actions,
             ofp.common.table_feature_prop_write_actions_miss,
             ofp.common.table_features,
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
         ]
