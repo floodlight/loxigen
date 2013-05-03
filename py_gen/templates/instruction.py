@@ -25,47 +25,44 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
+:: import itertools
+:: import of_g
 :: include('_copyright.py')
 
 :: include('_autogen.py')
 
-import loxi
-import const
 import struct
+import action
+import const
+import util
+import loxi.generic_util
+import loxi
 
-def pretty_mac(mac):
-    return ':'.join(["%02x" % x for x in mac])
+def unpack_list(reader):
+    def deserializer(reader, typ):
+        parser = parsers.get(typ)
+        if not parser: raise loxi.ProtocolError("unknown instruction type %d" % typ)
+        return parser(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
 
-def pretty_ipv4(v):
-    return "%d.%d.%d.%d" % ((v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF)
+class Instruction(object):
+    type = None # override in subclass
+    pass
 
-def pretty_flags(v, flag_names):
-    set_flags = []
-    for flag_name in flag_names:
-        flag_value = getattr(const, flag_name)
-        if v & flag_value == flag_value:
-            set_flags.append(flag_name)
-        elif v & flag_value:
-            set_flags.append('%s&%#x' % (flag_name, v & flag_value))
-        v &= ~flag_value
-    if v:
-        set_flags.append("%#x" % v)
-    return '|'.join(set_flags) or '0'
+:: for ofclass in ofclasses:
+:: include('_ofclass.py', ofclass=ofclass, superclass="Instruction")
 
-:: if version in [1,2]:
-def pretty_wildcards(v):
-    if v == const.OFPFW_ALL:
-        return 'OFPFW_ALL'
-    flag_names = ['OFPFW_IN_PORT', 'OFPFW_DL_VLAN', 'OFPFW_DL_SRC', 'OFPFW_DL_DST',
-                  'OFPFW_DL_TYPE', 'OFPFW_NW_PROTO', 'OFPFW_TP_SRC', 'OFPFW_TP_DST',
-                  'OFPFW_NW_SRC_MASK', 'OFPFW_NW_DST_MASK', 'OFPFW_DL_VLAN_PCP',
-                  'OFPFW_NW_TOS']
-    return pretty_flags(v, flag_names)
+:: #endfor
+
+parsers = {
+:: sort_key = lambda x: x.type_members[0].value
+:: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
+:: for (k, v) in msgtype_groups:
+:: v = list(v)
+:: if len(v) == 1:
+    ${k} : ${v[0].pyname}.unpack,
+:: else:
+    ${k} : parse_${k[12:].lower()},
 :: #endif
-
-def pretty_port(v):
-    named_ports = [(k,v2) for (k,v2) in const.__dict__.iteritems() if k.startswith('OFPP_')]
-    for (k, v2) in named_ports:
-        if v == v2:
-            return k
-    return v
+:: #endfor
+}

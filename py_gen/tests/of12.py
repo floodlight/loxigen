@@ -157,13 +157,7 @@ class TestAllOF12(unittest.TestCase):
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
-        expected_failures = [
-            ofp.common.group_desc_stats_entry,
-            ofp.common.table_stats_entry,
-            ofp.message.group_desc_stats_reply,
-            ofp.message.group_mod,
-            ofp.message.group_stats_reply,
-        ]
+        expected_failures = []
         for klass in self.klasses:
             def fn():
                 obj = klass()
@@ -177,9 +171,7 @@ class TestAllOF12(unittest.TestCase):
                 fn()
 
     def test_show(self):
-        expected_failures = [
-            ofp.common.table_stats_entry,
-        ]
+        expected_failures = []
         for klass in self.klasses:
             def fn():
                 obj = klass()

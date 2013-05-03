@@ -27,6 +27,7 @@
 
 import of_g
 import loxi_utils.loxi_utils as utils
+import loxi_front_end.type_maps
 import unittest
 
 class OFType(object):
@@ -54,7 +55,15 @@ class OFType(object):
         elif self.base == 'of_ipv6_t':
             v = repr('\x00' * 16)
         elif self.base == 'of_wc_bmap_t':
-            v = 'const.OFPFW_ALL'
+            if self.version in [1,2]:
+                v = 'const.OFPFW_ALL'
+            else:
+                v = 0
+        elif self.base == "of_match_bmap_t":
+            if self.version in [1,2]:
+                v = 'const.OFPFW_ALL'
+            else:
+                v = 0
         elif self.base in ['of_octets_t', 'of_port_name_t', 'of_table_name_t',
                            'of_desc_str_t', 'of_serial_num_t']:
             v = '""'
@@ -62,6 +71,8 @@ class OFType(object):
             v = 'common.match()'
         elif self.base == 'of_port_desc_t':
             v = 'common.port_desc()'
+        elif self.base == 'of_meter_features_t':
+            v = 'common.meter_features()'
         else:
             v = "None"
 
@@ -84,7 +95,7 @@ class OFType(object):
             return 'struct.pack("!6B", *%s)' % expr_expr
         elif self.base == 'of_ipv6_t':
             return 'struct.pack("!16s", %s)' % expr_expr
-        elif self.base in ['of_match_t', 'of_port_desc_t']:
+        elif self.base in ['of_match_t', 'of_port_desc_t', 'of_meter_features_t']:
             return '%s.pack()' % expr_expr
         elif self.base == 'of_port_name_t':
             return self._gen_string_pack_expr(16, expr_expr)
@@ -127,15 +138,30 @@ class OFType(object):
         elif self.base == 'of_list_oxm_t':
             # HACK need the match_v3 length field
             return 'oxm.unpack_list(%s.slice(_length-4))' % (reader_expr)
+        elif self.base == 'of_list_bucket_t':
+            return 'common.unpack_list_bucket(%s)' % (reader_expr)
+        elif self.base == 'of_list_group_desc_stats_entry_t':
+            return 'common.unpack_list_group_desc_stats_entry(%s)' % (reader_expr)
+        elif self.base == 'of_list_group_stats_entry_t':
+            return 'common.unpack_list_group_stats_entry(%s)' % (reader_expr)
+        elif self.base == 'of_list_meter_band_t':
+            return 'meter_band.unpack_list(%s)' % (reader_expr)
+        elif self.base == 'of_list_meter_stats_t':
+            return 'common.unpack_list_meter_stats(%s)' % (reader_expr)
         elif self.base == 'of_port_name_t':
             return self._gen_string_unpack_expr(reader_expr, 16)
         elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
             return self._gen_string_unpack_expr(reader_expr, 32)
         elif self.base == 'of_desc_str_t':
             return self._gen_string_unpack_expr(reader_expr, 256)
+        elif self.base == 'of_meter_features_t':
+            return 'common.meter_features.unpack(%s)' % (reader_expr)
+        elif self.base == 'of_list_instruction_t':
+            return 'instruction.unpack_list(%s)' % (reader_expr)
         elif utils.class_is_list(self.base):
             element_cls = utils.list_to_entry_type(self.base)[:-2]
-            if ((element_cls, self.version) in of_g.is_fixed_length):
+            if ((element_cls, self.version) in of_g.is_fixed_length) \
+               and not element_cls in loxi_front_end.type_maps.inheritance_map:
                 klass_name = self.base[8:-2]
                 element_size, = of_g.base_length[(element_cls, self.version)],
                 return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)

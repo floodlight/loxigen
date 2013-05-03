@@ -1320,6 +1320,27 @@ struct ofp_aggregate_stats_reply {
     uint8_t[4] pad;
 };
 
+struct ofp_table_stats_request {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type;
+    uint16_t flags;
+    uint8_t[4] pad;
+};
+
+struct ofp_table_stats_reply {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type;
+    uint16_t flags;
+    uint8_t[4] pad;
+    list(of_table_stats_entry_t) entries;
+};
+
 // FIXME: These are padded to 8 byte align beyond the length indicated
 
 struct ofp_table_feature_prop {

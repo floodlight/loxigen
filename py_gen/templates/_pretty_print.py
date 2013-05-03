@@ -48,7 +48,7 @@
                 q.text(util.pretty_mac(self.${m.name}))
 :: elif m.oftype.base == 'uint32_t' and m.name.startswith("ipv4"):
                 q.text(util.pretty_ipv4(self.${m.name}))
-:: elif m.oftype.base == 'of_wc_bmap_t':
+:: elif m.oftype.base == 'of_wc_bmap_t' and version in [1,2]:
                 q.text(util.pretty_wildcards(self.${m.name}))
 :: elif m.oftype.base == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
