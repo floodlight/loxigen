@@ -31,7 +31,7 @@
 
 import re
 import sys
-        
+
 def loxi_name(ident):
     """
     Return the LOXI name of an openflow.h identifier

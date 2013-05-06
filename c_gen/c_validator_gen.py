@@ -210,9 +210,9 @@ static inline int
 """ % dict(m_name=m_name, m_offset=m_offset, cls=cls))
         else:
             out.write("""
-    
+
     {    int %(m_name)s_len = len - %(m_offset)s;
-   
+
 """  % dict(m_name=m_name, m_offset=m_offset))
         out.write("""
         if (%(m_cls)s_%(ver_name)s_validate(buf + %(m_offset)s, %(m_name)s_len) < 0) {
@@ -240,7 +240,7 @@ static inline int
         subclasses = type_maps.inheritance_map[e_cls]
         out.write("""\
     while (len >= %(fixed_len)s) {
-        of_object_id_t e_id; 
+        of_object_id_t e_id;
         uint16_t e_type, e_len;
         buf_u16_get(buf, &e_type);
         buf_u16_get(buf+2, &e_len);

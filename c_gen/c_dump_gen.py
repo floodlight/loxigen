@@ -49,7 +49,7 @@ def gen_obj_dump_h(out, name):
  *
  * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
  *
- * Header file for object dumping. 
+ * Header file for object dumping.
  */
 
 /**
@@ -75,9 +75,9 @@ def gen_obj_dump_h(out, name):
 
 
 /**
- * Dump any OF object. 
+ * Dump any OF object.
  */
-int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj); 
+int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj);
 
 
 
@@ -110,8 +110,8 @@ def gen_obj_dump_c(out, name):
  *
  * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
  *
- * Source file for object dumping. 
- * 
+ * Source file for object dumping.
+ *
  */
 
 #define DISABLE_WARN_UNUSED_RESULT
@@ -122,9 +122,9 @@ def gen_obj_dump_c(out, name):
 static int
 unknown_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
-    return writer(cookie, "Unable to print object of type %d, version %d\\n", 
+    return writer(cookie, "Unable to print object of type %d, version %d\\n",
                          obj->object_id, obj->version);
-}    
+}
 """)
 
     for version in of_g.of_version_range:
@@ -188,7 +188,7 @@ int
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
     out += %(sub_cls)s_%(ver_name)s_dump(writer, cookie, &%(v_name)s);
-""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name, 
+""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
             out.write("""
@@ -236,11 +236,11 @@ static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
             if j < len(of_g.all_class_order) - 1: # Avoid ultimate comma
                 comma = ","
 
-            if (not loxi_utils.class_in_version(cls, version) or 
+            if (not loxi_utils.class_in_version(cls, version) or
                     cls in type_maps.inheritance_map):
                 out.write("    unknown_dump%s\n" % comma);
             else:
-                out.write("    %s_%s_dump%s\n" % 
+                out.write("    %s_%s_dump%s\n" %
                           (cls, loxi_utils.version_to_name(version), comma))
         out.write("};\n\n")
 

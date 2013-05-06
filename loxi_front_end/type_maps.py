@@ -636,7 +636,7 @@ error_types = {
 ##
 # These are the objects whose length is specified by an external
 # reference, specifically another data member in the class.
-# 
+#
 #external_length_spec = {
 #    ("of_packet_out", "actions", OF_VERSION_1_0) : "actions_len",
 #    ("of_packet_out", "actions", OF_VERSION_1_1) : "actions_len",
@@ -647,7 +647,7 @@ error_types = {
 
 ################################################################
 #
-# type_val is the primary data structure that maps an 
+# type_val is the primary data structure that maps an
 # (class_name, version) pair to the wire data type value
 #
 ################################################################
@@ -697,7 +697,7 @@ def type_array_len(version_indexed, max_val):
     Given versioned information about a type, calculate how long
     the unified array should be.
 
-    @param version_indexed A dict indexed by version. Each value is a 
+    @param version_indexed A dict indexed by version. Each value is a
     dict indexed by a name and whose value is an integer
     @param max_val Ignore values greater than this for length calcs
     """
@@ -923,7 +923,7 @@ def extension_to_experimenter_name(cls):
 
     This is brute force; we search all extension data for a match
     """
-    
+
     for ext_obj in extension_objects:
         for version, exp_list in ext_obj.items():
             for exp_name, classes in exp_list.items():
@@ -998,7 +998,7 @@ def cls_is_ext_obj(cls, version, ext_obj):
                     return True
 
     return False
-    
+
 ################################################################
 # These are extension message specific
 ################################################################

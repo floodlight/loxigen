@@ -48,7 +48,7 @@ The main content is struct elements for each OF recognized class.
 These are taken from current versions of openflow.h but are modified
 a bit.  See Overview for more information.
 
-Class canonical form:   A list of entries, each of which is a 
+Class canonical form:   A list of entries, each of which is a
 pair "type, name;".  The exception is when type is the keyword
 'list' in which the syntax is "list(type) name;".
 
@@ -60,8 +60,8 @@ can be calculated.
 
 @fixme Clean up the lang module architecture.  It should provide a
 list of files that it wants to generate and maps to the filenames,
-subdirectory names and generation functions.  It should also be 
-defined as a class, probably with the constructor taking the 
+subdirectory names and generation functions.  It should also be
+defined as a class, probably with the constructor taking the
 language target.
 
 @fixme Clean up global data structures such as versions and of_g
@@ -109,10 +109,10 @@ def config_sanity_check():
     # For now, only "error" supported for get returns
     if config_check("copy_semantics") != "read":
         debug("Only 'read' is supported for copy_semantics");
-        rv = False        
+        rv = False
     if config_check("get_returns") != "error":
         debug("Only 'error' is supported for get-accessor return types\m");
-        rv = False        
+        rv = False
     if not config_check("use_fn_ptrs") and not config_check("gen_unified_fns"):
         debug("Must have gen_fn_ptrs and/or gen_unified_fns set in config")
         rv = False
@@ -125,12 +125,12 @@ config_sanity_check if it is)")
         debug("Conflict: Cannot generate unified functions and lower case \
 unified macros")
         rv = False
-        
+
     return rv
 
 def add_class(wire_version, cls, members):
     """
-    Process a class for the given version and update the unified 
+    Process a class for the given version and update the unified
     list of classes as needed.
 
     @param wire_version The wire version for this class defn
@@ -153,7 +153,7 @@ def add_class(wire_version, cls, members):
             if wver == wire_version: continue
             if not "use_version" in uc[wver]:
                 if sig == loxi_utils.class_signature(uc[wver]["members"]):
-                    log("Matched %s, ver %d to ver %d" % 
+                    log("Matched %s, ver %d to ver %d" %
                           (cls, wire_version, wver))
                     # have a match with existing version
                     uc[wire_version]["use_version"] = wver
@@ -268,13 +268,13 @@ def calculate_offsets_and_lengths(ordered_classes, classes, wire_version):
                 if name == "pad":
                     log("Skipping pad for special offset for %s" % cls)
                 else:
-                    log("SPECIAL OFS: Member %s (prev %s), class %s ver %d" % 
+                    log("SPECIAL OFS: Member %s (prev %s), class %s ver %d" %
                           (name, last_name, cls, wire_version))
                     if (((cls, name) in of_g.special_offsets) and
                         (of_g.special_offsets[(cls, name)] != last_name)):
                         debug("ERROR: special offset prev name changed")
                         debug("  cls %s. name %s. version %d. was %s. now %s" %
-                              cls, name, wire_version, 
+                              cls, name, wire_version,
                               of_g.special_offsets[(cls, name)], last_name)
                         sys.exit(1)
                     of_g.special_offsets[(cls, name)] = last_name
@@ -292,13 +292,13 @@ def calculate_offsets_and_lengths(ordered_classes, classes, wire_version):
                 log("offset gen skipping octets: %s.%s " % (cls, name))
                 offset = -1
             else:
-                offset, len_update = update_offset(cls, wire_version, name, 
+                offset, len_update = update_offset(cls, wire_version, name,
                                                   offset, m_type)
                 if offset != -1:
                     fixed_offset = offset
                 else:
                     fixed_offset += len_update
-                    log("offset is -1 for %s.%s version %d " % 
+                    log("offset is -1 for %s.%s version %d " %
                         (cls, name, wire_version))
             last_offset = offset
             last_name = name
@@ -370,7 +370,7 @@ def order_and_assign_object_ids():
     This is done to promote a reasonable order of the objects, putting
     messages first followed by non-messages.  No assumptions should be
     made about the order, nor about contiguous numbering.  However, the
-    numbers should all be reasonably small allowing arrays indexed by 
+    numbers should all be reasonably small allowing arrays indexed by
     these enum values to be defined.
     """
 
@@ -510,7 +510,7 @@ def unify_input():
 
     global versions
 
-    # Add classes to unified in wire-format order so that it is easier 
+    # Add classes to unified in wire-format order so that it is easier
     # to generate things later
     keys = versions.keys()
     keys.sort(reverse=True)
@@ -536,7 +536,7 @@ def log_all_class_info():
                      loxi_utils.class_is_var_len(cls,v) and "not fixed"
                      or "fixed"))
                 if "use_version" in of_g.unified[cls][v]:
-                    log("cls %s: v %d mapped to %d" % (str(cls), v, 
+                    log("cls %s: v %d mapped to %d" % (str(cls), v,
                            of_g.unified[cls][v]["use_version"]))
                 if "members" in of_g.unified[cls][v]:
                     for member in of_g.unified[cls][v]["members"]:
