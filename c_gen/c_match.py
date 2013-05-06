@@ -600,9 +600,9 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
             of_oxm_%(key)s_masked_init(elt,
                 src->version, -1, 1);
             of_list_oxm_append_bind(oxm_list, &oxm_entry);
-            of_oxm_%(key)s_masked_value_set(elt, 
+            of_oxm_%(key)s_masked_value_set(elt,
                    src->fields.%(key)s);
-            of_oxm_%(key)s_masked_value_mask_set(elt, 
+            of_oxm_%(key)s_masked_value_mask_set(elt,
                    src->masks.%(key)s);
         } else {  /* Active, but not masked */
             of_oxm_%(key)s_t *elt;
@@ -900,7 +900,7 @@ of_match_deserialize(of_version_t version, of_match_t *match,
             of_match_v%(version)d_t wire_match;
             of_match_v%(version)d_init(&wire_match,
                    %(ver_name)s, -1, 1);
-            of_object_buffer_bind((of_object_t *)&wire_match, 
+            of_object_buffer_bind((of_object_t *)&wire_match,
                 octets->data, octets->bytes, NULL);
             OF_TRY(of_match_v%(version)d_to_match(&wire_match, match));
 
@@ -958,7 +958,7 @@ of_restricted_match_ipv6(of_ipv6_t *v1, of_ipv6_t *v2, of_ipv6_t *mask) {
     int idx;
 
     for (idx = 0; idx < OF_IPV6_BYTES; idx++) {
-        if ((v1->addr[idx] & mask->addr[idx]) != 
+        if ((v1->addr[idx] & mask->addr[idx]) !=
                (v2->addr[idx] & mask->addr[idx])) {
             return 0;
         }
@@ -977,7 +977,7 @@ of_overlap_ipv6(of_ipv6_t *v1, of_ipv6_t *v2,
     int idx;
 
     for (idx = 0; idx < OF_IPV6_BYTES; idx++) {
-        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) != 
+        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) !=
                ((v2->addr[idx] & m1->addr[idx]) & m2->addr[idx])) {
             return 0;
         }
@@ -1020,12 +1020,12 @@ of_more_specific_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2) {
  * Boolean test if two values agree when restricted to a mask
  */
 static inline int
-of_restricted_match_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2, 
+of_restricted_match_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
                              of_mac_addr_t *mask) {
     int idx;
 
     for (idx = 0; idx < OF_MAC_ADDR_BYTES; idx++) {
-        if ((v1->addr[idx] & mask->addr[idx]) != 
+        if ((v1->addr[idx] & mask->addr[idx]) !=
                (v2->addr[idx] & mask->addr[idx])) {
             return 0;
         }
@@ -1044,7 +1044,7 @@ of_overlap_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
     int idx;
 
     for (idx = 0; idx < OF_MAC_ADDR_BYTES; idx++) {
-        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) != 
+        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) !=
                ((v2->addr[idx] & m1->addr[idx]) & m2->addr[idx])) {
             return 0;
         }
@@ -1147,7 +1147,7 @@ of_match_more_specific(of_match_t *entry, of_match_t *query)
             %(q_m)s)) {
         return 0;
     }
-""" % dict(match_type=match_type, comp=comp, q_f=q_f, e_f=e_f, 
+""" % dict(match_type=match_type, comp=comp, q_f=q_f, e_f=e_f,
            q_m=q_m, e_m=e_m, key=key))
 
     out.write("""
@@ -1193,7 +1193,7 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
             f2 = "f2->%s" % key
         out.write("""
     /* Check overlap for %(key)s */
-    if (!%(check)s(%(f1)s, %(f2)s, 
+    if (!%(check)s(%(f1)s, %(f2)s,
         %(m2)s, %(m1)s)) {
         return 0; /* This field differentiates; all done */
     }

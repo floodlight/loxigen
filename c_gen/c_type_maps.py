@@ -61,46 +61,46 @@ def gen_object_id_to_type(out):
                 comma = ","
 
             if cls in type_maps.stats_reply_list:
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_stats_reply", version)],
                            comma, cls))
             elif cls in type_maps.stats_request_list:
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_stats_request", version)],
                            comma, cls))
             elif cls in type_maps.flow_mod_list:
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_flow_mod", version)],
                            comma, cls))
             elif (cls, version) in type_maps.type_val:
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[(cls, version)], comma, cls))
             elif type_maps.message_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_experimenter", version)],
                            comma, cls))
             elif type_maps.action_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_action_experimenter",
                                                version)],
                            comma, cls))
             elif type_maps.action_id_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_action_id_experimenter",
                                                version)],
                            comma, cls))
             elif type_maps.instruction_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_instruction_experimenter",
                                                version)],
                            comma, cls))
             elif type_maps.queue_prop_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_queue_prop_experimenter",
                                                version)],
                            comma, cls))
             elif type_maps.table_feature_prop_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" % 
+                out.write("    %d%s /* %s */\n" %
                     (type_maps.type_val[("of_table_feature_prop_experimenter",
                                          version)],
                      comma, cls))
@@ -142,7 +142,7 @@ of_object_to_extension_data_v%d[OF_OBJECT_COUNT] = {
             if type_maps.class_is_extension(cls, version):
                 exp_name = type_maps.extension_to_experimenter_macro_name(cls)
                 subtype = type_maps.extension_to_subtype(cls, version)
-                out.write("    {1, %s, %d}%s /* %s */\n" % 
+                out.write("    {1, %s, %d}%s /* %s */\n" %
                           (exp_name, subtype, comma, cls))
             else:
                 out.write("    {0, 0, 0}%s /* %s (non-extension) */\n" %
@@ -219,7 +219,7 @@ const of_object_id_t *const of_%(name)s[OF_VERSION_ARRAY_MAX] = {
     out.write("""
 };
 
-""" % dict(name=type_str, u_name=type_str.upper(), 
+""" % dict(name=type_str, u_name=type_str.upper(),
            max_val=max_val, c_name=prefix.lower()))
 
 def gen_type_maps(out):
@@ -238,7 +238,7 @@ def gen_type_maps(out):
                           "OF_ACTION_ID_%s", type_maps.action_id_types,
                           max_type_value)
     gen_type_to_object_id(out, "instruction_type_to_id", "OF_INSTRUCTION",
-                          "OF_INSTRUCTION_%s", type_maps.instruction_types, 
+                          "OF_INSTRUCTION_%s", type_maps.instruction_types,
                           max_type_value)
     gen_type_to_object_id(out, "queue_prop_type_to_id", "OF_QUEUE_PROP",
                           "OF_QUEUE_PROP_%s", type_maps.queue_prop_types,
@@ -301,10 +301,10 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @param version The version associated with the check
  * @return The %(name)s OF object type
  * @return OF_OBJECT_INVALID if type does not map to an object
- * 
+ *
  */
 static inline of_object_id_t
-of_%(name)s_to_object_id(int %(name)s, of_version_t version) 
+of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
         return OF_OBJECT_INVALID;
@@ -332,10 +332,10 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @param version The version associated with the check
  * @return The %(name)s OF object type
  * @return OF_OBJECT_INVALID if type does not map to an object
- * 
+ *
  */
 static inline of_object_id_t
-of_%(name)s_to_object_id(int %(name)s, of_version_t version) 
+of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
         return OF_OBJECT_INVALID;
@@ -367,10 +367,10 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @param version The version associated with the check
  * @return The %(name)s OF object type
  * @return OF_OBJECT_INVALID if type does not map to an object
- * 
+ *
  */
 static inline of_object_id_t
-of_%(name)s_to_object_id(int %(name)s, of_version_t version) 
+of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
         return OF_OBJECT_INVALID;
@@ -417,7 +417,7 @@ of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
     for version, experimenter_lists in type_maps.extension_message_subtype.items():
         for exp, subtypes in experimenter_lists.items():
             experimenter_function += """
-    if ((experimenter_id == OF_EXPERIMENTER_ID_%(exp_name)s) && 
+    if ((experimenter_id == OF_EXPERIMENTER_ID_%(exp_name)s) &&
             (version == %(ver_name)s)) {
 """ % dict(exp_name=exp.upper(), ver_name=of_g.wire_ver_map[version])
             for ext_msg, subtype in subtypes.items():
@@ -510,69 +510,69 @@ of_message_to_object_id(of_message_t msg, int length) {
 
     # Action types array gen
     ar_len = type_maps.type_array_len(type_maps.action_types, max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="action", u_name="ACTION", ar_len=ar_len))
 
     # Action ID types array gen
     ar_len = type_maps.type_array_len(type_maps.action_id_types, max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="action_id", u_name="ACTION_ID", ar_len=ar_len))
 
     # Instruction types array gen
     ar_len = type_maps.type_array_len(type_maps.instruction_types,
                                       max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="instruction", u_name="INSTRUCTION", ar_len=ar_len))
 
     # Queue prop types array gen
     ar_len = type_maps.type_array_len(type_maps.queue_prop_types,
                                       max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="queue_prop", u_name="QUEUE_PROP", ar_len=ar_len))
 
     # Table feature prop types array gen
     ar_len = type_maps.type_array_len(type_maps.table_feature_prop_types,
                                       max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="table_feature_prop", u_name="TABLE_FEATURE_PROP",
                    ar_len=ar_len))
 
     # Meter band types array gen
     ar_len = type_maps.type_array_len(type_maps.meter_band_types,
                                       max_type_value)
-    out.write(map_with_experimenter_template % 
+    out.write(map_with_experimenter_template %
               dict(name="meter_band", u_name="METER_BAND", ar_len=ar_len))
 
     # Hello elem types array gen
     ar_len = type_maps.type_array_len(type_maps.hello_elem_types,
                                       max_type_value)
-    out.write(map_template % 
+    out.write(map_template %
               dict(name="hello_elem", u_name="HELLO_ELEM", ar_len=ar_len))
 
     # Stats types array gen
     ar_len = type_maps.type_array_len(type_maps.stats_types,
                                       max_type_value)
-    out.write(stats_template % 
+    out.write(stats_template %
               dict(name="stats_reply", u_name="STATS_REPLY", ar_len=ar_len))
-    out.write(stats_template % 
-              dict(name="stats_request", u_name="STATS_REQUEST", 
+    out.write(stats_template %
+              dict(name="stats_request", u_name="STATS_REQUEST",
                    ar_len=ar_len))
 
     ar_len = type_maps.type_array_len(type_maps.flow_mod_types, max_type_value)
-    out.write(map_template % 
+    out.write(map_template %
               dict(name="flow_mod", u_name="FLOW_MOD", ar_len=ar_len))
 
     ar_len = type_maps.type_array_len(type_maps.oxm_types, max_type_value)
     out.write("""
 /* NOTE: We could optimize the OXM and only generate OF 1.2 versions. */
 """)
-    out.write(map_template % 
+    out.write(map_template %
               dict(name="oxm", u_name="OXM", ar_len=ar_len))
 
     out.write(experimenter_function)
     # Must follow stats reply/request
     ar_len = type_maps.type_array_len(type_maps.message_types, max_type_value)
-    out.write(msg_template % 
+    out.write(msg_template %
               dict(name="message", u_name="MESSAGE", ar_len=ar_len))
 
 def gen_obj_to_type_map_functions(out):
@@ -784,7 +784,7 @@ def gen_type_maps_header(out):
 
     out.write("""
 /**
- * Generic experimenter type value.  Applies to all except 
+ * Generic experimenter type value.  Applies to all except
  * top level message: Action, instruction, error, stats, queue_props, oxm
  */
 #define OF_EXPERIMENTER_TYPE 0xffff
@@ -926,7 +926,7 @@ def gen_type_data_header(out):
         out.write("""
 /**
  * Special length calculation for %(cls)s->%(name)s.
- * @param obj An object of type %(cls)s to check for 
+ * @param obj An object of type %(cls)s to check for
  * length of %(name)s
  * @param bytes[out] Where to store the calculated length
  *
@@ -937,7 +937,7 @@ extern int of_length_%(s_cls)s_%(name)s_get(
 
 /**
  * Special offset calculation for %(cls)s->%(name)s.
- * @param obj An object of type %(cls)s to check for 
+ * @param obj An object of type %(cls)s to check for
  * length of %(name)s
  * @param offset[out] Where to store the calculated length
  *
@@ -966,7 +966,7 @@ extern int of_offset_%(s_cls)s_%(name)s_get(
 #  */
 # extern int of_length_%(s_cls)s_get(
 #     %(cls)s_t *obj, int *bytes);
-# """ % dict(cls=cls, s_cls=s_cls))        
+# """ % dict(cls=cls, s_cls=s_cls))
 
     out.write("""
 /****************************************************************
@@ -992,15 +992,15 @@ extern void of_u16_len_wire_length_set(of_object_t *obj, int bytes);
 
 extern void of_action_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
 extern void of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
-extern void of_instruction_wire_object_id_get(of_object_t *obj, 
+extern void of_instruction_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-extern void of_queue_prop_wire_object_id_get(of_object_t *obj, 
+extern void of_queue_prop_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-extern void of_table_feature_prop_wire_object_id_get(of_object_t *obj, 
+extern void of_table_feature_prop_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-extern void of_meter_band_wire_object_id_get(of_object_t *obj, 
+extern void of_meter_band_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-extern void of_hello_elem_wire_object_id_get(of_object_t *obj, 
+extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 
 /** @fixme VERIFY LENGTH IS NUMBER OF BYTES OF ENTRY INCLUDING HDR */
@@ -1064,7 +1064,7 @@ const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX] = {
 };
 """)
 
-    
+
 ################################################################
 ################################################################
 

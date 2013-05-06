@@ -73,4 +73,4 @@ def ident_is_flag(ident):
             return True
 
     return False
-    
+

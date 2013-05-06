@@ -49,7 +49,7 @@ def gen_obj_show_h(out, name):
  *
  * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
  *
- * Header file for object showing. 
+ * Header file for object showing.
  */
 
 /**
@@ -75,9 +75,9 @@ def gen_obj_show_h(out, name):
 
 
 /**
- * Show any OF object. 
+ * Show any OF object.
  */
-int of_object_show(loci_writer_f writer, void* cookie, of_object_t* obj); 
+int of_object_show(loci_writer_f writer, void* cookie, of_object_t* obj);
 
 
 
@@ -110,8 +110,8 @@ def gen_obj_show_c(out, name):
  *
  * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
  *
- * Source file for object showing. 
- * 
+ * Source file for object showing.
+ *
  */
 
 #define DISABLE_WARN_UNUSED_RESULT
@@ -122,9 +122,9 @@ def gen_obj_show_c(out, name):
 static int
 unknown_show(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
-    return writer(cookie, "Unable to print object of type %d, version %d\\n", 
+    return writer(cookie, "Unable to print object of type %d, version %d\\n",
                          obj->object_id, obj->version);
-}    
+}
 """)
 
     for version in of_g.of_version_range:
@@ -158,7 +158,7 @@ int
                 m_type = member["m_type"]
                 m_name = member["name"]
                 #emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type)
-                emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + m_name; 
+                emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + m_name;
                 if loxi_utils.skip_member_name(m_name):
                     continue
                 if (loxi_utils.type_is_scalar(m_type) or
@@ -167,7 +167,7 @@ int
     %(cls)s_%(m_name)s_get(obj, &%(v_name)s);
     out += writer(cookie, "%(m_name)s=");
     out += %(emitter)s(writer, cookie, %(v_name)s);
-    out += writer(cookie, " "); 
+    out += writer(cookie, " ");
 """ % dict(cls=cls, m_name=m_name, m_type=m_type,
            v_name=var_name_map(m_type), emitter=emitter))
                 elif loxi_utils.class_is_list(m_type):
@@ -179,7 +179,7 @@ int
     %(u_type)s_ITER(&%(v_name)s, &elt, rv) {
         of_object_show(writer, cookie, (of_object_t *)&elt);
     }
-    out += writer(cookie, "} "); 
+    out += writer(cookie, "} ");
 """ % dict(sub_cls=sub_cls, u_type=sub_cls.upper(), v_name=var_name_map(m_type),
            elt_type=elt_type, cls=cls, m_name=m_name, m_type=m_type))
                 else:
@@ -187,7 +187,7 @@ int
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
     out += %(sub_cls)s_%(ver_name)s_show(writer, cookie, &%(v_name)s);
-""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name, 
+""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
             out.write("""
@@ -207,12 +207,12 @@ loci_show_match(loci_writer_f writer, void* cookie, of_match_t *match)
     for key, entry in match.of_match_members.items():
         m_type = entry["m_type"]
         #emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type)
-        emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + key; 
+        emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + key;
         out.write("""
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(match)) {
-        out += writer(cookie, "%(key)s active="); 
+        out += writer(cookie, "%(key)s active=");
         out += %(emitter)s(writer, cookie, match->fields.%(key)s);
-        out += writer(cookie, "/"); 
+        out += writer(cookie, "/");
         out += %(emitter)s(writer, cookie, match->masks.%(key)s);
         out += writer(cookie, " ");
     }
@@ -234,11 +234,11 @@ static const loci_obj_show_f show_funs_v%(version)s[OF_OBJECT_COUNT] = {
             if j < len(of_g.all_class_order) - 1: # Avoid ultimate comma
                 comma = ","
 
-            if (not loxi_utils.class_in_version(cls, version) or 
+            if (not loxi_utils.class_in_version(cls, version) or
                     cls in type_maps.inheritance_map):
                 out.write("    unknown_show%s\n" % comma);
             else:
-                out.write("    %s_%s_show%s\n" % 
+                out.write("    %s_%s_show%s\n" %
                           (cls, loxi_utils.version_to_name(version), comma))
         out.write("};\n\n")
 

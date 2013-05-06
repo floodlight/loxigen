@@ -207,11 +207,11 @@ def add_oxm_classes_1_2(classes, version):
         members.append(dict(name="value", m_type=oxm_types[oxm]))
         if oxm.find("_masked") > 0:
             members.append(dict(name="value_mask", m_type=oxm_types[oxm]))
-            
+
         name = "of_oxm_" + oxm
         of_g.ordered_classes[version].append(name)
         classes[name] = members
-        
+
 # /* Header for OXM experimenter match fields. */
 # struct ofp_oxm_experimenter_header {
 #     uint32_t oxm_header;        /* oxm_class = OFPXMC_EXPERIMENTER */
@@ -221,8 +221,8 @@ def add_oxm_classes_1_2(classes, version):
 
 
 # enum ofp_vlan_id {
-#     OFPVID_PRESENT = 0x1000, 
-#     OFPVID_NONE    = 0x0000, 
+#     OFPVID_PRESENT = 0x1000,
+#     OFPVID_NONE    = 0x0000,
 # };
 
 # #define OFP_VLAN_NONE      OFPVID_NONE

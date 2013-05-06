@@ -69,7 +69,7 @@ target_version_list = []
 
 def lang_normalize(lang):
     """
-    Normalize the representation of the language 
+    Normalize the representation of the language
     """
     return lang.lower()
 
@@ -115,7 +115,7 @@ def process_commandline(default_vals=options_default):
     parser.add_option("-i", "--install-dir",
                       default=default_vals["install-dir"],
                       help="Directory to install generated files to (default %s)" % default_vals["install-dir"])
-    parser.add_option("-v", "--version-list", 
+    parser.add_option("-v", "--version-list",
                       default=default_vals["version-list"],
                       help="Specify the versions to target as 1.0 1.1 etc")
 
@@ -130,7 +130,7 @@ def process_commandline(default_vals=options_default):
 # The dictionary of config variables related to code
 #
 # @param gen_unified_fns  Boolean; Generate top level function definitions for
-# accessors which are independent of the version; the alternative is to only 
+# accessors which are independent of the version; the alternative is to only
 # use the function pointers in the class definitions.  These functions support
 # better inlining optimizations.
 #
@@ -139,7 +139,7 @@ def process_commandline(default_vals=options_default):
 # unified (use_) functions
 #
 # @param use_obj_id  Use object IDs in struct defns   CURRENTLY NOT SUPPORTED
-# 
+#
 # @param return_base_types For 'get' accessors, return values when possible.
 # Otherwise all values are returned thru a call by variable parameter
 #
@@ -152,7 +152,7 @@ def process_commandline(default_vals=options_default):
 # @param encode_typedefs Use object and member IDs (rather than names)
 # when generating the names used for accessor function typedefs
 #
-# @param get_returns One of "error", "value", or "void"; 
+# @param get_returns One of "error", "value", or "void";
 # CURRENTLY ONLY "error" IS SUPPORTED.  "error" means
 # all get operations return an error code.  "value" means return a base_type
 # value when possible or void if not.  "void" means always return void
@@ -200,8 +200,8 @@ ofp_constants = dict(
 # the value is the name of the type to use for that version
 #
 # This is the map between the external type (like of_port_no_t)
-# which is used by customers of this code and the internal 
-# datatypes (like uint16_t) that appear on the wire for a 
+# which is used by customers of this code and the internal
+# datatypes (like uint16_t) that appear on the wire for a
 # particular version.
 #
 of_mixed_types = dict(
@@ -282,17 +282,17 @@ of_base_types = dict(
                          short_name="desc_str"),
     of_serial_num_t = dict(bytes=ofp_constants["OF_SERIAL_NUM_LEN"],
                            short_name="ser_num"),
-    of_match_v1_t = dict(bytes=40, to_w="match_v1_hton", 
-                         from_w="match_v1_ntoh", 
+    of_match_v1_t = dict(bytes=40, to_w="match_v1_hton",
+                         from_w="match_v1_ntoh",
                          short_name="match_v1"),
-    of_match_v2_t = dict(bytes=88, to_w="match_v2_hton", 
-                         from_w="match_v2_ntoh", 
+    of_match_v2_t = dict(bytes=88, to_w="match_v2_hton",
+                         from_w="match_v2_ntoh",
                          short_name="match_v2"),
-    of_match_v3_t = dict(bytes=-1, to_w="match_v3_hton", 
-                         from_w="match_v3_ntoh", 
+    of_match_v3_t = dict(bytes=-1, to_w="match_v3_hton",
+                         from_w="match_v3_ntoh",
                          short_name="match_v3"),
-#    of_match_v4_t = dict(bytes=-1, to_w="match_v4_hton", 
-#                         from_w="match_v4_ntoh", 
+#    of_match_v4_t = dict(bytes=-1, to_w="match_v4_hton",
+#                         from_w="match_v4_ntoh",
 #                         short_name="match_v4"),
     of_octets_t = dict(bytes=-1, short_name="octets")
 )
@@ -300,7 +300,7 @@ of_base_types = dict(
 of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
-                   "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t", 
+                   "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                    "of_ipv6_t"]
 
 base_object_members = """\
@@ -394,7 +394,7 @@ all_class_order = []
 ## Map from class, wire_version to size of fixed part of class
 base_length = {}
 
-## Boolean indication of variable length, per class, wire_version, 
+## Boolean indication of variable length, per class, wire_version,
 is_fixed_length = set()
 
 ## The global object ID counter
@@ -467,7 +467,7 @@ of_version_wire2name = {
 #
 # Experimenters, vendors, extensions
 #
-# Although the term "experimenter" is used for identifying 
+# Although the term "experimenter" is used for identifying
 # external extension definitions, we generally use the term
 # extension when refering to the messages or objects themselves.
 #

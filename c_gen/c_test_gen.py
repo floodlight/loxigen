@@ -83,11 +83,11 @@ def var_name_map(m_type):
         of_fm_cmd_t="fm_cmd",
         of_wc_bmap_t="wc_bmap",
         of_match_bmap_t = "match_bmap",
-        of_port_name_t="port_name", 
+        of_port_name_t="port_name",
         of_table_name_t="table_name",
         of_desc_str_t="desc_str",
-        of_serial_num_t="ser_num", 
-        of_mac_addr_t="mac_addr", 
+        of_serial_num_t="ser_num",
+        of_mac_addr_t="mac_addr",
         of_ipv6_t="ipv6",
         # Non-scalars; more TBD
         of_octets_t="octets",
@@ -104,7 +104,7 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                  "of_match_bmap_t"]
 string_types = [ "of_port_name_t", "of_table_name_t",
-                "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t", 
+                "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                 "of_ipv6_t"]
 
 scalar_types = integer_types[:]
@@ -240,7 +240,7 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
 
     for key, entry in match.of_match_members.items():
         out.write("""
-    if (!(of_match_incompat[version] & 
+    if (!(of_match_incompat[version] &
             OF_OXM_BIT(OF_OXM_INDEX_%(ku)s))) {
         OF_MATCH_MASK_%(ku)s_EXACT_SET(match);
         VAR_%(u_type)s_INIT(match->fields.%(key)s, value);
@@ -362,7 +362,7 @@ extern int %(cls)s_%(v_name)s_check_scalars(
  * Declarations for list population and check primitives
  */
 """)
- 
+
     for version in of_g.of_version_range:
         for cls in of_g.ordered_list_objects:
             if cls in type_maps.inheritance_map:
@@ -411,7 +411,7 @@ def gen_common_test(out, name):
 int exit_on_error = 1;
 
 /**
- * Global error state: 0 is okay, 1 is error 
+ * Global error state: 0 is okay, 1 is error
  */
 int global_error = 0;
 
@@ -501,7 +501,7 @@ run_scalar_acc_tests(void)
                 out.write("    RUN_TEST(%s_scalar);\n" % test_name)
 
     out.write("    return TEST_PASS;\n}\n");
-    
+
 def message_scalar_test(out, version, cls):
     """
     Generate one test case for the given version and class
@@ -523,7 +523,7 @@ test_%(cls)s_%(v_name)s_scalar(void)
     TEST_ASSERT(obj->length == %(length)d);
     TEST_ASSERT(obj->parent == NULL);
     TEST_ASSERT(obj->object_id == %(u_cls)s);
-""" % dict(cls=cls, u_cls=cls.upper(), 
+""" % dict(cls=cls, u_cls=cls.upper(),
            v_name=v_name, length=length, version=version))
     if not type_maps.class_is_virtual(cls):
         out.write("""
@@ -539,7 +539,7 @@ test_%(cls)s_%(v_name)s_scalar(void)
 
     /* Check values just set */
     TEST_ASSERT(%(cls)s_%(v_name)s_check_scalars(obj, 1) != 0);
-""" % dict(cls=cls, u_cls=cls.upper(), 
+""" % dict(cls=cls, u_cls=cls.upper(),
            v_name=v_name, length=length, version=version))
 
     out.write("""
@@ -566,7 +566,7 @@ def scalar_member_types_get(cls, version):
     for member in members:
         m_type = member["m_type"]
         m_name = member["name"]
-        if (not loxi_utils.type_is_scalar(m_type) or 
+        if (not loxi_utils.type_is_scalar(m_type) or
             ignore_member(cls, version, m_name, m_type)):
             continue
         if not m_type in member_types:
@@ -580,8 +580,8 @@ def scalar_funs_instance(out, cls, version, members, member_types):
     """
     out.write("""
 /**
- * Populate the scalar values in obj of type %(cls)s, 
- * version %(v_name)s 
+ * Populate the scalar values in obj of type %(cls)s,
+ * version %(v_name)s
  * @param obj Pointer to an object to populate
  * @param value The seed value to use in populating the object
  * @returns The value after increments for this object's values
@@ -608,11 +608,11 @@ int %(cls)s_%(v_name)s_populate_scalars(
     return value;
 }
 """)
-    
+
     out.write("""
 /**
- * Check scalar values in obj of type %(cls)s, 
- * version %(v_name)s 
+ * Check scalar values in obj of type %(cls)s,
+ * version %(v_name)s
  * @param obj Pointer to an object to check
  * @param value Starting value for checking
  * @returns The value after increments for this object's values
@@ -644,7 +644,7 @@ int %(cls)s_%(v_name)s_check_scalars(
 
 def gen_scalar_set_check_funs(out):
     """
-    For each object class with scalar members, generate functions that 
+    For each object class with scalar members, generate functions that
     set and check their values
     """
     for version in of_g.of_version_range:
@@ -658,7 +658,7 @@ def setup_instance(out, cls, subcls, instance, v_name, inst_len, version):
     base_type = loxi_utils.list_to_entry_type(cls)
     setup_template = """
     %(subcls)s_init(%(inst)s, %(v_name)s, -1, 1);
-    %(cls)s_append_bind(list, 
+    %(cls)s_append_bind(list,
             (%(base_type)s_t *)%(inst)s);
     value = %(subcls)s_%(v_name)s_populate(
         %(inst)s, value);
@@ -670,8 +670,8 @@ def setup_instance(out, cls, subcls, instance, v_name, inst_len, version):
 """ % subcls)
     for i in range(2):
         out.write(setup_template %
-                  dict(inst=instance, subcls=subcls, v_name=v_name, 
-                       base_type=base_type, cls=cls, inst_len=inst_len, 
+                  dict(inst=instance, subcls=subcls, v_name=v_name,
+                       base_type=base_type, cls=cls, inst_len=inst_len,
                        version=version))
 
 def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
@@ -695,7 +695,7 @@ def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
 """
     out.write("\n    /* Check two instances of type %s */" % instance)
 
-    out.write(check_template % 
+    out.write(check_template %
               dict(elt_name=loxi_utils.enum_name(subcls), inst_len=inst_len,
                    inst=instance, subcls=subcls,
                    v_name=loxi_utils.version_to_name(version)))
@@ -703,7 +703,7 @@ def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
     TEST_OK(%(cls)s_next(list, &elt));
 """ % dict(cls=cls))
 
-    out.write(check_template % 
+    out.write(check_template %
               dict(elt_name=loxi_utils.enum_name(subcls), inst_len=inst_len,
                    inst=instance, subcls=subcls,
                    v_name=loxi_utils.version_to_name(version)))
@@ -735,7 +735,7 @@ list_setup_%(cls)s_%(v_name)s(
     %(base_type)s_t elt;
     int cur_len = 0;
 """ % dict(cls=cls, base_type=base_type))
-    
+
     sub_classes =  type_maps.sub_class_map(base_type, version)
     v_name = loxi_utils.version_to_name(version)
 
@@ -770,7 +770,7 @@ def check_list_fn(out, version, cls):
     """
     out.write("""
 /**
- * Check a list of type %(cls)s generated by 
+ * Check a list of type %(cls)s generated by
  * list_setup_%(cls)s_%(v_name)s
  */
 int
@@ -782,7 +782,7 @@ list_check_%(cls)s_%(v_name)s(
     out.write("""
     %(base_type)s_t elt;
 """ % dict(cls=cls, base_type=base_type))
-    
+
     sub_classes =  type_maps.sub_class_map(base_type, version)
     v_name = loxi_utils.version_to_name(version)
 
@@ -804,7 +804,7 @@ list_check_%(cls)s_%(v_name)s(
             inst_len = -1
         else:
             inst_len = loxi_utils.base_type_to_length(base_type, version)
-        check_instance(out, cls, base_type, "elt_p", v_name, inst_len, 
+        check_instance(out, cls, base_type, "elt_p", v_name, inst_len,
                        version, True)
     else:
         count = 0
@@ -814,7 +814,7 @@ list_check_%(cls)s_%(v_name)s(
                 inst_len = -1
             else:
                 inst_len = of_g.base_length[(subcls, version)]
-            check_instance(out, cls, subcls, instance, v_name, inst_len, 
+            check_instance(out, cls, subcls, instance, v_name, inst_len,
                            version, count==len(sub_classes))
 
     out.write("""
@@ -856,7 +856,7 @@ test_%(cls)s_%(v_name)s(void)
 
     value = list_setup_%(cls)s_%(v_name)s(list, value);
     TEST_ASSERT(value != 0);
-""" % dict(cls=cls, base_type=base_type, v_name=loxi_utils.version_to_name(version), 
+""" % dict(cls=cls, base_type=base_type, v_name=loxi_utils.version_to_name(version),
            enum_cls=loxi_utils.enum_name(cls)))
 
     out.write("""
@@ -890,7 +890,7 @@ def gen_list_test(out, name):
 
 #include <locitest/test_common.h>
 """)
-    
+
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
         out.write("""
@@ -1034,9 +1034,9 @@ test_match_3(void)
         out.write("""
     /* Serialize to version %(v_name)s */
     TEST_ASSERT((value = of_match_populate(&match1, %(v_name)s, value)) > 0);
-    TEST_ASSERT(of_match_serialize(%(v_name)s, &match1, &octets) == 
+    TEST_ASSERT(of_match_serialize(%(v_name)s, &match1, &octets) ==
         OF_ERROR_NONE);
-    TEST_ASSERT(of_match_deserialize(%(v_name)s, &match2, &octets) == 
+    TEST_ASSERT(of_match_deserialize(%(v_name)s, &match2, &octets) ==
         OF_ERROR_NONE);
     TEST_ASSERT(memcmp(&match1, &match2, sizeof(match1)) == 0);
     FREE(octets.data);
@@ -1132,7 +1132,7 @@ run_message_tests(void)
             out.write("    RUN_TEST(%s);\n" % test_name)
 
     out.write("\n    return TEST_PASS;\n}\n");
-        
+
 
 def gen_list_setup_check(out, cls, version):
     """
@@ -1156,7 +1156,7 @@ int
     %(base_type)s_t elt;
     int cur_len = 0;
 """ % dict(cls=cls, base_type=base_type))
-    
+
     sub_classes =  type_maps.sub_class_map(base_type, version)
     v_name = loxi_utils.version_to_name(version)
 
@@ -1188,7 +1188,7 @@ int
     else:
         for instance, subcls in sub_classes:
             inst_len = of_g.base_length[(subcls, version)]
-            setup_instance(out, cls, subcls, instance, v_name, 
+            setup_instance(out, cls, subcls, instance, v_name,
                            inst_len, version)
     out.write("""
     return value;
@@ -1196,7 +1196,7 @@ int
 """)
     out.write("""
 /**
- * Check a list of type %(cls)s generated by 
+ * Check a list of type %(cls)s generated by
  * %(cls)s_%(v_name)s_populate
  * @param list Pointer to the list that was populated
  * @param value Starting value for checking
@@ -1213,7 +1213,7 @@ int
     int count = 0;
     int rv;
 """ % dict(cls=cls, base_type=base_type))
-    
+
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
     v_name = loxi_utils.version_to_name(version)
@@ -1238,7 +1238,7 @@ int
             inst_len = -1
         else:
             inst_len = loxi_utils.base_type_to_length(base_type, version)
-        check_instance(out, cls, base_type, "elt_p", v_name, inst_len, 
+        check_instance(out, cls, base_type, "elt_p", v_name, inst_len,
                        version, True)
     else:
         count = 0
@@ -1248,7 +1248,7 @@ int
                 inst_len = -1
             else:
                 inst_len = of_g.base_length[(subcls, version)]
-            check_instance(out, cls, subcls, instance, v_name, inst_len, 
+            check_instance(out, cls, subcls, instance, v_name, inst_len,
                            version, count==len(sub_classes))
     out.write("""
 """ % dict(base_type=base_type))
@@ -1332,7 +1332,7 @@ int
         /* Test bind */
         %(cls)s_%(m_name)s_bind(obj, &sub_cls);
     }
-""" % dict(var_name=var_name_map(m_type), cls=cls, 
+""" % dict(var_name=var_name_map(m_type), cls=cls,
            m_name=m_name, sub_cls=sub_cls,
            v_name=loxi_utils.version_to_name(version)))
 
@@ -1355,7 +1355,7 @@ int
     TEST_ASSERT(value != 0);
     %(cls)s_%(m_name)s_set(
         obj, &%(var_name)s);
-""" % dict(cls=cls, var_name=var_name_map(m_type), 
+""" % dict(cls=cls, var_name=var_name_map(m_type),
            m_name=m_name, v_name=loxi_utils.version_to_name(version)))
         elif m_type == "of_octets_t":
             out.write("""\
@@ -1498,7 +1498,7 @@ test_%(cls)s_%(v_name)s(void)
     TEST_ASSERT(obj->length == %(length)d);
     TEST_ASSERT(obj->parent == NULL);
     TEST_ASSERT(obj->object_id == %(u_cls)s);
-""" % dict(cls=cls, u_cls=cls.upper(), 
+""" % dict(cls=cls, u_cls=cls.upper(),
            v_name=v_name, length=length, version=version))
     if (not type_maps.class_is_virtual(cls)) or loxi_utils.class_is_list(cls):
         out.write("""
@@ -1522,7 +1522,7 @@ test_%(cls)s_%(v_name)s(void)
     /* Check values just set */
     TEST_ASSERT(%(cls)s_%(v_name)s_check(
         obj, 1) != 0);
-""" % dict(cls=cls, u_cls=cls.upper(), 
+""" % dict(cls=cls, u_cls=cls.upper(),
            v_name=v_name, length=length, version=version))
 
     out.write("""
@@ -1602,7 +1602,7 @@ def gen_dup_list(out, cls, version):
     elt_type = loxi_utils.list_to_entry_type(cls)
     out.write("""
 /**
- * Duplicate a list of type %(cls)s 
+ * Duplicate a list of type %(cls)s
  * using accessor functions
  * @param src Pointer to object to be duplicated
  * @returns A new object of type %(cls)s.
@@ -1643,7 +1643,7 @@ def gen_dup_inheritance(out, cls, version):
     ver_name = loxi_utils.version_to_name(version)
     out.write("""
 /**
- * Duplicate a super class object of type %(cls)s 
+ * Duplicate a super class object of type %(cls)s
  * @param src Pointer to object to be duplicated
  * @returns A new object of type %(cls)s.
  *
@@ -1680,7 +1680,7 @@ def gen_dup_cls(out, cls, version):
 
     out.write("""
 /**
- * Duplicate an object of type %(cls)s 
+ * Duplicate an object of type %(cls)s
  * using accessor functions
  * @param src Pointer to object to be duplicated
  * @returns A new object of type %(cls)s.
@@ -1741,7 +1741,7 @@ def gen_dup_cls(out, cls, version):
     }
     %(cls)s_%(m_name)s_set(dst, dst_%(v_name)s);
     %(sub_cls)s_delete(dst_%(v_name)s);
-""" % dict(sub_cls=sub_cls, cls=cls, m_name=m_name, 
+""" % dict(sub_cls=sub_cls, cls=cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
     out.write("""
@@ -1902,7 +1902,7 @@ test_dump_objs(void)
     of_object_dump((loci_writer_f)fprintf, out, obj);
     of_object_delete(obj);
 """ % dict(cls=cls, version=of_g.of_version_wire2name[version]))
-    
+
     out.write("""
     fclose(out);
     return TEST_PASS;

@@ -69,11 +69,11 @@ def member_returns_val(cls, m_name):
     Should get accessor return a value rather than void
     @param cls The class name
     @param m_name The member name
-    @return True if of_g config and the specific member allow a 
+    @return True if of_g config and the specific member allow a
     return value.  Otherwise False
     """
     m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and 
+    return (config_check("get_returns") =="value" and
             m_type in of_g.of_scalar_types)
 
 # TODO serialize match outside accessor?
@@ -139,7 +139,7 @@ def identifiers_gen(out, filename):
 /**
  * For each identifier from an OpenFlow header file, a Loxi version
  * of the identifier is generated.  For example, ofp_port_flood becomes
- * OF_PORT_DEST_FLOOD.  Loxi provides the following macros related to 
+ * OF_PORT_DEST_FLOOD.  Loxi provides the following macros related to
  * OpenFlow identifiers (using OF_IDENT_ as an example below):
  *     OF_IDENT_BY_VERSION(version) Get the value for the specific version
  *     OF_IDENT_SUPPORTED(version) Boolean: Is OF_IDENT defined for version
@@ -248,7 +248,7 @@ def identifiers_gen(out, filename):
         idents.sort()
         out.write("""
 /****************************************************************
- * Identifiers from %s 
+ * Identifiers from %s
  *****************************************************************/
 """ % group)
         for ident in idents:
@@ -578,10 +578,10 @@ of_object_u16_set(of_object_t *obj, int offset, int value) {
 /*
  * Match structs in 1.2 come at the end of the fixed length part
  * of structures.  They add 8 bytes to the minimal length of the
- * message, but are also variable length.  This means that the 
- * type/length offsets are 8 bytes back from the end of the fixed 
- * length part of the object.  The right way to handle this is to 
- * expose the offset of the match member more explicitly.  For now, 
+ * message, but are also variable length.  This means that the
+ * type/length offsets are 8 bytes back from the end of the fixed
+ * length part of the object.  The right way to handle this is to
+ * expose the offset of the match member more explicitly.  For now,
  * we make the calculation as described here.
  */
 
@@ -613,7 +613,7 @@ of_object_u16_set(of_object_t *obj, int offset, int value) {
  * @param obj An object with a match member
  * @param match_offset The wire offset of the match object.
  *
- * See above; for 1.2, 
+ * See above; for 1.2,
  * The match length is raw bytes but the actual space it takes
  * up is padded for alignment to 64-bits
  */
@@ -1187,7 +1187,7 @@ typedef enum of_version_e {
  */
 #define OF_VERSION_ARRAY_MAX %d
 """ % (max + 1))
-    
+
 def gen_object_enum(out):
     """
     Generate the enumerated type for object identification in LoxiGen
@@ -1474,7 +1474,7 @@ def field_ver_get(cls, m_name):
 
 def v3_match_offset_get(cls):
     """
-    Return the offset of an OF 1.2 match in an object if it has such; 
+    Return the offset of an OF 1.2 match in an object if it has such;
     otherwise return -1
     """
     result = field_ver_get(cls, "match")
@@ -1653,7 +1653,7 @@ of_packet_in_setup_from_flow_add(of_packet_in_t *obj,
  *     idle_timeout
  *     hard_timeout
  *
- * Note that the actions/instructions of a flow may be modified by a 
+ * Note that the actions/instructions of a flow may be modified by a
  * subsequent flow modify message.  To facilitate implementations,
  * the "effects" parameter is provided.  If effects is NULL, the
  * actions/instructions are taken from the flow_add message.
@@ -1817,7 +1817,7 @@ int
     %(i_call)s;
 
     /* Derive offset and length of child in parent */
-    OF_TRY(of_object_child_attach(parent, child, 
+    OF_TRY(of_object_child_attach(parent, child,
     if ((rv = of_list_first((of_object_t *)list, (of_object_t *)obj)) < 0) {
         return rv;
     }
@@ -1849,7 +1849,7 @@ def gen_list_next(out, cls, e_type):
         len_str = "obj->header.length"
     else:
         len_str = "obj->length"
-        
+
     out.write("""
 /**
  * Advance an iterator to the next element in a list
@@ -1936,7 +1936,7 @@ def gen_list_accessors(out, cls):
 #
 ################################################################
 
-    
+
 def gen_accessor_declarations(out):
     """
     Generate the declaration of each version independent accessor
@@ -1987,7 +1987,7 @@ extern %(get_ret_type)s %(base_name)s_get(
     %(gparams)s);
 """ % dict(base_name=base_name, gparams=gparams, sparams=sparams,
            get_ret_type=get_ret_type, set_ret_type=set_ret_type))
-            
+
         if loxi_utils.class_is_list(cls):
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
@@ -2101,7 +2101,7 @@ def length_of(m_type, version):
         return of_g.base_length[(m_type[:-2], version)]
     print "Unknown length request", m_type, version
     sys.exit(1)
-        
+
 
 def gen_get_accessor_body(out, cls, m_type, m_name):
     """
@@ -2231,7 +2231,7 @@ def gen_of_object_get(out, cls, m_name, m_type):
     sub_cls = m_type[:-2]
     out.write("""
 /**
- * Create a copy of %(m_name)s into a new variable of type %(m_type)s from 
+ * Create a copy of %(m_name)s into a new variable of type %(m_type)s from
  * a %(cls)s instance.
  *
  * @param obj Pointer to the source of type %(cls)s_t
@@ -2602,7 +2602,7 @@ def gen_init_fn_body(cls, out):
  * If bytes < 0, then the default fixed length is used for the object
  *
  * This is a "coerce" function that sets up the pointers for the
- * accessors properly.  
+ * accessors properly.
  *
  * If anything other than 0 is passed in for the buffer size, the underlying
  * wire buffer will have 'grow' called.
@@ -2679,7 +2679,7 @@ static inline int
                  %(name)s));
     }
 """ % dict(name = enum_name(cls)))
- 
+
         for version in of_g.of_version_range:
             if type_maps.class_is_extension(cls, version):
                 exp_name = type_maps.extension_to_experimenter_macro_name(cls)
@@ -2697,7 +2697,7 @@ static inline int
     }
 """ % dict(exp_name=exp_name, version=of_g.wire_ver_map[version],
            subtype=str(subtype)))
-           
+
     else: # Not a message
         if loxi_utils.class_is_tlv16(cls):
             out.write("""
@@ -2714,7 +2714,7 @@ static inline int
     /* Extended TLV obj; Call specific accessor */
     of_extension_object_id_set(obj, %(enum)s);
 """ % dict(cls=cls, enum=enum_name(cls)))
-                
+
 
         if loxi_utils.class_is_oxm(cls):
             out.write("""\
@@ -3175,7 +3175,7 @@ def gen_accessor_doc(out, name):
 
         out.write("""
 /**
- * Structure for %(cls)s object.  Get/set 
+ * Structure for %(cls)s object.  Get/set
  * accessors available in all versions unless noted otherwise
  *
 """ % dict(cls=cls))
@@ -3310,7 +3310,7 @@ def gen_code_samples(out, name):
 """)
 
 def gen_jump_table_template(out=sys.stdout, all_unhandled=True,
-                            cxn_type="ls_cxn_handle_t", 
+                            cxn_type="ls_cxn_handle_t",
                             unhandled="unhandled_message"):
     """
     Generate a template for a jump table.
@@ -3340,11 +3340,11 @@ msg_jump_table_t jump_table = {
         if not all_unhandled:
             fn_name = "%s_handler" % cls[3:]
         out.write("    %s%s /* %s */\n" % (fn_name, comma, enum_name(cls)))
-            
+
     out.write("};\n")
 
 def gen_message_switch_stmt_tmeplate(out=sys.stdout, all_unhandled=True,
-                                     cxn_type="ls_cxn_handle_t", 
+                                     cxn_type="ls_cxn_handle_t",
                                      unhandled="unhandled_message"):
     out.write("""
 /*
@@ -3533,7 +3533,7 @@ flow_removed_setup_from_flow_add_common(of_flow_removed_t *obj,
 
     of_flow_add_idle_timeout_get(flow_add, &val16);
     of_flow_removed_idle_timeout_set(obj, val16);
- 
+
     if (obj->version >= OF_VERSION_1_2) {
         of_flow_add_hard_timeout_get(flow_add, &val16);
         of_flow_removed_hard_timeout_set(obj, val16);
@@ -3550,13 +3550,13 @@ of_flow_removed_setup_from_flow_add(of_flow_removed_t *obj,
 {
     switch (obj->version) {
     case OF_VERSION_1_0:
-        return flow_removed_setup_from_flow_add_common(obj, flow_add, 
+        return flow_removed_setup_from_flow_add_common(obj, flow_add,
                                                        8, 8);
         break;
     case OF_VERSION_1_1:
     case OF_VERSION_1_2:
     case OF_VERSION_1_3:
-        return flow_removed_setup_from_flow_add_common(obj, flow_add, 
+        return flow_removed_setup_from_flow_add_common(obj, flow_add,
                                                        48, 48);
         break;
     default:
@@ -3625,7 +3625,7 @@ of_flow_stats_entry_setup_from_flow_add(of_flow_stats_entry_t *obj,
     case OF_VERSION_1_1:
     case OF_VERSION_1_2:
     case OF_VERSION_1_3:
-        return flow_stats_entry_setup_from_flow_add_common(obj, flow_add, 
+        return flow_stats_entry_setup_from_flow_add_common(obj, flow_add,
                                                            effects, 48, 48);
         break;
     default:
