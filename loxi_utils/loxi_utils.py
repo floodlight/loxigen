@@ -493,15 +493,16 @@ def accessor_returns_error(a_type, m_type):
     else:
         return False
 
-def render_template(out, name, path, context):
+def render_template(out, name, path, context, prefix = None):
     """
     Render a template using tenjin.
     out: a file-like object
     name: name of the template
     path: array of directories to search for the template
     context: dictionary of variables to pass to the template
+    prefix: optional prefix to use for embedding (for other languages than python)
     """
-    pp = [ tenjin.PrefixedLinePreprocessor() ] # support "::" syntax
+    pp = [ tenjin.PrefixedLinePreprocessor(prefix=prefix) if prefix else tenjin.PrefixedLinePreprocessor() ] # support "::" syntax
     template_globals = { "to_str": str, "escape": str } # disable HTML escaping
     engine = TemplateEngine(path=path, pp=pp)
     out.write(engine.render(name, context, template_globals))
