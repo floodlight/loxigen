@@ -71,7 +71,7 @@ def primary_wire_type(cls, version):
     elif type_maps.table_feature_prop_is_extension(cls, version):
         return type_maps.type_val[("of_table_feature_prop_experimenter", version)]
     else:
-        raise ValueError
+        raise ValueError("No wiretype for %s in version %d" % (cls, version))
 
 def constant_for_value(version, group, value):
     return (["const." + v["ofp_name"] for k, v in of_g.identifiers.items()

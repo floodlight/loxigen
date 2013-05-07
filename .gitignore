@@ -6,3 +6,4 @@ local
 .loxi_gen_files
 loxi_output
 loxigen.log
+tags

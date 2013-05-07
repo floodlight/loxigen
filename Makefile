@@ -57,6 +57,13 @@ python: .loxi_ts.python
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=python
 	touch $@
 
+java: .loxi_ts.java
+
+.loxi_ts.java: ${LOXI_JAVA_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
+	touch $@
+
+
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
 	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python
