@@ -223,6 +223,13 @@ stats_reply_parsers = {
 :: else:
     const.OFPST_EXPERIMENTER : experimenter_stats_reply.unpack,
 :: #endif
+:: if version >= of_g.VERSION_1_1:
+    const.OFPST_GROUP : group_stats_reply.unpack,
+    const.OFPST_GROUP_DESC : group_desc_stats_reply.unpack,
+:: #endif
+:: if version >= of_g.VERSION_1_2:
+    const.OFPST_GROUP_FEATURES : group_features_stats_reply.unpack,
+:: #endif
 }
 
 stats_request_parsers = {
@@ -237,9 +244,16 @@ stats_request_parsers = {
 :: else:
     const.OFPST_EXPERIMENTER : experimenter_stats_request.unpack,
 :: #endif
+:: if version >= of_g.VERSION_1_1:
+    const.OFPST_GROUP : group_stats_request.unpack,
+    const.OFPST_GROUP_DESC : group_desc_stats_request.unpack,
+:: #endif
+:: if version >= of_g.VERSION_1_2:
+    const.OFPST_GROUP_FEATURES : group_features_stats_request.unpack,
+:: #endif
 }
 :: else:
-
+# TODO OF 1.3 multipart messages
 :: #endif
 
 :: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 'const.OFPT_VENDOR']
