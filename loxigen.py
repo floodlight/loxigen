@@ -76,6 +76,7 @@ import string
 import os
 import glob
 import copy
+import collections
 import of_g
 import loxi_front_end.oxm as oxm
 import loxi_front_end.type_maps as type_maps
@@ -415,6 +416,7 @@ def read_input():
     @fixme Should select versions to support from command line
     """
 
+    ofinputs_by_version = collections.defaultdict(lambda: [])
     filenames = sorted(glob.glob("%s/openflow_input/*" % root_dir))
 
     for filename in filenames:
@@ -423,6 +425,7 @@ def read_input():
 
         # Populate global state
         for wire_version in ofinput.wire_versions:
+            ofinputs_by_version[wire_version].append(ofinput)
             version_name = of_g.of_version_wire2name[wire_version]
 
             for ofclass in ofinput.classes:
@@ -446,6 +449,13 @@ def read_input():
                         translation.loxi_name(name),
                         name, enum.name, value, wire_version,
                         of_g.identifiers, of_g.identifiers_by_group)
+
+        for wire_version, ofinputs in ofinputs_by_version.items():
+            ofprotocol = OFProtocol(wire_version=wire_version, classes=[], enums=[])
+            for ofinput in ofinputs:
+                ofprotocol.classes.extend(ofinput.classes)
+                ofprotocol.enums.extend(ofinput.enums)
+            of_g.ir[wire_version] = ofprotocol
 
 def add_extra_classes():
     """

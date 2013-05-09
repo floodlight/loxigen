@@ -343,6 +343,11 @@ base_object_members = """\
     uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
 """
 
+# LOXI intermediate representation
+# This is a hash from wire versions to OFProtocol objects.
+# See loxi_ir.py
+
+ir = {}
 
 ##
 # LOXI identifiers
