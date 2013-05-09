@@ -83,6 +83,16 @@ struct foo {
         self.assertEquals(ast,
             [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
 
+    def test_pad_type(self):
+        src = """\
+struct foo {
+    pad(1);
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [['pad', 1]]]])
+
 class EnumTests(unittest.TestCase):
     def test_empty(self):
         src = """\

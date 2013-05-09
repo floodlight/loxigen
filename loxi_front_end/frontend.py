@@ -46,7 +46,18 @@ def create_ofinput(ast):
     for s in ast:
         if s[0] == 'struct':
             name = s[1]
-            members = [dict(m_type=x[0], name=x[1]) for x in s[2]]
+            pad_count = 0
+            members = []
+            for x in s[2]:
+                if x[0] == 'pad':
+                    # HACK until we have a real intermediate representation
+                    m_name = 'pad%d' % pad_count
+                    if m_name == 'pad0': m_name = 'pad'
+                    members.append(dict(m_type='uint8_t[%d]' % x[1],
+                                        name=m_name))
+                    pad_count += 1
+                else:
+                    members.append(dict(m_type=x[0], name=x[1]))
             ofinput.classes[name] = members
             ofinput.ordered_classes.append(name)
             if name in type_maps.inheritance_map:

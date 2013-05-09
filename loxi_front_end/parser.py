@@ -50,9 +50,10 @@ list_type = P.Combine(kw('list') - lit('(') - identifier - lit(')'))
 any_type = (array_type | list_type | scalar_type).setName("type name")
 
 # Structs
-struct_member = P.Group(any_type - identifier - s(';'))
+pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
+struct_member = pad_member | P.Group(any_type - identifier);
 struct = kw('struct') - identifier - s('{') + \
-         P.Group(P.ZeroOrMore(struct_member)) + \
+         P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 
 # Enums
