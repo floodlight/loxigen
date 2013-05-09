@@ -33,7 +33,7 @@ enum ofp_nicira_controller_role {
    NX_ROLE_SLAVE = 2,
 };
 
-struct ofp_nicira_controller_role_request {
+struct of_nicira_controller_role_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -43,7 +43,7 @@ struct ofp_nicira_controller_role_request {
     uint32_t role;         // 0 other, 1 master, 2 slave
 };
 
-struct ofp_nicira_controller_role_reply {
+struct of_nicira_controller_role_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;

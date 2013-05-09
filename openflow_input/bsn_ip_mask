@@ -27,7 +27,7 @@
 
 #version 1
 
-struct ofp_bsn_set_ip_mask {
+struct of_bsn_set_ip_mask {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -39,7 +39,7 @@ struct ofp_bsn_set_ip_mask {
     uint32_t mask;
 };
 
-struct ofp_bsn_get_ip_mask_request {
+struct of_bsn_get_ip_mask_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -50,7 +50,7 @@ struct ofp_bsn_get_ip_mask_request {
     uint8_t[7] pad;
 };
 
-struct ofp_bsn_get_ip_mask_reply {
+struct of_bsn_get_ip_mask_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;

@@ -548,7 +548,7 @@ enum ofp_hello_elem_type {
     OFPHET_VERSIONBITMAP = 1,
 };
 
-struct ofp_header {
+struct of_header {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -556,27 +556,27 @@ struct ofp_header {
 };
 
 // Special structures used for managing scalar list elements
-struct ofp_uint32 {
+struct of_uint32 {
     uint32_t value;
 };
 
 // Special structures used for managing scalar list elements
-struct ofp_uint8 {
+struct of_uint8 {
     uint8_t value;
 };
 
-struct ofp_hello_elem {
+struct of_hello_elem {
     uint16_t type;
     uint16_t length;
 };
 
-struct ofp_hello_elem_versionbitmap {
+struct of_hello_elem_versionbitmap {
     uint16_t type;
     uint16_t length;
     list(of_uint32_t) bitmaps;
 };
 
-struct ofp_hello {
+struct of_hello {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -584,7 +584,7 @@ struct ofp_hello {
     list(of_hello_elem_t) elements;
 };
 
-struct ofp_echo_request {
+struct of_echo_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -592,7 +592,7 @@ struct ofp_echo_request {
     of_octets_t data;
 };
 
-struct ofp_echo_reply {
+struct of_echo_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -600,7 +600,7 @@ struct ofp_echo_reply {
     of_octets_t data;
 };
 
-struct ofp_experimenter {
+struct of_experimenter {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -610,37 +610,28 @@ struct ofp_experimenter {
     of_octets_t data;
 };
 
-struct ofp_barrier_request {
+struct of_barrier_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_barrier_reply {
+struct of_barrier_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_get_config_request {
+struct of_get_config_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_get_config_reply {
-    uint8_t version;
-    uint8_t type;
-    uint16_t length;
-    uint32_t xid;
-    uint16_t flags;
-    uint16_t miss_send_len;
-};
-
-struct ofp_set_config {
+struct of_get_config_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -649,7 +640,16 @@ struct ofp_set_config {
     uint16_t miss_send_len;
 };
 
-struct ofp_table_mod {
+struct of_set_config {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t flags;
+    uint16_t miss_send_len;
+};
+
+struct of_table_mod {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -659,7 +659,7 @@ struct ofp_table_mod {
     uint32_t config;
 };
 
-struct ofp_port_desc {
+struct of_port_desc {
     of_port_no_t port_no;
     uint8_t[4] pad;
     of_mac_addr_t hw_addr;
@@ -675,14 +675,14 @@ struct ofp_port_desc {
     uint32_t max_speed;
 };
 
-struct ofp_features_request {
+struct of_features_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_features_reply {
+struct of_features_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -696,7 +696,7 @@ struct ofp_features_reply {
     uint32_t reserved;
 };
 
-struct ofp_port_status {
+struct of_port_status {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -706,7 +706,7 @@ struct ofp_port_status {
     of_port_desc_t desc;
 };
 
-struct ofp_port_mod {
+struct of_port_mod {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -722,13 +722,13 @@ struct ofp_port_mod {
 };
 
 // FIXME Does this need to be v4?
-struct ofp_match_v3 {
+struct of_match_v3 {
     uint16_t type;
     uint16_t length;
     list(of_oxm_t) oxm_list;
 };
 
-struct ofp_oxm_experimenter_header {
+struct of_oxm_experimenter_header {
     uint32_t oxm_header;
     uint32_t experimenter;
     of_octets_t data;
@@ -736,13 +736,13 @@ struct ofp_oxm_experimenter_header {
 
 // This looks like an action header, but is standalone.  See 
 // ofp_table_features_prop_actions
-struct ofp_action_id {
+struct of_action_id {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_output {
+struct of_action_output {
     uint16_t type;
     uint16_t len;
     of_port_no_t port;
@@ -750,128 +750,128 @@ struct ofp_action_output {
     uint8_t[6] pad;
 };
 
-struct ofp_action_copy_ttl_out {
+struct of_action_copy_ttl_out {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_copy_ttl_in {
+struct of_action_copy_ttl_in {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_set_mpls_ttl {
+struct of_action_set_mpls_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t mpls_ttl;
     uint8_t[3] pad;
 };
 
-struct ofp_action_dec_mpls_ttl {
+struct of_action_dec_mpls_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_push_vlan {
+struct of_action_push_vlan {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
     uint8_t[2] pad;
 };
 
-struct ofp_action_pop_vlan {
+struct of_action_pop_vlan {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_push_mpls {
+struct of_action_push_mpls {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
     uint8_t[2] pad;
 };
 
-struct ofp_action_pop_mpls {
+struct of_action_pop_mpls {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
     uint8_t[2] pad;
 };
 
-struct ofp_action_set_queue {
+struct of_action_set_queue {
     uint16_t type;
     uint16_t len;
     uint32_t queue_id;
 };
 
-struct ofp_action_group {
+struct of_action_group {
     uint16_t type;
     uint16_t len;
     uint32_t group_id;
 };
 
-struct ofp_action_set_nw_ttl {
+struct of_action_set_nw_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t nw_ttl;
     uint8_t[3] pad;
 };
 
-struct ofp_action_dec_nw_ttl {
+struct of_action_dec_nw_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_set_field {
+struct of_action_set_field {
     uint16_t type;
     uint16_t len;
     of_octets_t field;
 };
 
-struct ofp_action_experimenter {
+struct of_action_experimenter {
     uint16_t type;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct ofp_action_pop_pbb {
+struct of_action_pop_pbb {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_action_push_pbb {
+struct of_action_push_pbb {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
     uint8_t[2] pad;
 };
 
-struct ofp_action {
+struct of_action {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_instruction {
+struct of_instruction {
     uint16_t type;
     uint16_t len;
 };
 
-struct ofp_instruction_goto_table {
+struct of_instruction_goto_table {
     uint16_t type;
     uint16_t len;
     uint8_t table_id;
     uint8_t[3] pad;
 };
 
-struct ofp_instruction_write_metadata {
+struct of_instruction_write_metadata {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
@@ -879,40 +879,40 @@ struct ofp_instruction_write_metadata {
     uint64_t metadata_mask;
 };
 
-struct ofp_instruction_write_actions {
+struct of_instruction_write_actions {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
     list(of_action_t) actions;
 };
 
-struct ofp_instruction_apply_actions {
+struct of_instruction_apply_actions {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
     list(of_action_t) actions;
 };
 
-struct ofp_instruction_clear_actions {
+struct of_instruction_clear_actions {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_instruction_meter {
+struct of_instruction_meter {
     uint16_t type;
     uint16_t len;
     uint32_t meter_id;
 };
 
-struct ofp_instruction_experimenter {
+struct of_instruction_experimenter {
     uint16_t type;		
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct ofp_flow_add {
+struct of_flow_add {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -933,7 +933,7 @@ struct ofp_flow_add {
     list(of_instruction_t) instructions;
 };
 
-struct ofp_flow_modify {
+struct of_flow_modify {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -954,7 +954,7 @@ struct ofp_flow_modify {
     list(of_instruction_t) instructions;
 };
 
-struct ofp_flow_modify_strict {
+struct of_flow_modify_strict {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -975,7 +975,7 @@ struct ofp_flow_modify_strict {
     list(of_instruction_t) instructions;
 };
 
-struct ofp_flow_delete {
+struct of_flow_delete {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -996,7 +996,7 @@ struct ofp_flow_delete {
     list(of_instruction_t) instructions;
 };
 
-struct ofp_flow_delete_strict {
+struct of_flow_delete_strict {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1017,7 +1017,7 @@ struct ofp_flow_delete_strict {
     list(of_instruction_t) instructions;
 };
 
-struct ofp_bucket {
+struct of_bucket {
     uint16_t len;
     uint16_t weight;
     of_port_no_t watch_port;
@@ -1026,7 +1026,7 @@ struct ofp_bucket {
     list(of_action_t) actions;
 };
 
-struct ofp_group_mod {
+struct of_group_mod {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1038,7 +1038,7 @@ struct ofp_group_mod {
     list(of_bucket_t) buckets;
 };
 
-struct ofp_packet_out {
+struct of_packet_out {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1051,7 +1051,7 @@ struct ofp_packet_out {
     of_octets_t data;
 };
 
-struct ofp_packet_in {
+struct of_packet_in {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1066,7 +1066,7 @@ struct ofp_packet_in {
     of_octets_t data; /* FIXME: Ensure total_len gets updated */
 };
 
-struct ofp_flow_removed {
+struct of_flow_removed {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1084,14 +1084,14 @@ struct ofp_flow_removed {
     of_match_t match;
 };
 
-struct ofp_meter_band {
+struct of_meter_band {
     uint16_t        type;
     uint16_t        len;
 //    uint32_t        rate;  // These are excluded b/c this is the header
 //    uint32_t        burst_size;  // These are excluded b/c this is the header
 };
 
-struct ofp_meter_band_drop {
+struct of_meter_band_drop {
     uint16_t        type;
     uint16_t        len;
     uint32_t        rate;
@@ -1099,7 +1099,7 @@ struct ofp_meter_band_drop {
     uint8_t[4]      pad;
 };
 
-struct ofp_meter_band_dscp_remark {
+struct of_meter_band_dscp_remark {
     uint16_t        type;
     uint16_t        len;
     uint32_t        rate;
@@ -1108,7 +1108,7 @@ struct ofp_meter_band_dscp_remark {
     uint8_t[3]      pad;
 };
 
-struct ofp_meter_band_experimenter {
+struct of_meter_band_experimenter {
     uint16_t        type;
     uint16_t        len;
     uint32_t        rate;
@@ -1116,7 +1116,7 @@ struct ofp_meter_band_experimenter {
     uint32_t        experimenter;
 };
 
-struct ofp_meter_mod {
+struct of_meter_mod {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1127,7 +1127,7 @@ struct ofp_meter_mod {
     list(of_meter_band_t) meters;
 };
 
-struct ofp_error_msg {
+struct of_error_msg {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1137,7 +1137,7 @@ struct ofp_error_msg {
     of_octets_t data;
 };
 
-//struct ofp_error_experimenter_msg {
+//struct of_error_experimenter_msg {
 //    uint8_t version;
 //    uint8_t type;
 //    uint16_t length;
@@ -1150,7 +1150,7 @@ struct ofp_error_msg {
 
 // STATS ENTRIES: flow, table, port, queue, group stats, group desc stats
 
-struct ofp_flow_stats_entry {
+struct of_flow_stats_entry {
     uint16_t length;
     uint8_t table_id;
     uint8_t pad;
@@ -1168,7 +1168,7 @@ struct ofp_flow_stats_entry {
 };
 
 
-struct ofp_table_stats_entry {
+struct of_table_stats_entry {
     uint8_t table_id;
     uint8_t[3] pad;
     uint32_t active_count;
@@ -1176,7 +1176,7 @@ struct ofp_table_stats_entry {
     uint64_t matched_count;
 };
 
-struct ofp_port_stats_entry {
+struct of_port_stats_entry {
     of_port_no_t port_no;
     uint8_t[4] pad;
     uint64_t rx_packets;
@@ -1195,7 +1195,7 @@ struct ofp_port_stats_entry {
     uint32_t duration_nsec;
 };
 
-struct ofp_queue_stats_entry {
+struct of_queue_stats_entry {
     of_port_no_t port_no;
     uint32_t queue_id;
     uint64_t tx_bytes;
@@ -1205,12 +1205,12 @@ struct ofp_queue_stats_entry {
     uint32_t duration_nsec;
 };
 
-struct ofp_bucket_counter {
+struct of_bucket_counter {
     uint64_t packet_count;
     uint64_t byte_count;
 };
 
-struct ofp_group_stats_entry {
+struct of_group_stats_entry {
     uint16_t length;
     uint8_t[2] pad;
     uint32_t group_id;
@@ -1223,7 +1223,7 @@ struct ofp_group_stats_entry {
     list(of_bucket_counter_t) bucket_stats;
 };
 
-struct ofp_group_desc_stats_entry {
+struct of_group_desc_stats_entry {
     uint16_t length;
     uint8_t type;
     uint8_t pad;
@@ -1234,7 +1234,7 @@ struct ofp_group_desc_stats_entry {
 // STATS: 
 //  Desc, flow, agg, table, port, queue, group, group_desc, group_feat, experi
 
-struct ofp_desc_stats_request {
+struct of_desc_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1244,7 +1244,7 @@ struct ofp_desc_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_desc_stats_reply {
+struct of_desc_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1259,7 +1259,7 @@ struct ofp_desc_stats_reply {
     of_desc_str_t dp_desc;
 };
 
-struct ofp_flow_stats_request {
+struct of_flow_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1277,7 +1277,7 @@ struct ofp_flow_stats_request {
     of_match_t match;
 };
 
-struct ofp_flow_stats_reply {
+struct of_flow_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1288,7 +1288,7 @@ struct ofp_flow_stats_reply {
     list(of_flow_stats_entry_t) entries;
 };
 
-struct ofp_aggregate_stats_request {
+struct of_aggregate_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1306,7 +1306,7 @@ struct ofp_aggregate_stats_request {
     of_match_t match;
 };
 
-struct ofp_aggregate_stats_reply {
+struct of_aggregate_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1320,7 +1320,7 @@ struct ofp_aggregate_stats_reply {
     uint8_t[4] pad;
 };
 
-struct ofp_table_stats_request {
+struct of_table_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1330,7 +1330,7 @@ struct ofp_table_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_table_stats_reply {
+struct of_table_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1343,97 +1343,97 @@ struct ofp_table_stats_reply {
 
 // FIXME: These are padded to 8 byte align beyond the length indicated
 
-struct ofp_table_feature_prop {
+struct of_table_feature_prop {
     uint16_t         type;
     uint16_t         length;
 };
 
-struct ofp_table_feature_prop_instructions {
+struct of_table_feature_prop_instructions {
     uint16_t         type;
     uint16_t         length;
     // FIXME Check if instruction_t is right for ids here
     list(of_instruction_t)   instruction_ids;
 };
 
-struct ofp_table_feature_prop_instructions_miss {
+struct of_table_feature_prop_instructions_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_instruction_t)   instruction_ids;
 };
 
-struct ofp_table_feature_prop_next_tables {
+struct of_table_feature_prop_next_tables {
     uint16_t         type;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct ofp_table_feature_prop_next_tables_miss {
+struct of_table_feature_prop_next_tables_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct ofp_table_feature_prop_write_actions {
+struct of_table_feature_prop_write_actions {
     uint16_t         type;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct ofp_table_feature_prop_write_actions_miss {
+struct of_table_feature_prop_write_actions_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct ofp_table_feature_prop_apply_actions {
+struct of_table_feature_prop_apply_actions {
     uint16_t         type;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct ofp_table_feature_prop_apply_actions_miss {
+struct of_table_feature_prop_apply_actions_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct ofp_table_feature_prop_match {
+struct of_table_feature_prop_match {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_wildcards {
+struct of_table_feature_prop_wildcards {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_write_setfield {
+struct of_table_feature_prop_write_setfield {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_write_setfield_miss {
+struct of_table_feature_prop_write_setfield_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_apply_setfield {
+struct of_table_feature_prop_apply_setfield {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_apply_setfield_miss {
+struct of_table_feature_prop_apply_setfield_miss {
     uint16_t         type;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct ofp_table_feature_prop_experimenter {
+struct of_table_feature_prop_experimenter {
     uint16_t         type;
     uint16_t         length;
     uint32_t         experimenter;
@@ -1442,7 +1442,7 @@ struct ofp_table_feature_prop_experimenter {
 };
 
 // Not yet supported
-// struct ofp_table_feature_prop_experimenter_miss {
+// struct of_table_feature_prop_experimenter_miss {
 //     uint16_t         type;
 //     uint16_t         length;
 //     uint32_t         experimenter;
@@ -1450,7 +1450,7 @@ struct ofp_table_feature_prop_experimenter {
 //     of_octets_t      experimenter_data;
 // };
 
-struct ofp_table_features {
+struct of_table_features {
     uint16_t length;
     uint8_t table_id;
     uint8_t[5] pad;
@@ -1462,7 +1462,7 @@ struct ofp_table_features {
     list(of_table_feature_prop_t) properties;
 };
 
-struct ofp_meter_features {
+struct of_meter_features {
     uint32_t    max_meter;
     uint32_t    band_types;
     uint32_t    capabilities;
@@ -1471,7 +1471,7 @@ struct ofp_meter_features {
     uint8_t[2]     pad;
 };
 
-struct ofp_port_stats_request {
+struct of_port_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1483,7 +1483,7 @@ struct ofp_port_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_port_stats_reply {
+struct of_port_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1494,7 +1494,7 @@ struct ofp_port_stats_reply {
     list(of_port_stats_entry_t) entries;
 };
 
-struct ofp_queue_stats_request {
+struct of_queue_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1506,7 +1506,7 @@ struct ofp_queue_stats_request {
     uint32_t queue_id;
 };
 
-struct ofp_queue_stats_reply {
+struct of_queue_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1517,7 +1517,7 @@ struct ofp_queue_stats_reply {
     list(of_queue_stats_entry_t) entries;
 };
 
-struct ofp_group_stats_request {
+struct of_group_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1529,7 +1529,7 @@ struct ofp_group_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_group_stats_reply {
+struct of_group_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1540,7 +1540,7 @@ struct ofp_group_stats_reply {
     list(of_group_stats_entry_t) entries;
 };
 
-struct ofp_group_desc_stats_request {
+struct of_group_desc_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1550,7 +1550,7 @@ struct ofp_group_desc_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_group_desc_stats_reply {
+struct of_group_desc_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1561,7 +1561,7 @@ struct ofp_group_desc_stats_reply {
     list(of_group_desc_stats_entry_t) entries;
 };
 
-struct ofp_group_features_stats_request {
+struct of_group_features_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1571,7 +1571,7 @@ struct ofp_group_features_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_group_features_stats_reply {
+struct of_group_features_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1591,7 +1591,7 @@ struct ofp_group_features_stats_reply {
     uint32_t actions_ff;
 };
 
-struct ofp_meter_stats_request {
+struct of_meter_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1603,7 +1603,7 @@ struct ofp_meter_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_meter_stats_reply {
+struct of_meter_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1614,7 +1614,7 @@ struct ofp_meter_stats_reply {
     list(of_meter_stats_t) entries;
 };
 
-struct ofp_meter_config_stats_request {
+struct of_meter_config_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1626,7 +1626,7 @@ struct ofp_meter_config_stats_request {
     uint8_t[4] pad;
 };
 
-struct ofp_meter_config_stats_reply {
+struct of_meter_config_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1638,7 +1638,7 @@ struct ofp_meter_config_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct ofp_meter_features_stats_request {
+struct of_meter_features_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1649,7 +1649,7 @@ struct ofp_meter_features_stats_request {
 };
 
 // FIXME stats added to get things working
-struct ofp_meter_features_stats_reply {
+struct of_meter_features_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1661,7 +1661,7 @@ struct ofp_meter_features_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct ofp_table_features_stats_request {
+struct of_table_features_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1673,7 +1673,7 @@ struct ofp_table_features_stats_request {
 };
 
 // FIXME stats added to get things working
-struct ofp_table_features_stats_reply {
+struct of_table_features_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1685,7 +1685,7 @@ struct ofp_table_features_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct ofp_port_desc_stats_request {
+struct of_port_desc_stats_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1696,7 +1696,7 @@ struct ofp_port_desc_stats_request {
 };
 
 // FIXME stats added to get things working
-struct ofp_port_desc_stats_reply {
+struct of_port_desc_stats_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1707,12 +1707,12 @@ struct ofp_port_desc_stats_reply {
     list(of_port_desc_t) entries;
 };
 
-struct ofp_meter_band_stats {
+struct of_meter_band_stats {
     uint64_t        packet_band_count;
     uint64_t        byte_band_count;
 };
 
-struct ofp_meter_stats {
+struct of_meter_stats {
     uint32_t        meter_id;
     uint16_t        len;
     uint8_t[6]         pad;
@@ -1724,35 +1724,27 @@ struct ofp_meter_stats {
     list(of_meter_band_stats_t) band_stats;
 };
 
-struct ofp_meter_config {
+struct of_meter_config {
     uint16_t        length;
     uint16_t        flags;
     uint32_t        meter_id;
     list(of_meter_band_t) entries;
 };
 
-struct ofp_experimenter_multipart_header {
+struct of_experimenter_multipart_header {
     uint32_t experimenter;
     uint32_t subtype;
 };
 
 // END OF STATS OBJECTS
 
-struct ofp_queue_prop {
+struct of_queue_prop {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
 };
 
-struct ofp_queue_prop_min_rate {
-    uint16_t type;
-    uint16_t len;
-    uint8_t[4] pad;
-    uint16_t rate;
-    uint8_t[6] pad;
-};
-
-struct ofp_queue_prop_max_rate {
+struct of_queue_prop_min_rate {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
@@ -1760,7 +1752,15 @@ struct ofp_queue_prop_max_rate {
     uint8_t[6] pad;
 };
 
-struct ofp_queue_prop_experimenter {
+struct of_queue_prop_max_rate {
+    uint16_t type;
+    uint16_t len;
+    uint8_t[4] pad;
+    uint16_t rate;
+    uint8_t[6] pad;
+};
+
+struct of_queue_prop_experimenter {
     uint16_t type;
     uint16_t len;
     uint8_t[4] pad;
@@ -1769,7 +1769,7 @@ struct ofp_queue_prop_experimenter {
     of_octets_t data;
 };
 
-struct ofp_packet_queue {
+struct of_packet_queue {
     uint32_t queue_id;
     of_port_no_t port;
     uint16_t len;
@@ -1777,7 +1777,7 @@ struct ofp_packet_queue {
     list(of_queue_prop_t) properties;
 };
 
-struct ofp_queue_get_config_request {
+struct of_queue_get_config_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1786,7 +1786,7 @@ struct ofp_queue_get_config_request {
     uint8_t[4] pad;
 };
 
-struct ofp_queue_get_config_reply {
+struct of_queue_get_config_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1796,7 +1796,7 @@ struct ofp_queue_get_config_reply {
     list(of_packet_queue_t) queues;
 };
 
-struct ofp_role_request {
+struct of_role_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1806,7 +1806,7 @@ struct ofp_role_request {
     uint64_t generation_id;
 };
 
-struct ofp_role_reply {
+struct of_role_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1821,7 +1821,7 @@ struct ofp_role_reply {
 //   while uint32_t[1] is interest for slave
 ////////////////////////////////////////////////////////////////
 
-struct ofp_async_get_request {
+struct of_async_get_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1834,7 +1834,7 @@ struct ofp_async_get_request {
     uint32_t flow_removed_mask_slave;
 };
 
-struct ofp_async_get_reply {
+struct of_async_get_reply {
     uint8_t version;
     uint8_t type;
     uint16_t length;
@@ -1847,7 +1847,7 @@ struct ofp_async_get_reply {
     uint32_t flow_removed_mask_slave;
 };
 
-struct ofp_async_set {
+struct of_async_set {
     uint8_t version;
     uint8_t type;
     uint16_t length;

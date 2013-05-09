@@ -45,7 +45,7 @@ def create_ofinput(ast):
     # Now for each structure, generate lists for each member
     for s in ast:
         if s[0] == 'struct':
-            name = s[1].replace("ofp_", "of_", 1)
+            name = s[1]
             members = [dict(m_type=x[0], name=x[1]) for x in s[2]]
             ofinput.classes[name] = members
             ofinput.ordered_classes.append(name)

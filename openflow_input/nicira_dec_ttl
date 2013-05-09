@@ -27,7 +27,7 @@
 
 #version any
 
-struct ofp_action_nicira_dec_ttl {
+struct of_action_nicira_dec_ttl {
     uint16_t type;      // OF_ACTION_TYPE_EXPERIMENTER
     uint16_t len;
     uint32_t experimenter;    // OF_EXPERIMENTER_ID_NICIRA
