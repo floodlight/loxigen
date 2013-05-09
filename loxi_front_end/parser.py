@@ -71,4 +71,11 @@ grammar = P.ZeroOrMore(P.Group(struct) | P.Group(enum) | P.Group(metadata))
 grammar.ignore(P.cppStyleComment)
 
 def parse(src):
-    return grammar.parseString(src, parseAll=True)
+    """
+    Given an input string, return the AST.
+
+    The AST is a low-level representation of the input. It changes frequently
+    with the input file syntax. The frontend.py module transforms the AST
+    into the OFInput represntation.
+    """
+    return grammar.parseString(src, parseAll=True).asList()

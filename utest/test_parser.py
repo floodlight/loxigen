@@ -36,7 +36,7 @@ class StructTests(unittest.TestCase):
 struct foo { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['struct', 'foo', []]])
+        self.assertEquals(ast, [['struct', 'foo', []]])
 
     def test_one_field(self):
         src = """\
@@ -45,7 +45,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', [['uint32_t', 'bar']]]])
 
     def test_multiple_fields(self):
@@ -57,7 +57,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo',
                 [['uint32_t', 'bar'],
                  ['uint8_t', 'baz'],
@@ -70,7 +70,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', [['uint32_t[4]', 'bar']]]])
 
     def test_list_type(self):
@@ -80,7 +80,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
 
 class EnumTests(unittest.TestCase):
@@ -90,7 +90,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', []]])
+        self.assertEquals(ast, [['enum', 'foo', []]])
 
     def test_one(self):
         src = """\
@@ -99,7 +99,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', 1]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['BAR', 1]]]])
 
     def test_multiple(self):
         src = """\
@@ -110,7 +110,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
     def test_trailing_comma(self):
         src = """\
@@ -121,7 +121,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
 class TestMetadata(unittest.TestCase):
     def test_version(self):
@@ -129,7 +129,7 @@ class TestMetadata(unittest.TestCase):
 #version 1
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['metadata', 'version', '1']])
+        self.assertEquals(ast, [['metadata', 'version', '1']])
 
 class TestToplevel(unittest.TestCase):
     def test_multiple_structs(self):
@@ -138,7 +138,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', []], ['struct', 'bar', []]])
 
     def test_comments(self):
@@ -152,7 +152,7 @@ struct foo { //comment 2
 // comment 4
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', [['uint32_t', 'a']]]])
 
     def test_mixed(self):
@@ -163,7 +163,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['metadata', 'version', '1'],
              ['struct', 'foo', []],
              ['metadata', 'version', '2'],
