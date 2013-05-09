@@ -25,11 +25,25 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+import copy
 import of_g
 import loxi_front_end.type_maps as type_maps
+from loxi_ir import *
 
 class InputError(Exception):
     pass
+
+# TODO handle type members
+def create_member(m_ast):
+    if m_ast[0] == 'pad':
+        return OFPadMember(length=m_ast[1])
+    elif m_ast[1] == 'length' or m_ast[1] == 'len': # Should be moved to parser
+        return OFLengthMember(name=m_ast[1], oftype=m_ast[0])
+    elif m_ast[1] == 'actions_len':
+        # HACK only usage so far
+        return OFFieldLengthMember(name=m_ast[1], oftype=m_ast[0], field_name='actions')
+    else:
+        return OFDataMember(name=m_ast[1], oftype=m_ast[0])
 
 def create_ofinput(ast):
     """
@@ -40,42 +54,30 @@ def create_ofinput(ast):
     @returns An OFInput object
     """
 
-    ofinput = of_g.OFInput()
+    ofinput = OFInput(wire_versions=set(), classes=[], enums=[])
 
-    # Now for each structure, generate lists for each member
-    for s in ast:
-        if s[0] == 'struct':
-            name = s[1]
-            pad_count = 0
-            members = []
-            for x in s[2]:
-                if x[0] == 'pad':
-                    # HACK until we have a real intermediate representation
-                    m_name = 'pad%d' % pad_count
-                    if m_name == 'pad0': m_name = 'pad'
-                    members.append(dict(m_type='uint8_t[%d]' % x[1],
-                                        name=m_name))
-                    pad_count += 1
-                else:
-                    members.append(dict(m_type=x[0], name=x[1]))
-            ofinput.classes[name] = members
-            ofinput.ordered_classes.append(name)
-            if name in type_maps.inheritance_map:
+    for decl_ast in ast:
+        if decl_ast[0] == 'struct':
+            members = [create_member(m_ast) for m_ast in decl_ast[2]]
+            ofclass = OFClass(name=decl_ast[1], members=members)
+            ofinput.classes.append(ofclass)
+            if ofclass.name in type_maps.inheritance_map:
                 # Clone class into header class and add to list
-                ofinput.classes[name + "_header"] = members[:]
-                ofinput.ordered_classes.append(name + "_header")
-        if s[0] == 'enum':
-            name = s[1]
-            members = s[2]
-            ofinput.enums[name] = [(x[0], x[1]) for x in members]
-        elif s[0] == 'metadata':
-            if s[1] == 'version':
-                if s[2] == 'any':
+                # TODO figure out if these are actually used
+                ofclass_header = OFClass(ofclass.name + '_header',
+                                         copy.deepcopy(members))
+                ofinput.classes.append(ofclass_header)
+        if decl_ast[0] == 'enum':
+            enum = OFEnum(name=decl_ast[1], values=[(x[0], x[1]) for x in decl_ast[2]])
+            ofinput.enums.append(enum)
+        elif decl_ast[0] == 'metadata':
+            if decl_ast[1] == 'version':
+                if decl_ast[2] == 'any':
                     ofinput.wire_versions.update(of_g.wire_ver_map.keys())
-                elif int(s[2]) in of_g.supported_wire_protos:
-                    ofinput.wire_versions.add(int(s[2]))
+                elif int(decl_ast[2]) in of_g.supported_wire_protos:
+                    ofinput.wire_versions.add(int(decl_ast[2]))
                 else:
-                    raise InputError("Unrecognized wire protocol version %s" % repr(s[2]))
+                    raise InputError("Unrecognized wire protocol version %r" % decl_ast[2])
                 found_wire_version = True
 
     if not ofinput.wire_versions:

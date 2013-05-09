@@ -86,7 +86,7 @@ import pyparsing
 import loxi_front_end.parser as parser
 import loxi_front_end.translation as translation
 import loxi_front_end.frontend as frontend
-
+from loxi_ir import *
 from generic_utils import *
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
@@ -424,14 +424,27 @@ def read_input():
         # Populate global state
         for wire_version in ofinput.wire_versions:
             version_name = of_g.of_version_wire2name[wire_version]
-            versions[version_name]['classes'].update(copy.deepcopy(ofinput.classes))
-            of_g.ordered_classes[wire_version].extend(ofinput.ordered_classes)
 
-            for enum_name, members in ofinput.enums.items():
-                for member_name, value in members:
+            for ofclass in ofinput.classes:
+                of_g.ordered_classes[wire_version].append(ofclass.name)
+                legacy_members = []
+                pad_count = 0
+                for m in ofclass.members:
+                    if type(m) == OFPadMember:
+                        m_name = 'pad%d' % pad_count
+                        if m_name == 'pad0': m_name = 'pad'
+                        legacy_members.append(dict(m_type='uint8_t[%d]' % m.length,
+                                                   name=m_name))
+                        pad_count += 1
+                    else:
+                        legacy_members.append(dict(m_type=m.oftype, name=m.name))
+                versions[version_name]['classes'][ofclass.name] = legacy_members
+
+            for enum in ofinput.enums:
+                for name, value in enum.values:
                     identifiers.add_identifier(
-                        translation.loxi_name(member_name),
-                        member_name, enum_name, value, wire_version,
+                        translation.loxi_name(name),
+                        name, enum.name, value, wire_version,
                         of_g.identifiers, of_g.identifiers_by_group)
 
 def add_extra_classes():

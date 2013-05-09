@@ -506,20 +506,3 @@ def experimenter_name_lookup(experimenter_id):
 
 loxigen_dbg_file = sys.stdout
 loxigen_log_file = sys.stdout
-
-################################################################
-#
-# Internal representation
-#
-################################################################
-
-class OFInput(object):
-    """
-    A single LOXI input file.
-    """
-
-    def __init__(self):
-        self.wire_versions = set()
-        self.classes = {}
-        self.ordered_classes = []
-        self.enums = {}
