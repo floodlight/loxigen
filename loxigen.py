@@ -455,6 +455,7 @@ def read_input():
             for ofinput in ofinputs:
                 ofprotocol.classes.extend(ofinput.classes)
                 ofprotocol.enums.extend(ofinput.enums)
+            ofprotocol.classes.sort(key=lambda ofclass: ofclass.name)
             of_g.ir[wire_version] = ofprotocol
 
 def add_extra_classes():
