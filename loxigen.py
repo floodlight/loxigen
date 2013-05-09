@@ -85,6 +85,7 @@ import loxi_front_end.identifiers as identifiers
 import pyparsing
 import loxi_front_end.parser as parser
 import loxi_front_end.translation as translation
+import loxi_front_end.frontend as frontend
 
 from generic_utils import *
 
@@ -314,51 +315,26 @@ def process_input_file(filename):
     """
     Process an input file
 
+    Does not modify global state.
+
     @param filename The input filename
 
-    @returns (wire_version, classes), where wire_version is the integer wire
-    protocol number and classes is the dict of all classes processed from the
-    file.
+    @returns An OFInput object
     """
 
     # Parse the input file
     try:
-        ast = parser.parse(open(filename, 'r').read())
+        with open(filename, 'r') as f:
+            ast = parser.parse(f.read())
     except pyparsing.ParseBaseException as e:
         print "Parse error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
 
-    ofinput = of_g.OFInput()
-
-    # Now for each structure, generate lists for each member
-    for s in ast:
-        if s[0] == 'struct':
-            name = s[1].replace("ofp_", "of_", 1)
-            members = [dict(m_type=x[0], name=x[1]) for x in s[2]]
-            ofinput.classes[name] = members
-            ofinput.ordered_classes.append(name)
-            if name in type_maps.inheritance_map:
-                # Clone class into header class and add to list
-                ofinput.classes[name + "_header"] = members[:]
-                ofinput.ordered_classes.append(name + "_header")
-        if s[0] == 'enum':
-            name = s[1]
-            members = s[2]
-            ofinput.enums[name] = [(x[0], x[1]) for x in members]
-        elif s[0] == 'metadata':
-            if s[1] == 'version':
-                log("Found version: wire version " + s[2])
-                if s[2] == 'any':
-                    ofinput.wire_versions.update(of_g.wire_ver_map.keys())
-                elif int(s[2]) in of_g.supported_wire_protos:
-                    ofinput.wire_versions.add(int(s[2]))
-                else:
-                    debug("Unrecognized wire protocol version")
-                    sys.exit(1)
-                found_wire_version = True
-
-    if not ofinput.wire_versions:
-        debug("Missing #version metadata")
+    # Create the OFInput from the AST
+    try:
+        ofinput = frontend.create_ofinput(ast)
+    except frontend.InputError as e:
+        print "Error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
 
     return ofinput
