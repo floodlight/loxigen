@@ -35,6 +35,6 @@ struct of_table_mod {
     uint16_t length;
     uint32_t xid;
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t config;
 };

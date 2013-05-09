@@ -36,7 +36,7 @@ struct of_action_bsn_mirror {
     uint32_t dest_port; // mirror destination port
     uint32_t vlan_tag;  // VLAN tag for mirrored packet (TPID+TCI) (0 == none)
     uint8_t copy_stage; // 0 == ingress, 1 == egress 
-    uint8_t[3] pad;
+    pad(3);
 };
 
 // BSN mirroring messages
@@ -48,7 +48,7 @@ struct of_bsn_set_mirroring {
     uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
     uint32_t subtype;   // BSN_MIRRORING_SET
     uint8_t report_mirror_ports;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_bsn_get_mirroring_request {
@@ -59,7 +59,7 @@ struct of_bsn_get_mirroring_request {
     uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
     uint32_t subtype;   // BSN_MIRRORING_GET_REQUEST
     uint8_t report_mirror_ports;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_bsn_get_mirroring_reply {
@@ -70,5 +70,5 @@ struct of_bsn_get_mirroring_reply {
     uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
     uint32_t subtype;   // BSN_MIRRORING_GET_REPLY
     uint8_t report_mirror_ports;
-    uint8_t[3] pad;
+    pad(3);
 };

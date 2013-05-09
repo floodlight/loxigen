@@ -402,7 +402,7 @@ struct of_features_reply {
     uint64_t datapath_id;
     uint32_t n_buffers;
     uint8_t n_tables;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t capabilities;
     uint32_t actions;
     list(of_port_desc_t) ports;
@@ -414,7 +414,7 @@ struct of_port_status {
     uint16_t length;
     uint32_t xid;
     uint8_t reason;
-    uint8_t[7] pad;
+    pad(7);
     of_port_desc_t desc;
 };
 
@@ -428,7 +428,7 @@ struct of_port_mod {
     uint32_t config;
     uint32_t mask;
     uint32_t advertise;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_packet_in {
@@ -440,7 +440,7 @@ struct of_packet_in {
     uint16_t total_len;
     of_port_no_t in_port;
     uint8_t reason;
-    uint8_t pad;
+    pad(1);
     of_octets_t data;
 };
 
@@ -455,34 +455,34 @@ struct of_action_set_vlan_vid {
     uint16_t type;
     uint16_t len;
     uint16_t vlan_vid;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_strip_vlan {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_set_vlan_pcp {
     uint16_t type;
     uint16_t len;
     uint8_t vlan_pcp;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_action_set_dl_src {
     uint16_t type;
     uint16_t len;
     of_mac_addr_t dl_addr;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_action_set_dl_dst {
     uint16_t type;
     uint16_t len;
     of_mac_addr_t dl_addr;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_action_set_nw_src {
@@ -501,21 +501,21 @@ struct of_action_set_tp_src {
     uint16_t type;
     uint16_t len;
     uint16_t tp_port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_set_tp_dst {
     uint16_t type;
     uint16_t len;
     uint16_t tp_port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_set_nw_tos {
     uint16_t type;
     uint16_t len;
     uint8_t nw_tos;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_action_experimenter {
@@ -529,14 +529,14 @@ struct of_action_enqueue {
     uint16_t type;
     uint16_t len;
     of_port_no_t port;
-    uint8_t[6] pad;
+    pad(6);
     uint32_t queue_id;
 };
 
 struct of_action {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_packet_out {
@@ -558,11 +558,11 @@ struct of_match_v1 {
     of_mac_addr_t eth_dst;
     uint16_t vlan_vid;
     uint8_t vlan_pcp;
-    uint8_t[1] pad1;
+    pad(1);
     uint16_t eth_type;
     uint8_t ip_dscp;
     uint8_t ip_proto;
-    uint8_t[2] pad2;
+    pad(2);
     uint32_t ipv4_src;
     uint32_t ipv4_dst;
     uint16_t tcp_src;
@@ -663,11 +663,11 @@ struct of_flow_removed {
     uint64_t cookie;
     uint16_t priority;
     uint8_t reason;
-    uint8_t[1] pad;
+    pad(1);
     uint32_t duration_sec;
     uint32_t duration_nsec;
     uint16_t idle_timeout;
-    uint8_t[2] pad2;
+    pad(2);
     uint64_t packet_count;
     uint64_t byte_count;
 };
@@ -686,14 +686,14 @@ struct of_error_msg {
 struct of_flow_stats_entry {
     uint16_t length;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_match_t match;
     uint32_t duration_sec;
     uint32_t duration_nsec;
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    uint8_t[6] pad2;
+    pad(6);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
@@ -702,7 +702,7 @@ struct of_flow_stats_entry {
 
 struct of_table_stats_entry {
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     of_table_name_t name;
     of_wc_bmap_t wildcards;
     uint32_t max_entries;
@@ -713,7 +713,7 @@ struct of_table_stats_entry {
 
 struct of_port_stats_entry {
     of_port_no_t port_no;
-    uint8_t[6] pad;
+    pad(6);
     uint64_t rx_packets;
     uint64_t tx_packets;
     uint64_t rx_bytes;
@@ -730,7 +730,7 @@ struct of_port_stats_entry {
 
 struct of_queue_stats_entry {
     of_port_no_t port_no;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t queue_id;
     uint64_t tx_bytes;
     uint64_t tx_packets;
@@ -771,7 +771,7 @@ struct of_flow_stats_request {
     uint16_t flags;
     of_match_t match;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_port_no_t out_port;
 };
 
@@ -794,7 +794,7 @@ struct of_aggregate_stats_request {
     uint16_t flags;
     of_match_t match;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_port_no_t out_port;
 };
 
@@ -808,7 +808,7 @@ struct of_aggregate_stats_reply {
     uint64_t packet_count;
     uint64_t byte_count;
     uint32_t flow_count;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_table_stats_request {
@@ -838,7 +838,7 @@ struct of_port_stats_request {
     uint16_t stats_type;
     uint16_t flags;
     of_port_no_t port_no;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_port_stats_reply {
@@ -859,7 +859,7 @@ struct of_queue_stats_request {
     uint16_t stats_type;
     uint16_t flags;
     of_port_no_t port_no;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t queue_id;
 };
 
@@ -900,21 +900,21 @@ struct of_experimenter_stats_reply {
 struct of_queue_prop {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_queue_prop_min_rate {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint16_t rate;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_packet_queue {
     uint32_t queue_id;
     uint16_t len;
-    uint8_t[2] pad;
+    pad(2);
     list(of_queue_prop_t) properties;
 };
 
@@ -924,7 +924,7 @@ struct of_queue_get_config_request {
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_queue_get_config_reply {
@@ -933,6 +933,6 @@ struct of_queue_get_config_reply {
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[6] pad;
+    pad(6);
     list(of_packet_queue_t) queues;
 };

@@ -35,7 +35,7 @@ struct of_bsn_set_ip_mask {
     uint32_t experimenter;  // bsn 0x005c16c7,
     uint32_t subtype;       // 0
     uint8_t index;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t mask;
 };
 
@@ -47,7 +47,7 @@ struct of_bsn_get_ip_mask_request {
     uint32_t experimenter;  // bsn 0x005c16c7,
     uint32_t subtype;       // 1
     uint8_t index;
-    uint8_t[7] pad;
+    pad(7);
 };
 
 struct of_bsn_get_ip_mask_reply {
@@ -58,6 +58,6 @@ struct of_bsn_get_ip_mask_reply {
     uint32_t experimenter;  // bsn 0x005c16c7,
     uint32_t subtype;       // 2
     uint8_t index;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t mask;
 };

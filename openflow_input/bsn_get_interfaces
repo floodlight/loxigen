@@ -38,7 +38,7 @@ struct of_bsn_get_interfaces_request {
 
 struct of_bsn_interface {
     of_mac_addr_t hw_addr;
-    uint16_t pad;
+    pad(2);
     of_port_name_t name;
     uint32_t ipv4_addr;
     uint32_t ipv4_netmask;

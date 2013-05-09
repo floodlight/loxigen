@@ -655,15 +655,15 @@ struct of_table_mod {
     uint16_t length;
     uint32_t xid;
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t config;
 };
 
 struct of_port_desc {
     of_port_no_t port_no;
-    uint8_t[4] pad;
+    pad(4);
     of_mac_addr_t hw_addr;
-    uint8_t[2] pad2;
+    pad(2);
     of_port_name_t name;
     uint32_t config;
     uint32_t state;
@@ -691,7 +691,7 @@ struct of_features_reply {
     uint32_t n_buffers;
     uint8_t n_tables;
     uint8_t auxiliary_id;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t capabilities;
     uint32_t reserved;
 };
@@ -702,7 +702,7 @@ struct of_port_status {
     uint16_t length;
     uint32_t xid;
     uint8_t reason;
-    uint8_t[7] pad;
+    pad(7);
     of_port_desc_t desc;
 };
 
@@ -712,13 +712,13 @@ struct of_port_mod {
     uint16_t length;
     uint32_t xid;
     of_port_no_t port_no;
-    uint8_t[4] pad;
+    pad(4);
     of_mac_addr_t hw_addr;
-    uint8_t[2] pad2;
+    pad(2);
     uint32_t config;
     uint32_t mask;
     uint32_t advertise;
-    uint8_t[4] pad3;
+    pad(4);
 };
 
 // FIXME Does this need to be v4?
@@ -739,7 +739,7 @@ struct of_oxm_experimenter_header {
 struct of_action_id {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_output {
@@ -747,59 +747,59 @@ struct of_action_output {
     uint16_t len;
     of_port_no_t port;
     uint16_t max_len;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_action_copy_ttl_out {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_copy_ttl_in {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_set_mpls_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t mpls_ttl;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_action_dec_mpls_ttl {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_push_vlan {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_pop_vlan {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_push_mpls {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_pop_mpls {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action_set_queue {
@@ -818,13 +818,13 @@ struct of_action_set_nw_ttl {
     uint16_t type;
     uint16_t len;
     uint8_t nw_ttl;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_action_dec_nw_ttl {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_set_field {
@@ -843,20 +843,20 @@ struct of_action_experimenter {
 struct of_action_pop_pbb {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_action_push_pbb {
     uint16_t type;
     uint16_t len;
     uint16_t ethertype;
-    uint8_t[2] pad;
+    pad(2);
 };
 
 struct of_action {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_instruction {
@@ -868,13 +868,13 @@ struct of_instruction_goto_table {
     uint16_t type;
     uint16_t len;
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
 };
 
 struct of_instruction_write_metadata {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint64_t metadata;
     uint64_t metadata_mask;
 };
@@ -882,21 +882,21 @@ struct of_instruction_write_metadata {
 struct of_instruction_write_actions {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     list(of_action_t) actions;
 };
 
 struct of_instruction_apply_actions {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     list(of_action_t) actions;
 };
 
 struct of_instruction_clear_actions {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_instruction_meter {
@@ -928,7 +928,7 @@ struct of_flow_add {
     of_port_no_t out_port;
     uint32_t out_group;
     uint16_t flags;
-    uint8_t[2] pad;
+    pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -949,7 +949,7 @@ struct of_flow_modify {
     of_port_no_t out_port;
     uint32_t out_group;
     uint16_t flags;
-    uint8_t[2] pad;
+    pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -970,7 +970,7 @@ struct of_flow_modify_strict {
     of_port_no_t out_port;
     uint32_t out_group;
     uint16_t flags;
-    uint8_t[2] pad;
+    pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -991,7 +991,7 @@ struct of_flow_delete {
     of_port_no_t out_port;
     uint32_t out_group;
     uint16_t flags;
-    uint8_t[2] pad;
+    pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -1012,7 +1012,7 @@ struct of_flow_delete_strict {
     of_port_no_t out_port;
     uint32_t out_group;
     uint16_t flags;
-    uint8_t[2] pad;
+    pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -1022,7 +1022,7 @@ struct of_bucket {
     uint16_t weight;
     of_port_no_t watch_port;
     uint32_t watch_group;
-    uint8_t[4] pad;
+    pad(4);
     list(of_action_t) actions;
 };
 
@@ -1033,7 +1033,7 @@ struct of_group_mod {
     uint32_t xid;
     uint16_t command;
     uint8_t group_type;
-    uint8_t pad;
+    pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
 };
@@ -1046,7 +1046,7 @@ struct of_packet_out {
     uint32_t buffer_id;
     of_port_no_t in_port;
     uint16_t actions_len;
-    uint8_t[6] pad;
+    pad(6);
     list(of_action_t) actions;
     of_octets_t data;
 };
@@ -1062,7 +1062,7 @@ struct of_packet_in {
     uint8_t table_id;
     uint64_t cookie;
     of_match_t match;
-    uint8_t[2] pad;
+    pad(2);
     of_octets_t data; /* FIXME: Ensure total_len gets updated */
 };
 
@@ -1096,7 +1096,7 @@ struct of_meter_band_drop {
     uint16_t        len;
     uint32_t        rate;
     uint32_t        burst_size;
-    uint8_t[4]      pad;
+    pad(4);
 };
 
 struct of_meter_band_dscp_remark {
@@ -1105,7 +1105,7 @@ struct of_meter_band_dscp_remark {
     uint32_t        rate;
     uint32_t        burst_size;
     uint8_t         prec_level;
-    uint8_t[3]      pad;
+    pad(3);
 };
 
 struct of_meter_band_experimenter {
@@ -1153,13 +1153,13 @@ struct of_error_msg {
 struct of_flow_stats_entry {
     uint16_t length;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     uint32_t duration_sec;
     uint32_t duration_nsec;
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    uint8_t[6] pad2;
+    pad(6);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
@@ -1170,7 +1170,7 @@ struct of_flow_stats_entry {
 
 struct of_table_stats_entry {
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t active_count;
     uint64_t lookup_count;
     uint64_t matched_count;
@@ -1178,7 +1178,7 @@ struct of_table_stats_entry {
 
 struct of_port_stats_entry {
     of_port_no_t port_no;
-    uint8_t[4] pad;
+    pad(4);
     uint64_t rx_packets;
     uint64_t tx_packets;
     uint64_t rx_bytes;
@@ -1212,10 +1212,10 @@ struct of_bucket_counter {
 
 struct of_group_stats_entry {
     uint16_t length;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t group_id;
     uint32_t ref_count;
-    uint8_t[4] pad;
+    pad(4);
     uint64_t packet_count;
     uint64_t byte_count;
     uint32_t duration_sec;
@@ -1226,7 +1226,7 @@ struct of_group_stats_entry {
 struct of_group_desc_stats_entry {
     uint16_t length;
     uint8_t type;
-    uint8_t pad;
+    pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
 };
@@ -1241,7 +1241,7 @@ struct of_desc_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_desc_stats_reply {
@@ -1251,7 +1251,7 @@ struct of_desc_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     of_desc_str_t mfr_desc;
     of_desc_str_t hw_desc;
     of_desc_str_t sw_desc;
@@ -1266,12 +1266,12 @@ struct of_flow_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     of_port_no_t out_port;
     uint32_t out_group;
-    uint8_t[4] pad2;
+    pad(4);
     uint64_t cookie;
     uint64_t cookie_mask;
     of_match_t match;
@@ -1284,7 +1284,7 @@ struct of_flow_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_flow_stats_entry_t) entries;
 };
 
@@ -1295,12 +1295,12 @@ struct of_aggregate_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     of_port_no_t out_port;
     uint32_t out_group;
-    uint8_t[4] pad2;
+    pad(4);
     uint64_t cookie;
     uint64_t cookie_mask;
     of_match_t match;
@@ -1313,11 +1313,11 @@ struct of_aggregate_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint64_t packet_count;
     uint64_t byte_count;
     uint32_t flow_count;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_table_stats_request {
@@ -1327,7 +1327,7 @@ struct of_table_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_table_stats_reply {
@@ -1337,7 +1337,7 @@ struct of_table_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_table_stats_entry_t) entries;
 };
 
@@ -1453,7 +1453,7 @@ struct of_table_feature_prop_experimenter {
 struct of_table_features {
     uint16_t length;
     uint8_t table_id;
-    uint8_t[5] pad;
+    pad(5);
     of_table_name_t name;
     uint64_t metadata_match;
     uint64_t metadata_write;
@@ -1468,7 +1468,7 @@ struct of_meter_features {
     uint32_t    capabilities;
     uint8_t     max_bands;
     uint8_t     max_color;
-    uint8_t[2]     pad;
+    pad(2);
 };
 
 struct of_port_stats_request {
@@ -1478,9 +1478,9 @@ struct of_port_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     of_port_no_t port_no;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_port_stats_reply {
@@ -1490,7 +1490,7 @@ struct of_port_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_port_stats_entry_t) entries;
 };
 
@@ -1501,7 +1501,7 @@ struct of_queue_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     of_port_no_t port_no;
     uint32_t queue_id;
 };
@@ -1513,7 +1513,7 @@ struct of_queue_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_queue_stats_entry_t) entries;
 };
 
@@ -1524,9 +1524,9 @@ struct of_group_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint32_t group_id;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_group_stats_reply {
@@ -1536,7 +1536,7 @@ struct of_group_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_group_stats_entry_t) entries;
 };
 
@@ -1547,7 +1547,7 @@ struct of_group_desc_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_group_desc_stats_reply {
@@ -1557,7 +1557,7 @@ struct of_group_desc_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_group_desc_stats_entry_t) entries;
 };
 
@@ -1568,7 +1568,7 @@ struct of_group_features_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_group_features_stats_reply {
@@ -1578,7 +1578,7 @@ struct of_group_features_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint32_t types;
     uint32_t capabilities;
     uint32_t max_groups_all;
@@ -1598,9 +1598,9 @@ struct of_meter_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint32_t meter_id;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_meter_stats_reply {
@@ -1610,7 +1610,7 @@ struct of_meter_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_meter_stats_t) entries;
 };
 
@@ -1621,9 +1621,9 @@ struct of_meter_config_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     uint32_t meter_id;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_meter_config_stats_reply {
@@ -1633,7 +1633,7 @@ struct of_meter_config_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_meter_band_t) entries;
 };
 
@@ -1645,7 +1645,7 @@ struct of_meter_features_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 // FIXME stats added to get things working
@@ -1656,7 +1656,7 @@ struct of_meter_features_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     of_meter_features_t features;
 };
 
@@ -1668,7 +1668,7 @@ struct of_table_features_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_table_features_t) entries;
 };
 
@@ -1680,7 +1680,7 @@ struct of_table_features_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_table_features_t) entries;
 };
 
@@ -1692,7 +1692,7 @@ struct of_port_desc_stats_request {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 // FIXME stats added to get things working
@@ -1703,7 +1703,7 @@ struct of_port_desc_stats_reply {
     uint32_t xid;
     uint16_t stats_type;
     uint16_t flags;
-    uint8_t[4] pad;
+    pad(4);
     list(of_port_desc_t) entries;
 };
 
@@ -1715,7 +1715,7 @@ struct of_meter_band_stats {
 struct of_meter_stats {
     uint32_t        meter_id;
     uint16_t        len;
-    uint8_t[6]         pad;
+    pad(6);
     uint32_t        flow_count;
     uint64_t        packet_in_count;
     uint64_t        byte_in_count;
@@ -1741,31 +1741,31 @@ struct of_experimenter_multipart_header {
 struct of_queue_prop {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_queue_prop_min_rate {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint16_t rate;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_queue_prop_max_rate {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint16_t rate;
-    uint8_t[6] pad;
+    pad(6);
 };
 
 struct of_queue_prop_experimenter {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint32_t experimenter;
-    uint8_t[4] pad;
+    pad(4);
     of_octets_t data;
 };
 
@@ -1773,7 +1773,7 @@ struct of_packet_queue {
     uint32_t queue_id;
     of_port_no_t port;
     uint16_t len;
-    uint8_t[6] pad;
+    pad(6);
     list(of_queue_prop_t) properties;
 };
 
@@ -1783,7 +1783,7 @@ struct of_queue_get_config_request {
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_queue_get_config_reply {
@@ -1792,7 +1792,7 @@ struct of_queue_get_config_reply {
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[4] pad;
+    pad(4);
     list(of_packet_queue_t) queues;
 };
 
@@ -1802,7 +1802,7 @@ struct of_role_request {
     uint16_t length;
     uint32_t xid;
     uint32_t role;
-    uint8_t[4] pad;
+    pad(4);
     uint64_t generation_id;
 };
 

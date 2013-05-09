@@ -32,6 +32,6 @@ struct of_action_nicira_dec_ttl {
     uint16_t len;
     uint32_t experimenter;    // OF_EXPERIMENTER_ID_NICIRA
     uint16_t subtype;         // 18
-    uint16_t pad;
-    uint32_t pad2;
+    pad(2);
+    pad(4);
 };
