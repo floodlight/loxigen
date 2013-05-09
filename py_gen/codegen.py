@@ -100,10 +100,7 @@ def get_type_values(cls, version):
 
 # Create intermediate representation
 def build_ofclasses(version):
-    blacklist = ["of_action", "of_action_header", "of_header", "of_queue_prop",
-                 "of_queue_prop_header", "of_experimenter", "of_action_experimenter",
-                 "of_oxm", "of_oxm_header", "of_oxm_experimenter_header",
-                 "of_hello_elem", "of_hello_elem_header"]
+    blacklist = ["of_experimenter", "of_action_experimenter"]
     ofclasses = []
     for cls in of_g.standard_class_order:
         if type_maps.class_is_virtual(cls):
