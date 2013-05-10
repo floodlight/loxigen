@@ -465,24 +465,32 @@ def match_sanity_check():
                 print "Key %s not found in match struct, v %s" % (key, match_v)
                 sys.exit(1)
 
-    # Check oxm list and the list above
-    for key in oxm.oxm_types:
+    # Generate list of OXM names from the unified classes
+    oxm_names = [x[7:] for x in of_g.unified.keys() if
+                 x.startswith('of_oxm_') and
+                 x.find('masked') < 0 and
+                 x.find('header') < 0]
+
+    # Check that all OXMs are in the match members
+    for key in oxm_names:
         if not key in of_match_members:
             if not (key.find("_masked") > 0):
-                debug("Key %s in oxm.oxm_types, not of_match_members" % key)
+                debug("Key %s in OXM, not of_match_members" % key)
                 sys.exit(1)
             if not key[:-7] in of_match_members:
-                debug("Key %s in oxm.oxm_types, but %s not in of_match_members"
+                debug("Key %s in OXM, but %s not in of_match_members"
                       % (key, key[:-7]))
                 sys.exit(1)
 
+    # Check that all match members are in the OXMs
     for key in of_match_members:
-        if not key in oxm.oxm_types:
-            debug("Key %s in of_match_members, not in oxm.oxm_types" % key)
+        if not key in oxm_names:
+            debug("Key %s in of_match_members, not in OXM" % key)
             sys.exit(1)
-        if of_match_members[key]["m_type"] != oxm.oxm_types[key]:
+        oxm_type = of_g.unified['of_oxm_%s' % key]['union']['value']['m_type']
+        if of_match_members[key]["m_type"] != oxm_type:
             debug("Type mismatch for key %s in oxm data: %s vs %s" %
-                  (key, of_match_members[key]["m_type"], oxm.oxm_types[key]))
+                  (key, of_match_members[key]["m_type"], oxm_type))
             sys.exit(1)
 
 
