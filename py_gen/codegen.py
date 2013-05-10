@@ -129,16 +129,8 @@ def generate_common(out, name, version):
     util.render_template(out, 'common.py', ofclasses=ofclasses, version=version)
 
 def generate_const(out, name, version):
-    groups = {}
-    for (group, idents) in of_g.identifiers_by_group.items():
-        items = []
-        for ident in idents:
-            info = of_g.identifiers[ident]
-            if version in info["values_by_version"]:
-                items.append((info["ofp_name"], info["values_by_version"][version]))
-        if items:
-            groups[group] = items
-    util.render_template(out, 'const.py', version=version, groups=groups)
+    util.render_template(out, 'const.py', version=version,
+                         enums=of_g.ir[version].enums)
 
 def generate_instruction(out, name, version):
     ofclasses = [x for x in build_ofclasses(version)
