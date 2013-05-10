@@ -26,7 +26,9 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+import sys
 import difflib
+import test_data
 
 # Human-friendly format for binary strings. 8 bytes per line.
 def format_binary(buf):
@@ -56,3 +58,20 @@ def test_serialization(obj, buf):
         b = unpacked.show()
         raise AssertionError("Deserialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
             (type(obj).__name__, a, b, diff(a, b)))
+
+def test_pretty(obj, expected):
+    pretty = obj.show()
+    if expected != pretty:
+        raise AssertionError("Pretty printing of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
+            (type(obj).__name__, expected, pretty, diff(expected, pretty)))
+
+# Run test_serialization and possibly test_pretty against the named data file
+# Uses the globals of the calling function to get 'ofp'
+def test_datafile(name):
+    data = test_data.read(name)
+    binary = data['binary']
+    python = data['python']
+    obj = eval(python, sys._getframe(1).f_globals)
+    test_serialization(obj, binary)
+    if 'python pretty-printer' in data:
+        test_pretty(obj, data['python pretty-printer'])
