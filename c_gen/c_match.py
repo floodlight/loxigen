@@ -41,7 +41,6 @@
 
 import sys
 import of_g
-import loxi_front_end.oxm as oxm
 import loxi_front_end.match as match
 import c_code_gen
 

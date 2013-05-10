@@ -78,7 +78,6 @@ import glob
 import copy
 import collections
 import of_g
-import loxi_front_end.oxm as oxm
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
 import loxi_front_end.c_parse_utils as c_parse_utils

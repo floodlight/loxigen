@@ -36,7 +36,6 @@
 import of_g
 import sys
 from generic_utils import *
-import oxm
 import loxi_utils.loxi_utils as loxi_utils
 
 invalid_type = "invalid_type"
@@ -227,6 +226,81 @@ queue_prop_types = {
         )
     }
 
+oxm_wire_types_1_2 = dict(
+    in_port               = (0 << 1),
+    in_port_masked        = (0 << 1) + 1,
+    in_phy_port           = (1 << 1),
+    in_phy_port_masked    = (1 << 1) + 1,
+    metadata              = (2 << 1),
+    metadata_masked       = (2 << 1) + 1,
+    eth_dst               = (3 << 1),
+    eth_dst_masked        = (3 << 1) + 1,
+    eth_src               = (4 << 1),
+    eth_src_masked        = (4 << 1) + 1,
+    eth_type              = (5 << 1),
+    eth_type_masked       = (5 << 1) + 1,
+    vlan_vid              = (6 << 1),
+    vlan_vid_masked       = (6 << 1) + 1,
+    vlan_pcp              = (7 << 1),
+    vlan_pcp_masked       = (7 << 1) + 1,
+    ip_dscp               = (8 << 1),
+    ip_dscp_masked        = (8 << 1) + 1,
+    ip_ecn                = (9 << 1),
+    ip_ecn_masked         = (9 << 1) + 1,
+    ip_proto              = (10 << 1),
+    ip_proto_masked       = (10 << 1) + 1,
+    ipv4_src              = (11 << 1),
+    ipv4_src_masked       = (11 << 1) + 1,
+    ipv4_dst              = (12 << 1),
+    ipv4_dst_masked       = (12 << 1) + 1,
+    tcp_src               = (13 << 1),
+    tcp_src_masked        = (13 << 1) + 1,
+    tcp_dst               = (14 << 1),
+    tcp_dst_masked        = (14 << 1) + 1,
+    udp_src               = (15 << 1),
+    udp_src_masked        = (15 << 1) + 1,
+    udp_dst               = (16 << 1),
+    udp_dst_masked        = (16 << 1) + 1,
+    sctp_src              = (17 << 1),
+    sctp_src_masked       = (17 << 1) + 1,
+    sctp_dst              = (18 << 1),
+    sctp_dst_masked       = (18 << 1) + 1,
+    icmpv4_type           = (19 << 1),
+    icmpv4_type_masked    = (19 << 1) + 1,
+    icmpv4_code           = (20 << 1),
+    icmpv4_code_masked    = (20 << 1) + 1,
+    arp_op                = (21 << 1),
+    arp_op_masked         = (21 << 1) + 1,
+    arp_spa               = (22 << 1),
+    arp_spa_masked        = (22 << 1) + 1,
+    arp_tpa               = (23 << 1),
+    arp_tpa_masked        = (23 << 1) + 1,
+    arp_sha               = (24 << 1),
+    arp_sha_masked        = (24 << 1) + 1,
+    arp_tha               = (25 << 1),
+    arp_tha_masked        = (25 << 1) + 1,
+    ipv6_src              = (26 << 1),
+    ipv6_src_masked       = (26 << 1) + 1,
+    ipv6_dst              = (27 << 1),
+    ipv6_dst_masked       = (27 << 1) + 1,
+    ipv6_flabel           = (28 << 1),
+    ipv6_flabel_masked    = (28 << 1) + 1,
+    icmpv6_type           = (29 << 1),
+    icmpv6_type_masked    = (29 << 1) + 1,
+    icmpv6_code           = (30 << 1),
+    icmpv6_code_masked    = (30 << 1) + 1,
+    ipv6_nd_target        = (31 << 1),
+    ipv6_nd_target_masked = (31 << 1) + 1,
+    ipv6_nd_sll           = (32 << 1),
+    ipv6_nd_sll_masked    = (32 << 1) + 1,
+    ipv6_nd_tll           = (33 << 1),
+    ipv6_nd_tll_masked    = (33 << 1) + 1,
+    mpls_label            = (34 << 1),
+    mpls_label_masked     = (34 << 1) + 1,
+    mpls_tc               = (35 << 1),
+    mpls_tc_masked        = (35 << 1) + 1
+)
+
 oxm_types = {
     # version 1.0
     of_g.VERSION_1_0:dict(),
@@ -235,10 +309,10 @@ oxm_types = {
     of_g.VERSION_1_1:dict(),
 
     # version 1.2
-    of_g.VERSION_1_2:oxm.oxm_wire_type,
+    of_g.VERSION_1_2:oxm_wire_types_1_2,
 
     # version 1.3
-    of_g.VERSION_1_3:oxm.oxm_wire_type  # FIXME needs update for 1.3?
+    of_g.VERSION_1_3:oxm_wire_types_1_2,  # FIXME needs update for 1.3?
     }
 
 hello_elem_types = {

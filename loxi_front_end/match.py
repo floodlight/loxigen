@@ -32,7 +32,6 @@
 import sys
 import of_g
 from generic_utils import *
-import oxm
 import loxi_utils.loxi_utils as loxi_utils
 
 #
