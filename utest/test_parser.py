@@ -46,7 +46,7 @@ struct foo {
 """
         ast = parser.parse(src)
         self.assertEquals(ast,
-            [['struct', 'foo', [['uint32_t', 'bar']]]])
+            [['struct', 'foo', [['data', 'uint32_t', 'bar']]]])
 
     def test_multiple_fields(self):
         src = """\
@@ -59,9 +59,9 @@ struct foo {
         ast = parser.parse(src)
         self.assertEquals(ast,
             [['struct', 'foo',
-                [['uint32_t', 'bar'],
-                 ['uint8_t', 'baz'],
-                 ['uint64_t', 'abc']]]])
+                [['data', 'uint32_t', 'bar'],
+                 ['data', 'uint8_t', 'baz'],
+                 ['data', 'uint64_t', 'abc']]]])
 
     def test_array_type(self):
         src = """\
@@ -71,7 +71,7 @@ struct foo {
 """
         ast = parser.parse(src)
         self.assertEquals(ast,
-            [['struct', 'foo', [['uint32_t[4]', 'bar']]]])
+            [['struct', 'foo', [['data', 'uint32_t[4]', 'bar']]]])
 
     def test_list_type(self):
         src = """\
@@ -81,7 +81,7 @@ struct foo {
 """
         ast = parser.parse(src)
         self.assertEquals(ast,
-            [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
+            [['struct', 'foo', [['data', 'list(of_action_t)', 'bar']]]])
 
     def test_pad_type(self):
         src = """\
@@ -163,7 +163,7 @@ struct foo { //comment 2
 """
         ast = parser.parse(src)
         self.assertEquals(ast,
-            [['struct', 'foo', [['uint32_t', 'a']]]])
+            [['struct', 'foo', [['data', 'uint32_t', 'a']]]])
 
     def test_mixed(self):
         src = """\

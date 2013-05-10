@@ -37,13 +37,14 @@ class InputError(Exception):
 def create_member(m_ast):
     if m_ast[0] == 'pad':
         return OFPadMember(length=m_ast[1])
-    elif m_ast[1] == 'length' or m_ast[1] == 'len': # Should be moved to parser
-        return OFLengthMember(name=m_ast[1], oftype=m_ast[0])
-    elif m_ast[1] == 'actions_len':
-        # HACK only usage so far
-        return OFFieldLengthMember(name=m_ast[1], oftype=m_ast[0], field_name='actions')
-    else:
-        return OFDataMember(name=m_ast[1], oftype=m_ast[0])
+    elif m_ast[0] == 'data':
+        if m_ast[2] == 'length' or m_ast[2] == 'len': # Should be moved to parser
+            return OFLengthMember(name=m_ast[2], oftype=m_ast[1])
+        elif m_ast[2] == 'actions_len':
+            # HACK only usage so far
+            return OFFieldLengthMember(name=m_ast[2], oftype=m_ast[1], field_name='actions')
+        else:
+            return OFDataMember(name=m_ast[2], oftype=m_ast[1])
 
 def create_ofinput(ast):
     """

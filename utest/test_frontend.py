@@ -85,20 +85,20 @@ struct of_packet_queue {
                 ['OFPPC_NO_PACKET_IN', 64]]],
             ['metadata', 'version', '2'],
             ['struct', 'of_echo_reply', [
-                ['uint8_t', 'version'],
-                ['uint8_t', 'type'],
-                ['uint16_t', 'length'],
-                ['uint32_t', 'xid'],
-                ['of_octets_t', 'data']]],
+                ['data', 'uint8_t', 'version'],
+                ['data', 'uint8_t', 'type'],
+                ['data', 'uint16_t', 'length'],
+                ['data', 'uint32_t', 'xid'],
+                ['data', 'of_octets_t', 'data']]],
             ['enum', 'ofp_queue_op_failed_code', [
                 ['OFPQOFC_BAD_PORT', 0],
                 ['OFPQOFC_BAD_QUEUE', 1],
                 ['OFPQOFC_EPERM', 2]]],
             ['struct', 'of_packet_queue', [
-                ['uint32_t', 'queue_id'],
-                ['uint16_t', 'len'],
+                ['data', 'uint32_t', 'queue_id'],
+                ['data', 'uint16_t', 'len'],
                 ['pad', 2],
-                ['list(of_queue_prop_t)', 'properties']]],
+                ['data', 'list(of_queue_prop_t)', 'properties']]],
         ]
         self.assertEquals(expected_ast, ast)
 
