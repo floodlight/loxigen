@@ -284,8 +284,8 @@ def identifiers_gen(out, filename):
                                                   of_g.target_version_list,
                                                   ident):
                 out.write("""\
-#define %(ident)s (%(value)s)
-#define %(ident)s_BY_VERSION(version) (%(value)s)
+#define %(ident)s (%(value)#x)
+#define %(ident)s_BY_VERSION(version) (%(value)#x)
 """ % dict(ident=ident,value=info["common_value"]))
             else: # Values differ between versions
                 # Generate version check and value by version
@@ -296,7 +296,7 @@ def identifiers_gen(out, filename):
                         value = info["values_by_version"][version]
                     else:
                         value = identifiers.UNDEFINED_IDENT_VALUE
-                    val_list.append("%s" % value)
+                    val_list.append("%#x" % value)
                 out.write("""\
 #define %(ident)s_BY_VERSION(version)     \\
     OF_VALUE_BY_VERSION(version, %(val_str)s)
