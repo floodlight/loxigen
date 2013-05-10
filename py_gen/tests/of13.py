@@ -26,42 +26,13 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 import unittest
-import difflib
+from testutil import test_serialization
 
 try:
     import loxi.of13 as ofp
     from loxi.generic_util import OFReader
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
-
-# Human-friendly format for binary strings. 8 bytes per line.
-def format_binary(buf):
-    byts = map(ord, buf)
-    lines = [[]]
-    for byt in byts:
-        if len(lines[-1]) == 8:
-            lines.append([])
-        lines[-1].append(byt)
-    return '\n'.join([' '.join(['%02x' % y for y in x]) for x in lines])
-
-def diff(a, b):
-    return '\n'.join(difflib.ndiff(a.splitlines(), b.splitlines()))
-
-# Test serialization / deserialization of a sample object.
-# Depends on the __eq__ method being correct.
-def test_serialization(obj, buf):
-    packed = obj.pack()
-    if packed != buf:
-        a = format_binary(buf)
-        b = format_binary(packed)
-        raise AssertionError("Serialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
-            (type(obj).__name__, a, b, diff(a, b)))
-    unpacked = type(obj).unpack(buf)
-    if obj != unpacked:
-        a = obj.show()
-        b = unpacked.show()
-        raise AssertionError("Deserialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
-            (type(obj).__name__, a, b, diff(a, b)))
 
 class TestImports(unittest.TestCase):
     def test_toplevel(self):
