@@ -52,7 +52,7 @@ enum ofp_port_config {
 
 struct of_echo_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 3;
     uint16_t length;
     uint32_t xid;
     of_octets_t data;
@@ -86,7 +86,7 @@ struct of_packet_queue {
             ['metadata', 'version', '2'],
             ['struct', 'of_echo_reply', [
                 ['data', 'uint8_t', 'version'],
-                ['data', 'uint8_t', 'type'],
+                ['type', 'uint8_t', 'type', 3],
                 ['data', 'uint16_t', 'length'],
                 ['data', 'uint32_t', 'xid'],
                 ['data', 'of_octets_t', 'data']]],
@@ -107,7 +107,7 @@ struct of_packet_queue {
         expected_classes = [
             OFClass('of_echo_reply', [
                 OFDataMember('version', 'uint8_t'), # XXX
-                OFDataMember('type', 'uint8_t'), # XXX
+                OFTypeMember('type', 'uint8_t', 3),
                 OFLengthMember('length', 'uint16_t'),
                 OFDataMember('xid', 'uint32_t'),
                 OFDataMember('data', 'of_octets_t')]),

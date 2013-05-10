@@ -33,10 +33,11 @@ from loxi_ir import *
 class InputError(Exception):
     pass
 
-# TODO handle type members
 def create_member(m_ast):
     if m_ast[0] == 'pad':
         return OFPadMember(length=m_ast[1])
+    elif m_ast[0] == 'type':
+        return OFTypeMember(name=m_ast[2], oftype=m_ast[1], value=m_ast[3])
     elif m_ast[0] == 'data':
         if m_ast[2] == 'length' or m_ast[2] == 'len': # Should be moved to parser
             return OFLengthMember(name=m_ast[2], oftype=m_ast[1])

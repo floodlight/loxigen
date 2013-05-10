@@ -51,8 +51,9 @@ any_type = (array_type | list_type | scalar_type).setName("type name")
 
 # Structs
 pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
+type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
-struct_member = pad_member | data_member;
+struct_member = pad_member | type_member | data_member;
 struct = kw('struct') - identifier - s('{') + \
          P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
