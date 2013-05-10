@@ -43,8 +43,8 @@ def format_binary(buf):
 def diff(a, b):
     return '\n'.join(difflib.ndiff(a.splitlines(), b.splitlines()))
 
-# Test serialization / deserialization of a sample object.
-# Depends on the __eq__ method being correct.
+# Test serialization / deserialization / reserialization of a sample object.
+# Depends in part on the __eq__ method being correct.
 def test_serialization(obj, buf):
     packed = obj.pack()
     if packed != buf:
@@ -57,6 +57,12 @@ def test_serialization(obj, buf):
         a = obj.show()
         b = unpacked.show()
         raise AssertionError("Deserialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
+            (type(obj).__name__, a, b, diff(a, b)))
+    packed = unpacked.pack()
+    if packed != buf:
+        a = format_binary(buf)
+        b = format_binary(packed)
+        raise AssertionError("Reserialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
             (type(obj).__name__, a, b, diff(a, b)))
 
 def test_pretty(obj, expected):
