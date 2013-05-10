@@ -29,31 +29,31 @@
 
 struct of_bsn_shell_command {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_SHELL_COMMAND
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 6;
     uint32_t service;
     of_octets_t data;
 };
 
 struct of_bsn_shell_output {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_SHELL_OUTPUT
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 7;
     of_octets_t data;
 };
 
 struct of_bsn_shell_status {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_SHELL_STATUS
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 8;
     uint32_t status;
 };

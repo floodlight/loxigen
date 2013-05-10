@@ -57,11 +57,11 @@
 
 struct of_bsn_set_pktin_suppression {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;         // 11
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 11;
     uint8_t enabled;
     pad(1);
     uint16_t idle_timeout;

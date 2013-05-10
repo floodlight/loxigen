@@ -416,14 +416,14 @@ struct of_header {
 
 struct of_hello {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 0;
     uint16_t length;
     uint32_t xid;
 };
 
 struct of_echo_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 2;
     uint16_t length;
     uint32_t xid;
     of_octets_t data;
@@ -431,7 +431,7 @@ struct of_echo_request {
 
 struct of_echo_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 3;
     uint16_t length;
     uint32_t xid;
     of_octets_t data;
@@ -439,7 +439,7 @@ struct of_echo_reply {
 
 struct of_experimenter {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter;
@@ -449,28 +449,28 @@ struct of_experimenter {
 
 struct of_barrier_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 20;
     uint16_t length;
     uint32_t xid;
 };
 
 struct of_barrier_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 21;
     uint16_t length;
     uint32_t xid;
 };
 
 struct of_get_config_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 7;
     uint16_t length;
     uint32_t xid;
 };
 
 struct of_get_config_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 8;
     uint16_t length;
     uint32_t xid;
     uint16_t flags;
@@ -479,7 +479,7 @@ struct of_get_config_reply {
 
 struct of_set_config {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 9;
     uint16_t length;
     uint32_t xid;
     uint16_t flags;
@@ -488,7 +488,7 @@ struct of_set_config {
 
 struct of_table_mod {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
     uint8_t table_id;
@@ -514,14 +514,14 @@ struct of_port_desc {
 
 struct of_features_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 5;
     uint16_t length;
     uint32_t xid;
 };
 
 struct of_features_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 6;
     uint16_t length;
     uint32_t xid;
     uint64_t datapath_id;
@@ -535,7 +535,7 @@ struct of_features_reply {
 
 struct of_port_status {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 12;
     uint16_t length;
     uint32_t xid;
     uint8_t reason;
@@ -545,7 +545,7 @@ struct of_port_status {
 
 struct of_port_mod {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port_no;
@@ -560,7 +560,7 @@ struct of_port_mod {
 
 struct of_packet_in {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 10;
     uint16_t length;
     uint32_t xid;
     uint32_t buffer_id;
@@ -573,7 +573,7 @@ struct of_packet_in {
 };
 
 struct of_action_output {
-    uint16_t type;
+    uint16_t type == 0;
     uint16_t len;
     of_port_no_t port;
     uint16_t max_len;
@@ -581,165 +581,165 @@ struct of_action_output {
 };
 
 struct of_action_set_vlan_vid {
-    uint16_t type;
+    uint16_t type == 1;
     uint16_t len;
     uint16_t vlan_vid;
     pad(2);
 };
 
 struct of_action_set_vlan_pcp {
-    uint16_t type;
+    uint16_t type == 2;
     uint16_t len;
     uint8_t vlan_pcp;
     pad(3);
 };
 
 struct of_action_set_dl_src {
-    uint16_t type;
+    uint16_t type == 3;
     uint16_t len;
     of_mac_addr_t dl_addr;
     pad(6);
 };
 
 struct of_action_set_dl_dst {
-    uint16_t type;
+    uint16_t type == 4;
     uint16_t len;
     of_mac_addr_t dl_addr;
     pad(6);
 };
 
 struct of_action_set_nw_src {
-    uint16_t type;
+    uint16_t type == 5;
     uint16_t len;
     uint32_t nw_addr;
 };
 
 struct of_action_set_nw_dst {
-    uint16_t type;
+    uint16_t type == 6;
     uint16_t len;
     uint32_t nw_addr;
 };
 
 struct of_action_set_nw_tos {
-    uint16_t type;
+    uint16_t type == 7;
     uint16_t len;
     uint8_t nw_tos;
     pad(3);
 };
 
 struct of_action_set_nw_ecn {
-    uint16_t type;
+    uint16_t type == 8;
     uint16_t len;
     uint8_t nw_ecn;
     pad(3);
 };
 
 struct of_action_set_tp_src {
-    uint16_t type;
+    uint16_t type == 9;
     uint16_t len;
     uint16_t tp_port;
     pad(2);
 };
 
 struct of_action_set_tp_dst {
-    uint16_t type;
+    uint16_t type == 10;
     uint16_t len;
     uint16_t tp_port;
     pad(2);
 };
 
 struct of_action_copy_ttl_out {
-    uint16_t type;
+    uint16_t type == 11;
     uint16_t len;
     pad(4);
 };
 
 struct of_action_copy_ttl_in {
-    uint16_t type;
+    uint16_t type == 12;
     uint16_t len;
     pad(4);
 };
 
 struct of_action_set_mpls_label {
-    uint16_t type;
+    uint16_t type == 13;
     uint16_t len;
     uint32_t mpls_label;
 };
 
 struct of_action_set_mpls_tc {
-    uint16_t type;
+    uint16_t type == 14;
     uint16_t len;
     uint8_t mpls_tc;
     pad(3);
 };
 
 struct of_action_set_mpls_ttl {
-    uint16_t type;
+    uint16_t type == 15;
     uint16_t len;
     uint8_t mpls_ttl;
     pad(3);
 };
 
 struct of_action_dec_mpls_ttl {
-    uint16_t type;
+    uint16_t type == 16;
     uint16_t len;
     pad(4);
 };
 
 struct of_action_push_vlan {
-    uint16_t type;
+    uint16_t type == 17;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
 struct of_action_pop_vlan {
-    uint16_t type;
+    uint16_t type == 18;
     uint16_t len;
     pad(4);
 };
 
 struct of_action_push_mpls {
-    uint16_t type;
+    uint16_t type == 19;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
 struct of_action_pop_mpls {
-    uint16_t type;
+    uint16_t type == 20;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
 struct of_action_set_queue {
-    uint16_t type;
+    uint16_t type == 21;
     uint16_t len;
     uint32_t queue_id;
 };
 
 struct of_action_group {
-    uint16_t type;
+    uint16_t type == 22;
     uint16_t len;
     uint32_t group_id;
 };
 
 struct of_action_set_nw_ttl {
-    uint16_t type;
+    uint16_t type == 23;
     uint16_t len;
     uint8_t nw_ttl;
     pad(3);
 };
 
 struct of_action_dec_nw_ttl {
-    uint16_t type;
+    uint16_t type == 24;
     uint16_t len;
     pad(4);
 };
 
 struct of_action_experimenter {
-    uint16_t type;
+    uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
@@ -753,7 +753,7 @@ struct of_action {
 
 struct of_packet_out {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 13;
     uint16_t length;
     uint32_t xid;
     uint32_t buffer_id;
@@ -765,7 +765,7 @@ struct of_packet_out {
 };
 
 struct of_match_v2 {
-    uint16_t type;
+    uint16_t type == 0;
     uint16_t length;
     of_port_no_t in_port;
     of_wc_bmap_t wildcards;
@@ -799,14 +799,14 @@ struct of_instruction {
 };
 
 struct of_instruction_goto_table {
-    uint16_t type;
+    uint16_t type == 1;
     uint16_t len;
     uint8_t table_id;
     pad(3);
 };
 
 struct of_instruction_write_metadata {
-    uint16_t type;
+    uint16_t type == 2;
     uint16_t len;
     pad(4);
     uint64_t metadata;
@@ -814,27 +814,27 @@ struct of_instruction_write_metadata {
 };
 
 struct of_instruction_write_actions {
-    uint16_t type;
+    uint16_t type == 3;
     uint16_t len;
     pad(4);
     list(of_action_t) actions;
 };
 
 struct of_instruction_apply_actions {
-    uint16_t type;
+    uint16_t type == 4;
     uint16_t len;
     pad(4);
     list(of_action_t) actions;
 };
 
 struct of_instruction_clear_actions {
-    uint16_t type;
+    uint16_t type == 5;
     uint16_t len;
     pad(4);
 };
 
 struct of_instruction_experimenter {
-    uint16_t type;		
+    uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
@@ -842,13 +842,13 @@ struct of_instruction_experimenter {
 
 struct of_flow_add {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 0;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -863,13 +863,13 @@ struct of_flow_add {
 
 struct of_flow_modify {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 1;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -884,13 +884,13 @@ struct of_flow_modify {
 
 struct of_flow_modify_strict {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 2;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -905,13 +905,13 @@ struct of_flow_modify_strict {
 
 struct of_flow_delete {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 3;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -926,13 +926,13 @@ struct of_flow_delete {
 
 struct of_flow_delete_strict {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 4;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -956,7 +956,7 @@ struct of_bucket {
 
 struct of_group_mod {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 15;
     uint16_t length;
     uint32_t xid;
     uint16_t command;
@@ -968,7 +968,7 @@ struct of_group_mod {
 
 struct of_flow_removed {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 11;
     uint16_t length;
     uint32_t xid;
     uint64_t cookie;
@@ -986,7 +986,7 @@ struct of_flow_removed {
 
 struct of_error_msg {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 1;
     uint16_t length;
     uint32_t xid;
     uint16_t err_type;
@@ -1082,20 +1082,20 @@ struct of_group_desc_stats_entry {
 
 struct of_desc_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0;
     uint16_t flags;
     pad(4);
 };
 
 struct of_desc_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0;
     uint16_t flags;
     pad(4);
     of_desc_str_t mfr_desc;
@@ -1107,10 +1107,10 @@ struct of_desc_stats_reply {
 
 struct of_flow_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 1;
     uint16_t flags;
     pad(4);
     uint8_t table_id;
@@ -1125,10 +1125,10 @@ struct of_flow_stats_request {
 
 struct of_flow_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 1;
     uint16_t flags;
     pad(4);
     list(of_flow_stats_entry_t) entries;
@@ -1136,10 +1136,10 @@ struct of_flow_stats_reply {
 
 struct of_aggregate_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 2;
     uint16_t flags;
     pad(4);
     uint8_t table_id;
@@ -1154,10 +1154,10 @@ struct of_aggregate_stats_request {
 
 struct of_aggregate_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 2;
     uint16_t flags;
     pad(4);
     uint64_t packet_count;
@@ -1168,20 +1168,20 @@ struct of_aggregate_stats_reply {
 
 struct of_table_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 3;
     uint16_t flags;
     pad(4);
 };
 
 struct of_table_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 3;
     uint16_t flags;
     pad(4);
     list(of_table_stats_entry_t) entries;
@@ -1189,10 +1189,10 @@ struct of_table_stats_reply {
 
 struct of_port_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 4;
     uint16_t flags;
     pad(4);
     of_port_no_t port_no;
@@ -1201,10 +1201,10 @@ struct of_port_stats_request {
 
 struct of_port_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 4;
     uint16_t flags;
     pad(4);
     list(of_port_stats_entry_t) entries;
@@ -1212,10 +1212,10 @@ struct of_port_stats_reply {
 
 struct of_queue_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 5;
     uint16_t flags;
     pad(4);
     of_port_no_t port_no;
@@ -1224,10 +1224,10 @@ struct of_queue_stats_request {
 
 struct of_queue_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 5;
     uint16_t flags;
     pad(4);
     list(of_queue_stats_entry_t) entries;
@@ -1235,10 +1235,10 @@ struct of_queue_stats_reply {
 
 struct of_group_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 6;
     uint16_t flags;
     pad(4);
     uint32_t group_id;
@@ -1247,10 +1247,10 @@ struct of_group_stats_request {
 
 struct of_group_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 6;
     uint16_t flags;
     pad(4);
     list(of_group_stats_entry_t) entries;
@@ -1258,20 +1258,20 @@ struct of_group_stats_reply {
 
 struct of_group_desc_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 7;
     uint16_t flags;
     pad(4);
 };
 
 struct of_group_desc_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 7;
     uint16_t flags;
     pad(4);
     list(of_group_desc_stats_entry_t) entries;
@@ -1279,10 +1279,10 @@ struct of_group_desc_stats_reply {
 
 struct of_experimenter_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0xffff;
     uint16_t flags;
     pad(4);
     uint32_t experimenter;
@@ -1292,10 +1292,10 @@ struct of_experimenter_stats_request {
 
 struct of_experimenter_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0xffff;
     uint16_t flags;
     pad(4);
     uint32_t experimenter;
@@ -1312,7 +1312,7 @@ struct of_queue_prop {
 };
 
 struct of_queue_prop_min_rate {
-    uint16_t type;
+    uint16_t type == 1;
     uint16_t len;
     pad(4);
     uint16_t rate;
@@ -1328,7 +1328,7 @@ struct of_packet_queue {
 
 struct of_queue_get_config_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 22;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
@@ -1337,7 +1337,7 @@ struct of_queue_get_config_request {
 
 struct of_queue_get_config_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 23;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;

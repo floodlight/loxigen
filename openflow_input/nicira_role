@@ -35,20 +35,20 @@ enum ofp_nicira_controller_role {
 
 struct of_nicira_controller_role_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter; // OF_EXPERIMENTER_ID_NICIRA 0x00002320
-    uint32_t subtype;      // 10
+    uint32_t experimenter == 0x2320;
+    uint32_t subtype == 10;
     uint32_t role;         // 0 other, 1 master, 2 slave
 };
 
 struct of_nicira_controller_role_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter; // OF_EXPERIMENTER_ID_NICIRA 0x00002320
-    uint32_t subtype;      // 11
+    uint32_t experimenter == 0x2320;
+    uint32_t subtype == 11;
     uint32_t role;         // 0 other, 1 master, 2 slave
 };
