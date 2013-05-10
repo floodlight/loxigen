@@ -26,22 +26,22 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: from py_gen.codegen import Member, LengthMember, FieldLengthMember, TypeMember, PadMember
+:: from loxi_ir import *
 :: length_member = None
 :: length_member_index = None
 :: field_length_members = {}
 :: field_length_indexes = {}
 :: index = 0
 :: for m in ofclass.members:
-::     if type(m) == LengthMember:
+::     if type(m) == OFLengthMember:
 ::         length_member = m
 ::         length_member_index = index
         packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${index}
-::     elif type(m) == FieldLengthMember:
+::     elif type(m) == OFFieldLengthMember:
 ::         field_length_members[m.field_name] = m
 ::         field_length_indexes[m.field_name] = index
         packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${index}
-::     elif type(m) == PadMember:
+::     elif type(m) == OFPadMember:
         packed.append('\x00' * ${m.length})
 ::     else:
         packed.append(${m.oftype.gen_pack_expr('self.' + m.name)})

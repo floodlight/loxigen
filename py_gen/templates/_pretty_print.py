@@ -29,8 +29,8 @@
         with q.group():
             with q.indent(2):
                 q.breakable()
-:: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member]
+:: from loxi_ir import *
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
 :: first = True
 :: for m in normal_members:
 :: if not first:

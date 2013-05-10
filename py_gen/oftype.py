@@ -46,7 +46,7 @@ class OFType(object):
         self.is_array = self.array_length != 1
 
     def gen_init_expr(self):
-        if utils.class_is_list(self.base):
+        if self.base.startswith('list('):
             v = "[]"
         elif self.base.find("uint") == 0 or self.base in ["char", "of_port_no_t"]:
             v = "0"
@@ -89,7 +89,7 @@ class OFType(object):
             return 'struct.pack("!%s%s", *%s)' % (self.array_length, pack_fmt, expr_expr)
         elif self.base == 'of_octets_t':
             return expr_expr
-        elif utils.class_is_list(self.base):
+        elif self.base.startswith('list('):
             return '"".join([x.pack() for x in %s])' % expr_expr
         elif self.base == 'of_mac_addr_t':
             return 'struct.pack("!6B", *%s)' % expr_expr
@@ -114,7 +114,7 @@ class OFType(object):
         if pack_fmt and not self.is_array:
             return "%s.read('!%s')[0]" % (reader_expr, pack_fmt)
         elif pack_fmt and self.is_array:
-            return "list(%s.read('!%d%s'))" % (self.array_length, pack_fmt)
+            return "list(%s.read('!%d%s'))" % (reader_expr, self.array_length, pack_fmt)
         elif self.base == 'of_octets_t':
             return "str(%s.read_all())" % (reader_expr)
         elif self.base == 'of_mac_addr_t':
@@ -125,28 +125,28 @@ class OFType(object):
             return 'common.match.unpack(%s)' % (reader_expr)
         elif self.base == 'of_port_desc_t':
             return 'common.port_desc.unpack(%s)' % (reader_expr)
-        elif self.base == 'of_list_action_t':
+        elif self.base == 'list(of_action_t)':
             return 'action.unpack_list(%s)' % (reader_expr)
-        elif self.base == 'of_list_flow_stats_entry_t':
+        elif self.base == 'list(of_flow_stats_entry_t)':
             return 'common.unpack_list_flow_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'of_list_queue_prop_t':
+        elif self.base == 'list(of_queue_prop_t)':
             return 'common.unpack_list_queue_prop(%s)' % (reader_expr)
-        elif self.base == 'of_list_packet_queue_t':
+        elif self.base == 'list(of_packet_queue_t)':
             return 'common.unpack_list_packet_queue(%s)' % (reader_expr)
-        elif self.base == 'of_list_hello_elem_t':
+        elif self.base == 'list(of_hello_elem_t)':
             return 'common.unpack_list_hello_elem(%s)' % (reader_expr)
-        elif self.base == 'of_list_oxm_t':
+        elif self.base == 'list(of_oxm_t)':
             # HACK need the match_v3 length field
             return 'oxm.unpack_list(%s.slice(_length-4))' % (reader_expr)
-        elif self.base == 'of_list_bucket_t':
+        elif self.base == 'list(of_bucket_t)':
             return 'common.unpack_list_bucket(%s)' % (reader_expr)
-        elif self.base == 'of_list_group_desc_stats_entry_t':
+        elif self.base == 'list(of_group_desc_stats_entry_t)':
             return 'common.unpack_list_group_desc_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'of_list_group_stats_entry_t':
+        elif self.base == 'list(of_group_stats_entry_t)':
             return 'common.unpack_list_group_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'of_list_meter_band_t':
+        elif self.base == 'list(of_meter_band_t)':
             return 'meter_band.unpack_list(%s)' % (reader_expr)
-        elif self.base == 'of_list_meter_stats_t':
+        elif self.base == 'list(of_meter_stats_t)':
             return 'common.unpack_list_meter_stats(%s)' % (reader_expr)
         elif self.base == 'of_port_name_t':
             return self._gen_string_unpack_expr(reader_expr, 16)
@@ -156,13 +156,13 @@ class OFType(object):
             return self._gen_string_unpack_expr(reader_expr, 256)
         elif self.base == 'of_meter_features_t':
             return 'common.meter_features.unpack(%s)' % (reader_expr)
-        elif self.base == 'of_list_instruction_t':
+        elif self.base == 'list(of_instruction_t)':
             return 'instruction.unpack_list(%s)' % (reader_expr)
-        elif utils.class_is_list(self.base):
-            element_cls = utils.list_to_entry_type(self.base)[:-2]
+        elif self.base.startswith('list('):
+            element_cls = self.base[5:-3]
             if ((element_cls, self.version) in of_g.is_fixed_length) \
                and not element_cls in loxi_front_end.type_maps.inheritance_map:
-                klass_name = self.base[8:-2]
+                klass_name = self.base[8:-3]
                 element_size, = of_g.base_length[(element_cls, self.version)],
                 return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)
             else:
@@ -204,7 +204,7 @@ class OFType(object):
 class TestOFType(unittest.TestCase):
     def test_init(self):
         from oftype import OFType
-        self.assertEquals("None", OFType("of_list_action_t", 1).gen_init_expr())
+        self.assertEquals("None", OFType("list(of_action_t)", 1).gen_init_expr())
         self.assertEquals("[0,0,0]", OFType("uint32_t[3]", 1).gen_init_expr())
 
     def test_pack(self):

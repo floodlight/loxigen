@@ -27,6 +27,7 @@
 ::
 :: import itertools
 :: import of_g
+:: import py_gen.util as util
 :: include('_copyright.py')
 
 :: include('_autogen.py')
@@ -76,6 +77,7 @@ parsers = {
 :: sort_key = lambda x: x.type_members[0].value
 :: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
+:: k = util.constant_for_value(version, "ofp_action_type", k)
 :: v = list(v)
 :: if len(v) == 1:
     ${k} : ${v[0].pyname}.unpack,
@@ -85,7 +87,7 @@ parsers = {
 :: #endfor
 }
 
-:: experimenter_ofclasses = [x for x in ofclasses if x.type_members[0].value == 'const.OFPAT_VENDOR']
+:: experimenter_ofclasses = [x for x in ofclasses if x.type_members[0].value == 0xffff]
 :: sort_key = lambda x: x.type_members[1].value
 :: experimenter_ofclasses.sort(key=sort_key)
 :: grouped = itertools.groupby(experimenter_ofclasses, sort_key)

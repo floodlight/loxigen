@@ -52,9 +52,9 @@ class OXM(object):
     pass
 
 :: for ofclass in ofclasses:
-:: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member]
-:: type_members = [m for m in ofclass.members if type(m) == TypeMember]
+:: from loxi_ir import *
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
+:: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
 class ${ofclass.pyname}(OXM):
 :: for m in type_members:
     ${m.name} = ${m.value}
@@ -99,7 +99,7 @@ class ${ofclass.pyname}(OXM):
 :: #endfor
 
 parsers = {
-:: key = lambda x: int(x.type_members[0].value, 16)
+:: key = lambda x: x.type_members[0].value
 :: for ofclass in sorted(ofclasses, key=key):
     ${key(ofclass)} : ${ofclass.pyname}.unpack,
 :: #endfor

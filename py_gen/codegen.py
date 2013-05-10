@@ -32,132 +32,77 @@ import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as utils
 import util
 import oftype
+from loxi_ir import *
 
-OFClass = namedtuple('OFClass', ['name', 'pyname', 'members', 'type_members',
-                                 'min_length', 'is_fixed_length'])
-Member = namedtuple('Member', ['name', 'oftype'])
-LengthMember = namedtuple('LengthMember', ['name', 'oftype'])
-FieldLengthMember = namedtuple('FieldLengthMember', ['name', 'oftype', 'field_name'])
-TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'value'])
-PadMember = namedtuple('PadMember', ['length'])
+PyOFClass = namedtuple('PyOFClass', ['name', 'pyname', 'members', 'type_members',
+                                     'min_length', 'is_fixed_length'])
 
-# XXX move to frontend
-field_length_members = {
-    ('of_packet_out', 1, 'actions_len') : 'actions',
-    ('of_packet_out', 2, 'actions_len') : 'actions',
-    ('of_packet_out', 3, 'actions_len') : 'actions',
-    ('of_packet_out', 4, 'actions_len') : 'actions',
-}
-
-def get_type_values(cls, version):
-    """
-    Returns a map from the name of the type member to its value.
-    """
-    type_values = {}
-
-    # Primary wire type
-    if utils.class_is_message(cls):
-        type_values['version'] = 'const.OFP_VERSION'
-        type_values['type'] = util.constant_for_value(version, "ofp_type", util.primary_wire_type(cls, version))
-        if cls in type_maps.flow_mod_list:
-            type_values['_command'] = util.constant_for_value(version, "ofp_flow_mod_command",
-                                                              type_maps.flow_mod_types[version][cls[8:]])
-        if cls in type_maps.stats_request_list:
-            type_values['stats_type'] = util.constant_for_value(version, "ofp_stats_types",
-                                                                type_maps.stats_types[version][cls[3:-14]])
-        if cls in type_maps.stats_reply_list:
-            type_values['stats_type'] = util.constant_for_value(version, "ofp_stats_types",
-                                                                type_maps.stats_types[version][cls[3:-12]])
-        if type_maps.message_is_extension(cls, version):
-            type_values['experimenter'] = '%#x' % type_maps.extension_to_experimenter_id(cls)
-            type_values['subtype'] = type_maps.extension_message_to_subtype(cls, version)
-    elif utils.class_is_action(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_action_type", util.primary_wire_type(cls, version))
-        if type_maps.action_is_extension(cls, version):
-            type_values['experimenter'] = '%#x' % type_maps.extension_to_experimenter_id(cls)
-            type_values['subtype'] = type_maps.extension_action_to_subtype(cls, version)
-    elif utils.class_is_queue_prop(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_queue_properties", util.primary_wire_type(cls, version))
-    elif utils.class_is_hello_elem(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_hello_elem_type", util.primary_wire_type(cls, version))
+# Return the name for the generated Python class
+def generate_pyname(cls):
+    if utils.class_is_action(cls):
+        return cls[10:]
     elif utils.class_is_oxm(cls):
-        oxm_class = 0x8000
-        oxm_type = util.primary_wire_type(cls, version)
-        oxm_masked = cls.find('masked') != -1 and 1 or 0
-        oxm_len = of_g.base_length[(cls, version)] - 4
-        type_values['type_len'] = '%#x' % (oxm_class << 16 | oxm_type << 8 | \
-                                           oxm_masked << 8 | oxm_len)
-    elif cls == "of_match_v2":
-        type_values['type'] = 0
-    elif cls == "of_match_v3":
-        type_values['type'] = 1
+        return cls[7:]
     elif utils.class_is_meter_band(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_meter_band_type", util.primary_wire_type(cls, version))
+        return cls[14:]
     elif utils.class_is_instruction(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_instruction_type", util.primary_wire_type(cls, version))
+        return cls[15:]
+    else:
+        return cls[3:]
 
-    return type_values
-
-# Create intermediate representation
+# Create intermediate representation, extended from the LOXI IR
+# HACK the oftype member attribute is replaced with an OFType instance
 def build_ofclasses(version):
     blacklist = ["of_experimenter", "of_action_experimenter"]
     ofclasses = []
-    for cls in of_g.standard_class_order:
+    for ofclass in of_g.ir[version].classes:
+        cls = ofclass.name
         if type_maps.class_is_virtual(cls):
             continue
-        if version not in of_g.unified[cls] or cls in blacklist:
+        if cls in blacklist:
             continue
-        unified_class = util.lookup_unified_class(cls, version)
 
-        # Name for the generated Python class
-        if utils.class_is_action(cls):
-            pyname = cls[10:]
-        elif utils.class_is_oxm(cls):
-            pyname = cls[7:]
-        elif utils.class_is_meter_band(cls):
-            pyname = cls[14:]
-        elif utils.class_is_instruction(cls):
-            pyname = cls[15:]
-        else:
-            pyname = cls[3:]
-
-        type_values = get_type_values(cls, version)
         members = []
         type_members = []
 
-        pad_count = 0
-
-        for member in unified_class['members']:
-            if member['name'] in ['length', 'len']:
-                members.append(LengthMember(name=member['name'],
-                                            oftype=oftype.OFType(member['m_type'], version)))
-            elif (cls, version, member['name']) in field_length_members:
-                field_name = field_length_members[(cls, version, member['name'])]
-                members.append(FieldLengthMember(name=member['name'],
-                                                 oftype=oftype.OFType(member['m_type'], version),
-                                                 field_name=field_name))
-            elif member['name'] in type_values:
-                members.append(TypeMember(name=member['name'],
-                                          oftype=oftype.OFType(member['m_type'], version),
-                                          value=type_values[member['name']]))
+        for m in ofclass.members:
+            if type(m) == OFTypeMember:
+                members.append(OFTypeMember(
+                    name=m.name,
+                    oftype=oftype.OFType(m.oftype, version),
+                    value=m.value))
                 type_members.append(members[-1])
-            elif member['name'].startswith("pad"):
-                # HACK this should be moved to the frontend
-                pad_oftype = oftype.OFType(member['m_type'], version)
-                length = struct.calcsize("!" + pad_oftype._pack_fmt())
-                if pad_oftype.is_array: length *= pad_oftype.array_length
-                members.append(PadMember(length=length))
-            else:
-                members.append(Member(name=member['name'],
-                                      oftype=oftype.OFType(member['m_type'], version)))
+            elif type(m) == OFLengthMember:
+                members.append(OFLengthMember(
+                    name=m.name,
+                    oftype=oftype.OFType(m.oftype, version)))
+            elif type(m) == OFFieldLengthMember:
+                members.append(OFFieldLengthMember(
+                    name=m.name,
+                    oftype=oftype.OFType(m.oftype, version),
+                    field_name=m.field_name))
+            elif type(m) == OFPadMember:
+                members.append(m)
+            elif type(m) == OFDataMember:
+                if utils.class_is_message(ofclass.name) and m.name == 'version':
+                    # HACK move to frontend
+                    members.append(OFTypeMember(
+                        name=m.name,
+                        oftype=oftype.OFType(m.oftype, version),
+                        value=version))
+                    type_members.append(members[-1])
+                else:
+                    members.append(OFDataMember(
+                        name=m.name,
+                        oftype=oftype.OFType(m.oftype, version)))
 
         ofclasses.append(
-            OFClass(name=cls,
-                    pyname=pyname,
-                    members=members,
-                    type_members=type_members,
-                    min_length=of_g.base_length[(cls, version)],
-                    is_fixed_length=(cls, version) in of_g.is_fixed_length))
+            PyOFClass(name=cls,
+                      pyname=generate_pyname(cls),
+                      members=members,
+                      type_members=type_members,
+                      min_length=of_g.base_length[(cls, version)],
+                      is_fixed_length=(cls, version) in of_g.is_fixed_length))
     return ofclasses
 
 def generate_init(out, name, version):
