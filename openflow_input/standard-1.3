@@ -728,12 +728,6 @@ struct of_match_v3 {
     list(of_oxm_t) oxm_list;
 };
 
-struct of_oxm_experimenter_header {
-    uint32_t oxm_header;
-    uint32_t experimenter;
-    of_octets_t data;
-};
-
 // This looks like an action header, but is standalone.  See 
 // ofp_table_features_prop_actions
 struct of_action_id {

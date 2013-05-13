@@ -604,12 +604,6 @@ struct of_match_v3 {
     list(of_oxm_t) oxm_list;
 };
 
-struct of_oxm_experimenter_header {
-    uint32_t oxm_header;
-    uint32_t experimenter;
-    of_octets_t data;
-};
-
 struct of_action_output {
     uint16_t type == 0;
     uint16_t len;
