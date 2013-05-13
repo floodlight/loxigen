@@ -393,35 +393,6 @@ inheritance_data = dict(
     of_meter_band = meter_band_types
     )
 
-################################################################
-# Now generate the maps from parent to list of subclasses
-################################################################
-
-# # These lists have entries which are a fixed type, no inheritance
-# fixed_lists = [
-#     "of_list_bucket",
-#     "of_list_bucket_counter",
-#     "of_list_flow_stats_entry",
-#     "of_list_group_desc_stats_entry",
-#     "of_list_group_stats_entry",
-#     "of_list_packet_queue",
-#     "of_list_port_desc",
-#     "of_list_port_stats_entry",
-#     "of_list_queue_stats_entry",
-#     "of_list_table_stats_entry"
-#     ]
-
-# for cls in fixed_lists:
-#     base_type = list_to_entry_type(cls)
-#     of_g.inheritance_map[base_type] = [base_type]
-
-inheritance_map = dict()
-for parent, versioned in inheritance_data.items():
-    inheritance_map[parent] = set()
-    for ver, subclasses in versioned.items():
-        for subcls in subclasses:
-            inheritance_map[parent].add(subcls)
-
 def class_is_virtual(cls):
     """
     Returns True if cls is a virtual class
@@ -727,21 +698,29 @@ error_types = {
 ################################################################
 
 type_val = dict()
+inheritance_map = dict()
 
-for version, classes in message_types.items():
-    for cls in classes:
-        name = "of_" + cls
-        type_val[(name, version)] = classes[cls]
+def generate_maps():
+    for parent, versioned in inheritance_data.items():
+        inheritance_map[parent] = set()
+        for ver, subclasses in versioned.items():
+            for subcls in subclasses:
+                inheritance_map[parent].add(subcls)
 
-for parent, versioned in inheritance_data.items():
-    for version, subclasses in versioned.items():
-        for subcls, value in subclasses.items():
-            name = parent + "_" + subcls
-            type_val[(name, version)] = value
+    for version, classes in message_types.items():
+        for cls in classes:
+            name = "of_" + cls
+            type_val[(name, version)] = classes[cls]
 
-# Special case OF-1.2 match type
-type_val[("of_match_v3", of_g.VERSION_1_2)] = 0x8000
-type_val[("of_match_v3", of_g.VERSION_1_3)] = 0x8000
+    for parent, versioned in inheritance_data.items():
+        for version, subclasses in versioned.items():
+            for subcls, value in subclasses.items():
+                name = parent + "_" + subcls
+                type_val[(name, version)] = value
+
+    # Special case OF-1.2 match type
+    type_val[("of_match_v3", of_g.VERSION_1_2)] = 0x8000
+    type_val[("of_match_v3", of_g.VERSION_1_3)] = 0x8000
 
 # Utility function
 def dict_to_array(d, m_val, def_val=-1):

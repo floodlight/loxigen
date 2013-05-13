@@ -568,6 +568,7 @@ if __name__ == '__main__':
     log("\nGenerating files for target language %s\n" % of_g.options.lang)
 
     initialize_versions()
+    type_maps.generate_maps()
     read_input()
     analyze_input()
     unify_input()
