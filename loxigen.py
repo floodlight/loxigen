@@ -463,6 +463,15 @@ def analyze_input():
     lengths of struct members and the set of list and action_id types.
     """
 
+    # Generate header classes for inheritance parents
+    for wire_version, ordered_classes in of_g.ordered_classes.items():
+        classes = versions[of_g.of_version_wire2name[wire_version]]['classes']
+        for cls in ordered_classes:
+            if cls in type_maps.inheritance_map:
+                new_cls = cls + '_header'
+                of_g.ordered_classes[wire_version].append(new_cls)
+                classes[new_cls] = classes[cls]
+
     # Generate action_id classes for OF 1.3
     for wire_version, ordered_classes in of_g.ordered_classes.items():
         if not wire_version in [of_g.VERSION_1_3]:

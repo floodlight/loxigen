@@ -63,12 +63,6 @@ def create_ofinput(ast):
             members = [create_member(m_ast) for m_ast in decl_ast[2]]
             ofclass = OFClass(name=decl_ast[1], members=members)
             ofinput.classes.append(ofclass)
-            if ofclass.name in type_maps.inheritance_map:
-                # Clone class into header class and add to list
-                # TODO figure out if these are actually used
-                ofclass_header = OFClass(ofclass.name + '_header',
-                                         copy.deepcopy(members))
-                ofinput.classes.append(ofclass_header)
         if decl_ast[0] == 'enum':
             enum = OFEnum(name=decl_ast[1], values=[(x[0], x[1]) for x in decl_ast[2]])
             ofinput.enums.append(enum)
