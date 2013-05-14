@@ -457,6 +457,75 @@ def read_input():
             ofprotocol.classes.sort(key=lambda ofclass: ofclass.name)
             of_g.ir[wire_version] = ofprotocol
 
+def populate_type_maps():
+    """
+    Use the type members in the IR to fill out the legacy type_maps.
+    """
+
+    def split_inherited_cls(cls):
+        if cls == 'of_meter_band_stats': # HACK not a subtype of of_meter_band
+            return None, None
+        for parent in sorted(type_maps.inheritance_data.keys(), reverse=True):
+            if cls.startswith(parent):
+                return (parent, cls[len(parent)+1:])
+        return None, None
+
+    def find_experimenter(parent, cls):
+        for experimenter in sorted(of_g.experimenter_name_to_id.keys(), reverse=True):
+            prefix = parent + '_' + experimenter
+            if cls.startswith(prefix):
+                return experimenter
+        return None
+
+    def find_type_value(ofclass, m_name):
+        for m in ofclass.members:
+            if isinstance(m, OFTypeMember) and m.name == m_name:
+                return m.value
+        raise KeyError("ver=%d, cls=%s, m_name=%s" % (wire_version, cls, m_name))
+
+    # Most inheritance classes: actions, instructions, etc
+    for wire_version, protocol in of_g.ir.items():
+        for ofclass in protocol.classes:
+            cls = ofclass.name
+            parent, subcls = split_inherited_cls(cls)
+            if not (parent and subcls):
+                continue
+            if parent == 'of_oxm':
+                val = (find_type_value(ofclass, 'type_len') >> 8) & 0xff
+            else:
+                val = find_type_value(ofclass, 'type')
+            type_maps.inheritance_data[parent][wire_version][subcls] = val
+
+            # Extensions (only actions for now)
+            experimenter = find_experimenter(parent, cls)
+            if parent == 'of_action' and experimenter:
+                val = find_type_value(ofclass, 'subtype')
+                type_maps.extension_action_subtype[wire_version][experimenter][cls] = val
+                if wire_version >= of_g.VERSION_1_3:
+                    cls2 = parent + "_id" + cls[len(parent):]
+                    type_maps.extension_action_id_subtype[wire_version][experimenter][cls2] = val
+
+    # Messages
+    for wire_version, protocol in of_g.ir.items():
+        for ofclass in protocol.classes:
+            cls = ofclass.name
+            # HACK (though this is what loxi_utils.class_is_message() does)
+            if not [x for x in ofclass.members if isinstance(x, OFDataMember) and x.name == 'xid']:
+                continue
+            if cls == 'of_header':
+                continue
+            subcls = cls[3:]
+            val = find_type_value(ofclass, 'type')
+            type_maps.message_types[wire_version][subcls] = val
+
+            # Extensions
+            experimenter = find_experimenter('of', cls)
+            if experimenter:
+                val = find_type_value(ofclass, 'subtype')
+                type_maps.extension_message_subtype[wire_version][experimenter][cls] = val
+
+    type_maps.generate_maps()
+
 def analyze_input():
     """
     Add information computed from the input, including offsets and
@@ -577,8 +646,8 @@ if __name__ == '__main__':
     log("\nGenerating files for target language %s\n" % of_g.options.lang)
 
     initialize_versions()
-    type_maps.generate_maps()
     read_input()
+    populate_type_maps()
     analyze_input()
     unify_input()
     order_and_assign_object_ids()

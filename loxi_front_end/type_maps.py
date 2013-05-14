@@ -53,148 +53,23 @@ invalid_value = "0xeeee"  # Note, as a string
 ################################################################
 
 instruction_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
-
-    # version 1.1
-    of_g.VERSION_1_1:dict(
-        goto_table = 1,
-        write_metadata = 2,
-        write_actions = 3,
-        apply_actions = 4,
-        clear_actions = 5,
-        experimenter = 0xffff
-        ),
-
-    # version 1.2
-    of_g.VERSION_1_2:dict(
-        goto_table = 1,
-        write_metadata = 2,
-        write_actions = 3,
-        apply_actions = 4,
-        clear_actions = 5,
-        experimenter = 0xffff
-        ),
-
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        goto_table = 1,
-        write_metadata = 2,
-        write_actions = 3,
-        apply_actions = 4,
-        clear_actions = 5,
-        meter = 6,
-        experimenter = 0xffff
-        )
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict()
     }
 
-of_1_3_action_types = dict(
-    output       = 0,
-    copy_ttl_out = 11,
-    copy_ttl_in  = 12,
-    set_mpls_ttl = 15,
-    dec_mpls_ttl = 16,
-    push_vlan    = 17,
-    pop_vlan     = 18,
-    push_mpls    = 19,
-    pop_mpls     = 20,
-    set_queue    = 21,
-    group        = 22,
-    set_nw_ttl   = 23,
-    dec_nw_ttl   = 24,
-    set_field    = 25,
-    push_pbb     = 26,
-    pop_pbb      = 27,
-    experimenter = 0xffff,
-    bsn_mirror = 0xffff,
-    bsn_set_tunnel_dst = 0xffff,
-    nicira_dec_ttl = 0xffff
-    )
+# HACK shared between actions and action_ids
+of_1_3_action_types = dict()
 
-# Indexed by OF version
 action_types = {
-    # version 1.0
-    of_g.VERSION_1_0:dict(
-        output = 0,
-        set_vlan_vid = 1,
-        set_vlan_pcp = 2,
-        strip_vlan = 3,
-        set_dl_src = 4,
-        set_dl_dst = 5,
-        set_nw_src = 6,
-        set_nw_dst = 7,
-        set_nw_tos = 8,
-        set_tp_src = 9,
-        set_tp_dst = 10,
-        enqueue = 11,
-        experimenter = 0xffff,
-        bsn_mirror = 0xffff,
-        bsn_set_tunnel_dst = 0xffff,
-        nicira_dec_ttl = 0xffff
-        ),
-
-    # version 1.1
-    of_g.VERSION_1_1:dict(
-        output = 0,
-        set_vlan_vid = 1,
-        set_vlan_pcp = 2,
-        set_dl_src = 3,
-        set_dl_dst = 4,
-        set_nw_src = 5,
-        set_nw_dst = 6,
-        set_nw_tos = 7,
-        set_nw_ecn = 8,
-        set_tp_src = 9,
-        set_tp_dst = 10,
-        copy_ttl_out = 11,
-        copy_ttl_in = 12,
-        set_mpls_label = 13,
-        set_mpls_tc = 14,
-        set_mpls_ttl = 15,
-        dec_mpls_ttl = 16,
-        push_vlan = 17,
-        pop_vlan = 18,
-        push_mpls = 19,
-        pop_mpls = 20,
-        set_queue = 21,
-        group = 22,
-        set_nw_ttl = 23,
-        dec_nw_ttl = 24,
-        experimenter = 0xffff,
-        bsn_mirror = 0xffff,
-        bsn_set_tunnel_dst = 0xffff,
-        nicira_dec_ttl = 0xffff
-        ),
-
-    # version 1.2
-    of_g.VERSION_1_2:dict(
-        output       = 0,
-        copy_ttl_out = 11,
-        copy_ttl_in  = 12,
-        set_mpls_ttl = 15,
-        dec_mpls_ttl = 16,
-        push_vlan    = 17,
-        pop_vlan     = 18,
-        push_mpls    = 19,
-        pop_mpls     = 20,
-        set_queue    = 21,
-        group        = 22,
-        set_nw_ttl   = 23,
-        dec_nw_ttl   = 24,
-        set_field    = 25,
-        experimenter = 0xffff,
-        bsn_mirror = 0xffff,
-        bsn_set_tunnel_dst = 0xffff,
-        nicira_dec_ttl = 0xffff
-        ),
-
-    # version 1.3
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
     of_g.VERSION_1_3:of_1_3_action_types
-
     }
 
 action_id_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
     of_g.VERSION_1_2:dict(),
@@ -202,183 +77,38 @@ action_id_types = {
     }
 
 queue_prop_types = {
-    # version 1.0
-    of_g.VERSION_1_0:dict(
-        min_rate      = 1,
-        # experimenter  = 0xffff
-        ),
-    # version 1.1
-    of_g.VERSION_1_1:dict(
-        min_rate      = 1,
-        #  experimenter  = 0xffff
-        ),
-    # version 1.2
-    of_g.VERSION_1_2:dict(
-        min_rate      = 1,
-        max_rate      = 2,
-        experimenter  = 0xffff
-        ),
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        min_rate      = 1,
-        max_rate      = 2,
-        experimenter  = 0xffff
-        )
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict()
     }
 
-oxm_wire_types_1_2 = dict(
-    in_port               = (0 << 1),
-    in_port_masked        = (0 << 1) + 1,
-    in_phy_port           = (1 << 1),
-    in_phy_port_masked    = (1 << 1) + 1,
-    metadata              = (2 << 1),
-    metadata_masked       = (2 << 1) + 1,
-    eth_dst               = (3 << 1),
-    eth_dst_masked        = (3 << 1) + 1,
-    eth_src               = (4 << 1),
-    eth_src_masked        = (4 << 1) + 1,
-    eth_type              = (5 << 1),
-    eth_type_masked       = (5 << 1) + 1,
-    vlan_vid              = (6 << 1),
-    vlan_vid_masked       = (6 << 1) + 1,
-    vlan_pcp              = (7 << 1),
-    vlan_pcp_masked       = (7 << 1) + 1,
-    ip_dscp               = (8 << 1),
-    ip_dscp_masked        = (8 << 1) + 1,
-    ip_ecn                = (9 << 1),
-    ip_ecn_masked         = (9 << 1) + 1,
-    ip_proto              = (10 << 1),
-    ip_proto_masked       = (10 << 1) + 1,
-    ipv4_src              = (11 << 1),
-    ipv4_src_masked       = (11 << 1) + 1,
-    ipv4_dst              = (12 << 1),
-    ipv4_dst_masked       = (12 << 1) + 1,
-    tcp_src               = (13 << 1),
-    tcp_src_masked        = (13 << 1) + 1,
-    tcp_dst               = (14 << 1),
-    tcp_dst_masked        = (14 << 1) + 1,
-    udp_src               = (15 << 1),
-    udp_src_masked        = (15 << 1) + 1,
-    udp_dst               = (16 << 1),
-    udp_dst_masked        = (16 << 1) + 1,
-    sctp_src              = (17 << 1),
-    sctp_src_masked       = (17 << 1) + 1,
-    sctp_dst              = (18 << 1),
-    sctp_dst_masked       = (18 << 1) + 1,
-    icmpv4_type           = (19 << 1),
-    icmpv4_type_masked    = (19 << 1) + 1,
-    icmpv4_code           = (20 << 1),
-    icmpv4_code_masked    = (20 << 1) + 1,
-    arp_op                = (21 << 1),
-    arp_op_masked         = (21 << 1) + 1,
-    arp_spa               = (22 << 1),
-    arp_spa_masked        = (22 << 1) + 1,
-    arp_tpa               = (23 << 1),
-    arp_tpa_masked        = (23 << 1) + 1,
-    arp_sha               = (24 << 1),
-    arp_sha_masked        = (24 << 1) + 1,
-    arp_tha               = (25 << 1),
-    arp_tha_masked        = (25 << 1) + 1,
-    ipv6_src              = (26 << 1),
-    ipv6_src_masked       = (26 << 1) + 1,
-    ipv6_dst              = (27 << 1),
-    ipv6_dst_masked       = (27 << 1) + 1,
-    ipv6_flabel           = (28 << 1),
-    ipv6_flabel_masked    = (28 << 1) + 1,
-    icmpv6_type           = (29 << 1),
-    icmpv6_type_masked    = (29 << 1) + 1,
-    icmpv6_code           = (30 << 1),
-    icmpv6_code_masked    = (30 << 1) + 1,
-    ipv6_nd_target        = (31 << 1),
-    ipv6_nd_target_masked = (31 << 1) + 1,
-    ipv6_nd_sll           = (32 << 1),
-    ipv6_nd_sll_masked    = (32 << 1) + 1,
-    ipv6_nd_tll           = (33 << 1),
-    ipv6_nd_tll_masked    = (33 << 1) + 1,
-    mpls_label            = (34 << 1),
-    mpls_label_masked     = (34 << 1) + 1,
-    mpls_tc               = (35 << 1),
-    mpls_tc_masked        = (35 << 1) + 1
-)
-
 oxm_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
-
-    # version 1.1
     of_g.VERSION_1_1:dict(),
-
-    # version 1.2
-    of_g.VERSION_1_2:oxm_wire_types_1_2,
-
-    # version 1.3
-    of_g.VERSION_1_3:oxm_wire_types_1_2,  # FIXME needs update for 1.3?
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(),
     }
 
 hello_elem_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
-
-    # version 1.1
     of_g.VERSION_1_1:dict(),
-
-    # version 1.2
     of_g.VERSION_1_2:dict(),
-
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        versionbitmap = 1
-        )
+    of_g.VERSION_1_3:dict(),
     }
 
 table_feature_prop_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
-
-    # version 1.1
     of_g.VERSION_1_1:dict(),
-
-    # version 1.2
     of_g.VERSION_1_2:dict(),
-
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        instructions           = 0,
-        instructions_miss      = 1,
-        next_tables            = 2,
-        next_tables_miss       = 3,
-        write_actions          = 4,
-        write_actions_miss     = 5,
-        apply_actions          = 6,
-        apply_actions_miss     = 7,
-        match                  = 8,
-        wildcards              = 10,
-        write_setfield         = 12,
-        write_setfield_miss    = 13,
-        apply_setfield         = 14,
-        apply_setfield_miss    = 15,
-#        experimenter           = 0xFFFE,
-#        experimenter_miss      = 0xFFFF,
-        experimenter            = 0xFFFF,  # Wrong: should be experimenter_miss
-        )
+    of_g.VERSION_1_3:dict(),
     }
 
 meter_band_types = {
-    # version 1.0
     of_g.VERSION_1_0:dict(),
-
-    # version 1.1
     of_g.VERSION_1_1:dict(),
-
-    # version 1.2
     of_g.VERSION_1_2:dict(),
-
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        drop                   = 1,
-        dscp_remark            = 2,
-        experimenter           = 0xFFFF,
-        )
+    of_g.VERSION_1_3:dict(),
     }
 
 # All inheritance data for non-messages
@@ -411,124 +141,34 @@ def class_is_virtual(cls):
 #
 ################################################################
 
+# The hardcoded message types are for objects without proper inheritance
 message_types = {
     # version 1.0
     of_g.VERSION_1_0:dict(
-        hello                   = 0,
-        error_msg               = 1,
-        echo_request            = 2,
-        echo_reply              = 3,
-        experimenter            = 4,
-        features_request        = 5,
-        features_reply          = 6,
-        get_config_request      = 7,
-        get_config_reply        = 8,
-        set_config              = 9,
-        packet_in               = 10,
-        flow_removed            = 11,
-        port_status             = 12,
-        packet_out              = 13,
         flow_mod                = 14,
-        port_mod                = 15,
         stats_request           = 16,
         stats_reply             = 17,
-        barrier_request         = 18,
-        barrier_reply           = 19,
-        queue_get_config_request = 20,
-        queue_get_config_reply  = 21,
-        table_mod               = 22    # Unofficial 1.0 extension
         ),
 
     # version 1.1
     of_g.VERSION_1_1:dict(
-        hello                   = 0,
-        error_msg               = 1,
-        echo_request            = 2,
-        echo_reply              = 3,
-        experimenter            = 4,
-        features_request        = 5,
-        features_reply          = 6,
-        get_config_request      = 7,
-        get_config_reply        = 8,
-        set_config              = 9,
-        packet_in               = 10,
-        flow_removed            = 11,
-        port_status             = 12,
-        packet_out              = 13,
         flow_mod                = 14,
-        group_mod               = 15,
-        port_mod                = 16,
-        table_mod               = 17,
         stats_request           = 18,
         stats_reply             = 19,
-        barrier_request         = 20,
-        barrier_reply           = 21,
-        queue_get_config_request = 22,
-        queue_get_config_reply  = 23
         ),
 
     # version 1.2
     of_g.VERSION_1_2:dict(
-        hello                   = 0,
-        error_msg               = 1,
-        echo_request            = 2,
-        echo_reply              = 3,
-        experimenter            = 4,
-        features_request        = 5,
-        features_reply          = 6,
-        get_config_request      = 7,
-        get_config_reply        = 8,
-        set_config              = 9,
-        packet_in               = 10,
-        flow_removed            = 11,
-        port_status             = 12,
-        packet_out              = 13,
         flow_mod                = 14,
-        group_mod               = 15,
-        port_mod                = 16,
-        table_mod               = 17,
         stats_request           = 18,
         stats_reply             = 19,
-        barrier_request         = 20,
-        barrier_reply           = 21,
-        queue_get_config_request = 22,
-        queue_get_config_reply   = 23,
-        role_request            = 24,
-        role_reply              = 25,
         ),
 
     # version 1.3
     of_g.VERSION_1_3:dict(
-        hello                   = 0,
-        error_msg               = 1,
-        echo_request            = 2,
-        echo_reply              = 3,
-        experimenter            = 4,
-        features_request        = 5,
-        features_reply          = 6,
-        get_config_request      = 7,
-        get_config_reply        = 8,
-        set_config              = 9,
-        packet_in               = 10,
-        flow_removed            = 11,
-        port_status             = 12,
-        packet_out              = 13,
         flow_mod                = 14,
-        group_mod               = 15,
-        port_mod                = 16,
-        table_mod               = 17,
         stats_request           = 18,  # FIXME Multipart
         stats_reply             = 19,
-        barrier_request         = 20,
-        barrier_reply           = 21,
-        queue_get_config_request = 22,
-        queue_get_config_reply   = 23,
-        role_request            = 24,
-        role_reply              = 25,
-        async_get_request       = 26,
-        async_get_reply         = 27,
-        async_set               = 28,
-        meter_mod               = 29
         )
     }
 
@@ -837,55 +477,20 @@ extension_message_subtype = {
     # version 1.0
     of_g.VERSION_1_0:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_ip_mask"             : 0,
-            "of_bsn_get_ip_mask_request"     : 1,
-            "of_bsn_get_ip_mask_reply"       : 2,
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_shell_command"           : 6,
-            "of_bsn_shell_output"            : 7,
-            "of_bsn_shell_status"            : 8,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
-            "of_bsn_set_l2_table"            : 12,
-            "of_bsn_get_l2_table_request"    : 13,
-            "of_bsn_get_l2_table_reply"      : 14,
             },
         nicira = {   # Nicira extensions, value is subtype
-            "of_nicira_controller_role_request"      : 10,
-            "of_nicira_controller_role_reply"        : 11,
             },
         ),
     of_g.VERSION_1_1:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
     of_g.VERSION_1_2:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
     of_g.VERSION_1_3:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
             },
         ),
 }
@@ -896,38 +501,26 @@ extension_action_subtype = {
     # version 1.0
     of_g.VERSION_1_0:dict(  # Version 1.0 extensions
         bsn = {   # of_action_bsn_
-            "of_action_bsn_mirror"           : 1,
-            "of_action_bsn_set_tunnel_dst"   : 2,
             },
         nicira = {   # of_action_nicira_
-            "of_action_nicira_dec_ttl"       : 18,
             }
         ),
     of_g.VERSION_1_1:dict(  # Version 1.0 extensions
         bsn = {   # of_action_bsn_
-            "of_action_bsn_mirror"           : 1,
-            "of_action_bsn_set_tunnel_dst"   : 2,
             },
         nicira = {   # of_action_nicira_
-            "of_action_nicira_dec_ttl"       : 18,
             }
         ),
     of_g.VERSION_1_2:dict(  # Version 1.0 extensions
         bsn = {   # of_action_bsn_
-            "of_action_bsn_mirror"           : 1,
-            "of_action_bsn_set_tunnel_dst"   : 2,
             },
         nicira = {   # of_action_nicira_
-            "of_action_nicira_dec_ttl"       : 18,
             }
         ),
     of_g.VERSION_1_3:dict(  # Version 1.0 extensions
         bsn = {   # of_action_bsn_
-            "of_action_bsn_mirror"           : 1,
-            "of_action_bsn_set_tunnel_dst"   : 2,
             },
         nicira = {   # of_action_nicira_
-            "of_action_nicira_dec_ttl"       : 18,
             }
         ),
 }
@@ -941,11 +534,8 @@ extension_action_id_subtype = {
     of_g.VERSION_1_2:dict(),
     of_g.VERSION_1_3:dict(  # Version 1.3 extensions
         bsn = {   # of_action_bsn_
-            "of_action_id_bsn_mirror"           : 1,
-            "of_action_id_bsn_set_tunnel_dst"   : 2,
             },
         nicira = {   # of_action_nicira_
-            "of_action_id_nicira_dec_ttl"       : 18,
             }
         ),
 }
