@@ -76,8 +76,8 @@ import string
 import os
 import glob
 import copy
+import collections
 import of_g
-import loxi_front_end.oxm as oxm
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
 import loxi_front_end.c_parse_utils as c_parse_utils
@@ -85,7 +85,8 @@ import loxi_front_end.identifiers as identifiers
 import pyparsing
 import loxi_front_end.parser as parser
 import loxi_front_end.translation as translation
-
+import loxi_front_end.frontend as frontend
+from loxi_ir import *
 from generic_utils import *
 
 root_dir = os.path.dirname(os.path.realpath(__file__))
@@ -314,51 +315,26 @@ def process_input_file(filename):
     """
     Process an input file
 
+    Does not modify global state.
+
     @param filename The input filename
 
-    @returns (wire_version, classes), where wire_version is the integer wire
-    protocol number and classes is the dict of all classes processed from the
-    file.
+    @returns An OFInput object
     """
 
     # Parse the input file
     try:
-        ast = parser.parse(open(filename, 'r').read())
+        with open(filename, 'r') as f:
+            ast = parser.parse(f.read())
     except pyparsing.ParseBaseException as e:
         print "Parse error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
 
-    ofinput = of_g.OFInput()
-
-    # Now for each structure, generate lists for each member
-    for s in ast:
-        if s[0] == 'struct':
-            name = s[1].replace("ofp_", "of_", 1)
-            members = [dict(m_type=x[0], name=x[1]) for x in s[2]]
-            ofinput.classes[name] = members
-            ofinput.ordered_classes.append(name)
-            if name in type_maps.inheritance_map:
-                # Clone class into header class and add to list
-                ofinput.classes[name + "_header"] = members[:]
-                ofinput.ordered_classes.append(name + "_header")
-        if s[0] == 'enum':
-            name = s[1]
-            members = s[2]
-            ofinput.enums[name] = [(x[0], x[1]) for x in members]
-        elif s[0] == 'metadata':
-            if s[1] == 'version':
-                log("Found version: wire version " + s[2])
-                if s[2] == 'any':
-                    ofinput.wire_versions.update(of_g.wire_ver_map.keys())
-                elif int(s[2]) in of_g.supported_wire_protos:
-                    ofinput.wire_versions.add(int(s[2]))
-                else:
-                    debug("Unrecognized wire protocol version")
-                    sys.exit(1)
-                found_wire_version = True
-
-    if not ofinput.wire_versions:
-        debug("Missing #version metadata")
+    # Create the OFInput from the AST
+    try:
+        ofinput = frontend.create_ofinput(ast)
+    except frontend.InputError as e:
+        print "Error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
 
     return ofinput
@@ -439,6 +415,7 @@ def read_input():
     @fixme Should select versions to support from command line
     """
 
+    ofinputs_by_version = collections.defaultdict(lambda: [])
     filenames = sorted(glob.glob("%s/openflow_input/*" % root_dir))
 
     for filename in filenames:
@@ -447,32 +424,122 @@ def read_input():
 
         # Populate global state
         for wire_version in ofinput.wire_versions:
+            ofinputs_by_version[wire_version].append(ofinput)
             version_name = of_g.of_version_wire2name[wire_version]
-            versions[version_name]['classes'].update(copy.deepcopy(ofinput.classes))
-            of_g.ordered_classes[wire_version].extend(ofinput.ordered_classes)
 
-            for enum_name, members in ofinput.enums.items():
-                for member_name, value in members:
+            for ofclass in ofinput.classes:
+                of_g.ordered_classes[wire_version].append(ofclass.name)
+                legacy_members = []
+                pad_count = 0
+                for m in ofclass.members:
+                    if type(m) == OFPadMember:
+                        m_name = 'pad%d' % pad_count
+                        if m_name == 'pad0': m_name = 'pad'
+                        legacy_members.append(dict(m_type='uint8_t[%d]' % m.length,
+                                                   name=m_name))
+                        pad_count += 1
+                    else:
+                        legacy_members.append(dict(m_type=m.oftype, name=m.name))
+                versions[version_name]['classes'][ofclass.name] = legacy_members
+
+            for enum in ofinput.enums:
+                for name, value in enum.values:
                     identifiers.add_identifier(
-                        translation.loxi_name(member_name),
-                        member_name, enum_name, value, wire_version,
+                        translation.loxi_name(name),
+                        name, enum.name, value, wire_version,
                         of_g.identifiers, of_g.identifiers_by_group)
 
-def add_extra_classes():
+        for wire_version, ofinputs in ofinputs_by_version.items():
+            ofprotocol = OFProtocol(wire_version=wire_version, classes=[], enums=[])
+            for ofinput in ofinputs:
+                ofprotocol.classes.extend(ofinput.classes)
+                ofprotocol.enums.extend(ofinput.enums)
+            ofprotocol.classes.sort(key=lambda ofclass: ofclass.name)
+            of_g.ir[wire_version] = ofprotocol
+
+def populate_type_maps():
     """
-    Add classes that are generated by Python code instead of from the
-    input files.
+    Use the type members in the IR to fill out the legacy type_maps.
     """
 
-    for wire_version in [of_g.VERSION_1_2, of_g.VERSION_1_3]:
-        version_name = of_g.of_version_wire2name[wire_version]
-        oxm.add_oxm_classes_1_2(versions[version_name]['classes'], wire_version)
+    def split_inherited_cls(cls):
+        if cls == 'of_meter_band_stats': # HACK not a subtype of of_meter_band
+            return None, None
+        for parent in sorted(type_maps.inheritance_data.keys(), reverse=True):
+            if cls.startswith(parent):
+                return (parent, cls[len(parent)+1:])
+        return None, None
+
+    def find_experimenter(parent, cls):
+        for experimenter in sorted(of_g.experimenter_name_to_id.keys(), reverse=True):
+            prefix = parent + '_' + experimenter
+            if cls.startswith(prefix):
+                return experimenter
+        return None
+
+    def find_type_value(ofclass, m_name):
+        for m in ofclass.members:
+            if isinstance(m, OFTypeMember) and m.name == m_name:
+                return m.value
+        raise KeyError("ver=%d, cls=%s, m_name=%s" % (wire_version, cls, m_name))
+
+    # Most inheritance classes: actions, instructions, etc
+    for wire_version, protocol in of_g.ir.items():
+        for ofclass in protocol.classes:
+            cls = ofclass.name
+            parent, subcls = split_inherited_cls(cls)
+            if not (parent and subcls):
+                continue
+            if parent == 'of_oxm':
+                val = (find_type_value(ofclass, 'type_len') >> 8) & 0xff
+            else:
+                val = find_type_value(ofclass, 'type')
+            type_maps.inheritance_data[parent][wire_version][subcls] = val
+
+            # Extensions (only actions for now)
+            experimenter = find_experimenter(parent, cls)
+            if parent == 'of_action' and experimenter:
+                val = find_type_value(ofclass, 'subtype')
+                type_maps.extension_action_subtype[wire_version][experimenter][cls] = val
+                if wire_version >= of_g.VERSION_1_3:
+                    cls2 = parent + "_id" + cls[len(parent):]
+                    type_maps.extension_action_id_subtype[wire_version][experimenter][cls2] = val
+
+    # Messages
+    for wire_version, protocol in of_g.ir.items():
+        for ofclass in protocol.classes:
+            cls = ofclass.name
+            # HACK (though this is what loxi_utils.class_is_message() does)
+            if not [x for x in ofclass.members if isinstance(x, OFDataMember) and x.name == 'xid']:
+                continue
+            if cls == 'of_header':
+                continue
+            subcls = cls[3:]
+            val = find_type_value(ofclass, 'type')
+            type_maps.message_types[wire_version][subcls] = val
+
+            # Extensions
+            experimenter = find_experimenter('of', cls)
+            if experimenter:
+                val = find_type_value(ofclass, 'subtype')
+                type_maps.extension_message_subtype[wire_version][experimenter][cls] = val
+
+    type_maps.generate_maps()
 
 def analyze_input():
     """
     Add information computed from the input, including offsets and
     lengths of struct members and the set of list and action_id types.
     """
+
+    # Generate header classes for inheritance parents
+    for wire_version, ordered_classes in of_g.ordered_classes.items():
+        classes = versions[of_g.of_version_wire2name[wire_version]]['classes']
+        for cls in ordered_classes:
+            if cls in type_maps.inheritance_map:
+                new_cls = cls + '_header'
+                of_g.ordered_classes[wire_version].append(new_cls)
+                classes[new_cls] = classes[cls]
 
     # Generate action_id classes for OF 1.3
     for wire_version, ordered_classes in of_g.ordered_classes.items():
@@ -580,7 +647,7 @@ if __name__ == '__main__':
 
     initialize_versions()
     read_input()
-    add_extra_classes()
+    populate_type_maps()
     analyze_input()
     unify_input()
     order_and_assign_object_ids()

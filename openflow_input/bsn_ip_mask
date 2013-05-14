@@ -27,37 +27,37 @@
 
 #version 1
 
-struct ofp_bsn_set_ip_mask {
+struct of_bsn_set_ip_mask {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // bsn 0x005c16c7,
-    uint32_t subtype;       // 0
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 0;
     uint8_t index;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t mask;
 };
 
-struct ofp_bsn_get_ip_mask_request {
+struct of_bsn_get_ip_mask_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // bsn 0x005c16c7,
-    uint32_t subtype;       // 1
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 1;
     uint8_t index;
-    uint8_t[7] pad;
+    pad(7);
 };
 
-struct ofp_bsn_get_ip_mask_reply {
+struct of_bsn_get_ip_mask_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // bsn 0x005c16c7,
-    uint32_t subtype;       // 2
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 2;
     uint8_t index;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t mask;
 };

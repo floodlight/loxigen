@@ -32,7 +32,6 @@
 import of_g
 import sys
 from generic_utils import *
-import loxi_front_end.oxm as oxm
 import loxi_front_end.type_maps as type_maps
 
 

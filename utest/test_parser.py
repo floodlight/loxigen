@@ -36,7 +36,7 @@ class StructTests(unittest.TestCase):
 struct foo { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['struct', 'foo', []]])
+        self.assertEquals(ast, [['struct', 'foo', []]])
 
     def test_one_field(self):
         src = """\
@@ -45,8 +45,8 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [['data', 'uint32_t', 'bar']]]])
 
     def test_multiple_fields(self):
         src = """\
@@ -57,11 +57,11 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo',
-                [['uint32_t', 'bar'],
-                 ['uint8_t', 'baz'],
-                 ['uint64_t', 'abc']]]])
+                [['data', 'uint32_t', 'bar'],
+                 ['data', 'uint8_t', 'baz'],
+                 ['data', 'uint64_t', 'abc']]]])
 
     def test_array_type(self):
         src = """\
@@ -70,8 +70,8 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t[4]', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [['data', 'uint32_t[4]', 'bar']]]])
 
     def test_list_type(self):
         src = """\
@@ -80,8 +80,28 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [['data', 'list(of_action_t)', 'bar']]]])
+
+    def test_pad_member(self):
+        src = """\
+struct foo {
+    pad(1);
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [['pad', 1]]]])
+
+    def test_type_member(self):
+        src = """\
+struct foo {
+    uint16_t foo == 0x10;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [['type', 'uint16_t', 'foo', 0x10]]]])
 
 class EnumTests(unittest.TestCase):
     def test_empty(self):
@@ -90,7 +110,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', []]])
+        self.assertEquals(ast, [['enum', 'foo', []]])
 
     def test_one(self):
         src = """\
@@ -99,7 +119,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', 1]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['BAR', 1]]]])
 
     def test_multiple(self):
         src = """\
@@ -110,7 +130,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
     def test_trailing_comma(self):
         src = """\
@@ -121,7 +141,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
 
 class TestMetadata(unittest.TestCase):
     def test_version(self):
@@ -129,7 +149,7 @@ class TestMetadata(unittest.TestCase):
 #version 1
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['metadata', 'version', '1']])
+        self.assertEquals(ast, [['metadata', 'version', '1']])
 
 class TestToplevel(unittest.TestCase):
     def test_multiple_structs(self):
@@ -138,7 +158,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['struct', 'foo', []], ['struct', 'bar', []]])
 
     def test_comments(self):
@@ -152,8 +172,8 @@ struct foo { //comment 2
 // comment 4
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t', 'a']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [['data', 'uint32_t', 'a']]]])
 
     def test_mixed(self):
         src = """\
@@ -163,7 +183,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['metadata', 'version', '1'],
              ['struct', 'foo', []],
              ['metadata', 'version', '2'],

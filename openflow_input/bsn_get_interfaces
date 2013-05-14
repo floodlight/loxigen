@@ -27,29 +27,29 @@
 
 #version any
 
-struct ofp_bsn_get_interfaces_request {
+struct of_bsn_get_interfaces_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_GET_INTERFACES_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 9;
 };
 
-struct ofp_bsn_interface {
+struct of_bsn_interface {
     of_mac_addr_t hw_addr;
-    uint16_t pad;
+    pad(2);
     of_port_name_t name;
     uint32_t ipv4_addr;
     uint32_t ipv4_netmask;
 };
 
-struct ofp_bsn_get_interfaces_reply {
+struct of_bsn_get_interfaces_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_GET_INTERFACES_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 10;
     list(of_bsn_interface_t) interfaces;
 };
