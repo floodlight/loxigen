@@ -796,6 +796,9 @@ extension_message_subtype = {
             "of_bsn_get_interfaces_request"  : 9,
             "of_bsn_get_interfaces_reply"    : 10,
             "of_bsn_set_pktin_suppression"   : 11,
+            "of_bsn_set_l2_table"            : 12,
+            "of_bsn_get_l2_table_request"    : 13,
+            "of_bsn_get_l2_table_reply"      : 14,
             },
         nicira = {   # Nicira extensions, value is subtype
             "of_nicira_controller_role_request"      : 10,
