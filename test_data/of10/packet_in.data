@@ -1,0 +1,18 @@
+-- binary
+01 0a # version / type
+00 15 # length
+12 34 56 78 # xid
+ab cd ef 01 # buffer_id
+00 09 # total_len
+ff fe # in_port
+01 # reason
+00 # pad
+61 62 63 # data
+-- python
+ofp.message.packet_in(
+    xid=0x12345678,
+    buffer_id=0xabcdef01,
+    total_len=9,
+    in_port=ofp.OFPP_LOCAL,
+    reason=ofp.OFPR_ACTION,
+    data='abc')

@@ -1,0 +1,7 @@
+-- binary
+80 00 # class
+02 # type/masked
+04 # length
+00 00 00 2a # value
+-- python
+ofp.oxm.in_phy_port(value=42)

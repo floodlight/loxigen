@@ -1,0 +1,52 @@
+-- binary
+04 0e # version, type
+00 48 # length
+12 34 56 78 # xid
+
+fe dc ba 98 76 54 32 10 # cookie
+
+ff 00 ff 00 ff 00 ff 00 # cookie_mask
+
+03 # table_id
+00 # _command
+00 05 # idle_timeout
+00 0a # hard_timeout
+17 70 # priority
+
+00 00 00 32 # buffer_id
+00 00 00 06 # out_port
+
+00 00 00 08 # out_group
+00 00 # flags
+00 00 # pad
+
+00 01 # match.type
+00 04 # match.length
+00 00 00 00 # pad
+
+00 01 # instructions[0].type
+00 08 # instructions[0].length
+04 # instructions[0].table_id
+00 00 00 # pad
+
+00 01 # instructions[1].type
+00 08 # instructions[1].length
+07 # instructions[1].table_id
+00 00 00 # pad
+-- python
+ofp.message.flow_add(
+    xid=0x12345678,
+    cookie=0xFEDCBA9876543210,
+    cookie_mask=0xFF00FF00FF00FF00,
+    table_id=3,
+    idle_timeout=5,
+    hard_timeout=10,
+    priority=6000,
+    buffer_id=50,
+    out_port=6,
+    out_group=8,
+    flags=0,
+    match=ofp.match(oxm_list=[]),
+    instructions=[
+        ofp.instruction.goto_table(table_id=4),
+        ofp.instruction.goto_table(table_id=7)])
