@@ -27,7 +27,7 @@
 # under the EPL.
 import unittest
 import test_data
-from testutil import test_datafile
+from testutil import add_datafiles_tests
 
 try:
     import loxi.of10 as ofp
@@ -58,9 +58,6 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of10, "message"))
 
 class TestActions(unittest.TestCase):
-    def test_output(self):
-        test_datafile('action_output.data')
-
     def test_output_equality(self):
         action = ofp.action.output(port=1, max_len=0x1234)
         action2 = ofp.action.output(port=1, max_len=0x1234)
@@ -73,9 +70,6 @@ class TestActions(unittest.TestCase):
         action2.max_len = 0xffff
         self.assertNotEquals(action, action2)
         action2.max_len = 0x1234
-
-    def test_bsn_set_tunnel_dst(self):
-        test_datafile('of10/action_bsn_set_tunnel_dst.data')
 
 # Assumes action serialization/deserialization works
 class TestActionList(unittest.TestCase):
@@ -130,15 +124,6 @@ class TestConstants(unittest.TestCase):
         self.assertEquals(0xfc000, ofp.OFPFW_NW_DST_MASK)
 
 class TestCommon(unittest.TestCase):
-    def test_port_desc(self):
-        test_datafile('of10/port_desc.data')
-
-    def test_table_stats_entry(self):
-        test_datafile('of10/table_stats_entry.data')
-
-    def test_flow_stats_entry(self):
-        test_datafile('of10/flow_stats_entry.data')
-
     def test_match(self):
         match = ofp.match()
         self.assertEquals(match.wildcards, ofp.OFPFW_ALL)
@@ -161,17 +146,11 @@ class TestMessages(unittest.TestCase):
         msg = ofp.message.hello(xid=0)
         self.assertEquals(msg.xid, 0)
 
-    def test_hello(self):
-        test_datafile('of10/hello.data')
-
     def test_echo_request_construction(self):
         msg = ofp.message.echo_request(data="abc")
         self.assertEquals(msg.data, "abc")
 
-    def test_echo_request(self):
-        test_datafile('of10/echo_request.data')
-
-        # Invalid length
+    def test_echo_request_invalid_length(self):
         buf = "\x01\x02\x00\x07\x12\x34\x56"
         with self.assertRaisesRegexp(ofp.ProtocolError, "buffer too short"):
             ofp.message.echo_request.unpack(buf)
@@ -648,6 +627,11 @@ flow_add {
         self.assertEquals(msg.queues[1].queue_id, 2)
         self.assertEquals(msg.queues[1].properties[0].rate, 6)
         self.assertEquals(msg.queues[1].properties[1].rate, 7)
+
+class TestDataFiles(unittest.TestCase):
+    pass
+
+add_datafiles_tests(TestDataFiles, 'of10/', ofp)
 
 class TestParse(unittest.TestCase):
     def test_parse_header(self):
