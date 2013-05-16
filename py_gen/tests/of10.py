@@ -26,6 +26,8 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 import unittest
+import test_data
+from testutil import test_datafile
 
 try:
     import loxi.of10 as ofp
@@ -56,22 +58,8 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of10, "message"))
 
 class TestActions(unittest.TestCase):
-    def test_output_pack(self):
-        expected = "\x00\x00\x00\x08\xff\xf8\xff\xff"
-        action = ofp.action.output(port=ofp.OFPP_IN_PORT, max_len=0xffff)
-        self.assertEquals(expected, action.pack())
-
-    def test_output_unpack(self):
-        # Normal case
-        buf = "\x00\x00\x00\x08\xff\xf8\xff\xff"
-        action = ofp.action.output.unpack(buf)
-        self.assertEqual(action.port, ofp.OFPP_IN_PORT)
-        self.assertEqual(action.max_len, 0xffff)
-
-        # Invalid length
-        #buf = "\x00\x00\x00\x09\xff\xf8\xff\xff\x00"
-        #with self.assertRaises(ofp.ProtocolError):
-        #    ofp.action.output.unpack(buf)
+    def test_output(self):
+        test_datafile('action_output.data')
 
     def test_output_equality(self):
         action = ofp.action.output(port=1, max_len=0x1234)
@@ -86,31 +74,8 @@ class TestActions(unittest.TestCase):
         self.assertNotEquals(action, action2)
         action2.max_len = 0x1234
 
-    def test_output_show(self):
-        action = ofp.action.output(port=1, max_len=0x1234)
-        expected = "output { port = 1, max_len = 0x1234 }"
-        self.assertEquals(expected, action.show())
-
-    def test_bsn_set_tunnel_dst_pack(self):
-        expected = ''.join([
-            "\xff\xff", "\x00\x10", # type/length
-            "\x00\x5c\x16\xc7", # experimenter
-            "\x00\x00\x00\x02", # subtype
-            "\x12\x34\x56\x78" # dst
-        ])
-        action = ofp.action.bsn_set_tunnel_dst(dst=0x12345678)
-        self.assertEquals(expected, action.pack())
-
-    def test_bsn_set_tunnel_dst_unpack(self):
-        buf = ''.join([
-            "\xff\xff", "\x00\x10", # type/length
-            "\x00\x5c\x16\xc7", # experimenter
-            "\x00\x00\x00\x02", # subtype
-            "\x12\x34\x56\x78" # dst
-        ])
-        action = ofp.action.bsn_set_tunnel_dst.unpack(buf)
-        self.assertEqual(action.subtype, 2)
-        self.assertEqual(action.dst, 0x12345678)
+    def test_bsn_set_tunnel_dst(self):
+        test_datafile('of10/action_bsn_set_tunnel_dst.data')
 
 # Assumes action serialization/deserialization works
 class TestActionList(unittest.TestCase):
@@ -165,152 +130,14 @@ class TestConstants(unittest.TestCase):
         self.assertEquals(0xfc000, ofp.OFPFW_NW_DST_MASK)
 
 class TestCommon(unittest.TestCase):
-    def test_port_desc_pack(self):
-        obj = ofp.port_desc(port_no=ofp.OFPP_CONTROLLER,
-                            hw_addr=[1,2,3,4,5,6],
-                            name="foo",
-                            config=ofp.OFPPC_NO_FLOOD,
-                            state=ofp.OFPPS_STP_FORWARD,
-                            curr=ofp.OFPPF_10MB_HD,
-                            advertised=ofp.OFPPF_1GB_FD,
-                            supported=ofp.OFPPF_AUTONEG,
-                            peer=ofp.OFPPF_PAUSE_ASYM)
-        expected = ''.join([
-            '\xff\xfd', # port_no
-            '\x01\x02\x03\x04\x05\x06', # hw_addr
-            'foo'.ljust(16, '\x00'), # name
-            '\x00\x00\x00\x10', # config
-            '\x00\x00\x02\x00', # state
-            '\x00\x00\x00\x01', # curr
-            '\x00\x00\x00\x20', # advertised
-            '\x00\x00\x02\x00', # supported
-            '\x00\x00\x08\x00', # peer
-        ])
-        self.assertEquals(expected, obj.pack())
+    def test_port_desc(self):
+        test_datafile('of10/port_desc.data')
 
-    def test_port_desc_unpack(self):
-        buf = ''.join([
-            '\xff\xfd', # port_no
-            '\x01\x02\x03\x04\x05\x06', # hw_addr
-            'foo'.ljust(16, '\x00'), # name
-            '\x00\x00\x00\x10', # config
-            '\x00\x00\x02\x00', # state
-            '\x00\x00\x00\x01', # curr
-            '\x00\x00\x00\x20', # advertised
-            '\x00\x00\x02\x00', # supported
-            '\x00\x00\x08\x00', # peer
-        ])
-        obj = ofp.port_desc.unpack(buf)
-        self.assertEquals(ofp.OFPP_CONTROLLER, obj.port_no)
-        self.assertEquals('foo', obj.name)
-        self.assertEquals(ofp.OFPPF_PAUSE_ASYM, obj.peer)
+    def test_table_stats_entry(self):
+        test_datafile('of10/table_stats_entry.data')
 
-    def test_table_stats_entry_pack(self):
-        obj = ofp.table_stats_entry(table_id=3,
-                                    name="foo",
-                                    wildcards=ofp.OFPFW_ALL,
-                                    max_entries=5,
-                                    active_count=2,
-                                    lookup_count=1099511627775,
-                                    matched_count=9300233470495232273L)
-        expected = ''.join([
-            '\x03', # table_id
-            '\x00\x00\x00', # pad
-            'foo'.ljust(32, '\x00'), # name
-            '\x00\x3f\xFF\xFF', # wildcards
-            '\x00\x00\x00\x05', # max_entries
-            '\x00\x00\x00\x02', # active_count
-            '\x00\x00\x00\xff\xff\xff\xff\xff', # lookup_count
-            '\x81\x11\x11\x11\x11\x11\x11\x11', # matched_count
-        ])
-        self.assertEquals(expected, obj.pack())
-
-    def test_table_stats_entry_unpack(self):
-        buf = ''.join([
-            '\x03', # table_id
-            '\x00\x00\x00', # pad
-            'foo'.ljust(32, '\x00'), # name
-            '\x00\x3f\xFF\xFF', # wildcards
-            '\x00\x00\x00\x05', # max_entries
-            '\x00\x00\x00\x02', # active_count
-            '\x00\x00\x00\xff\xff\xff\xff\xff', # lookup_count
-            '\x81\x11\x11\x11\x11\x11\x11\x11', # matched_count
-        ])
-        obj = ofp.table_stats_entry.unpack(buf)
-        self.assertEquals(3, obj.table_id)
-        self.assertEquals('foo', obj.name)
-        self.assertEquals(9300233470495232273L, obj.matched_count)
-
-    def test_flow_stats_entry_pack(self):
-        obj = ofp.flow_stats_entry(table_id=3,
-                                   match=ofp.match(),
-                                   duration_sec=1,
-                                   duration_nsec=2,
-                                   priority=100,
-                                   idle_timeout=5,
-                                   hard_timeout=10,
-                                   cookie=0x0123456789abcdef,
-                                   packet_count=10,
-                                   byte_count=1000,
-                                   actions=[ofp.action.output(port=1),
-                                            ofp.action.output(port=2)])
-        expected = ''.join([
-            '\x00\x68', # length
-            '\x03', # table_id
-            '\x00', # pad
-            '\x00\x3f\xff\xff', # match.wildcards
-            '\x00' * 36, # remaining match fields
-            '\x00\x00\x00\x01', # duration_sec
-            '\x00\x00\x00\x02', # duration_nsec
-            '\x00\x64', # priority
-            '\x00\x05', # idle_timeout
-            '\x00\x0a', # hard_timeout
-            '\x00' * 6, # pad2
-            '\x01\x23\x45\x67\x89\xab\xcd\xef', # cookie
-            '\x00\x00\x00\x00\x00\x00\x00\x0a', # packet_count
-            '\x00\x00\x00\x00\x00\x00\x03\xe8', # byte_count
-            '\x00\x00', # actions[0].type
-            '\x00\x08', # actions[0].len
-            '\x00\x01', # actions[0].port
-            '\x00\x00', # actions[0].max_len
-            '\x00\x00', # actions[1].type
-            '\x00\x08', # actions[1].len
-            '\x00\x02', # actions[1].port
-            '\x00\x00', # actions[1].max_len
-        ])
-        self.assertEquals(expected, obj.pack())
-
-    def test_flow_stats_entry_unpack(self):
-        buf = ''.join([
-            '\x00\x68', # length
-            '\x03', # table_id
-            '\x00', # pad
-            '\x00\x3f\xff\xff', # match.wildcards
-            '\x00' * 36, # remaining match fields
-            '\x00\x00\x00\x01', # duration_sec
-            '\x00\x00\x00\x02', # duration_nsec
-            '\x00\x64', # priority
-            '\x00\x05', # idle_timeout
-            '\x00\x0a', # hard_timeout
-            '\x00' * 6, # pad2
-            '\x01\x23\x45\x67\x89\xab\xcd\xef', # cookie
-            '\x00\x00\x00\x00\x00\x00\x00\x0a', # packet_count
-            '\x00\x00\x00\x00\x00\x00\x03\xe8', # byte_count
-            '\x00\x00', # actions[0].type
-            '\x00\x08', # actions[0].len
-            '\x00\x01', # actions[0].port
-            '\x00\x00', # actions[0].max_len
-            '\x00\x00', # actions[1].type
-            '\x00\x08', # actions[1].len
-            '\x00\x02', # actions[1].port
-            '\x00\x00', # actions[1].max_len
-        ])
-        obj = ofp.flow_stats_entry.unpack(buf)
-        self.assertEquals(3, obj.table_id)
-        self.assertEquals(ofp.OFPFW_ALL, obj.match.wildcards)
-        self.assertEquals(2, len(obj.actions))
-        self.assertEquals(1, obj.actions[0].port)
-        self.assertEquals(2, obj.actions[1].port)
+    def test_flow_stats_entry(self):
+        test_datafile('of10/flow_stats_entry.data')
 
     def test_match(self):
         match = ofp.match()
@@ -334,34 +161,15 @@ class TestMessages(unittest.TestCase):
         msg = ofp.message.hello(xid=0)
         self.assertEquals(msg.xid, 0)
 
-    def test_hello_unpack(self):
-        # Normal case
-        buf = "\x01\x00\x00\x08\x12\x34\x56\x78"
-        msg = ofp.message.hello(xid=0x12345678)
-        self.assertEquals(buf, msg.pack())
-
-        # Invalid length
-        #buf = "\x01\x00\x00\x09\x12\x34\x56\x78\x9a"
-        #with self.assertRaisesRegexp(ofp.ProtocolError, "should be 8"):
-        #    ofp.message.hello.unpack(buf)
+    def test_hello(self):
+        test_datafile('of10/hello.data')
 
     def test_echo_request_construction(self):
         msg = ofp.message.echo_request(data="abc")
         self.assertEquals(msg.data, "abc")
 
-    def test_echo_request_pack(self):
-        msg = ofp.message.echo_request(xid=0x12345678, data="abc")
-        buf = msg.pack()
-        self.assertEquals(buf, "\x01\x02\x00\x0b\x12\x34\x56\x78\x61\x62\x63")
-
-        msg2 = ofp.message.echo_request.unpack(buf)
-        self.assertEquals(msg, msg2)
-
-    def test_echo_request_unpack(self):
-        # Normal case
-        buf = "\x01\x02\x00\x0b\x12\x34\x56\x78\x61\x62\x63"
-        msg = ofp.message.echo_request(xid=0x12345678, data="abc")
-        self.assertEquals(buf, msg.pack())
+    def test_echo_request(self):
+        test_datafile('of10/echo_request.data')
 
         # Invalid length
         buf = "\x01\x02\x00\x07\x12\x34\x56"
@@ -381,11 +189,6 @@ class TestMessages(unittest.TestCase):
         msg2.data = "a"
         self.assertNotEquals(msg, msg2)
         msg2.data = msg.data
-
-    def test_echo_request_show(self):
-        expected = "echo_request { xid = 0x12345678, data = 'ab\\x01' }"
-        msg = ofp.message.echo_request(xid=0x12345678, data="ab\x01")
-        self.assertEquals(msg.show(), expected)
 
     def test_flow_add(self):
         match = ofp.match()

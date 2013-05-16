@@ -1,0 +1,9 @@
+-- binary
+00 00 # type
+00 08 # len
+ff f8 # in_port
+ff ff # max_len
+-- python
+ofp.action.output(port=ofp.OFPP_IN_PORT, max_len=0xffff)
+-- python pretty-printer
+output { port = OFPP_IN_PORT, max_len = 0xffff }
