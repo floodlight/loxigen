@@ -1,0 +1,39 @@
+-- binary
+01 11 # version/type
+00 dc # length
+00 00 00 05 # xid
+00 04 # stats_type
+00 00 # flags
+00 01 # entries[0].port_no
+00 00 00 00 00 00 # entries[0].pad
+00 00 00 00 00 00 00 38 # entries[0].rx_packets
+00 00 00 00 00 00 00 00 # entries[0].tx_packets
+00 00 00 00 00 00 00 00 # entries[0].rx_bytes
+00 00 00 00 00 00 00 00 # entries[0].tx_bytes
+00 00 00 00 00 00 00 00 # entries[0].rx_dropped
+00 00 00 00 00 00 00 00 # entries[0].tx_dropped
+00 00 00 00 00 00 00 00 # entries[0].rx_errors
+00 00 00 00 00 00 00 00 # entries[0].tx_errors
+00 00 00 00 00 00 00 00 # entries[0].rx_frame_err
+00 00 00 00 00 00 00 00 # entries[0].rx_over_err
+00 00 00 00 00 00 00 00 # entries[0].rx_crc_err
+00 00 00 00 00 00 00 05 # entries[0].collisions
+ff fe # entries[1].port_no
+00 00 00 00 00 00 # entries[1].pad
+00 00 00 00 00 00 00 01 # entries[1].rx_packets
+00 00 00 00 00 00 00 00 # entries[1].tx_packets
+00 00 00 00 00 00 00 00 # entries[1].rx_bytes
+00 00 00 00 00 00 00 00 # entries[1].tx_bytes
+00 00 00 00 00 00 00 00 # entries[1].rx_dropped
+00 00 00 00 00 00 00 00 # entries[1].tx_dropped
+00 00 00 00 00 00 00 00 # entries[1].rx_errors
+00 00 00 00 00 00 00 00 # entries[1].tx_errors
+00 00 00 00 00 00 00 00 # entries[1].rx_frame_err
+00 00 00 00 00 00 00 00 # entries[1].rx_over_err
+00 00 00 00 00 00 00 00 # entries[1].rx_crc_err
+00 00 00 00 00 00 00 01 # entries[1].collisions
+-- python
+ofp.message.port_stats_reply(
+    xid=5, flags=0, entries=[
+        ofp.port_stats_entry(port_no=1, rx_packets=56, collisions=5),
+        ofp.port_stats_entry(port_no=ofp.OFPP_LOCAL, rx_packets=1, collisions=1)])

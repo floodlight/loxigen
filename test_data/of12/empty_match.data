@@ -1,0 +1,6 @@
+-- binary
+00 01 # type
+00 04 # length
+00 00 00 00 # padding
+-- python
+ofp.match()

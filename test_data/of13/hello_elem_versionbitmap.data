@@ -1,0 +1,10 @@
+-- binary
+00 01 # type
+00 0c # length
+01 23 45 67 # bitmaps[0]
+89 ab cd ef # bitmaps[1]
+-- python
+ofp.hello_elem_versionbitmap(
+    bitmaps=[
+        ofp.uint32(0x01234567),
+        ofp.uint32(0x89abcdef)])

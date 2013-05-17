@@ -1,0 +1,26 @@
+-- binary
+04 0d # version, type
+00 33 # length
+12 34 56 78 # xid
+00 00 00 64 # buffer_id
+00 00 00 04 # in_port
+00 18 # actions_len
+00 00 00 00 00 00 # pad
+00 00 # actions[0].type
+00 10 # actions[0].length
+00 00 00 02 # actions[0].port
+ff ff # actions[0].max_len
+00 00 00 00 00 00 # pad
+00 18 # actions[1].type
+00 08 # actions[1].length
+00 00 00 00 # pad
+61 62 63 # data
+-- python
+ofp.message.packet_out(
+    xid=0x12345678,
+    buffer_id=100,
+    in_port=4,
+    actions=[
+        ofp.action.output(port=2, max_len=0xffff),
+        ofp.action.dec_nw_ttl()],
+    data="abc")

@@ -1,0 +1,25 @@
+-- binary
+00 01 # type
+00 3C # length
+80 00 # oxm_list[0].class
+20 02 # oxm_list[0].type_len
+00 35 # oxm_list[0].value
+80 00 # oxm_list[1].class
+05 10 # oxm_list[1].type_len
+FE DC BA 98 76 54 32 10 # oxm_list[1].value
+FF FF FF FF 12 34 56 78 # oxm_list[1].mask
+80 00 # oxm_list[2].class
+08 06 # oxm_list[2].type_len
+01 02 03 04 05 06 # oxm_list[2].value
+80 00 # oxm_list[3].class
+36 10 # oxm_list[3].type_len
+12 12 12 12 12 12 12 12 # oxm_list[3].value
+12 12 12 12 12 12 12 12 # ...
+00 00 00 00 # pad
+-- python
+ofp.match([
+    ofp.oxm.udp_dst(53),
+    ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678),
+    ofp.oxm.eth_src([1,2,3,4,5,6]),
+    ofp.oxm.ipv6_dst("\x12" * 16),
+])

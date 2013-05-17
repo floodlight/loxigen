@@ -28,6 +28,9 @@
 
 import sys
 import difflib
+import re
+import os
+import unittest
 import test_data
 
 # Human-friendly format for binary strings. 8 bytes per line.
@@ -72,12 +75,32 @@ def test_pretty(obj, expected):
             (type(obj).__name__, expected, pretty, diff(expected, pretty)))
 
 # Run test_serialization and possibly test_pretty against the named data file
-# Uses the globals of the calling function to get 'ofp'
-def test_datafile(name):
+def test_datafile(name, ofp):
     data = test_data.read(name)
+    if not 'python' in data:
+        raise unittest.SkipTest("no python section in datafile")
     binary = data['binary']
     python = data['python']
-    obj = eval(python, sys._getframe(1).f_globals)
+    obj = eval(python, { 'ofp': ofp })
     test_serialization(obj, binary)
     if 'python pretty-printer' in data:
         test_pretty(obj, data['python pretty-printer'])
+
+# Add test_datafile tests for each datafile matching the given regex
+# The argument 'klass' should be a subclass of TestCase which will have the
+# test_* methods added to it.
+#
+# It would be cleaner to do this by constructing a TestSuite instance and
+# adding individual TestCase objects, but the TestLoader wouldn't pick it
+# up. We could use the load_tests protocol but that isn't available before
+# Python 2.7.
+def add_datafiles_tests(klass, regex, ofp):
+    for filename in test_data.list_files():
+        match = re.match(regex, filename)
+        if not match:
+            continue
+        def make_test(filename):
+            def fn(self):
+                test_datafile(filename, ofp)
+            return fn
+        setattr(klass, 'test_' + os.path.splitext(filename)[0], make_test(filename))
