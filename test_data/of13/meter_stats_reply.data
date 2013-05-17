@@ -1,0 +1,50 @@
+-- binary
+04 13 # version, type
+00 80 # length
+12 34 56 78 # xid
+00 09 # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 00 00 01 # entries[0].meter_id
+00 48 # entries[0].len
+00 00 00 00 00 00 # pad
+00 00 00 08 # entries[0].flow_count
+00 00 00 00 00 00 00 10 # entries[0].packet_in_count
+00 00 00 00 00 00 00 20 # entries[0].byte_in_count
+00 00 00 14 # entries[0].duration_sec
+00 00 00 64 # entries[0].duration_nsec
+00 00 00 00 00 00 00 01 # entries[0].band_stats[0].packet_band_count
+00 00 00 00 00 00 00 02 # entries[0].band_stats[0].byte_band_count
+00 00 00 00 00 00 00 03 # entries[0].band_stats[1].packet_band_count
+00 00 00 00 00 00 00 04 # entries[0].band_stats[1].byte_band_count
+00 00 00 02 # entries[1].meter_id
+00 28 # entries[1].len
+00 00 00 00 00 00 # pad
+00 00 00 08 # entries[1].flow_count
+00 00 00 00 00 00 00 10 # entries[1].packet_in_count
+00 00 00 00 00 00 00 20 # entries[1].byte_in_count
+00 00 00 14 # entries[1].duration_sec
+00 00 00 64 # entries[1].duration_nsec
+-- python
+ofp.message.meter_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    entries=[
+        ofp.meter_stats(
+            meter_id=1,
+            flow_count=8,
+            packet_in_count=16,
+            byte_in_count=32,
+            duration_sec=20,
+            duration_nsec=100,
+            band_stats=[
+                ofp.meter_band_stats(packet_band_count=1, byte_band_count=2),
+                ofp.meter_band_stats(packet_band_count=3, byte_band_count=4)]),
+        ofp.meter_stats(
+            meter_id=2,
+            flow_count=8,
+            packet_in_count=16,
+            byte_in_count=32,
+            duration_sec=20,
+            duration_nsec=100,
+            band_stats=[])])

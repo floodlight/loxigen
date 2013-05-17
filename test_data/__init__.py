@@ -61,7 +61,7 @@ def read(name):
 
     with open(os.path.join(_test_data_dir, name)) as f:
         for line in f:
-            line = line.strip().partition('#')[0].strip()
+            line = line.rstrip().partition('#')[0].rstrip()
             if line == '':
                 continue
             elif line.startswith('--'):

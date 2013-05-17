@@ -34,7 +34,7 @@ class DataFileTests(unittest.TestCase):
         self.assertTrue('./example.data' in test_data.list_files())
         data = test_data.read('example.data')
         self.assertEquals(sorted(['section1', 'section2', 'binary']), sorted(data.keys()))
-        self.assertEquals('abc def\nghi', data['section1'])
+        self.assertEquals(' abc def\nghi', data['section1'])
         self.assertEquals('123\n456\n789', data['section2'])
         self.assertEquals('\x00\x01\x02\x03\x04\x05\x06\x07\x77\x66\x55\x44\x33\x22\x11\x00',
                           data['binary'])

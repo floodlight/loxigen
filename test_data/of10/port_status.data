@@ -1,0 +1,30 @@
+-- binary
+01 0c # version / type
+00 40 # length
+00 00 00 04 # xid
+01 # reason
+00 00 00 00 00 00 00 # pad
+ff fd # desc.port_no
+01 02 03 04 05 06 # desc.hw_addr
+66 6f 6f 00 00 00 00 00 # desc.name
+00 00 00 00 00 00 00 00 # ...
+00 00 00 10 # desc.config
+00 00 02 00 # desc.state
+00 00 00 01 # desc.curr
+00 00 00 20 # desc.advertised
+00 00 02 00 # desc.supported
+00 00 08 00 # desc.peer
+-- python
+ofp.message.port_status(
+    xid=4,
+    reason=ofp.OFPPR_DELETE,
+    desc=ofp.port_desc(
+        port_no=ofp.OFPP_CONTROLLER,
+        hw_addr=[1,2,3,4,5,6],
+        name="foo",
+        config=ofp.OFPPC_NO_FLOOD,
+        state=ofp.OFPPS_STP_FORWARD,
+        curr=ofp.OFPPF_10MB_HD,
+        advertised=ofp.OFPPF_1GB_FD,
+        supported=ofp.OFPPF_AUTONEG,
+        peer=ofp.OFPPF_PAUSE_ASYM))

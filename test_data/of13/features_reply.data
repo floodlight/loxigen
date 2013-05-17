@@ -1,0 +1,20 @@
+-- binary
+04 06 # version, type
+00 20 # length
+12 34 56 78 # xid
+fe dc ba 98 76 54 32 10 # datapath_id
+00 00 00 40 # n_buffers
+c8 # n_tables
+05 # auxiliary_id
+00 00 # pad
+00 00 01 01 # capabilities
+00 00 00 00 # reserved
+-- python
+ofp.message.features_reply(
+    xid=0x12345678,
+    datapath_id=0xFEDCBA9876543210,
+    n_buffers=64,
+    n_tables=200,
+    auxiliary_id=5,
+    capabilities=ofp.OFPC_FLOW_STATS|ofp.OFPC_PORT_BLOCKED,
+    reserved=0)
