@@ -418,6 +418,9 @@ def read_input():
     ofinputs_by_version = collections.defaultdict(lambda: [])
     filenames = sorted(glob.glob("%s/openflow_input/*" % root_dir))
 
+    # Ignore emacs backup files
+    filenames = [x for x in filenames if not x.endswith('~')]
+
     for filename in filenames:
         log("Processing struct file: " + filename)
         ofinput = process_input_file(filename)

@@ -1,0 +1,23 @@
+-- binary
+04 13 # version, type
+00 20 # length
+12 34 56 78 # xid
+00 0b # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 00 00 05 # max_meter
+00 00 00 03 # band_types
+00 00 00 09 # capabilities
+0a # max_bands
+07 # max_color
+00 00 # pad
+-- python
+ofp.message.meter_features_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    features=ofp.meter_features(
+        max_meter=5,
+        band_types=ofp.OFPMBT_DROP|ofp.OFPMBT_DSCP_REMARK,
+        capabilities=ofp.OFPMF_KBPS|ofp.OFPMF_STATS,
+        max_bands=10,
+        max_color=7))

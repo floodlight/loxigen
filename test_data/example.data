@@ -1,0 +1,17 @@
+# Comment outside section
+# Another comment
+
+# That was a blank line
+This is not a blank line
+-- section1
+ abc def
+ghi
+-- section2
+123
+456 # comment
+# comment inside a section
+789
+-- binary
+00 01 02 03 04 05 06 07 # comment
+77 66 55 44 33 22 11 00
+ # comment in binary

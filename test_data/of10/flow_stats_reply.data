@@ -1,0 +1,92 @@
+-- binary
+01 11 # version/type
+00 e4 # length
+00 00 00 06 # xid
+00 01 # stats_type
+00 00 # flags
+00 68 # entries[0].length
+03 # entries[0].table_id
+00 # entries[0].pad
+00 3f ff ff # entries[0].match.wildcards
+00 00 00 00 # remaining match fields
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 01 # entries[0].duration_sec
+00 00 00 02 # entries[0].duration_nsec
+00 64 # entries[0].priority
+00 05 # entries[0].idle_timeout
+00 0a # entries[0].hard_timeout
+00 00 00 00 00 00 # pad
+01 23 45 67 89 ab cd ef # entries[0].cookie
+00 00 00 00 00 00 00 0a # entries[0].packet_count
+00 00 00 00 00 00 03 e8 # entries[0].byte_count
+00 00 # entries[0].actions[0].type
+00 08 # entries[0].actions[0].len
+00 01 # entries[0].actions[0].port
+00 00 # entries[0].actions[0].max_len
+00 00 # entries[0].actions[1].type
+00 08 # entries[0].actions[1].len
+00 02 # entries[0].actions[1].port
+00 00 # entries[0].actions[1].max_len
+00 70 # entries[1].length
+04 # entries[1].table_id
+00 # entries[1].pad
+00 3f ff ff # entries[1].match.wildcards
+00 00 00 00 # remaining match fields
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 00 00 00 00 00 # ...
+00 00 00 01 # entries[1].duration_sec
+00 00 00 02 # entries[1].duration_nsec
+00 64 # entries[1].priority
+00 05 # entries[1].idle_timeout
+00 0a # entries[1].hard_timeout
+00 00 00 00 00 00 # pad
+01 23 45 67 89 ab cd ef # entries[1].cookie
+00 00 00 00 00 00 00 0a # entries[1].packet_count
+00 00 00 00 00 00 03 e8 # entries[1].byte_count
+00 00 # entries[1].actions[0].type
+00 08 # entries[1].actions[0].len
+00 01 # entries[1].actions[0].port
+00 00 # entries[1].actions[0].max_len
+00 00 # entries[1].actions[1].type
+00 08 # entries[1].actions[1].len
+00 02 # entries[1].actions[1].port
+00 00 # entries[1].actions[1].max_len
+00 00 # entries[1].actions[2].type
+00 08 # entries[1].actions[2].len
+00 03 # entries[1].actions[2].port
+00 00 # entries[1].actions[2].max_len
+-- python
+ofp.message.flow_stats_reply(
+    xid=6,
+    flags=0,
+    entries=[
+        ofp.flow_stats_entry(table_id=3,
+            match=ofp.match(),
+            duration_sec=1,
+            duration_nsec=2,
+            priority=100,
+            idle_timeout=5,
+            hard_timeout=10,
+            cookie=0x0123456789abcdef,
+            packet_count=10,
+            byte_count=1000,
+            actions=[ofp.action.output(port=1),
+            ofp.action.output(port=2)]),
+        ofp.flow_stats_entry(table_id=4,
+            match=ofp.match(),
+            duration_sec=1,
+            duration_nsec=2,
+            priority=100,
+            idle_timeout=5,
+            hard_timeout=10,
+            cookie=0x0123456789abcdef,
+            packet_count=10,
+            byte_count=1000,
+            actions=[ofp.action.output(port=1),
+            ofp.action.output(port=2),
+            ofp.action.output(port=3)])])

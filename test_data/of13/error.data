@@ -1,0 +1,13 @@
+-- binary
+04 01 # version / type
+00 0f # length
+12 34 56 78 # xid
+00 04 # err_type
+00 08 # code
+61 62 63 # data
+-- python
+ofp.message.error_msg(
+    xid=0x12345678,
+    err_type=ofp.OFPET_BAD_MATCH,
+    code=ofp.OFPBMC_BAD_MASK,
+    data="abc")

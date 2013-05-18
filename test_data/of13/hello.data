@@ -1,0 +1,20 @@
+-- binary
+04 00 # version, type
+00 20 # length
+12 34 56 78 # xid
+00 01 # elements[0].type
+00 0c # elements[0].length
+00 00 00 01 # elements[0].bitmaps[0]
+00 00 00 02 # elements[0].bitmaps[1]
+00 01 # elements[1].type
+00 0c # elements[1].length
+00 00 00 03 # elements[1].bitmaps[0]
+00 00 00 04 # elements[1].bitmaps[1]
+-- python
+ofp.message.hello(
+    xid=0x12345678,
+    elements=[
+        ofp.hello_elem_versionbitmap(
+            bitmaps=[ofp.uint32(1), ofp.uint32(2)]),
+        ofp.hello_elem_versionbitmap(
+            bitmaps=[ofp.uint32(3), ofp.uint32(4)])])
