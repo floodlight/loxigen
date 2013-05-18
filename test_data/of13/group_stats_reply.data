@@ -1,0 +1,52 @@
+-- binary
+04 13 # version, type
+00 80 # length
+12 34 56 78 # xid
+00 06 # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 48 # entries[0].length
+00 00 # pad
+00 00 00 01 # entries[0].group_id
+00 00 00 08 # entries[0].ref_count
+00 00 00 00 # pad
+00 00 00 00 00 00 00 10 # entries[0].packet_count
+00 00 00 00 00 00 00 20 # entries[0].byte_count
+00 00 00 14 # entries[0].duration_sec
+00 00 00 64 # entries[0].duration_nsec
+00 00 00 00 00 00 00 01 # entries[0].bucket_stats[0].packet_count
+00 00 00 00 00 00 00 02 # entries[0].bucket_stats[0].byte_count
+00 00 00 00 00 00 00 03 # entries[0].bucket_stats[1].packet_count
+00 00 00 00 00 00 00 04 # entries[0].bucket_stats[1].byte_count
+00 28 # entries[0].length
+00 00 # pad
+00 00 00 01 # entries[0].group_id
+00 00 00 08 # entries[0].ref_count
+00 00 00 00 # pad
+00 00 00 00 00 00 00 10 # entries[0].packet_count
+00 00 00 00 00 00 00 20 # entries[0].byte_count
+00 00 00 14 # entries[0].duration_sec
+00 00 00 64 # entries[0].duration_nsec
+-- python
+ofp.message.group_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    entries=[
+        ofp.group_stats_entry(
+            group_id=1,
+            ref_count=8,
+            packet_count=16,
+            byte_count=32,
+            duration_sec=20,
+            duration_nsec=100,
+            bucket_stats=[
+                ofp.bucket_counter(packet_count=1, byte_count=2),
+                ofp.bucket_counter(packet_count=3, byte_count=4)]),
+        ofp.group_stats_entry(
+            group_id=1,
+            ref_count=8,
+            packet_count=16,
+            byte_count=32,
+            duration_sec=20,
+            duration_nsec=100,
+            bucket_stats=[])])

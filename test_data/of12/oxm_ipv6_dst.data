@@ -1,0 +1,8 @@
+-- binary
+80 00 # class
+36 # type/masked
+10 # length
+00 01 02 03 04 05 06 07 # value
+08 09 0a 0b 0c 0d 0e 0f # ...
+-- python
+ofp.oxm.ipv6_dst('\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f')

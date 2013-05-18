@@ -1,0 +1,6 @@
+-- binary
+04 05 # version, type
+00 08 # length
+12 34 56 78 # xid
+-- python
+ofp.message.features_request(xid=0x12345678)

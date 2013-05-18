@@ -1,0 +1,36 @@
+-- binary
+04 0c # version, type
+00 50 # length
+12 34 56 78 # xid
+02 # reason
+00 00 00 00 00 00 00 # pad
+00 00 00 04 # port_no
+00 00 00 00 # pad
+01 02 03 04 05 06 # hw_addr
+00 00 # pad
+66 6f 6f 00 00 00 00 00 # name
+00 00 00 00 00 00 00 00 # ...
+00 00 00 24 # config
+00 00 00 02 # state
+00 00 00 01 # curr
+00 00 00 02 # advertised
+00 00 00 04 # supported
+00 00 00 08 # peer
+00 00 00 0a # curr_speed
+00 00 00 14 # max_speed
+-- python
+ofp.message.port_status(
+    xid=0x12345678,
+    reason=ofp.OFPPR_MODIFY,
+    desc=ofp.port_desc(
+        port_no=4,
+        hw_addr=[1,2,3,4,5,6],
+        name="foo",
+        config=ofp.OFPPC_NO_FWD|ofp.OFPPC_NO_RECV,
+        state=ofp.OFPPS_BLOCKED,
+        curr=ofp.OFPPF_10MB_HD,
+        advertised=ofp.OFPPF_10MB_FD,
+        supported=ofp.OFPPF_100MB_HD,
+        peer=ofp.OFPPF_100MB_FD,
+        curr_speed=10,
+        max_speed=20))

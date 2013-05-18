@@ -28,35 +28,35 @@
 #version 1
 
 // BSN L2 table configuration messages
-struct ofp_bsn_set_l2_table {
+struct of_bsn_set_l2_table {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_L2_TABLE_SET
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 12;
     uint8_t l2_table_enable;    // 1 == enabled, 0 == disabled
     uint8_t pad;
     uint16_t l2_table_priority;  // priority of all flows in L2 table
     uint8_t[4] pad;
 };
 
-struct ofp_bsn_get_l2_table_request {
+struct of_bsn_get_l2_table_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_L2_TABLE_GET_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 13;
 };
 
-struct ofp_bsn_get_l2_table_reply {
+struct of_bsn_get_l2_table_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;   // BSN_L2_TABLE_GET_REPLY
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 14;
     uint8_t l2_table_enable;    // 1 == enabled, 0 == disabled
     uint8_t pad;
     uint16_t l2_table_priority;  // priority of all flows in L2 table

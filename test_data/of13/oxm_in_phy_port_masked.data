@@ -1,0 +1,8 @@
+-- binary
+80 00 # class
+03 # type/masked
+08 # length
+00 00 00 2a # value
+aa bb cc dd # mask
+-- python
+ofp.oxm.in_phy_port_masked(value=42, value_mask=0xaabbccdd)

@@ -296,39 +296,39 @@ enum ofp_queue_op_failed_code {
     OFPQOFC_EPERM = 2,
 };
 
-struct ofp_header {
+struct of_header {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_hello {
+struct of_hello {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 0;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_echo_request {
+struct of_echo_request {
     uint8_t version;
-    uint8_t type;
-    uint16_t length;
-    uint32_t xid;
-    of_octets_t data;
-};
-
-struct ofp_echo_reply {
-    uint8_t version;
-    uint8_t type;
+    uint8_t type == 2;
     uint16_t length;
     uint32_t xid;
     of_octets_t data;
 };
 
-struct ofp_experimenter {
+struct of_echo_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 3;
+    uint16_t length;
+    uint32_t xid;
+    of_octets_t data;
+};
+
+struct of_experimenter {
+    uint8_t version;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter;
@@ -336,46 +336,46 @@ struct ofp_experimenter {
     of_octets_t data;
 };
 
-struct ofp_barrier_request {
+struct of_barrier_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_barrier_reply {
+struct of_barrier_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_get_config_request {
+struct of_get_config_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 7;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_get_config_reply {
+struct of_get_config_reply {
     uint8_t version;
-    uint8_t type;
-    uint16_t length;
-    uint32_t xid;
-    uint16_t flags;
-    uint16_t miss_send_len;
-};
-
-struct ofp_set_config {
-    uint8_t version;
-    uint8_t type;
+    uint8_t type == 8;
     uint16_t length;
     uint32_t xid;
     uint16_t flags;
     uint16_t miss_send_len;
 };
 
-struct ofp_port_desc {
+struct of_set_config {
+    uint8_t version;
+    uint8_t type == 9;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t flags;
+    uint16_t miss_send_len;
+};
+
+struct of_port_desc {
     of_port_no_t port_no;
     of_mac_addr_t hw_addr;
     of_port_name_t name;
@@ -387,40 +387,40 @@ struct ofp_port_desc {
     uint32_t peer;
 };
 
-struct ofp_features_request {
+struct of_features_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 5;
     uint16_t length;
     uint32_t xid;
 };
 
-struct ofp_features_reply {
+struct of_features_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 6;
     uint16_t length;
     uint32_t xid;
     uint64_t datapath_id;
     uint32_t n_buffers;
     uint8_t n_tables;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t capabilities;
     uint32_t actions;
     list(of_port_desc_t) ports;
 };
 
-struct ofp_port_status {
+struct of_port_status {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 12;
     uint16_t length;
     uint32_t xid;
     uint8_t reason;
-    uint8_t[7] pad;
+    pad(7);
     of_port_desc_t desc;
 };
 
-struct ofp_port_mod {
+struct of_port_mod {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 15;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port_no;
@@ -428,120 +428,120 @@ struct ofp_port_mod {
     uint32_t config;
     uint32_t mask;
     uint32_t advertise;
-    uint8_t[4] pad;
+    pad(4);
 };
 
-struct ofp_packet_in {
+struct of_packet_in {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 10;
     uint16_t length;
     uint32_t xid;
     uint32_t buffer_id;
     uint16_t total_len;
     of_port_no_t in_port;
     uint8_t reason;
-    uint8_t pad;
+    pad(1);
     of_octets_t data;
 };
 
-struct ofp_action_output {
-    uint16_t type;
+struct of_action_output {
+    uint16_t type == 0;
     uint16_t len;
     of_port_no_t port;
     uint16_t max_len;
 };
 
-struct ofp_action_set_vlan_vid {
-    uint16_t type;
+struct of_action_set_vlan_vid {
+    uint16_t type == 1;
     uint16_t len;
     uint16_t vlan_vid;
-    uint8_t[2] pad;
+    pad(2);
 };
 
-struct ofp_action_strip_vlan {
-    uint16_t type;
+struct of_action_strip_vlan {
+    uint16_t type == 3;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
-struct ofp_action_set_vlan_pcp {
-    uint16_t type;
+struct of_action_set_vlan_pcp {
+    uint16_t type == 2;
     uint16_t len;
     uint8_t vlan_pcp;
-    uint8_t[3] pad;
+    pad(3);
 };
 
-struct ofp_action_set_dl_src {
-    uint16_t type;
+struct of_action_set_dl_src {
+    uint16_t type == 4;
     uint16_t len;
     of_mac_addr_t dl_addr;
-    uint8_t[6] pad;
+    pad(6);
 };
 
-struct ofp_action_set_dl_dst {
-    uint16_t type;
+struct of_action_set_dl_dst {
+    uint16_t type == 5;
     uint16_t len;
     of_mac_addr_t dl_addr;
-    uint8_t[6] pad;
+    pad(6);
 };
 
-struct ofp_action_set_nw_src {
-    uint16_t type;
+struct of_action_set_nw_src {
+    uint16_t type == 6;
     uint16_t len;
     uint32_t nw_addr;
 };
 
-struct ofp_action_set_nw_dst {
-    uint16_t type;
+struct of_action_set_nw_dst {
+    uint16_t type == 7;
     uint16_t len;
     uint32_t nw_addr;
 };
 
-struct ofp_action_set_tp_src {
-    uint16_t type;
+struct of_action_set_tp_src {
+    uint16_t type == 9;
     uint16_t len;
     uint16_t tp_port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
-struct ofp_action_set_tp_dst {
-    uint16_t type;
+struct of_action_set_tp_dst {
+    uint16_t type == 10;
     uint16_t len;
     uint16_t tp_port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
-struct ofp_action_set_nw_tos {
-    uint16_t type;
+struct of_action_set_nw_tos {
+    uint16_t type == 8;
     uint16_t len;
     uint8_t nw_tos;
-    uint8_t[3] pad;
+    pad(3);
 };
 
-struct ofp_action_experimenter {
-    uint16_t type;
+struct of_action_experimenter {
+    uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct ofp_action_enqueue {
-    uint16_t type;
+struct of_action_enqueue {
+    uint16_t type == 11;
     uint16_t len;
     of_port_no_t port;
-    uint8_t[6] pad;
+    pad(6);
     uint32_t queue_id;
 };
 
-struct ofp_action {
+struct of_action {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
-struct ofp_packet_out {
+struct of_packet_out {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 13;
     uint16_t length;
     uint32_t xid;
     uint32_t buffer_id;
@@ -551,32 +551,32 @@ struct ofp_packet_out {
     of_octets_t data;
 };
 
-struct ofp_match_v1 {
+struct of_match_v1 {
     of_wc_bmap_t wildcards;
     of_port_no_t in_port;
     of_mac_addr_t eth_src;
     of_mac_addr_t eth_dst;
     uint16_t vlan_vid;
     uint8_t vlan_pcp;
-    uint8_t[1] pad1;
+    pad(1);
     uint16_t eth_type;
     uint8_t ip_dscp;
     uint8_t ip_proto;
-    uint8_t[2] pad2;
+    pad(2);
     uint32_t ipv4_src;
     uint32_t ipv4_dst;
     uint16_t tcp_src;
     uint16_t tcp_dst;
 };
 
-struct ofp_flow_add {
+struct of_flow_add {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 0;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -586,14 +586,14 @@ struct ofp_flow_add {
     list(of_action_t) actions;
 };
 
-struct ofp_flow_modify {
+struct of_flow_modify {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 1;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -603,14 +603,14 @@ struct ofp_flow_modify {
     list(of_action_t) actions;
 };
 
-struct ofp_flow_modify_strict {
+struct of_flow_modify_strict {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 2;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -620,14 +620,14 @@ struct ofp_flow_modify_strict {
     list(of_action_t) actions;
 };
 
-struct ofp_flow_delete {
+struct of_flow_delete {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 3;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -637,14 +637,14 @@ struct ofp_flow_delete {
     list(of_action_t) actions;
 };
 
-struct ofp_flow_delete_strict {
+struct of_flow_delete_strict {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 14;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == 4;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -654,27 +654,27 @@ struct ofp_flow_delete_strict {
     list(of_action_t) actions;
 };
 
-struct ofp_flow_removed {
+struct of_flow_removed {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 11;
     uint16_t length;
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
     uint16_t priority;
     uint8_t reason;
-    uint8_t[1] pad;
+    pad(1);
     uint32_t duration_sec;
     uint32_t duration_nsec;
     uint16_t idle_timeout;
-    uint8_t[2] pad2;
+    pad(2);
     uint64_t packet_count;
     uint64_t byte_count;
 };
 
-struct ofp_error_msg {
+struct of_error_msg {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 1;
     uint16_t length;
     uint32_t xid;
     uint16_t err_type;
@@ -683,26 +683,26 @@ struct ofp_error_msg {
 };
 
 // STATS ENTRIES: flow, table, port, queue,
-struct ofp_flow_stats_entry {
+struct of_flow_stats_entry {
     uint16_t length;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_match_t match;
     uint32_t duration_sec;
     uint32_t duration_nsec;
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    uint8_t[6] pad2;
+    pad(6);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
     list(of_action_t) actions;
 };
 
-struct ofp_table_stats_entry {
+struct of_table_stats_entry {
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     of_table_name_t name;
     of_wc_bmap_t wildcards;
     uint32_t max_entries;
@@ -711,9 +711,9 @@ struct ofp_table_stats_entry {
     uint64_t matched_count;
 };
 
-struct ofp_port_stats_entry {
+struct of_port_stats_entry {
     of_port_no_t port_no;
-    uint8_t[6] pad;
+    pad(6);
     uint64_t rx_packets;
     uint64_t tx_packets;
     uint64_t rx_bytes;
@@ -728,9 +728,9 @@ struct ofp_port_stats_entry {
     uint64_t collisions;
 };
 
-struct ofp_queue_stats_entry {
+struct of_queue_stats_entry {
     of_port_no_t port_no;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t queue_id;
     uint64_t tx_bytes;
     uint64_t tx_packets;
@@ -739,21 +739,21 @@ struct ofp_queue_stats_entry {
 
 // STATS request/reply:  Desc, flow, agg, table, port, queue
 
-struct ofp_desc_stats_request {
+struct of_desc_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0;
     uint16_t flags;
 };
 
-struct ofp_desc_stats_reply {
+struct of_desc_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0;
     uint16_t flags;
     of_desc_str_t mfr_desc;
     of_desc_str_t hw_desc;
@@ -762,134 +762,134 @@ struct ofp_desc_stats_reply {
     of_desc_str_t dp_desc;
 };
 
-struct ofp_flow_stats_request {
+struct of_flow_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 1;
     uint16_t flags;
     of_match_t match;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_port_no_t out_port;
 };
 
-struct ofp_flow_stats_reply {
+struct of_flow_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 1;
     uint16_t flags;
     list(of_flow_stats_entry_t) entries;
 };
 
-struct ofp_aggregate_stats_request {
+struct of_aggregate_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 2;
     uint16_t flags;
     of_match_t match;
     uint8_t table_id;
-    uint8_t pad;
+    pad(1);
     of_port_no_t out_port;
 };
 
-struct ofp_aggregate_stats_reply {
+struct of_aggregate_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 2;
     uint16_t flags;
     uint64_t packet_count;
     uint64_t byte_count;
     uint32_t flow_count;
-    uint8_t[4] pad;
+    pad(4);
 };
 
-struct ofp_table_stats_request {
+struct of_table_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 3;
     uint16_t flags;
 };
 
-struct ofp_table_stats_reply {
+struct of_table_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 3;
     uint16_t flags;
     list(of_table_stats_entry_t) entries;
 };
 
-struct ofp_port_stats_request {
+struct of_port_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 4;
     uint16_t flags;
     of_port_no_t port_no;
-    uint8_t[6] pad;
+    pad(6);
 };
 
-struct ofp_port_stats_reply {
+struct of_port_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 4;
     uint16_t flags;
     list(of_port_stats_entry_t) entries;
 };
 
-struct ofp_queue_stats_request {
+struct of_queue_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 5;
     uint16_t flags;
     of_port_no_t port_no;
-    uint8_t[2] pad;
+    pad(2);
     uint32_t queue_id;
 };
 
-struct ofp_queue_stats_reply {
+struct of_queue_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 5;
     uint16_t flags;
     list(of_queue_stats_entry_t) entries;
 };
 
-struct ofp_experimenter_stats_request {
+struct of_experimenter_stats_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0xffff;
     uint16_t flags;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct ofp_experimenter_stats_reply {
+struct of_experimenter_stats_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == 0xffff;
     uint16_t flags;
     uint32_t experimenter;
     of_octets_t data;
@@ -897,42 +897,42 @@ struct ofp_experimenter_stats_reply {
 
 // END OF STATS OBJECTS
 
-struct ofp_queue_prop {
+struct of_queue_prop {
     uint16_t type;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
 };
 
-struct ofp_queue_prop_min_rate {
-    uint16_t type;
+struct of_queue_prop_min_rate {
+    uint16_t type == 1;
     uint16_t len;
-    uint8_t[4] pad;
+    pad(4);
     uint16_t rate;
-    uint8_t[6] pad;
+    pad(6);
 };
 
-struct ofp_packet_queue {
+struct of_packet_queue {
     uint32_t queue_id;
     uint16_t len;
-    uint8_t[2] pad;
+    pad(2);
     list(of_queue_prop_t) properties;
 };
 
-struct ofp_queue_get_config_request {
+struct of_queue_get_config_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 20;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[2] pad;
+    pad(2);
 };
 
-struct ofp_queue_get_config_reply {
+struct of_queue_get_config_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 21;
     uint16_t length;
     uint32_t xid;
     of_port_no_t port;
-    uint8_t[6] pad;
+    pad(6);
     list(of_packet_queue_t) queues;
 };
