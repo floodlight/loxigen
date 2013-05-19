@@ -227,6 +227,25 @@ queue_prop_types = {
         )
     }
 
+bsn_vport_types = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.1
+    of_g.VERSION_1_1:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.2
+    of_g.VERSION_1_2:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.3
+    of_g.VERSION_1_3:dict(
+        q_in_q      = 0,
+        )
+    }
+
 oxm_types = {
     # version 1.0
     of_g.VERSION_1_0:dict(),
@@ -316,7 +335,9 @@ inheritance_data = dict(
     of_queue_prop = queue_prop_types,
     of_hello_elem = hello_elem_types,
     of_table_feature_prop = table_feature_prop_types,
-    of_meter_band = meter_band_types
+    of_meter_band = meter_band_types,
+    # BSN specific inheritance extensions
+    of_bsn_vport = bsn_vport_types
     )
 
 ################################################################
@@ -784,21 +805,24 @@ extension_message_subtype = {
     # version 1.0
     of_g.VERSION_1_0:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_ip_mask"             : 0,
-            "of_bsn_get_ip_mask_request"     : 1,
-            "of_bsn_get_ip_mask_reply"       : 2,
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_shell_command"           : 6,
-            "of_bsn_shell_output"            : 7,
-            "of_bsn_shell_status"            : 8,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
-            "of_bsn_set_l2_table"            : 12,
-            "of_bsn_get_l2_table_request"    : 13,
-            "of_bsn_get_l2_table_reply"      : 14,
+            "of_bsn_set_ip_mask"                     : 0,
+            "of_bsn_get_ip_mask_request"             : 1,
+            "of_bsn_get_ip_mask_reply"               : 2,
+            "of_bsn_set_mirroring"                   : 3,
+            "of_bsn_get_mirroring_request"           : 4,
+            "of_bsn_get_mirroring_reply"             : 5,
+            "of_bsn_shell_command"                   : 6,
+            "of_bsn_shell_output"                    : 7,
+            "of_bsn_shell_status"                    : 8,
+            "of_bsn_get_interfaces_request"          : 9,
+            "of_bsn_get_interfaces_reply"            : 10,
+            "of_bsn_set_pktin_suppression"           : 11,
+            "of_bsn_set_l2_table"                    : 12,
+            "of_bsn_get_l2_table_request"            : 13,
+            "of_bsn_get_l2_table_reply"              : 14,
+            "of_bsn_virtual_port_create_request"     : 15,
+            "of_bsn_virtual_port_create_reply"       : 16,
+            "of_bsn_virtual_port_remove"             : 17,
             },
         nicira = {   # Nicira extensions, value is subtype
             "of_nicira_controller_role_request"      : 10,
@@ -807,32 +831,41 @@ extension_message_subtype = {
         ),
     of_g.VERSION_1_1:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
+            "of_bsn_set_mirroring"                   : 3,
+            "of_bsn_get_mirroring_request"           : 4,
+            "of_bsn_get_mirroring_reply"             : 5,
+            "of_bsn_get_interfaces_request"          : 9,
+            "of_bsn_get_interfaces_reply"            : 10,
+            "of_bsn_set_pktin_suppression"           : 11,
+            "of_bsn_virtual_port_create_request"     : 15,
+            "of_bsn_virtual_port_create_reply"       : 16,
+            "of_bsn_virtual_port_remove"             : 17,
             },
         ),
     of_g.VERSION_1_2:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
+            "of_bsn_set_mirroring"                   : 3,
+            "of_bsn_get_mirroring_request"           : 4,
+            "of_bsn_get_mirroring_reply"             : 5,
+            "of_bsn_get_interfaces_request"          : 9,
+            "of_bsn_get_interfaces_reply"            : 10,
+            "of_bsn_set_pktin_suppression"           : 11,
+            "of_bsn_virtual_port_create_request"     : 15,
+            "of_bsn_virtual_port_create_reply"       : 16,
+            "of_bsn_virtual_port_remove"             : 17,
             },
         ),
     of_g.VERSION_1_3:dict(  # Version 1.0 extensions
         bsn = {   # BSN extensions; indexed by class name, value is subtype
-            "of_bsn_set_mirroring"           : 3,
-            "of_bsn_get_mirroring_request"   : 4,
-            "of_bsn_get_mirroring_reply"     : 5,
-            "of_bsn_get_interfaces_request"  : 9,
-            "of_bsn_get_interfaces_reply"    : 10,
-            "of_bsn_set_pktin_suppression"   : 11,
+            "of_bsn_set_mirroring"                   : 3,
+            "of_bsn_get_mirroring_request"           : 4,
+            "of_bsn_get_mirroring_reply"             : 5,
+            "of_bsn_get_interfaces_request"          : 9,
+            "of_bsn_get_interfaces_reply"            : 10,
+            "of_bsn_set_pktin_suppression"           : 11,
+            "of_bsn_virtual_port_create_request"     : 15,
+            "of_bsn_virtual_port_create_reply"       : 16,
+            "of_bsn_virtual_port_remove"             : 17,
             },
         ),
 }

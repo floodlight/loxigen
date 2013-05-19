@@ -219,6 +219,13 @@ of_mixed_types = dict(
         4: "of_port_desc_t",
         "short_name":"port_desc"
         },
+    of_bsn_vport_t = {
+        1: "of_bsn_vport_t",
+        2: "of_bsn_vport_t",
+        3: "of_bsn_vport_t",
+        4: "of_bsn_vport_t",
+        "short_name":"bsn_vport"
+        },
     of_fm_cmd_t = { # Flow mod command went from u16 to u8
         1: "uint16_t",
         2: "uint8_t",
