@@ -823,6 +823,10 @@ extension_message_subtype = {
             "of_bsn_virtual_port_create_request"     : 15,
             "of_bsn_virtual_port_create_reply"       : 16,
             "of_bsn_virtual_port_remove"             : 17,
+            "of_bsn_bw_enable_set"                   : 18,
+            "of_bsn_bw_enable_get_request"           : 19,
+            "of_bsn_bw_enable_get_reply"             : 20,
+            "of_bsn_bw_clear_data"                   : 21,
             },
         nicira = {   # Nicira extensions, value is subtype
             "of_nicira_controller_role_request"      : 10,
@@ -840,6 +844,10 @@ extension_message_subtype = {
             "of_bsn_virtual_port_create_request"     : 15,
             "of_bsn_virtual_port_create_reply"       : 16,
             "of_bsn_virtual_port_remove"             : 17,
+            "of_bsn_bw_enable_set"                   : 18,
+            "of_bsn_bw_enable_get_request"           : 19,
+            "of_bsn_bw_enable_get_reply"             : 20,
+            "of_bsn_bw_clear_data"                   : 21,
             },
         ),
     of_g.VERSION_1_2:dict(  # Version 1.0 extensions
@@ -853,6 +861,10 @@ extension_message_subtype = {
             "of_bsn_virtual_port_create_request"     : 15,
             "of_bsn_virtual_port_create_reply"       : 16,
             "of_bsn_virtual_port_remove"             : 17,
+            "of_bsn_bw_enable_set"                   : 18,
+            "of_bsn_bw_enable_get_request"           : 19,
+            "of_bsn_bw_enable_get_reply"             : 20,
+            "of_bsn_bw_clear_data"                   : 21,
             },
         ),
     of_g.VERSION_1_3:dict(  # Version 1.0 extensions
@@ -866,6 +878,10 @@ extension_message_subtype = {
             "of_bsn_virtual_port_create_request"     : 15,
             "of_bsn_virtual_port_create_reply"       : 16,
             "of_bsn_virtual_port_remove"             : 17,
+            "of_bsn_bw_enable_set"                   : 18,
+            "of_bsn_bw_enable_get_request"           : 19,
+            "of_bsn_bw_enable_get_reply"             : 20,
+            "of_bsn_bw_clear_data"                   : 21,
             },
         ),
 }
