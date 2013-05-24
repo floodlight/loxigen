@@ -30,6 +30,13 @@
 
 #version any
 
+// When the ingress or egress VID has this value, no outer tag should be used.
+// In this case, the corresponding TPID is ignored.
+
+enum ofp_bsn_vport_q_in_q_untagged {
+    OF_BSN_VPORT_Q_IN_Q_UNTAGGED = 0xffff,
+};
+
 // BSN Virtual port object header
 // FIXME For now, inheritance is not exercised.  See below.
 struct ofp_bsn_vport {
@@ -38,10 +45,6 @@ struct ofp_bsn_vport {
     /* Remainder of data is specific to the port type */
 };
 
-
-// When the ingress or egress VID has this value, no outer tag should be used.
-// In this case, the corresponding TPID is ignored.
-// #define OF_BSN_VPORT_Q_IN_Q_UNTAGGED 0xffff
 
 // Q-in-Q virtual port specification
 
