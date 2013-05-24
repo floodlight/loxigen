@@ -28,17 +28,30 @@
 #version 1
 
 // BSN L2 table configuration messages
-struct ofp_bsn_set_l2_table {
+struct ofp_bsn_set_l2_table_request {
     uint8_t version;
     uint8_t type;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
+    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN_REQUEST
     uint32_t subtype;   // BSN_L2_TABLE_SET
     uint8_t l2_table_enable;    // 1 == enabled, 0 == disabled
     uint8_t pad;
     uint16_t l2_table_priority;  // priority of all flows in L2 table
     uint8_t[4] pad;
+};
+
+struct ofp_bsn_set_l2_table_reply {
+    uint8_t version;
+    uint8_t type;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN
+    uint32_t subtype;   // BSN_L2_TABLE_SET_REPLY
+    uint8_t l2_table_enable;    // Resulting state: 1 == enabled, 0 == disabled
+    uint8_t pad;
+    uint16_t l2_table_priority;  // priority used, must match request if ok
+    uint32_t status; // 0 means success
 };
 
 struct ofp_bsn_get_l2_table_request {
