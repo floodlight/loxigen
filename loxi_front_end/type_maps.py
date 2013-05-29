@@ -83,6 +83,25 @@ queue_prop_types = {
     of_g.VERSION_1_3:dict()
     }
 
+bsn_vport_types = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.1
+    of_g.VERSION_1_1:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.2
+    of_g.VERSION_1_2:dict(
+        q_in_q      = 0,
+        ),
+    # version 1.3
+    of_g.VERSION_1_3:dict(
+        q_in_q      = 0,
+        )
+    }
+
 oxm_types = {
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
@@ -120,7 +139,9 @@ inheritance_data = dict(
     of_queue_prop = queue_prop_types,
     of_hello_elem = hello_elem_types,
     of_table_feature_prop = table_feature_prop_types,
-    of_meter_band = meter_band_types
+    of_meter_band = meter_band_types,
+    # BSN specific inheritance extensions
+    of_bsn_vport = bsn_vport_types
     )
 
 def class_is_virtual(cls):

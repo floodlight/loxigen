@@ -124,5 +124,5 @@ def loxi_name(ident):
         for id_from, id_to in entry.items():
             if re.match(id_from, ident):
                 return re.sub(id_from, id_to, ident)
-    return None
+    return ident
 
