@@ -79,6 +79,7 @@ debug:
 
 check:
 	PYTHONPATH=. ./utest/test_parser.py
+	PYTHONPATH=. ./utest/test_frontend.py
 	PYTHONPATH=. ./utest/test_test_data.py
 
 check-py: python

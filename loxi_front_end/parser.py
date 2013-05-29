@@ -50,9 +50,12 @@ list_type = P.Combine(kw('list') - lit('(') - identifier - lit(')'))
 any_type = (array_type | list_type | scalar_type).setName("type name")
 
 # Structs
-struct_member = P.Group(any_type - identifier - s(';'))
+pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
+type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
+data_member = P.Group(tag('data') + any_type - identifier)
+struct_member = pad_member | type_member | data_member;
 struct = kw('struct') - identifier - s('{') + \
-         P.Group(P.ZeroOrMore(struct_member)) + \
+         P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 
 # Enums
@@ -71,4 +74,11 @@ grammar = P.ZeroOrMore(P.Group(struct) | P.Group(enum) | P.Group(metadata))
 grammar.ignore(P.cppStyleComment)
 
 def parse(src):
-    return grammar.parseString(src, parseAll=True)
+    """
+    Given an input string, return the AST.
+
+    The AST is a low-level representation of the input. It changes frequently
+    with the input file syntax. The frontend.py module transforms the AST
+    into the OFInput represntation.
+    """
+    return grammar.parseString(src, parseAll=True).asList()

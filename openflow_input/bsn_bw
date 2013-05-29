@@ -30,61 +30,61 @@
 
 #version any
 
-struct ofp_bsn_bw_enable_set_request {
+struct of_bsn_bw_enable_set_request {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_ENABLE_SET
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 18;
     uint32_t enable;        // 0 to disable the extension, 1 to enable it
 };
 
-struct ofp_bsn_bw_enable_set_reply {
+struct of_bsn_bw_enable_set_reply {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_ENABLE_SET
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 23;
     uint32_t enable;        // Resulting state, 0 disabled, 1 enabled
     uint32_t status;        // Result code: 0 success
 };
 
-struct ofp_bsn_bw_enable_get_request {
+struct of_bsn_bw_enable_get_request {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_ENABLE_GET_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 19;
 };
 
-struct ofp_bsn_bw_enable_get_reply {
+struct of_bsn_bw_enable_get_reply {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_ENABLE_GET_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 20;
     uint32_t enabled;       // 0 if feature is disabled; 1 if feature enabled
 };
 
-struct ofp_bsn_bw_clear_data_request {
+struct of_bsn_bw_clear_data_request {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_CLEAR_DATA
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 21;
 };
 
-struct ofp_bsn_bw_clear_data_reply {
+struct of_bsn_bw_clear_data_reply {
     uint8_t version;
-    uint8_t type;           // OFPT_VENDOR
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_BW_CLEAR_DATA
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 22;
     uint32_t status;        // Result code, 0 success
 };

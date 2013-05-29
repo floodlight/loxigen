@@ -39,7 +39,7 @@ enum ofp_bsn_vport_q_in_q_untagged {
 
 // BSN Virtual port object header
 // FIXME For now, inheritance is not exercised.  See below.
-struct ofp_bsn_vport {
+struct of_bsn_vport {
     uint16_t type;  /* Discriminate virtual port type */
     uint16_t length; /* Length in bytes of this structure with this header */
     /* Remainder of data is specific to the port type */
@@ -49,7 +49,7 @@ struct ofp_bsn_vport {
 // Q-in-Q virtual port specification
 
 struct of_bsn_vport_q_in_q {
-    uint16_t type;    /* 0 */
+    uint16_t type == 0;
     uint16_t length;  /* 16 */
     uint32_t port_no;     /* OF port number of parent; usually phys port */
     uint16_t ingress_tpid;
@@ -59,13 +59,13 @@ struct of_bsn_vport_q_in_q {
 };
 
 // Request from controller to switch to create vport
-struct ofp_bsn_virtual_port_create_request {
+struct of_bsn_virtual_port_create_request {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_VIRTUAL_PORT_CREATE_REQUEST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 15;
     // FIXME This should be an instance of the inheritance superclass
     of_bsn_vport_q_in_q_t vport;   // Description of vport to create
     // Additional data follows depending on header type
@@ -73,23 +73,23 @@ struct ofp_bsn_virtual_port_create_request {
 
 // Reply from switch to controller indicating port number created
 // vport_no must be 16 bits to be compatible with 1.0
-struct ofp_bsn_virtual_port_create_reply {
+struct of_bsn_virtual_port_create_reply {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;           // Must match create_request
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_VIRTUAL_PORT_CREATE_REPLY
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 16;
     uint32_t vport_no;      // The OF port number created.  16-bits for OF 1.0
 };
 
 // Request from controller to switch to remove a vport
-struct ofp_bsn_virtual_port_remove {
+struct of_bsn_virtual_port_remove {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;  // OF_EXPERIMENTER_ID_BSN
-    uint32_t subtype;       // BSN_VIRTUAL_PORT_REMOVE
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 17;
     uint32_t vport_no;      // The OF port number to be removed
 };

@@ -27,11 +27,11 @@
 
 #version any
 
-struct ofp_action_nicira_dec_ttl {
-    uint16_t type;      // OF_ACTION_TYPE_EXPERIMENTER
+struct of_action_nicira_dec_ttl {
+    uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_NICIRA
-    uint16_t subtype;         // 18
-    uint16_t pad;
-    uint32_t pad2;
+    uint32_t experimenter == 0x2320;
+    uint16_t subtype == 18;
+    pad(2);
+    pad(4);
 };

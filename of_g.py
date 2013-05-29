@@ -350,6 +350,11 @@ base_object_members = """\
     uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
 """
 
+# LOXI intermediate representation
+# This is a hash from wire versions to OFProtocol objects.
+# See loxi_ir.py
+
+ir = {}
 
 ##
 # LOXI identifiers
@@ -513,20 +518,3 @@ def experimenter_name_lookup(experimenter_id):
 
 loxigen_dbg_file = sys.stdout
 loxigen_log_file = sys.stdout
-
-################################################################
-#
-# Internal representation
-#
-################################################################
-
-class OFInput(object):
-    """
-    A single LOXI input file.
-    """
-
-    def __init__(self):
-        self.wire_versions = set()
-        self.classes = {}
-        self.ordered_classes = []
-        self.enums = {}
