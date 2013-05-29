@@ -162,10 +162,11 @@ def class_is_virtual(cls):
 #
 ################################################################
 
-# The hardcoded message types are for objects without proper inheritance
+# The hardcoded message types are for inheritance parents
 message_types = {
     # version 1.0
     of_g.VERSION_1_0:dict(
+        experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 16,
         stats_reply             = 17,
@@ -173,6 +174,7 @@ message_types = {
 
     # version 1.1
     of_g.VERSION_1_1:dict(
+        experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,
         stats_reply             = 19,
@@ -180,6 +182,7 @@ message_types = {
 
     # version 1.2
     of_g.VERSION_1_2:dict(
+        experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,
         stats_reply             = 19,
@@ -187,6 +190,7 @@ message_types = {
 
     # version 1.3
     of_g.VERSION_1_3:dict(
+        experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,  # FIXME Multipart
         stats_reply             = 19,

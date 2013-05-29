@@ -519,7 +519,8 @@ def populate_type_maps():
                 continue
             subcls = cls[3:]
             val = find_type_value(ofclass, 'type')
-            type_maps.message_types[wire_version][subcls] = val
+            if not val in type_maps.message_types[wire_version].values():
+                type_maps.message_types[wire_version][subcls] = val
 
             # Extensions
             experimenter = find_experimenter('of', cls)
