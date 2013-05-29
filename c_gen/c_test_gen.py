@@ -92,7 +92,10 @@ def var_name_map(m_type):
         # Non-scalars; more TBD
         of_octets_t="octets",
         of_meter_features_t="features",
-        of_match_t="match")
+        of_match_t="match",
+        # BSN extensions
+        of_bsn_vport_q_in_q_t="vport",
+        )
 
     if m_type.find("of_list_") == 0:
         return "list"
