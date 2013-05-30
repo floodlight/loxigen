@@ -106,4 +106,5 @@ targets = {
     'locitest/src/test_setup_from_add.c': static,
     'locitest/src/test_utils.c': static,
     'locitest/src/test_validator.c': static,
+    'locitest/src/main.c': static,
 }
