@@ -31,7 +31,6 @@ Utilities for generating the target Python code
 
 import os
 import of_g
-import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as utils
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
@@ -41,37 +40,6 @@ def render_template(out, name, **context):
 
 def render_static(out, name):
     utils.render_static(out, name, [templates_dir])
-
-def lookup_unified_class(cls, version):
-    unified_class = of_g.unified[cls][version]
-    if "use_version" in unified_class: # deref version ref
-        ref_version = unified_class["use_version"]
-        unified_class = of_g.unified[cls][ref_version]
-    return unified_class
-
-def primary_wire_type(cls, version):
-    if cls in type_maps.stats_reply_list:
-        return type_maps.type_val[("of_stats_reply", version)]
-    elif cls in type_maps.stats_request_list:
-        return type_maps.type_val[("of_stats_request", version)]
-    elif cls in type_maps.flow_mod_list:
-        return type_maps.type_val[("of_flow_mod", version)]
-    elif (cls, version) in type_maps.type_val:
-        return type_maps.type_val[(cls, version)]
-    elif type_maps.message_is_extension(cls, version):
-        return type_maps.type_val[("of_experimenter", version)]
-    elif type_maps.action_is_extension(cls, version):
-        return type_maps.type_val[("of_action_experimenter", version)]
-    elif type_maps.action_id_is_extension(cls, version):
-        return type_maps.type_val[("of_action_id_experimenter", version)]
-    elif type_maps.instruction_is_extension(cls, version):
-        return type_maps.type_val[("of_instruction_experimenter", version)]
-    elif type_maps.queue_prop_is_extension(cls, version):
-        return type_maps.type_val[("of_queue_prop_experimenter", version)]
-    elif type_maps.table_feature_prop_is_extension(cls, version):
-        return type_maps.type_val[("of_table_feature_prop_experimenter", version)]
-    else:
-        raise ValueError("No wiretype for %s in version %d" % (cls, version))
 
 def constant_for_value(version, group, value):
     enums = of_g.ir[version].enums
