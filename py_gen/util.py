@@ -74,6 +74,9 @@ def primary_wire_type(cls, version):
         raise ValueError("No wiretype for %s in version %d" % (cls, version))
 
 def constant_for_value(version, group, value):
-    return (["const." + v["ofp_name"] for k, v in of_g.identifiers.items()
-             if k in of_g.identifiers_by_group[group] and
-                v["values_by_version"].get(version, None) == value] or [value])[0]
+    enums = of_g.ir[version].enums
+    enum = [x for x in enums if x.name == group][0]
+    for name, value2 in enum.values:
+        if value == value2:
+            return "const." + name
+    return repr(value)
