@@ -1,17 +1,30 @@
+:: import of_g
+:: ir = of_g.ir
 -- TODO copyright (GPL)
 
 p_of = Proto ("of", "OpenFlow")
 
-local ofp_type = {
-    [0] = "HELLO",
-    [1] = "ECHO_REQUEST",
-    [2] = "ECHO_REPLY",
-    [3] = "ERROR",
+local openflow_versions = {
+:: for (version, name) in of_g.param_version_names.items():
+    [${version}] = "${name}",
+:: #endfor
 }
 
-local f_version = ProtoField.uint8("of.version", "Version", base.HEX)
-local f_type = ProtoField.uint8("of.type", "Type", base.HEX, ofp_type)
-local f_length = ProtoField.uint16("of.length", "Length", base.HEX)
+:: for version, ofproto in ir.items():
+:: for enum in ofproto.enums:
+local enum_v${version}_${enum.name} = {
+:: for (name, value) in enum.values:
+    [${value}] = "${name}",
+:: #endfor
+}
+
+:: #endfor
+
+:: #endfor
+
+local f_version = ProtoField.uint8("of.version", "Version", base.HEX, openflow_versions)
+local f_type = ProtoField.uint8("of.type", "Type", base.HEX, enum_v1_ofp_type)
+local f_length = ProtoField.uint16("of.length", "Length")
 local f_xid = ProtoField.uint32("of.xid", "XID", base.HEX)
 
 p_of.fields = {
