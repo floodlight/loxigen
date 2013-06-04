@@ -57,6 +57,15 @@ python: .loxi_ts.python
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=python
 	touch $@
 
+python-doc: python
+	rm -rf ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	mkdir -p ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	cp -a py_gen/sphinx ${LOXI_OUTPUT_DIR}/pyloxi-doc/input
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi sphinx-apidoc -o ${LOXI_OUTPUT_DIR}/pyloxi-doc/input ${LOXI_OUTPUT_DIR}/pyloxi
+	sphinx-build ${LOXI_OUTPUT_DIR}/pyloxi-doc/input ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	rm -rf ${LOXI_OUTPUT_DIR}/pyloxi-doc/input
+	@echo "HTML documentation output to ${LOXI_OUTPUT_DIR}/pyloxi-doc"
+
 java: .loxi_ts.java
 
 .loxi_ts.java: ${LOXI_JAVA_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
