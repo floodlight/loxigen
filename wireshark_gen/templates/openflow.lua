@@ -34,7 +34,27 @@ p_of.fields = {
     f_xid,
 }
 
-function dissect_one(buf, pkt, root)
+:: for supercls in set(sorted(superclasses.values())):
+local ${supercls}_dissectors = {
+:: for version, ofproto in ir.items():
+    [${version}] = {},
+:: #endfor
+}
+:: #endfor
+
+:: for version, ofproto in ir.items():
+:: for ofclass in ofproto.classes:
+:: name = 'dissect_%s_v%d' % (ofclass.name, version)
+:: typeval = 0
+:: include('_ofclass_dissector.lua', name=name, ofclass=ofclass)
+:: if ofclass.name in superclasses:
+${superclasses[ofclass.name]}_dissectors[${version}][${typeval}] = ${name}
+
+:: #endif
+:: #endfor
+:: #endfor
+
+function dissect_of_message(buf, root)
     -- create subtree for of
     local subtree = root:add(p_of, buf(0))
     -- add protocol fields to subtree
@@ -43,7 +63,11 @@ function dissect_one(buf, pkt, root)
     subtree:add(f_length, buf(2,2))
     subtree:add(f_xid, buf(4,4))
 
+    local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
+    if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
+        of_message_dissectors[version_val][type_val](buf, root)
+    end
 end
 
 -- of dissector function
@@ -60,7 +84,7 @@ function p_of.dissector (buf, pkt, root)
                 return
             end
 
-            dissect_one(buf(offset, msg_len), pkt, root)
+            dissect_of_message(buf(offset, msg_len), root)
             offset = offset + msg_len
         else
             -- we don't have all of length field yet
