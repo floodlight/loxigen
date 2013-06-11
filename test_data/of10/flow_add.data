@@ -42,6 +42,8 @@ flow_add {
     eth_type = 0x0,
     ip_dscp = 0x0,
     ip_proto = 0x0,
+    src_meta_id = 0x0,
+    dst_meta_id = 0x0,
     ipv4_src = 192.168.3.127,
     ipv4_dst = 255.255.255.255,
     tcp_src = 0x0,
