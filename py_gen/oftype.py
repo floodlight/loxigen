@@ -73,6 +73,8 @@ class OFType(object):
             v = 'common.port_desc()'
         elif self.base == 'of_meter_features_t':
             v = 'common.meter_features()'
+        elif self.base == 'of_bsn_vport_q_in_q_t':
+            v = 'common.bsn_vport_q_in_q()'
         else:
             v = "None"
 
@@ -95,7 +97,7 @@ class OFType(object):
             return 'struct.pack("!6B", *%s)' % expr_expr
         elif self.base == 'of_ipv6_t':
             return 'struct.pack("!16s", %s)' % expr_expr
-        elif self.base in ['of_match_t', 'of_port_desc_t', 'of_meter_features_t']:
+        elif self.base in ['of_match_t', 'of_port_desc_t', 'of_meter_features_t', 'of_bsn_vport_q_in_q_t']:
             return '%s.pack()' % expr_expr
         elif self.base == 'of_port_name_t':
             return self._gen_string_pack_expr(16, expr_expr)
@@ -156,6 +158,8 @@ class OFType(object):
             return self._gen_string_unpack_expr(reader_expr, 256)
         elif self.base == 'of_meter_features_t':
             return 'common.meter_features.unpack(%s)' % (reader_expr)
+        elif self.base == 'of_bsn_vport_q_in_q_t':
+            return 'common.bsn_vport_q_in_q.unpack(%s)' % (reader_expr)
         elif self.base == 'of_list_instruction_t':
             return 'instruction.unpack_list(%s)' % (reader_expr)
         elif utils.class_is_list(self.base):
