@@ -77,5 +77,5 @@ struct of_bsn_set_pktin_suppression_reply {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 25;
-    uint8_t status; // 0 means success
+    uint32_t status; // 0 means success
 };

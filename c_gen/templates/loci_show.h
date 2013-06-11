@@ -117,7 +117,6 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_u16_egress_vlan_id(writer, cookie, val)  LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u32_enabled(writer, cookie, val)         LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_enable(writer, cookie, val)          LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_u8_status(writer, cookie, val)           LOCI_SHOW_u8(writer, cookie, val)
 
 
 
