@@ -107,11 +107,3 @@ pylint:
 	pylint -E ${LOXI_PY_FILES}
 
 .PHONY: all clean debug check pylint c python
-
-ifdef BIGCODE
-# Internal build system compatibility
-MODULE := LoxiGen
-LOXI_OUTPUT_DIR = ${BIGCODE}/Modules
-modulemake:
-.PHONY: modulemake
-endif
