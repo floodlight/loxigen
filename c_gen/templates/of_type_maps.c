@@ -191,6 +191,7 @@ extension_action_object_id_get(of_object_t *obj, of_object_id_t *id)
         switch (subtype) {
         case 1: *id = OF_ACTION_BSN_MIRROR; break;
         case 2: *id = OF_ACTION_BSN_SET_TUNNEL_DST; break;
+        case 3: *id = OF_ACTION_BSN_SET_META_ID; break;
         }
         break;
     }
@@ -207,8 +208,6 @@ extension_action_object_id_get(of_object_t *obj, of_object_id_t *id)
 
 /**
  * Set wire data for extension objects, not messages.
- *
- * Currently only handles BSN mirror; ignores all others
  */
 
 void
@@ -234,6 +233,12 @@ of_extension_object_id_set(of_object_t *obj, of_object_id_t id)
         buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
                     OF_EXPERIMENTER_ID_NICIRA);
         buf_u16_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 18);
+        break;
+    case OF_ACTION_BSN_SET_META_ID:
+    case OF_ACTION_ID_BSN_SET_META_ID:
+        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
+                    OF_EXPERIMENTER_ID_BSN);
+        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 3);
         break;
     default:
         break;
@@ -268,6 +273,7 @@ extension_action_id_object_id_get(of_object_t *obj, of_object_id_t *id)
         switch (subtype) {
         case 1: *id = OF_ACTION_ID_BSN_MIRROR; break;
         case 2: *id = OF_ACTION_ID_BSN_SET_TUNNEL_DST; break;
+        case 3: *id = OF_ACTION_ID_BSN_SET_META_ID; break;
         }
         break;
     }
@@ -749,6 +755,8 @@ of_extension_object_wire_push(of_object_t *obj)
     of_action_id_bsn_set_tunnel_dst_t *action_id_set_tunnel_dst;
     of_action_nicira_dec_ttl_t *action_nicira_dec_ttl;
     of_action_id_nicira_dec_ttl_t *action_id_nicira_dec_ttl;
+    of_action_bsn_set_meta_id_t *action_set_meta_id;
+    of_action_id_bsn_set_meta_id_t *action_id_set_meta_id;
 
     /* Push exp type, subtype */
     switch (obj->object_id) {
@@ -787,6 +795,18 @@ of_extension_object_wire_push(of_object_t *obj)
         of_action_id_nicira_dec_ttl_experimenter_set(action_id_nicira_dec_ttl,
             OF_EXPERIMENTER_ID_NICIRA);
         of_action_id_nicira_dec_ttl_subtype_set(action_id_nicira_dec_ttl, 18);
+        break;
+    case OF_ACTION_BSN_SET_META_ID:
+        action_set_meta_id = (of_action_bsn_set_meta_id_t *)obj;
+        of_action_bsn_set_meta_id_experimenter_set(action_set_meta_id,
+            OF_EXPERIMENTER_ID_BSN);
+        of_action_bsn_set_meta_id_subtype_set(action_set_meta_id, 3);
+        break;
+    case OF_ACTION_ID_BSN_SET_META_ID:
+        action_id_set_meta_id = (of_action_id_bsn_set_meta_id_t *)obj;
+        of_action_id_bsn_set_meta_id_experimenter_set(action_id_set_meta_id,
+            OF_EXPERIMENTER_ID_BSN);
+        of_action_id_bsn_set_meta_id_subtype_set(action_id_set_meta_id, 3);
         break;
     default:
         break;
