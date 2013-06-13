@@ -1,0 +1,2 @@
+#!/bin/bash -ex
+make all check check-c check-py
