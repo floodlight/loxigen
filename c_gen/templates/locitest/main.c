@@ -1,3 +1,5 @@
+:: include('_copyright.c')
+
 /**
  * @file test_main
  *

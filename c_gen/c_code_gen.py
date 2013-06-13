@@ -796,6 +796,7 @@ def type_data_c_gen(out, name):
 def common_top_matter(out, name):
     loxi_utils.gen_c_copy_license(out)
     out.write("""\
+
 /****************************************************************
  * File: %s
  *
