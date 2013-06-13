@@ -476,12 +476,8 @@ def gen_c_copy_license(out):
     """
     Generate the top comments for copyright and license
     """
-    out.write("""\
-/* Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior University */
-/* Copyright (c) 2011, 2012 Open Networking Foundation */
-/* Copyright (c) 2012, 2013 Big Switch Networks, Inc. */
-
-""")
+    import c_gen.util
+    c_gen.util.render_template(out, '_copyright.c')
 
 def accessor_returns_error(a_type, m_type):
     is_var_len = (not type_is_scalar(m_type)) and \

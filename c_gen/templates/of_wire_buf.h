@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2013, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 #if !defined(_OF_WIRE_BUF_H_)
 #define _OF_WIRE_BUF_H_

@@ -25,23 +25,6 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: include('_copyright.c')
-
-/******************************************************************************
- *
- *  /module/src/locitest_enums.c
- *
- *  locitest Enum Definitions
- *
- *****************************************************************************/
-#include <locitest/locitest_config.h> 
-#include <locitest/locitest.h> 
-#include "locitest_int.h" 
-
-
-
-#include <stdlib.h>
-#include <string.h>
-
-/* <auto.start.enum(ALL).source> */
-/* <auto.end.enum(ALL).source> */
+/* Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior University */
+/* Copyright (c) 2011, 2012 Open Networking Foundation */
+/* Copyright (c) 2012, 2013 Big Switch Networks, Inc. */
