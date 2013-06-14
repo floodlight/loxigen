@@ -261,7 +261,39 @@ stats_request_parsers = {
 :: #endif
 }
 :: else:
-# TODO OF 1.3 multipart messages
+multipart_reply_parsers = {
+    const.OFPMP_DESC : desc_stats_reply.unpack,
+    const.OFPMP_FLOW : flow_stats_reply.unpack,
+    const.OFPMP_AGGREGATE : aggregate_stats_reply.unpack,
+    const.OFPMP_TABLE : table_stats_reply.unpack,
+    const.OFPMP_PORT_STATS : port_stats_reply.unpack,
+    const.OFPMP_QUEUE : queue_stats_reply.unpack,
+    const.OFPMP_GROUP : group_stats_reply.unpack,
+    const.OFPMP_GROUP_DESC : group_desc_stats_reply.unpack,
+    const.OFPMP_GROUP_FEATURES : group_features_stats_reply.unpack,
+    const.OFPMP_METER : meter_stats_reply.unpack,
+    const.OFPMP_METER_CONFIG : meter_config_stats_reply.unpack,
+    const.OFPMP_METER_FEATURES : meter_features_stats_reply.unpack,
+    const.OFPMP_TABLE_FEATURES : table_features_stats_reply.unpack,
+    const.OFPMP_PORT_DESC : port_desc_stats_reply.unpack,
+}
+
+multipart_request_parsers = {
+    const.OFPMP_DESC : desc_stats_request.unpack,
+    const.OFPMP_FLOW : flow_stats_request.unpack,
+    const.OFPMP_AGGREGATE : aggregate_stats_request.unpack,
+    const.OFPMP_TABLE : table_stats_request.unpack,
+    const.OFPMP_PORT_STATS : port_stats_request.unpack,
+    const.OFPMP_QUEUE : queue_stats_request.unpack,
+    const.OFPMP_GROUP : group_stats_request.unpack,
+    const.OFPMP_GROUP_DESC : group_desc_stats_request.unpack,
+    const.OFPMP_GROUP_FEATURES : group_features_stats_request.unpack,
+    const.OFPMP_METER : meter_stats_request.unpack,
+    const.OFPMP_METER_CONFIG : meter_config_stats_request.unpack,
+    const.OFPMP_METER_FEATURES : meter_features_stats_request.unpack,
+    const.OFPMP_TABLE_FEATURES : table_features_stats_request.unpack,
+    const.OFPMP_PORT_DESC : port_desc_stats_request.unpack,
+}
 :: #endif
 
 :: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 4]

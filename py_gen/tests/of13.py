@@ -115,34 +115,8 @@ class TestAllOF13(unittest.TestCase):
 
     def test_parse_message(self):
         expected_failures = [
-            ofp.message.aggregate_stats_reply,
-            ofp.message.aggregate_stats_request,
-            ofp.message.desc_stats_reply,
-            ofp.message.desc_stats_request,
-            ofp.message.flow_stats_reply,
-            ofp.message.flow_stats_request,
-            ofp.message.group_desc_stats_reply,
-            ofp.message.group_desc_stats_request,
-            ofp.message.group_features_stats_reply,
-            ofp.message.group_features_stats_request,
-            ofp.message.group_stats_reply,
-            ofp.message.group_stats_request,
-            ofp.message.meter_config_stats_reply,
-            ofp.message.meter_config_stats_request,
-            ofp.message.meter_features_stats_reply,
-            ofp.message.meter_features_stats_request,
-            ofp.message.meter_stats_reply,
-            ofp.message.meter_stats_request,
-            ofp.message.port_desc_stats_reply,
-            ofp.message.port_desc_stats_request,
-            ofp.message.port_stats_reply,
-            ofp.message.port_stats_request,
-            ofp.message.queue_stats_reply,
-            ofp.message.queue_stats_request,
             ofp.message.table_features_stats_reply,
             ofp.message.table_features_stats_request,
-            ofp.message.table_stats_reply,
-            ofp.message.table_stats_request,
         ]
         for klass in self.klasses:
             if not issubclass(klass, ofp.message.Message):
