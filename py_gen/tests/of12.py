@@ -92,13 +92,7 @@ class TestAllOF12(unittest.TestCase):
                 fn()
 
     def test_parse_message(self):
-        expected_failures = [
-            ofp.message.flow_add,
-            ofp.message.flow_delete,
-            ofp.message.flow_delete_strict,
-            ofp.message.flow_modify,
-            ofp.message.flow_modify_strict,
-        ]
+        expected_failures = []
         for klass in self.klasses:
             if not issubclass(klass, ofp.message.Message):
                 continue

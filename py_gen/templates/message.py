@@ -122,11 +122,16 @@ def parse_message(buf):
     else:
         raise loxi.ProtocolError("unexpected message type")
 
-:: # TODO fix for OF 1.1+
 def parse_flow_mod(buf):
-    if len(buf) < 56 + 2:
+:: if version == 1:
+:: offset = 57
+:: elif version >= 2:
+:: offset = 25
+:: #endif
+    if len(buf) < ${offset} + 1:
         raise loxi.ProtocolError("message too short")
-    cmd, = struct.unpack_from("!H", buf, 56)
+    # Technically uint16_t for OF 1.0
+    cmd, = struct.unpack_from("!B", buf, ${offset})
     if cmd in flow_mod_parsers:
         return flow_mod_parsers[cmd](buf)
     else:
