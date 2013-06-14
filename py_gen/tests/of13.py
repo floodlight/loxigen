@@ -113,6 +113,72 @@ class TestAllOF13(unittest.TestCase):
             else:
                 fn()
 
+    def test_parse_message(self):
+        expected_failures = [
+            ofp.message.aggregate_stats_reply,
+            ofp.message.aggregate_stats_request,
+            ofp.message.bsn_bw_clear_data_reply,
+            ofp.message.bsn_bw_clear_data_request,
+            ofp.message.bsn_bw_enable_get_reply,
+            ofp.message.bsn_bw_enable_get_request,
+            ofp.message.bsn_bw_enable_set_reply,
+            ofp.message.bsn_bw_enable_set_request,
+            ofp.message.bsn_get_interfaces_reply,
+            ofp.message.bsn_get_interfaces_request,
+            ofp.message.bsn_get_mirroring_reply,
+            ofp.message.bsn_get_mirroring_request,
+            ofp.message.bsn_set_mirroring,
+            ofp.message.bsn_set_pktin_suppression_reply,
+            ofp.message.bsn_set_pktin_suppression_request,
+            ofp.message.bsn_virtual_port_create_reply,
+            ofp.message.bsn_virtual_port_create_request,
+            ofp.message.bsn_virtual_port_remove_reply,
+            ofp.message.bsn_virtual_port_remove_request,
+            ofp.message.desc_stats_reply,
+            ofp.message.desc_stats_request,
+            ofp.message.flow_add,
+            ofp.message.flow_delete,
+            ofp.message.flow_delete_strict,
+            ofp.message.flow_modify,
+            ofp.message.flow_modify_strict,
+            ofp.message.flow_stats_reply,
+            ofp.message.flow_stats_request,
+            ofp.message.group_desc_stats_reply,
+            ofp.message.group_desc_stats_request,
+            ofp.message.group_features_stats_reply,
+            ofp.message.group_features_stats_request,
+            ofp.message.group_stats_reply,
+            ofp.message.group_stats_request,
+            ofp.message.meter_config_stats_reply,
+            ofp.message.meter_config_stats_request,
+            ofp.message.meter_features_stats_reply,
+            ofp.message.meter_features_stats_request,
+            ofp.message.meter_stats_reply,
+            ofp.message.meter_stats_request,
+            ofp.message.port_desc_stats_reply,
+            ofp.message.port_desc_stats_request,
+            ofp.message.port_stats_reply,
+            ofp.message.port_stats_request,
+            ofp.message.queue_stats_reply,
+            ofp.message.queue_stats_request,
+            ofp.message.table_features_stats_reply,
+            ofp.message.table_features_stats_request,
+            ofp.message.table_stats_reply,
+            ofp.message.table_stats_request,
+        ]
+        for klass in self.klasses:
+            if not issubclass(klass, ofp.message.Message):
+                continue
+            def fn():
+                obj = klass(xid=42)
+                buf = obj.pack()
+                obj2 = ofp.message.parse_message(buf)
+                self.assertEquals(obj, obj2)
+            if klass in expected_failures:
+                self.assertRaises(Exception, fn)
+            else:
+                fn()
+
     def test_show(self):
         expected_failures = []
         for klass in self.klasses:
