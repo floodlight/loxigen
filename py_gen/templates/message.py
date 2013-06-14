@@ -113,8 +113,8 @@ def parse_header(buf):
 
 def parse_message(buf):
     msg_ver, msg_type, msg_len, msg_xid = parse_header(buf)
-    if msg_ver != const.OFP_VERSION and msg_type != ofp.OFPT_HELLO:
-        raise loxi.ProtocolError("wrong OpenFlow version")
+    if msg_ver != const.OFP_VERSION and msg_type != const.OFPT_HELLO:
+        raise loxi.ProtocolError("wrong OpenFlow version (expected %d, got %d)" % (const.OFP_VERSION, msg_ver))
     if len(buf) != msg_len:
         raise loxi.ProtocolError("incorrect message size")
     if msg_type in parsers:
