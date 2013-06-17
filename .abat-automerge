@@ -1,0 +1,5 @@
+#!/bin/bash -eux
+ROOTDIR=$(dirname $(readlink -f $0))
+cd "$ROOTDIR"
+
+make all check check-c check-py
