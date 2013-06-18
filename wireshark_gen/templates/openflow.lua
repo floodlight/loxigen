@@ -2,6 +2,8 @@
 :: ir = of_g.ir
 -- TODO copyright (GPL)
 
+:: include('_ofreader.lua')
+
 p_of = Proto ("of", "OpenFlow")
 
 local openflow_versions = {
