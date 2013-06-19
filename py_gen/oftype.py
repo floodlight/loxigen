@@ -25,10 +25,244 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-import of_g
-import loxi_utils.loxi_utils as utils
-import loxi_front_end.type_maps
-import unittest
+from collections import namedtuple
+
+OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
+
+type_data = {
+
+    ## Primitives
+
+    'char': OFTypeData(
+        init='0',
+        pack='struct.pack("!B", %s)',
+        unpack='%s.read("!B")[0]'),
+
+    'uint8_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!B", %s)',
+        unpack='%s.read("!B")[0]'),
+
+    'uint16_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!H", %s)',
+        unpack='%s.read("!H")[0]'),
+
+    'uint32_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!L", %s)',
+        unpack='%s.read("!L")[0]'),
+
+    'uint64_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!Q", %s)',
+        unpack='%s.read("!Q")[0]'),
+
+    'of_port_no_t': OFTypeData(
+        init='0',
+        pack='util.pack_port_no(%s)',
+        unpack='util.unpack_port_no(%s)'),
+
+    'of_fm_cmd_t': OFTypeData(
+        init='0',
+        pack='util.pack_fm_cmd(%s)',
+        unpack='util.unpack_fm_cmd(%s)'),
+
+    'of_wc_bmap_t': OFTypeData(
+        init='util.init_wc_bmap()',
+        pack='util.pack_wc_bmap(%s)',
+        unpack='util.unpack_wc_bmap(%s)'),
+
+    'of_match_bmap_t': OFTypeData(
+        init='util.init_match_bmap()',
+        pack='util.pack_match_bmap(%s)',
+        unpack='util.unpack_match_bmap(%s)'),
+
+    'of_ipv6_t': OFTypeData(
+        init="'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'",
+        pack='struct.pack("!16s", %s)',
+        unpack="%s.read('!16s')[0]"),
+
+    'of_mac_addr_t': OFTypeData(
+        init='[0,0,0,0,0,0]',
+        pack='struct.pack("!6B", *%s)',
+        unpack="list(%s.read('!6B'))"),
+
+    'of_octets_t': OFTypeData(
+        init="''",
+        pack='%s',
+        unpack='str(%s.read_all())'),
+
+    ## Strings
+
+    'of_port_name_t': OFTypeData(
+        init="''",
+        pack='struct.pack("!16s", %s)',
+        unpack='%s.read("!16s")[0].rstrip("\\x00")'),
+
+    'of_table_name_t': OFTypeData(
+        init="''",
+        pack='struct.pack("!32s", %s)',
+        unpack='%s.read("!32s")[0].rstrip("\\x00")'),
+
+    'of_serial_num_t': OFTypeData(
+        init="''",
+        pack='struct.pack("!32s", %s)',
+        unpack='%s.read("!32s")[0].rstrip("\\x00")'),
+
+    'of_desc_str_t': OFTypeData(
+        init="''",
+        pack='struct.pack("!256s", %s)',
+        unpack='%s.read("!256s")[0].rstrip("\\x00")'),
+
+    ## Embedded structs
+    # TODO add helper to generate these
+
+    'of_match_t': OFTypeData(
+        init='common.match()',
+        pack='%s.pack()',
+        unpack='common.match.unpack(%s)'),
+
+    'of_port_desc_t': OFTypeData(
+        init='common.port_desc()',
+        pack='%s.pack()',
+        unpack='common.port_desc.unpack(%s)'),
+
+    'of_meter_features_t': OFTypeData(
+        init='common.meter_features()',
+        pack='%s.pack()',
+        unpack='common.meter_features.unpack(%s)'),
+
+    'of_bsn_vport_q_in_q_t': OFTypeData(
+        init='common.bsn_vport_q_in_q()',
+        pack='%s.pack()',
+        unpack='common.bsn_vport_q_in_q.unpack(%s)'),
+
+    ## TLV Lists
+
+    'list(of_action_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='action.unpack_list(%s)'),
+
+    'list(of_table_features_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack=None),
+
+    'list(of_flow_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_flow_stats_entry(%s)'),
+
+    'list(of_bucket_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_bucket(%s)'),
+
+    'list(of_packet_queue_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_packet_queue(%s)'),
+
+    'list(of_meter_stats_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_meter_stats(%s)'),
+
+    # HACK need the match_v3 length field
+    'list(of_oxm_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='oxm.unpack_list(%s.slice(_length-4))'),
+
+    'list(of_group_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_group_stats_entry(%s)'),
+
+    'list(of_hello_elem_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_hello_elem(%s)'),
+
+    'list(of_action_id_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack=None),
+
+    'list(of_group_desc_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_group_desc_stats_entry(%s)'),
+
+    'list(of_queue_prop_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='common.unpack_list_queue_prop(%s)'),
+
+    'list(of_instruction_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='instruction.unpack_list(%s)'),
+
+    'list(of_table_feature_prop_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack=None),
+
+    'list(of_meter_band_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='meter_band.unpack_list(%s)'),
+
+    ## Lists with fixed-length elements
+
+    'list(of_bucket_counter_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.bucket_counter.unpack)'),
+
+    'list(of_uint32_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.uint32.unpack)'),
+
+    'list(of_queue_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.queue_stats_entry.unpack)'),
+
+    'list(of_table_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.table_stats_entry.unpack)'),
+
+    'list(of_uint8_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.uint8.unpack)'),
+
+    'list(of_port_stats_entry_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.port_stats_entry.unpack)'),
+
+    'list(of_bsn_interface_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.bsn_interface.unpack)'),
+
+    'list(of_meter_band_stats_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.meter_band_stats.unpack)'),
+
+    'list(of_port_desc_t)': OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%s, common.port_desc.unpack)'),
+}
 
 class OFType(object):
     """
@@ -37,185 +271,26 @@ class OFType(object):
 
     version = None
     base = None
-    is_array = False
-    array_length = None
 
     def __init__(self, string, version):
         self.version = version
-        self.array_length, self.base = utils.type_dec_to_count_base(string)
-        self.is_array = self.array_length != 1
+        self.base = string
+        self.type_data = type_data.get(self.base)
 
     def gen_init_expr(self):
-        if self.base.startswith('list('):
-            v = "[]"
-        elif self.base.find("uint") == 0 or self.base in ["char", "of_port_no_t"]:
-            v = "0"
-        elif self.base == 'of_mac_addr_t':
-            v = '[0,0,0,0,0,0]'
-        elif self.base == 'of_ipv6_t':
-            v = repr('\x00' * 16)
-        elif self.base == 'of_wc_bmap_t':
-            if self.version in [1,2]:
-                v = 'const.OFPFW_ALL'
-            else:
-                v = 0
-        elif self.base == "of_match_bmap_t":
-            if self.version in [1,2]:
-                v = 'const.OFPFW_ALL'
-            else:
-                v = 0
-        elif self.base in ['of_octets_t', 'of_port_name_t', 'of_table_name_t',
-                           'of_desc_str_t', 'of_serial_num_t']:
-            v = '""'
-        elif self.base == 'of_match_t':
-            v = 'common.match()'
-        elif self.base == 'of_port_desc_t':
-            v = 'common.port_desc()'
-        elif self.base == 'of_meter_features_t':
-            v = 'common.meter_features()'
-        elif self.base == 'of_bsn_vport_q_in_q_t':
-            v = 'common.bsn_vport_q_in_q()'
+        if self.type_data and self.type_data.init:
+            return self.type_data.init
         else:
-            v = "None"
+            return "loxi.unimplemented('init %s')" % self.base
 
-        if self.is_array:
-            return "[" + ','.join([v] * self.array_length) + "]"
+    def gen_pack_expr(self, value_expr):
+        if self.type_data and self.type_data.pack:
+            return self.type_data.pack % value_expr
         else:
-            return v
-
-    def gen_pack_expr(self, expr_expr):
-        pack_fmt = self._pack_fmt()
-        if pack_fmt and not self.is_array:
-            return 'struct.pack("!%s", %s)' % (pack_fmt, expr_expr)
-        elif pack_fmt and self.is_array:
-            return 'struct.pack("!%s%s", *%s)' % (self.array_length, pack_fmt, expr_expr)
-        elif self.base == 'of_octets_t':
-            return expr_expr
-        elif self.base.startswith('list('):
-            return '"".join([x.pack() for x in %s])' % expr_expr
-        elif self.base == 'of_mac_addr_t':
-            return 'struct.pack("!6B", *%s)' % expr_expr
-        elif self.base == 'of_ipv6_t':
-            return 'struct.pack("!16s", %s)' % expr_expr
-        elif self.base in ['of_match_t', 'of_port_desc_t', 'of_meter_features_t', 'of_bsn_vport_q_in_q_t']:
-            return '%s.pack()' % expr_expr
-        elif self.base == 'of_port_name_t':
-            return self._gen_string_pack_expr(16, expr_expr)
-        elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
-            return self._gen_string_pack_expr(32, expr_expr)
-        elif self.base == 'of_desc_str_t':
-            return self._gen_string_pack_expr(256, expr_expr)
-        else:
-            return "loxi.unimplemented('pack %s')" % self.base
-
-    def _gen_string_pack_expr(self, length, expr_expr):
-        return 'struct.pack("!%ds", %s)' % (length, expr_expr)
+            "loxi.unimplemented('pack %s')" % self.base
 
     def gen_unpack_expr(self, reader_expr):
-        pack_fmt = self._pack_fmt()
-        if pack_fmt and not self.is_array:
-            return "%s.read('!%s')[0]" % (reader_expr, pack_fmt)
-        elif pack_fmt and self.is_array:
-            return "list(%s.read('!%d%s'))" % (reader_expr, self.array_length, pack_fmt)
-        elif self.base == 'of_octets_t':
-            return "str(%s.read_all())" % (reader_expr)
-        elif self.base == 'of_mac_addr_t':
-            return "list(%s.read('!6B'))" % (reader_expr)
-        elif self.base == 'of_ipv6_t':
-            return "%s.read('!16s')[0]" % (reader_expr)
-        elif self.base == 'of_match_t':
-            return 'common.match.unpack(%s)' % (reader_expr)
-        elif self.base == 'of_port_desc_t':
-            return 'common.port_desc.unpack(%s)' % (reader_expr)
-        elif self.base == 'list(of_action_t)':
-            return 'action.unpack_list(%s)' % (reader_expr)
-        elif self.base == 'list(of_flow_stats_entry_t)':
-            return 'common.unpack_list_flow_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'list(of_queue_prop_t)':
-            return 'common.unpack_list_queue_prop(%s)' % (reader_expr)
-        elif self.base == 'list(of_packet_queue_t)':
-            return 'common.unpack_list_packet_queue(%s)' % (reader_expr)
-        elif self.base == 'list(of_hello_elem_t)':
-            return 'common.unpack_list_hello_elem(%s)' % (reader_expr)
-        elif self.base == 'list(of_oxm_t)':
-            # HACK need the match_v3 length field
-            return 'oxm.unpack_list(%s.slice(_length-4))' % (reader_expr)
-        elif self.base == 'list(of_bucket_t)':
-            return 'common.unpack_list_bucket(%s)' % (reader_expr)
-        elif self.base == 'list(of_group_desc_stats_entry_t)':
-            return 'common.unpack_list_group_desc_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'list(of_group_stats_entry_t)':
-            return 'common.unpack_list_group_stats_entry(%s)' % (reader_expr)
-        elif self.base == 'list(of_meter_band_t)':
-            return 'meter_band.unpack_list(%s)' % (reader_expr)
-        elif self.base == 'list(of_meter_stats_t)':
-            return 'common.unpack_list_meter_stats(%s)' % (reader_expr)
-        elif self.base == 'of_port_name_t':
-            return self._gen_string_unpack_expr(reader_expr, 16)
-        elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
-            return self._gen_string_unpack_expr(reader_expr, 32)
-        elif self.base == 'of_desc_str_t':
-            return self._gen_string_unpack_expr(reader_expr, 256)
-        elif self.base == 'of_meter_features_t':
-            return 'common.meter_features.unpack(%s)' % (reader_expr)
-        elif self.base == 'of_bsn_vport_q_in_q_t':
-            return 'common.bsn_vport_q_in_q.unpack(%s)' % (reader_expr)
-        elif self.base == 'list(of_instruction_t)':
-            return 'instruction.unpack_list(%s)' % (reader_expr)
-        elif self.base.startswith('list('):
-            element_cls = self.base[5:-3]
-            if ((element_cls, self.version) in of_g.is_fixed_length) \
-               and not element_cls in loxi_front_end.type_maps.inheritance_map:
-                klass_name = self.base[8:-3]
-                element_size, = of_g.base_length[(element_cls, self.version)],
-                return 'loxi.generic_util.unpack_list(%s, common.%s.unpack)' % (reader_expr, klass_name)
-            else:
-                return "loxi.unimplemented('unpack list %s')" % self.base
+        if self.type_data and self.type_data.unpack:
+            return self.type_data.unpack % reader_expr
         else:
-            return "loxi.unimplemented('unpack %s')" % self.base
-
-    def _gen_string_unpack_expr(self, reader_expr, length):
-        return '%s.read("!%ds")[0].rstrip("\\x00")' % (reader_expr, length)
-
-    def _pack_fmt(self):
-        if self.base == "char":
-            return "B"
-        if self.base == "uint8_t":
-            return "B"
-        if self.base == "uint16_t":
-            return "H"
-        if self.base == "uint32_t":
-            return "L"
-        if self.base == "uint64_t":
-            return "Q"
-        if self.base == "of_port_no_t":
-            if self.version == of_g.VERSION_1_0:
-                return "H"
-            else:
-                return "L"
-        if self.base == "of_fm_cmd_t":
-            if self.version == of_g.VERSION_1_0:
-                return "H"
-            else:
-                return "B"
-        if self.base in ["of_wc_bmap_t", "of_match_bmap_t"]:
-            if self.version in [of_g.VERSION_1_0, of_g.VERSION_1_1]:
-                return "L"
-            else:
-                return "Q"
-        return None
-
-class TestOFType(unittest.TestCase):
-    def test_init(self):
-        from oftype import OFType
-        self.assertEquals("None", OFType("list(of_action_t)", 1).gen_init_expr())
-        self.assertEquals("[0,0,0]", OFType("uint32_t[3]", 1).gen_init_expr())
-
-    def test_pack(self):
-        self.assertEquals('struct.pack("!16s", "foo")', OFType("of_port_name_t", 1).gen_pack_expr('"foo"'))
-
-    def test_unpack(self):
-        self.assertEquals('str(buffer(buf, 8, 16)).rstrip("\\x00")', OFType("of_port_name_t", 1).gen_unpack_expr('buf', 8))
-
-if __name__ == '__main__':
-    unittest.main()
+            "loxi.unimplemented('unpack %s')" % self.base

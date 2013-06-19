@@ -52,7 +52,7 @@
                 q.text(util.pretty_wildcards(self.${m.name}))
 :: elif m.oftype.base == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
-:: elif m.oftype.base.startswith("uint") and not m.oftype.is_array:
+:: elif m.oftype.base.startswith("uint"):
                 q.text("%#x" % self.${m.name})
 :: else:
                 q.pp(self.${m.name})
