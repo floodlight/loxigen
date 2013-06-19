@@ -26,11 +26,14 @@
 # under the EPL.
 
 import os
+from collections import namedtuple
 import loxi_utils.loxi_utils as utils
 import loxi_front_end
 import of_g
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
+
+DissectorField = namedtuple("DissectorField", ["name", "type", "base"])
 
 # TODO move into IR
 def create_superclass_map():
@@ -64,6 +67,14 @@ def create_superclass_map():
 
     return superclasses
 
+def create_fields():
+    return [
+        DissectorField("version", "UINT8", "DEC"),
+        DissectorField("type", "UINT8", "DEC"),
+        DissectorField("length", "UINT16", "DEC"),
+        DissectorField("xid", "UINT32", "HEX"),
+    ]
+
 def generate(out, name):
     superclasses = create_superclass_map()
     all_classes = sorted(of_g.unified.keys())
@@ -72,5 +83,8 @@ def generate(out, name):
         if cls not in superclasses:
             print cls + ": " + superclasses.get(cls, "NONE")
 
-    context = { 'superclasses': superclasses }
+    context = {
+        'superclasses': superclasses,
+        'fields': create_fields(),
+    }
     utils.render_template(out, "openflow.lua", [templates_dir], context)

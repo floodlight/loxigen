@@ -24,16 +24,14 @@ local enum_v${version}_${enum.name} = {
 
 :: #endfor
 
-local f_version = ProtoField.uint8("of.version", "Version", base.HEX, openflow_versions)
-local f_type = ProtoField.uint8("of.type", "Type", base.HEX, enum_v1_ofp_type)
-local f_length = ProtoField.uint16("of.length", "Length")
-local f_xid = ProtoField.uint32("of.xid", "XID", base.HEX)
+:: for field in fields:
+f_${field.name} = ProtoField.new("${field.name}", "of.${field.name}", "FT_${field.type}", nil, "BASE_${field.base}")
+:: #endfor
 
 p_of.fields = {
-    f_version,
-    f_type,
-    f_length,
-    f_xid,
+:: for field in fields:
+    f_${field.name},
+:: #endfor
 }
 
 :: for supercls in set(sorted(superclasses.values())):
