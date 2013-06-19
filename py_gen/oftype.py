@@ -29,10 +29,10 @@ from collections import namedtuple
 
 OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 
+# Map from LOXI type name to an object with templates for init, pack, and unpack
+# Most types are defined using the convenience code below. This dict should
+# only be used directly for special cases such as primitive types.
 type_data = {
-
-    ## Primitives
-
     'char': OFTypeData(
         init='0',
         pack='struct.pack("!B", %s)',
@@ -93,176 +93,107 @@ type_data = {
         pack='%s',
         unpack='str(%s.read_all())'),
 
-    ## Strings
-
-    'of_port_name_t': OFTypeData(
-        init="''",
-        pack='struct.pack("!16s", %s)',
-        unpack='%s.read("!16s")[0].rstrip("\\x00")'),
-
-    'of_table_name_t': OFTypeData(
-        init="''",
-        pack='struct.pack("!32s", %s)',
-        unpack='%s.read("!32s")[0].rstrip("\\x00")'),
-
-    'of_serial_num_t': OFTypeData(
-        init="''",
-        pack='struct.pack("!32s", %s)',
-        unpack='%s.read("!32s")[0].rstrip("\\x00")'),
-
-    'of_desc_str_t': OFTypeData(
-        init="''",
-        pack='struct.pack("!256s", %s)',
-        unpack='%s.read("!256s")[0].rstrip("\\x00")'),
-
-    ## Embedded structs
-    # TODO add helper to generate these
-
-    'of_match_t': OFTypeData(
-        init='common.match()',
-        pack='%s.pack()',
-        unpack='common.match.unpack(%s)'),
-
-    'of_port_desc_t': OFTypeData(
-        init='common.port_desc()',
-        pack='%s.pack()',
-        unpack='common.port_desc.unpack(%s)'),
-
-    'of_meter_features_t': OFTypeData(
-        init='common.meter_features()',
-        pack='%s.pack()',
-        unpack='common.meter_features.unpack(%s)'),
-
-    'of_bsn_vport_q_in_q_t': OFTypeData(
-        init='common.bsn_vport_q_in_q()',
-        pack='%s.pack()',
-        unpack='common.bsn_vport_q_in_q.unpack(%s)'),
-
-    ## TLV Lists
-
-    'list(of_action_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='action.unpack_list(%s)'),
-
-    'list(of_table_features_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack=None),
-
-    'list(of_flow_stats_entry_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_flow_stats_entry(%s)'),
-
-    'list(of_bucket_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_bucket(%s)'),
-
-    'list(of_packet_queue_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_packet_queue(%s)'),
-
-    'list(of_meter_stats_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_meter_stats(%s)'),
-
     # HACK need the match_v3 length field
     'list(of_oxm_t)': OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
         unpack='oxm.unpack_list(%s.slice(_length-4))'),
 
-    'list(of_group_stats_entry_t)': OFTypeData(
+    # TODO implement unpack
+    'list(of_table_features_t)': OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
-        unpack='common.unpack_list_group_stats_entry(%s)'),
+        unpack=None),
 
-    'list(of_hello_elem_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_hello_elem(%s)'),
-
+    # TODO implement unpack
     'list(of_action_id_t)': OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
         unpack=None),
 
-    'list(of_group_desc_stats_entry_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_group_desc_stats_entry(%s)'),
-
-    'list(of_queue_prop_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='common.unpack_list_queue_prop(%s)'),
-
-    'list(of_instruction_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='instruction.unpack_list(%s)'),
-
+    # TODO implement unpack
     'list(of_table_feature_prop_t)': OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
         unpack=None),
-
-    'list(of_meter_band_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='meter_band.unpack_list(%s)'),
-
-    ## Lists with fixed-length elements
-
-    'list(of_bucket_counter_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.bucket_counter.unpack)'),
-
-    'list(of_uint32_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.uint32.unpack)'),
-
-    'list(of_queue_stats_entry_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.queue_stats_entry.unpack)'),
-
-    'list(of_table_stats_entry_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.table_stats_entry.unpack)'),
-
-    'list(of_uint8_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.uint8.unpack)'),
-
-    'list(of_port_stats_entry_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.port_stats_entry.unpack)'),
-
-    'list(of_bsn_interface_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.bsn_interface.unpack)'),
-
-    'list(of_meter_band_stats_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.meter_band_stats.unpack)'),
-
-    'list(of_port_desc_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%s, common.port_desc.unpack)'),
 }
+
+## Fixed length strings
+
+# Map from class name to length
+fixed_length_strings = {
+    'of_port_name_t': 16,
+    'of_table_name_t': 32,
+    'of_serial_num_t': 32,
+    'of_desc_str_t': 256,
+}
+
+for (cls, length) in fixed_length_strings.items():
+    type_data[cls] = OFTypeData(
+        init='""',
+        pack='struct.pack("!%ds", %%s)' % length,
+        unpack='%%s.read("!%ds")[0].rstrip("\\x00")' % length)
+
+## Embedded structs
+
+# Map from class name to Python class name
+embedded_structs = {
+    'of_match_t': 'common.match',
+    'of_port_desc_t': 'common.port_desc',
+    'of_meter_features_t': 'common.meter_features',
+    'of_bsn_vport_q_in_q_t': 'common.bsn_vport_q_in_q',
+}
+
+for (cls, pyclass) in embedded_structs.items():
+    type_data[cls] = OFTypeData(
+        init='%s()' % pyclass,
+        pack='%s.pack()',
+        unpack='%s.unpack(%%s)' % pyclass)
+
+## Variable element length lists
+
+# Map from list class name to list deserializer
+variable_elem_len_lists = {
+    'list(of_action_t)': 'action.unpack_list',
+    'list(of_bucket_t)': 'common.unpack_list_bucket',
+    'list(of_flow_stats_entry_t)': 'common.unpack_list_flow_stats_entry',
+    'list(of_group_desc_stats_entry_t)': 'common.unpack_list_group_desc_stats_entry',
+    'list(of_group_stats_entry_t)': 'common.unpack_list_group_stats_entry',
+    'list(of_hello_elem_t)': 'common.unpack_list_hello_elem',
+    'list(of_instruction_t)': 'instruction.unpack_list',
+    'list(of_meter_band_t)': 'meter_band.unpack_list',
+    'list(of_meter_stats_t)': 'common.unpack_list_meter_stats',
+    'list(of_packet_queue_t)': 'common.unpack_list_packet_queue',
+    'list(of_queue_prop_t)': 'common.unpack_list_queue_prop',
+}
+
+for (cls, deserializer) in variable_elem_len_lists.items():
+    type_data[cls] = OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='%s(%%s)' % deserializer)
+
+## Fixed element length lists
+
+# Map from list class name to list element deserializer
+fixed_elem_len_lists = {
+    'list(of_bsn_interface_t)': 'common.bsn_interface.unpack',
+    'list(of_bucket_counter_t)': 'common.bucket_counter.unpack',
+    'list(of_meter_band_stats_t)': 'common.meter_band_stats.unpack',
+    'list(of_port_desc_t)': 'common.port_desc.unpack',
+    'list(of_port_stats_entry_t)': 'common.port_stats_entry.unpack',
+    'list(of_queue_stats_entry_t)': 'common.queue_stats_entry.unpack',
+    'list(of_table_stats_entry_t)': 'common.table_stats_entry.unpack',
+    'list(of_uint32_t)': 'common.uint32.unpack',
+    'list(of_uint8_t)': 'common.uint8.unpack',
+}
+
+for (cls, element_deserializer) in fixed_elem_len_lists.items():
+    type_data[cls] = OFTypeData(
+        init='[]',
+        pack='util.pack_list(%s)',
+        unpack='loxi.generic_util.unpack_list(%%s, %s)' % element_deserializer)
+
 
 class OFType(object):
     """
