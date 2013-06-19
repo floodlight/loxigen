@@ -67,20 +67,12 @@ def build_ofclasses(version):
 
         for m in ofclass.members:
             if type(m) == OFTypeMember:
-                members.append(OFTypeMember(
-                    name=m.name,
-                    oftype=oftype.OFType(m.oftype, version),
-                    value=m.value))
+                members.append(m)
                 type_members.append(members[-1])
             elif type(m) == OFLengthMember:
-                members.append(OFLengthMember(
-                    name=m.name,
-                    oftype=oftype.OFType(m.oftype, version)))
+                members.append(m)
             elif type(m) == OFFieldLengthMember:
-                members.append(OFFieldLengthMember(
-                    name=m.name,
-                    oftype=oftype.OFType(m.oftype, version),
-                    field_name=m.field_name))
+                members.append(m)
             elif type(m) == OFPadMember:
                 members.append(m)
             elif type(m) == OFDataMember:
@@ -88,13 +80,11 @@ def build_ofclasses(version):
                     # HACK move to frontend
                     members.append(OFTypeMember(
                         name=m.name,
-                        oftype=oftype.OFType(m.oftype, version),
+                        oftype=m.oftype,
                         value=version))
                     type_members.append(members[-1])
                 else:
-                    members.append(OFDataMember(
-                        name=m.name,
-                        oftype=oftype.OFType(m.oftype, version)))
+                    members.append(m)
 
         ofclasses.append(
             PyOFClass(name=cls,

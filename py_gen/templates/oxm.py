@@ -27,6 +27,7 @@
 ::
 :: import itertools
 :: import of_g
+:: import py_gen.oftype
 :: include('_copyright.py')
 
 :: include('_autogen.py')
@@ -65,7 +66,7 @@ class ${ofclass.pyname}(OXM):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype)}
 :: #endfor
 
     def pack(self):

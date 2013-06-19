@@ -32,7 +32,7 @@ OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 # Map from LOXI type name to an object with templates for init, pack, and unpack
 # Most types are defined using the convenience code below. This dict should
 # only be used directly for special cases such as primitive types.
-type_data = {
+type_data_map = {
     'char': OFTypeData(
         init='0',
         pack='struct.pack("!B", %s)',
@@ -129,7 +129,7 @@ fixed_length_strings = {
 }
 
 for (cls, length) in fixed_length_strings.items():
-    type_data[cls] = OFTypeData(
+    type_data_map[cls] = OFTypeData(
         init='""',
         pack='struct.pack("!%ds", %%s)' % length,
         unpack='%%s.read("!%ds")[0].rstrip("\\x00")' % length)
@@ -145,7 +145,7 @@ embedded_structs = {
 }
 
 for (cls, pyclass) in embedded_structs.items():
-    type_data[cls] = OFTypeData(
+    type_data_map[cls] = OFTypeData(
         init='%s()' % pyclass,
         pack='%s.pack()',
         unpack='%s.unpack(%%s)' % pyclass)
@@ -168,7 +168,7 @@ variable_elem_len_lists = {
 }
 
 for (cls, deserializer) in variable_elem_len_lists.items():
-    type_data[cls] = OFTypeData(
+    type_data_map[cls] = OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
         unpack='%s(%%s)' % deserializer)
@@ -189,39 +189,39 @@ fixed_elem_len_lists = {
 }
 
 for (cls, element_deserializer) in fixed_elem_len_lists.items():
-    type_data[cls] = OFTypeData(
+    type_data_map[cls] = OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
         unpack='loxi.generic_util.unpack_list(%%s, %s)' % element_deserializer)
 
+## Public interface
 
-class OFType(object):
-    """
-    Encapsulates knowledge about the OpenFlow type system.
-    """
+# Return an initializer expression for the given oftype
+def gen_init_expr(oftype):
+    type_data = type_data_map.get(oftype)
+    if type_data and type_data.init:
+        return type_data.init
+    else:
+        return "loxi.unimplemented('init %s')" % oftype
 
-    version = None
-    base = None
+# Return a pack expression for the given oftype
+#
+# 'value_expr' is a string of Python code which will evaluate to
+# the value to be packed.
+def gen_pack_expr(oftype, value_expr):
+    type_data = type_data_map.get(oftype)
+    if type_data and type_data.pack:
+        return type_data.pack % value_expr
+    else:
+        return "loxi.unimplemented('pack %s')" % oftype
 
-    def __init__(self, string, version):
-        self.version = version
-        self.base = string
-        self.type_data = type_data.get(self.base)
-
-    def gen_init_expr(self):
-        if self.type_data and self.type_data.init:
-            return self.type_data.init
-        else:
-            return "loxi.unimplemented('init %s')" % self.base
-
-    def gen_pack_expr(self, value_expr):
-        if self.type_data and self.type_data.pack:
-            return self.type_data.pack % value_expr
-        else:
-            "loxi.unimplemented('pack %s')" % self.base
-
-    def gen_unpack_expr(self, reader_expr):
-        if self.type_data and self.type_data.unpack:
-            return self.type_data.unpack % reader_expr
-        else:
-            "loxi.unimplemented('unpack %s')" % self.base
+# Return an unpack expression for the given oftype
+#
+# 'reader_expr' is a string of Python code which will evaluate to
+# the OFReader instance used for deserialization.
+def gen_unpack_expr(oftype, reader_expr):
+    type_data = type_data_map.get(oftype)
+    if type_data and type_data.unpack:
+        return type_data.unpack % reader_expr
+    else:
+        return "loxi.unimplemented('unpack %s')" % oftype
