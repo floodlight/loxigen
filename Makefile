@@ -87,9 +87,9 @@ debug:
 	@echo "INPUT_FILES=\"${INPUT_FILES}\""
 
 check:
-	PYTHONPATH=. ./utest/test_parser.py
-	PYTHONPATH=. ./utest/test_frontend.py
-	PYTHONPATH=. ./utest/test_test_data.py
+	./utest/test_parser.py
+	./utest/test_frontend.py
+	./utest/test_test_data.py
 
 check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/generic_util.py
@@ -98,20 +98,19 @@ check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of12.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of13.py
 
+CTEST_EXEC = ${LOXI_OUTPUT_DIR}/locitest/locitest
+CTEST_SOURCE = ${LOXI_OUTPUT_DIR}/locitest/src/*.c
+CTEST_SOURCE += ${LOXI_OUTPUT_DIR}/loci/src/*.c
+CTEST_INC = -I ${LOXI_OUTPUT_DIR}/loci/inc
+CTEST_INC += -I ${LOXI_OUTPUT_DIR}/locitest/inc
+CTEST_INC += -I ${LOXI_OUTPUT_DIR}/loci/src
+CTEST_CFLAGS = -Wall -Werror -g
+
 check-c: c
-	gcc -o ${LOXI_OUTPUT_DIR}/locitest/locitest ${LOXI_OUTPUT_DIR}/locitest/src/*.c ${LOXI_OUTPUT_DIR}/loci/src/*.c \
-		-I ${LOXI_OUTPUT_DIR}/loci/inc -I ${LOXI_OUTPUT_DIR}/locitest/inc -I ${LOXI_OUTPUT_DIR}/loci/src
-	${LOXI_OUTPUT_DIR}/locitest/locitest
+	gcc ${CTEST_CFLAGS} -o ${CTEST_EXEC} ${CTEST_SOURCE} ${CTEST_INC}
+	${CTEST_EXEC}
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
 
 .PHONY: all clean debug check pylint c python
-
-ifdef BIGCODE
-# Internal build system compatibility
-MODULE := LoxiGen
-LOXI_OUTPUT_DIR = ${BIGCODE}/Modules
-modulemake:
-.PHONY: modulemake
-endif

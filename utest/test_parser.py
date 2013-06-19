@@ -26,7 +26,13 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+import sys
+import os
 import unittest
+
+root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+sys.path.insert(0, root_dir)
+
 import pyparsing
 import loxi_front_end.parser as parser
 
