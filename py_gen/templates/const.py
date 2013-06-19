@@ -36,10 +36,9 @@
 
 OFP_VERSION = ${version}
 
-:: for (group, idents) in sorted(groups.items()):
-::    idents.sort(key=lambda (ident, value): value)
-# Identifiers from group ${group}
-::    for (ident, value) in idents:
+:: for enum in sorted(enums, key=lambda enum: enum.name):
+# Identifiers from group ${enum.name}
+::    for (ident, value) in enum.values:
 ::        if version == 1 and ident.startswith('OFPP_'):
 ::        # HACK loxi converts these to 32-bit
 ${ident} = ${"%#x" % (value & 0xffff)}
@@ -48,9 +47,9 @@ ${ident} = ${value}
 ::        #endif
 ::    #endfor
 
-::    if group not in blacklisted_map_groups:
-${group}_map = {
-::        for (ident, value) in idents:
+::    if enum.name not in blacklisted_map_groups:
+${enum.name}_map = {
+::        for (ident, value) in enum.values:
 ::            if ident in blacklisted_map_idents:
 ::                pass
 ::            elif version == 1 and ident.startswith('OFPP_'):

@@ -1,5 +1,6 @@
-:: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member]
+:: from loxi_ir import *
+:: import py_gen.oftype
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
 class ${ofclass.pyname}(${superclass}):
 :: for m in ofclass.type_members:
     ${m.name} = ${m.value}
@@ -10,7 +11,7 @@ class ${ofclass.pyname}(${superclass}):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype)}
 :: #endfor
         return
 

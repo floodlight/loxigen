@@ -29,8 +29,8 @@
         with q.group():
             with q.indent(2):
                 q.breakable()
-:: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member]
+:: from loxi_ir import *
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
 :: first = True
 :: for m in normal_members:
 :: if not first:
@@ -44,15 +44,15 @@
                     q.text("%#x" % self.${m.name})
                 else:
                     q.text('None')
-:: elif m.oftype.base == 'of_mac_addr_t':
+:: elif m.oftype == 'of_mac_addr_t':
                 q.text(util.pretty_mac(self.${m.name}))
-:: elif m.oftype.base == 'uint32_t' and m.name.startswith("ipv4"):
+:: elif m.oftype == 'uint32_t' and m.name.startswith("ipv4"):
                 q.text(util.pretty_ipv4(self.${m.name}))
-:: elif m.oftype.base == 'of_wc_bmap_t' and version in [1,2]:
+:: elif m.oftype == 'of_wc_bmap_t' and version in [1,2]:
                 q.text(util.pretty_wildcards(self.${m.name}))
-:: elif m.oftype.base == 'of_port_no_t':
+:: elif m.oftype == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
-:: elif m.oftype.base.startswith("uint") and not m.oftype.is_array:
+:: elif m.oftype.startswith("uint"):
                 q.text("%#x" % self.${m.name})
 :: else:
                 q.pp(self.${m.name})
