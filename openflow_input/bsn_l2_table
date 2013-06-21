@@ -36,9 +36,9 @@ struct of_bsn_set_l2_table_request {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 12;
     uint8_t l2_table_enable;    // 1 == enabled, 0 == disabled
-    uint8_t pad;
+    pad(1);
     uint16_t l2_table_priority;  // priority of all flows in L2 table
-    uint8_t[4] pad;
+    pad(4);
 };
 
 struct of_bsn_set_l2_table_reply {
@@ -49,7 +49,7 @@ struct of_bsn_set_l2_table_reply {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 24;
     uint8_t l2_table_enable;    // Resulting state: 1 == enabled, 0 == disabled
-    uint8_t pad;
+    pad(1);
     uint16_t l2_table_priority;  // priority used, must match request if ok
     uint32_t status; // 0 means success
 };
@@ -71,7 +71,7 @@ struct of_bsn_get_l2_table_reply {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 14;
     uint8_t l2_table_enable;    // 1 == enabled, 0 == disabled
-    uint8_t pad;
+    pad(1);
     uint16_t l2_table_priority;  // priority of all flows in L2 table
-    uint8_t[4] pad;
+    pad(4);
 };

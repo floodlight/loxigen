@@ -27,6 +27,8 @@
 ::
 :: import itertools
 :: import of_g
+:: import py_gen.util as util
+:: import py_gen.oftype
 :: include('_copyright.py')
 
 :: include('_autogen.py')
@@ -51,9 +53,9 @@ class Message(object):
     xid = None
 
 :: for ofclass in ofclasses:
-:: from py_gen.codegen import Member, LengthMember, TypeMember
-:: normal_members = [m for m in ofclass.members if type(m) == Member]
-:: type_members = [m for m in ofclass.members if type(m) == TypeMember]
+:: from loxi_ir import *
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
+:: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
 class ${ofclass.pyname}(Message):
 :: for m in type_members:
     ${m.name} = ${m.value}
@@ -65,7 +67,7 @@ class ${ofclass.pyname}(Message):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
-            self.${m.name} = ${m.oftype.gen_init_expr()}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype)}
 :: #endfor
 
     def pack(self):
@@ -193,6 +195,7 @@ parsers = {
 :: sort_key = lambda x: x.type_members[1].value
 :: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
+:: k = util.constant_for_value(version, "ofp_type", k)
 :: v = list(v)
 :: if len(v) == 1:
     ${k} : ${v[0].pyname}.unpack,
@@ -256,7 +259,7 @@ stats_request_parsers = {
 # TODO OF 1.3 multipart messages
 :: #endif
 
-:: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 'const.OFPT_VENDOR']
+:: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 4]
 :: sort_key = lambda x: x.type_members[2].value
 :: experimenter_ofclasses.sort(key=sort_key)
 :: grouped = itertools.groupby(experimenter_ofclasses, sort_key)
