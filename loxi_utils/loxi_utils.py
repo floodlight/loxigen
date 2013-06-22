@@ -417,7 +417,7 @@ def version_to_name(version):
 # Is class a flow modify of some sort?
 
 def cls_is_flow_mod(cls):
-    return cls in ["of_flow_modify", "of_flow_add", "of_flow_delete",
+    return cls in ["of_flow_mod", "of_flow_modify", "of_flow_add", "of_flow_delete",
                    "of_flow_modify_strict", "of_flow_delete_strict"]
 
 
