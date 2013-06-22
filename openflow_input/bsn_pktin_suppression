@@ -55,7 +55,7 @@
 // The switch should reject the message if both 'hard_timeout' and 'idle_timeout'
 // are zero, since the suppression flows would never expire.
 
-struct of_bsn_set_pktin_suppression_request {
+struct of_bsn_set_pktin_suppression_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -70,7 +70,7 @@ struct of_bsn_set_pktin_suppression_request {
     uint64_t cookie;
 };
 
-struct of_bsn_set_pktin_suppression_reply {
+struct of_bsn_set_pktin_suppression_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;

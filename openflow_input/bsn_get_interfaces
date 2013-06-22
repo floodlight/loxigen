@@ -27,7 +27,7 @@
 
 #version any
 
-struct of_bsn_get_interfaces_request {
+struct of_bsn_get_interfaces_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -44,7 +44,7 @@ struct of_bsn_interface {
     of_ipv4_t ipv4_netmask;
 };
 
-struct of_bsn_get_interfaces_reply {
+struct of_bsn_get_interfaces_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;

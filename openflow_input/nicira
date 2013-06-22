@@ -25,30 +25,25 @@
 // EPL for the specific language governing permissions and limitations
 // under the EPL.
 
-#version 1
+#version any
 
-enum ofp_nicira_controller_role {
-   NX_ROLE_OTHER = 0,
-   NX_ROLE_MASTER = 1,
-   NX_ROLE_SLAVE = 2,
-};
-
-struct of_nicira_controller_role_request : of_nicira_header {
+// Nicira extension message
+struct of_nicira_header : of_experimenter {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x2320;
-    uint32_t subtype == 10;
-    uint32_t role;         // 0 other, 1 master, 2 slave
+    uint32_t subtype;
 };
 
-struct of_nicira_controller_role_reply : of_nicira_header {
-    uint8_t version;
-    uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
+// Nicira extension action
+struct of_action_nicira: of_action_experimenter {
+    uint16_t type == 65535;
+    uint16_t len;
     uint32_t experimenter == 0x2320;
-    uint32_t subtype == 11;
-    uint32_t role;         // 0 other, 1 master, 2 slave
+    uint16_t subtype;
+    pad(2);
+    pad(4);
 };
+

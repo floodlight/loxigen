@@ -27,7 +27,7 @@
 
 #version any
 
-struct of_action_nicira_dec_ttl {
+struct of_action_nicira_dec_ttl : of_action_nicira {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == 0x2320;
