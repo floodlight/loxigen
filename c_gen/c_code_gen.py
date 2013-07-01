@@ -757,7 +757,21 @@ def top_c_gen(out, name):
  ****************************************************************/
 
 #ifdef __GNUC__
+#ifdef __linux__
+/* glibc */
 #include <features.h>
+#else
+/* NetBSD etc */
+#include <sys/cdefs.h>
+#ifdef __GNUC_PREREQ__
+#define	__GNUC_PREREQ __GNUC_PREREQ__
+#endif
+#endif
+
+#ifndef __GNUC_PREREQ
+/* fallback */
+#define	__GNUC_PREREQ(maj, min)	0
+#endif
 
 #if __GNUC_PREREQ(4,4)
 #pragma GCC optimize ("s")
