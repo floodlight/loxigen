@@ -33,10 +33,11 @@
 
 #include <locitest/test_common.h>
 
-#if !defined(__APPLE__)
+/* mcheck is a glibc extension */
+#if defined(__linux__)
 #include <mcheck.h>
 #define MCHECK_INIT mcheck(NULL)
-#else /* mcheck not available under OS X */
+#else
 #define MCHECK_INIT do { } while (0)
 #endif
 
