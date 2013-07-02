@@ -54,7 +54,7 @@ wire buffer through a parse routine).
 Verify that the members all have the appropriate value
 
 Through out, checking the consistency of memory and memory operations
-is done with mcheck (not supported on Mac OS X).
+is done with mcheck (if available).
 
 """
 
@@ -401,10 +401,11 @@ def gen_common_test(out, name):
 #include <locitest/unittest.h>
 #include <locitest/test_common.h>
 
-#if !defined(__APPLE__)
+/* mcheck is a glibc extension */
+#if defined(__linux__)
 #include <mcheck.h>
 #define MCHECK_INIT mcheck(NULL)
-#else /* mcheck not available under OS X */
+#else
 #define MCHECK_INIT do { } while (0)
 #endif
 
