@@ -274,8 +274,6 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
     OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
-    OF_OXM_INDEX_SRC_META_ID = 36,
-    OF_OXM_INDEX_DST_META_ID = 37,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))

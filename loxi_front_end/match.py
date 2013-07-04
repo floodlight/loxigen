@@ -394,28 +394,6 @@ of_match_members = dict(
         takes_mask_in_spec=False,
         order=501,
         ),
-
-    src_meta_id = dict(
-        name="src_meta_id",
-        m_type="uint8_t",
-        v1_wc_shift=23,
-        v2_wc_shift=23,
-        print_type="PRIx8",
-        conditions="",
-        takes_mask_in_spec=False,
-        order=600,
-        ),
-
-    dst_meta_id = dict(
-        name="dst_meta_id",
-        m_type="uint8_t",
-        v1_wc_shift=24,
-        v2_wc_shift=24,
-        print_type="PRIx8",
-        conditions="",
-        takes_mask_in_spec=False,
-        order=601,
-        ),
 )
 
 match_keys_sorted = of_match_members.keys()
@@ -433,9 +411,7 @@ of_v1_keys = [
     "tcp_dst",  # Means UDP too for 1.0 and 1.1
     "tcp_src",  # Means UDP too for 1.0 and 1.1
     "vlan_pcp",
-    "vlan_vid",
-    "src_meta_id",
-    "dst_meta_id",
+    "vlan_vid"
     ]
 
 of_v2_keys = [
