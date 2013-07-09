@@ -82,6 +82,21 @@ class TestAllOF11(unittest.TestCase):
             else:
                 fn()
 
+    def test_parse_message(self):
+        expected_failures = []
+        for klass in self.klasses:
+            if not issubclass(klass, ofp.message.Message):
+                continue
+            def fn():
+                obj = klass(xid=42)
+                buf = obj.pack()
+                obj2 = ofp.message.parse_message(buf)
+                self.assertEquals(obj, obj2)
+            if klass in expected_failures:
+                self.assertRaises(Exception, fn)
+            else:
+                fn()
+
     def test_show(self):
         expected_failures = []
         for klass in self.klasses:
