@@ -745,6 +745,7 @@ list_setup_%(cls)s_%(v_name)s(
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -792,6 +793,7 @@ list_check_%(cls)s_%(v_name)s(
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -1170,6 +1172,7 @@ int
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -1228,6 +1231,7 @@ int
 
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
