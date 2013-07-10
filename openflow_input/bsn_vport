@@ -30,7 +30,7 @@
 
 #version any
 
-enum ofp_bsn_vport_status_type{
+enum ofp_bsn_vport_status {
     OF_BSN_VPORT_STATUS_OK = 0,
     OF_BSN_VPORT_STATUS_FAILED = 1,
 };
