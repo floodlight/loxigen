@@ -30,6 +30,11 @@
 
 #version any
 
+enum ofp_bsn_vport_status {
+    OF_BSN_VPORT_STATUS_OK = 0,
+    OF_BSN_VPORT_STATUS_FAILED = 1,
+};
+
 // When the ingress or egress VID has this value, no outer tag should be used.
 // In this case, the corresponding TPID is ignored.
 
