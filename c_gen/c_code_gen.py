@@ -3451,7 +3451,6 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
                                             int entry_match_offset,
                                             int add_match_offset)
 {
-    of_list_action_t actions;
     int entry_len, add_len;
     of_wire_buffer_t *wbuf;
     int abs_offset;
@@ -3459,15 +3458,6 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
     uint16_t val16;
     uint64_t cookie;
     of_octets_t match_octets;
-
-    /* Effects may come from different places */
-    if (effects != NULL) {
-        OF_TRY(of_flow_stats_entry_actions_set(obj,
-               (of_list_action_t *)effects));
-    } else {
-        of_flow_add_actions_bind(flow_add, &actions);
-        OF_TRY(of_flow_stats_entry_actions_set(obj, &actions));
-    }
 
     /* Transfer the match underlying object from add to stats entry */
     wbuf = OF_OBJECT_TO_WBUF(obj);
@@ -3500,6 +3490,27 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
 
     of_flow_add_hard_timeout_get(flow_add, &val16);
     of_flow_stats_entry_hard_timeout_set(obj, val16);
+
+    /* Effects may come from different places */
+    if (effects != NULL) {
+        if (obj->version == OF_VERSION_1_0) {
+            OF_TRY(of_flow_stats_entry_actions_set(obj,
+                (of_list_action_t *)effects));
+        } else {
+            OF_TRY(of_flow_stats_entry_instructions_set(obj,
+                (of_list_instruction_t *)effects));
+        }
+    } else {
+        if (obj->version == OF_VERSION_1_0) {
+            of_list_action_t actions;
+            of_flow_add_actions_bind(flow_add, &actions);
+            OF_TRY(of_flow_stats_entry_actions_set(obj, &actions));
+        } else {
+            of_list_instruction_t instructions;
+            of_flow_add_instructions_bind(flow_add, &instructions);
+            OF_TRY(of_flow_stats_entry_instructions_set(obj, &instructions));
+        }
+    }
 
     return OF_ERROR_NONE;
 }
