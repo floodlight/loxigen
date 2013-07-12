@@ -384,8 +384,8 @@ def generate_maps():
                 type_val[(name, version)] = value
 
     # Special case OF-1.2 match type
-    type_val[("of_match_v3", of_g.VERSION_1_2)] = 0x8000
-    type_val[("of_match_v3", of_g.VERSION_1_3)] = 0x8000
+    type_val[("of_match_v3", of_g.VERSION_1_2)] = 1
+    type_val[("of_match_v3", of_g.VERSION_1_3)] = 1
 
 # Utility function
 def dict_to_array(d, m_val, def_val=-1):
