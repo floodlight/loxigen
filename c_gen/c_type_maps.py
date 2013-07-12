@@ -1002,14 +1002,14 @@ extern void of_meter_band_wire_object_id_get(of_object_t *obj,
 extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 
-/** @fixme VERIFY LENGTH IS NUMBER OF BYTES OF ENTRY INCLUDING HDR */
+/* XXX Hardcoded to the OpenFlow Basic OXM class */
 #define OF_OXM_MASKED_TYPE_GET(hdr) (((hdr) >> 8) & 0xff)
 #define OF_OXM_MASKED_TYPE_SET(hdr, val)                    \\
-    (hdr) = ((hdr) & 0xffff00ff) + (((val) & 0xff) << 8)
+    (hdr) = ((hdr) & 0x000000ff) + 0x80000000 + (((val) & 0xff) << 8)
 
-#define OF_OXM_LENGTH_GET(hdr) ((hdr) & 0xff)
+#define OF_OXM_LENGTH_GET(hdr) (((hdr) & 0xff) + 4)
 #define OF_OXM_LENGTH_SET(hdr, val)                         \\
-    (hdr) = ((hdr) & 0xffffff00) + ((val) & 0xff)
+    (hdr) = ((hdr) & 0xffffff00) + (((val) - 4) & 0xff)
 
 extern void of_packet_queue_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_packet_queue_wire_length_set(of_object_t *obj, int bytes);
