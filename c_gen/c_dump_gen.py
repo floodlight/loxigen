@@ -257,7 +257,7 @@ int
 of_object_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     if ((obj->object_id > 0) && (obj->object_id < OF_OBJECT_COUNT)) {
-        if (((obj)->version > 0) && ((obj)->version <= OF_VERSION_1_2)) {
+        if (((obj)->version > 0) && ((obj)->version <= OF_VERSION_1_3)) {
             /* @fixme VERSION */
             return dump_funs[obj->version][obj->object_id](writer, cookie, (of_object_t *)obj);
         } else {
