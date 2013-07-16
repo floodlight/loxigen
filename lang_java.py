@@ -42,11 +42,11 @@ define a single directory and generate everything in there.
 
 """
 
-import java_gen.java_code_gen as java_code_gen
+import java_gen.codegen as java_codegen
 
 
 targets = {
-    'base_java': java_code_gen.gen_all_java
+    'base_java': java_codegen.gen_all_java
 }
 
 ##
@@ -66,7 +66,7 @@ file_to_name_map = dict(
 # that generates the content of the file
 
 file_gen_map = dict(
-    base_java=java_code_gen.gen_all_java,
+    base_java=java_codegen.gen_all_java,
 )
 
 

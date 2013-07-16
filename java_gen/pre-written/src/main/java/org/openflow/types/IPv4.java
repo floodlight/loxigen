@@ -3,7 +3,6 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 import org.openflow.exceptions.OFShortRead;
-import org.openflow.exceptions.OFShortWrite;
 import org.openflow.protocol.OFObject;
 
 /**
@@ -90,7 +89,7 @@ public class IPv4 implements OFObject {
     }
 
     @Override
-    public void writeTo(final ChannelBuffer bb) throws OFParseError, OFShortWrite {
+    public void writeTo(final ChannelBuffer bb) {
         bb.writeInt(rawValue);
     }
 
