@@ -87,7 +87,7 @@ def memoize(obj):
 
     @functools.wraps(obj)
     def memoizer(*args, **kwargs):
-        key = str(args) + str(kwargs)
+        key = args + tuple(kwargs.items())
         if key not in cache:
             cache[key] = obj(*args, **kwargs)
         return cache[key]
