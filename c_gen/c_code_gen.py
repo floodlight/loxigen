@@ -681,11 +681,12 @@ wire_match_len(of_object_t *obj, int match_offset) {
  *
  * Get length of preceding match object and add to fixed length
  * Applies only to version 1.2 and 1.3
+ * The +2 comes from the 2 bytes of padding between the match and packet data.
  */
 
 #define _PACKET_IN_DATA_OFFSET(obj) \\
-    _OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
-%(packet_in)d : %(packet_in_1_3)d)
+    (_OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
+%(packet_in)d : %(packet_in_1_3)d) + 2)
 
 /**
  * Macro to calculate variable offset of data (packet) member in packet_out
@@ -801,6 +802,7 @@ def type_data_c_gen(out, name):
     common_top_matter(out, name)
     c_type_maps.gen_type_maps(out)
     c_type_maps.gen_length_array(out)
+    c_type_maps.gen_extra_length_array(out)
 
 ################################################################
 # Top Matter
@@ -2642,7 +2644,7 @@ void
         MEMSET(obj, 0, sizeof(*obj));
     }
     if (bytes < 0) {
-        bytes = of_object_fixed_len[version][%(enum)s];
+        bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
     }
     obj->version = version;
     obj->length = bytes;
@@ -2789,7 +2791,7 @@ def gen_new_fn_body(cls, out):
     %(cls)s_t *obj;
     int bytes;
 
-    bytes = of_object_fixed_len[version][%(enum)s];
+    bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
 
     /* Allocate a maximum-length wire buffer assuming we'll be appending to it. */
     if ((obj = (%(cls)s_t *)of_object_new(OF_WIRE_BUFFER_MAX_LENGTH)) == NULL) {
