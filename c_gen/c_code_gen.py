@@ -552,28 +552,27 @@ of_object_u16_set(of_object_t *obj, int offset, int value) {
 #define _END_LEN(obj, offset) ((obj)->length - (offset))
 
 /**
+ * Offset of the action_len member in a packet-out object
+ */
+
+#define _PACKET_OUT_ACTION_LEN_OFFSET(obj) \\
+    (((obj)->version == OF_VERSION_1_0) ? 14 : 16)
+
+/**
  * Get length of the action list object in a packet_out object
  * @param obj An object of type of_packet_out
- *
- * The length field is just before the end of the fixed length
- * part of the object in all versions.
  */
 
 #define _PACKET_OUT_ACTION_LEN(obj) \\
-    (of_object_u16_get((of_object_t *)(obj), \\
-     of_object_fixed_len[(obj)->version][OF_PACKET_OUT] - 2))
+    (of_object_u16_get((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj)))
 
 /**
  * Set length of the action list object in a packet_out object
  * @param obj An object of type of_packet_out
- *
- * The length field is just before the end of the fixed length
- * part of the object in all versions.
  */
 
 #define _PACKET_OUT_ACTION_LEN_SET(obj, len) \\
-    (of_object_u16_set((of_object_t *)(obj), \\
-     of_object_fixed_len[(obj)->version][OF_PACKET_OUT] - 2, len))
+    (of_object_u16_set((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj), len))
 
 /*
  * Match structs in 1.2 come at the end of the fixed length part
