@@ -512,7 +512,7 @@ def message_scalar_test(out, version, cls):
     """
 
     members, member_types = scalar_member_types_get(cls, version)
-    length = of_g.base_length[(cls, version)]
+    length = of_g.base_length[(cls, version)] + of_g.extra_length.get((cls, version), 0)
     v_name = loxi_utils.version_to_name(version)
 
     out.write("""
@@ -1079,7 +1079,7 @@ def gen_msg_test(out, name):
         for cls in of_g.ordered_messages:
             if not (cls, version) in of_g.base_length:
                 continue
-            bytes = of_g.base_length[(cls, version)]
+            bytes = of_g.base_length[(cls, version)] + of_g.extra_length.get((cls, version), 0)
             out.write("""
 static int
 test_%(cls)s_create_%(v_name)s(void)
@@ -1488,7 +1488,7 @@ def unified_accessor_test_case(out, cls, version):
     """
 
     members, member_types = scalar_member_types_get(cls, version)
-    length = of_g.base_length[(cls, version)]
+    length = of_g.base_length[(cls, version)] + of_g.extra_length.get((cls, version), 0)
     v_name = loxi_utils.version_to_name(version)
 
     out.write("""

@@ -138,11 +138,7 @@ of_wire_buffer_replace_data(of_wire_buffer_t *wbuf,
     /* Doesn't make sense; mismatch in current buffer info */
     ASSERT(old_len + offset <= wbuf->current_bytes);
 
-    if (old_len < new_len) {
-        of_wire_buffer_grow(wbuf, offset + new_len);
-    } else {
-        wbuf->current_bytes += (new_len - old_len); // may decrease size
-    }
+    wbuf->current_bytes += (new_len - old_len); // may decrease size
 
     if ((old_len + offset < cur_bytes) && (old_len != new_len)) {
         /* Need to move back of buffer */

@@ -41,6 +41,7 @@ import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
 import loxi_front_end.identifiers as identifiers
 from c_test_gen import var_name_map
+from c_code_gen import v3_match_offset_get
 
 def gen_h(out, name):
     loxi_utils.gen_c_copy_license(out)
@@ -208,6 +209,18 @@ static inline int
             return -1;
         }
 """ % dict(m_name=m_name, m_offset=m_offset, cls=cls))
+        elif version >= of_g.VERSION_1_2 and loxi_utils.cls_is_flow_mod(cls) and m_name == "instructions":
+            # See _FLOW_MOD_INSTRUCTIONS_OFFSET
+            match_offset = v3_match_offset_get(cls)
+            m_offset = '%s_offset' % m_name
+            out.write("""
+    {
+        uint16_t %(m_name)s_len, %(m_name)s_offset;
+        uint16_t match_len;
+        buf_u16_get(buf + %(match_offset)s + 2, &match_len);
+        %(m_name)s_offset = %(match_offset)s + OF_MATCH_BYTES(match_len);
+        %(m_name)s_len = len - %(m_name)s_offset;
+""" % dict(m_name=m_name, cls=cls, match_offset=match_offset))
         else:
             out.write("""
 
