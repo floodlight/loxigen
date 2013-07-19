@@ -227,24 +227,24 @@ struct of_oxm_ip_proto_masked {
 
 struct of_oxm_ipv4_dst {
     uint32_t type_len == 0x80001804;
-    uint32_t value;
+    of_ipv4_t value;
 };
 
 struct of_oxm_ipv4_dst_masked {
     uint32_t type_len == 0x80001908;
-    uint32_t value;
-    uint32_t value_mask;
+    of_ipv4_t value;
+    of_ipv4_t value_mask;
 };
 
 struct of_oxm_ipv4_src {
     uint32_t type_len == 0x80001604;
-    uint32_t value;
+    of_ipv4_t value;
 };
 
 struct of_oxm_ipv4_src_masked {
     uint32_t type_len == 0x80001708;
-    uint32_t value;
-    uint32_t value_mask;
+    of_ipv4_t value;
+    of_ipv4_t value_mask;
 };
 
 struct of_oxm_ipv6_dst {

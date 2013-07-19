@@ -779,10 +779,10 @@ struct of_match_v2 {
     uint16_t eth_type;
     uint8_t ip_dscp;
     uint8_t ip_proto;
-    uint32_t ipv4_src;
-    uint32_t ipv4_src_mask;
-    uint32_t ipv4_dst;
-    uint32_t ipv4_dst_mask;
+    of_ipv4_t ipv4_src;
+    of_ipv4_t ipv4_src_mask;
+    of_ipv4_t ipv4_dst;
+    of_ipv4_t ipv4_dst_mask;
     uint16_t tcp_src;
     uint16_t tcp_dst;
     uint32_t mpls_label;

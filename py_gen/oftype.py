@@ -78,6 +78,11 @@ type_data_map = {
         pack='util.pack_match_bmap(%s)',
         unpack='util.unpack_match_bmap(%s)'),
 
+    'of_ipv4_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!L", %s)',
+        unpack='%s.read("!L")[0]'),
+
     'of_ipv6_t': OFTypeData(
         init="'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'",
         pack='struct.pack("!16s", %s)',
