@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortRead;
 import org.openflow.protocol.OFObject;
 
 /**
@@ -160,7 +159,7 @@ public class IPv6 implements OFObject {
         return LENGTH;
     }
 
-    public static IPv6 readFrom(final ChannelBuffer bb) throws OFParseError, OFShortRead {
+    public static IPv6 readFrom(final ChannelBuffer bb) throws OFParseError {
         return IPv6.of(bb.readLong(), bb.readLong());
     }
 

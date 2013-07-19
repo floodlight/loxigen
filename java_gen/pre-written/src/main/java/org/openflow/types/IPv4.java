@@ -1,8 +1,6 @@
 package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortRead;
 import org.openflow.protocol.OFObject;
 
 /**
@@ -84,7 +82,7 @@ public class IPv4 implements OFObject {
         return LENGTH;
     }
 
-    public static IPv4 readFrom(final ChannelBuffer bb) throws OFParseError, OFShortRead {
+    public static IPv4 readFrom(final ChannelBuffer bb) {
         return IPv4.of(bb.readInt());
     }
 
