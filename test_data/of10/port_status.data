@@ -28,3 +28,27 @@ ofp.message.port_status(
         advertised=ofp.OFPPF_1GB_FD,
         supported=ofp.OFPPF_AUTONEG,
         peer=ofp.OFPPF_PAUSE_ASYM))
+-- c
+obj = of_port_status_new(OF_VERSION_1_0);
+{
+    of_object_t *desc = of_port_desc_new(OF_VERSION_1_0);
+    of_port_desc_advertised_set(desc, 32);
+    of_port_desc_config_set(desc, 16);
+    of_port_desc_curr_set(desc, 1);
+    {
+	of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
+	of_port_desc_hw_addr_set(desc, hw_addr);
+    }
+    {
+	of_port_name_t name = "foo";
+	of_port_desc_name_set(desc, name);
+    }
+    of_port_desc_peer_set(desc, 2048);
+    of_port_desc_port_no_set(desc, 65533);
+    of_port_desc_state_set(desc, 512);
+    of_port_desc_supported_set(desc, 512);
+    of_port_status_desc_set(obj, desc);
+    of_object_delete(desc);
+}
+of_port_status_reason_set(obj, 1);
+of_port_status_xid_set(obj, 4);

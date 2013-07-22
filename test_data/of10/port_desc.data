@@ -19,3 +19,20 @@ ofp.port_desc(
     advertised=ofp.OFPPF_1GB_FD,
     supported=ofp.OFPPF_AUTONEG,
     peer=ofp.OFPPF_PAUSE_ASYM)
+-- c
+obj = of_port_desc_new(OF_VERSION_1_0);
+of_port_desc_advertised_set(obj, 32);
+of_port_desc_config_set(obj, 16);
+of_port_desc_curr_set(obj, 1);
+{
+    of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
+    of_port_desc_hw_addr_set(obj, hw_addr);
+}
+{
+    of_port_name_t name = "foo";
+    of_port_desc_name_set(obj, name);
+}
+of_port_desc_peer_set(obj, 2048);
+of_port_desc_port_no_set(obj, 65533);
+of_port_desc_state_set(obj, 512);
+of_port_desc_supported_set(obj, 512);
