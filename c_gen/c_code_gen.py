@@ -552,28 +552,27 @@ of_object_u16_set(of_object_t *obj, int offset, int value) {
 #define _END_LEN(obj, offset) ((obj)->length - (offset))
 
 /**
+ * Offset of the action_len member in a packet-out object
+ */
+
+#define _PACKET_OUT_ACTION_LEN_OFFSET(obj) \\
+    (((obj)->version == OF_VERSION_1_0) ? 14 : 16)
+
+/**
  * Get length of the action list object in a packet_out object
  * @param obj An object of type of_packet_out
- *
- * The length field is just before the end of the fixed length
- * part of the object in all versions.
  */
 
 #define _PACKET_OUT_ACTION_LEN(obj) \\
-    (of_object_u16_get((of_object_t *)(obj), \\
-     of_object_fixed_len[(obj)->version][OF_PACKET_OUT] - 2))
+    (of_object_u16_get((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj)))
 
 /**
  * Set length of the action list object in a packet_out object
  * @param obj An object of type of_packet_out
- *
- * The length field is just before the end of the fixed length
- * part of the object in all versions.
  */
 
 #define _PACKET_OUT_ACTION_LEN_SET(obj, len) \\
-    (of_object_u16_set((of_object_t *)(obj), \\
-     of_object_fixed_len[(obj)->version][OF_PACKET_OUT] - 2, len))
+    (of_object_u16_set((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj), len))
 
 /*
  * Match structs in 1.2 come at the end of the fixed length part
@@ -682,11 +681,12 @@ wire_match_len(of_object_t *obj, int match_offset) {
  *
  * Get length of preceding match object and add to fixed length
  * Applies only to version 1.2 and 1.3
+ * The +2 comes from the 2 bytes of padding between the match and packet data.
  */
 
 #define _PACKET_IN_DATA_OFFSET(obj) \\
-    _OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
-%(packet_in)d : %(packet_in_1_3)d)
+    (_OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
+%(packet_in)d : %(packet_in_1_3)d) + 2)
 
 /**
  * Macro to calculate variable offset of data (packet) member in packet_out
@@ -802,6 +802,7 @@ def type_data_c_gen(out, name):
     common_top_matter(out, name)
     c_type_maps.gen_type_maps(out)
     c_type_maps.gen_length_array(out)
+    c_type_maps.gen_extra_length_array(out)
 
 ################################################################
 # Top Matter
@@ -2643,7 +2644,7 @@ void
         MEMSET(obj, 0, sizeof(*obj));
     }
     if (bytes < 0) {
-        bytes = of_object_fixed_len[version][%(enum)s];
+        bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
     }
     obj->version = version;
     obj->length = bytes;
@@ -2790,7 +2791,7 @@ def gen_new_fn_body(cls, out):
     %(cls)s_t *obj;
     int bytes;
 
-    bytes = of_object_fixed_len[version][%(enum)s];
+    bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
 
     /* Allocate a maximum-length wire buffer assuming we'll be appending to it. */
     if ((obj = (%(cls)s_t *)of_object_new(OF_WIRE_BUFFER_MAX_LENGTH)) == NULL) {
@@ -3451,7 +3452,6 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
                                             int entry_match_offset,
                                             int add_match_offset)
 {
-    of_list_action_t actions;
     int entry_len, add_len;
     of_wire_buffer_t *wbuf;
     int abs_offset;
@@ -3459,15 +3459,6 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
     uint16_t val16;
     uint64_t cookie;
     of_octets_t match_octets;
-
-    /* Effects may come from different places */
-    if (effects != NULL) {
-        OF_TRY(of_flow_stats_entry_actions_set(obj,
-               (of_list_action_t *)effects));
-    } else {
-        of_flow_add_actions_bind(flow_add, &actions);
-        OF_TRY(of_flow_stats_entry_actions_set(obj, &actions));
-    }
 
     /* Transfer the match underlying object from add to stats entry */
     wbuf = OF_OBJECT_TO_WBUF(obj);
@@ -3500,6 +3491,27 @@ flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
 
     of_flow_add_hard_timeout_get(flow_add, &val16);
     of_flow_stats_entry_hard_timeout_set(obj, val16);
+
+    /* Effects may come from different places */
+    if (effects != NULL) {
+        if (obj->version == OF_VERSION_1_0) {
+            OF_TRY(of_flow_stats_entry_actions_set(obj,
+                (of_list_action_t *)effects));
+        } else {
+            OF_TRY(of_flow_stats_entry_instructions_set(obj,
+                (of_list_instruction_t *)effects));
+        }
+    } else {
+        if (obj->version == OF_VERSION_1_0) {
+            of_list_action_t actions;
+            of_flow_add_actions_bind(flow_add, &actions);
+            OF_TRY(of_flow_stats_entry_actions_set(obj, &actions));
+        } else {
+            of_list_instruction_t instructions;
+            of_flow_add_instructions_bind(flow_add, &instructions);
+            OF_TRY(of_flow_stats_entry_instructions_set(obj, &instructions));
+        }
+    }
 
     return OF_ERROR_NONE;
 }

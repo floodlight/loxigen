@@ -597,7 +597,7 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
             elt = &oxm_entry.%(key)s_masked;
 
             of_oxm_%(key)s_masked_init(elt,
-                src->version, -1, 1);
+                oxm_list->version, -1, 1);
             of_list_oxm_append_bind(oxm_list, &oxm_entry);
             of_oxm_%(key)s_masked_value_set(elt,
                    src->fields.%(key)s);
@@ -607,7 +607,7 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
             of_oxm_%(key)s_t *elt;
             elt = &oxm_entry.%(key)s;
             of_oxm_%(key)s_init(elt,
-                src->version, -1, 1);
+                oxm_list->version, -1, 1);
             of_list_oxm_append_bind(oxm_list, &oxm_entry);
             of_oxm_%(key)s_value_set(elt, src->fields.%(key)s);
         }
@@ -636,9 +636,9 @@ of_match_to_wire_match_v3(of_match_t *src, of_match_v3_t *dst)
         return OF_ERROR_PARAM;
     }
     if (dst->object_id != OF_MATCH_V3) {
-        of_match_v3_init(dst, src->version, 0, 0);
+        of_match_v3_init(dst, OF_VERSION_1_2, 0, 0);
     }
-    if ((oxm_list = of_list_oxm_new(src->version)) == NULL) {
+    if ((oxm_list = of_list_oxm_new(dst->version)) == NULL) {
         return OF_ERROR_RESOURCE;
     }
 
