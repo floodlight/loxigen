@@ -99,6 +99,11 @@ type_data_map = {
         pack='util.pack_list(%s)',
         unpack='oxm.unpack_list(%s.slice(_length-4))'),
 
+    'of_oxm_t': OFTypeData(
+        init='None',
+        pack='%s.pack()',
+        unpack='oxm.unpack(%s)'),
+
     # TODO implement unpack
     'list(of_table_features_t)': OFTypeData(
         init='[]',

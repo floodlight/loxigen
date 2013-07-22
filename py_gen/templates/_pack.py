@@ -56,6 +56,11 @@
 :: #endfor
 :: if length_member_index != None:
         length = sum([len(x) for x in packed])
+:: if ofclass.name == 'of_action_set_field':
+        pad_len = (length + 7)/8*8 - length
+        length += pad_len
+        packed.append('\x00' * pad_len)
+:: #endif
         packed[${length_member_index}] = ${gen_pack_expr(length_member.oftype, 'length')}
 :: #endif
 :: if ofclass.name == 'of_match_v3':

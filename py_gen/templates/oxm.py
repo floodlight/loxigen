@@ -38,15 +38,16 @@ import util
 import loxi.generic_util
 import loxi
 
+def unpack(reader):
+    type_len, = reader.peek('!L')
+    if type_len in parsers:
+        return parsers[type_len](reader)
+    else:
+        raise loxi.ProtocolError("unknown OXM cls=%#x type=%#x masked=%d len=%d (%#x)" % \
+            ((type_len >> 16) & 0xffff, (type_len >> 9) & 0x7f, (type_len >> 8) & 1, type_len & 0xff, type_len))
+
 def unpack_list(reader):
-    def deserializer(reader):
-        type_len, = reader.peek('!L')
-        if type_len in parsers:
-            return parsers[type_len](reader)
-        else:
-            raise loxi.ProtocolError("unknown OXM cls=%#x type=%#x masked=%d len=%d (%#x)" % \
-                ((type_len >> 16) & 0xffff, (type_len >> 9) & 0x7f, (type_len >> 8) & 1, type_len & 0xff, type_len))
-    return loxi.generic_util.unpack_list(reader, deserializer)
+    return loxi.generic_util.unpack_list(reader, unpack)
 
 class OXM(object):
     type_len = None # override in subclass
