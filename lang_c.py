@@ -107,4 +107,5 @@ targets = {
     'locitest/src/test_utils.c': static,
     'locitest/src/test_validator.c': static,
     'locitest/src/main.c': static,
+    'locitest/Makefile': static,
 }
