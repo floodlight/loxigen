@@ -109,6 +109,12 @@ class OFReader(object):
             raise loxi.ProtocolError("Buffer too short")
         self.offset += length
 
+    def skip_align(self):
+        new_offset = (self.offset + 7) / 8 * 8
+        if new_offset > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        self.offset = new_offset
+
     def is_empty(self):
         return self.offset == len(self.buf)
 

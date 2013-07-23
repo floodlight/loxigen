@@ -53,6 +53,6 @@
         obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr)}
 ::     #endif
 :: #endfor
-:: if ofclass.name == 'of_match_v3':
-        reader.skip((_length + 7)/8*8 - _length)
+:: if ofclass.has_external_alignment or ofclass.has_internal_alignment:
+        reader.skip_align()
 :: #endif
