@@ -63,6 +63,13 @@ def unpack_list_tlv16(reader, deserializer):
         return deserializer(reader.slice(length), typ)
     return unpack_list(reader, wrapper)
 
+def pad_to(alignment, length):
+    """
+    Return a string of zero bytes that will pad a string of length 'length' to
+    a multiple of 'alignment'.
+    """
+    return "\x00" * ((length + alignment - 1)/alignment*alignment - length)
+
 class OFReader(object):
     """
     Cursor over a read-only buffer
