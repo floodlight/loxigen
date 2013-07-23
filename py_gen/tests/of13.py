@@ -93,6 +93,7 @@ class TestAllOF13(unittest.TestCase):
 
     def test_serialization(self):
         expected_failures = [
+            ofp.action.set_field, # field defaults to None
             ofp.common.table_feature_prop_apply_actions,
             ofp.common.table_feature_prop_apply_actions_miss,
             ofp.common.table_feature_prop_write_actions,

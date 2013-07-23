@@ -63,6 +63,13 @@ def unpack_list_tlv16(reader, deserializer):
         return deserializer(reader.slice(length), typ)
     return unpack_list(reader, wrapper)
 
+def pad_to(alignment, length):
+    """
+    Return a string of zero bytes that will pad a string of length 'length' to
+    a multiple of 'alignment'.
+    """
+    return "\x00" * ((length + alignment - 1)/alignment*alignment - length)
+
 class OFReader(object):
     """
     Cursor over a read-only buffer
@@ -101,6 +108,12 @@ class OFReader(object):
         if self.offset + length > len(self.buf):
             raise loxi.ProtocolError("Buffer too short")
         self.offset += length
+
+    def skip_align(self):
+        new_offset = (self.offset + 7) / 8 * 8
+        if new_offset > len(self.buf):
+            raise loxi.ProtocolError("Buffer too short")
+        self.offset = new_offset
 
     def is_empty(self):
         return self.offset == len(self.buf)

@@ -37,6 +37,9 @@ import const
 import util
 import loxi.generic_util
 import loxi
+:: if version >= 3:
+import oxm # for unpack
+:: #endif
 
 def unpack_list(reader):
     def deserializer(reader, typ):

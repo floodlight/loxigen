@@ -442,7 +442,12 @@ def read_input():
                                                    name=m_name))
                         pad_count += 1
                     else:
-                        legacy_members.append(dict(m_type=m.oftype, name=m.name))
+                        # HACK the C backend does not yet support of_oxm_t
+                        if m.oftype == 'of_oxm_t':
+                            m_type = 'of_octets_t'
+                        else:
+                            m_type = m.oftype
+                        legacy_members.append(dict(m_type=m_type, name=m.name))
                 versions[version_name]['classes'][ofclass.name] = legacy_members
 
             for enum in ofinput.enums:
