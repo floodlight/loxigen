@@ -157,7 +157,7 @@ class ${impl_class} implements ${msg.interface.name} {
         @Override
         public int write(ChannelBuffer bb, ${impl_class} message) {
 //:: if not msg.is_fixed_length:
-            int startIndex = bb.readerIndex();
+            int startIndex = bb.writerIndex();
 //:: #end
 
 //:: fields_with_length_member = {}

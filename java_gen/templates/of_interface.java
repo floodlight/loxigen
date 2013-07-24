@@ -36,7 +36,7 @@ package ${msg.package};
 //:: include("_imports.java", msg=msg)
 
 public interface ${msg.name} ${"extends %s" % msg.parent_interface if msg.parent_interface else ""} {
-//:: for prop in (prop for prop in msg.members):
+//:: for prop in msg.members:
     ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
 
