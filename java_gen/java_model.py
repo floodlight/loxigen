@@ -488,6 +488,5 @@ class JavaEnumEntry(object):
         res = self.version_value_map[version]
         return res
 
-    @memoize
     def all_values(self, versions, not_present=None):
         return [ self.values[version] if version in self.values else not_present for version in versions ]
