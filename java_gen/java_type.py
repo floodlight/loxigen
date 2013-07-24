@@ -56,13 +56,13 @@ class JType(object):
         if callable(self._read_op):
             return self._read_op(version)
         else:
-            return self._read_op.replace("$length", str(length))
+            return self._read_op.replace("$length", str(length)).replace("$version", version.of_version)
 
     def write_op(self, version=None, name=None):
         if callable(self._write_op):
             return self._write_op(version, name)
         else:
-            return self._write_op.replace("$name", str(name))
+            return self._write_op.replace("$name", str(name)).replace("$version", version.of_version)
 
 hello_elem_list = JType("List<OFHelloElement>",
         read_op = 'ChannelUtils.readHelloElementList(bb)',
