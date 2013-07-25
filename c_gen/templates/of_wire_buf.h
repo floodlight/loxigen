@@ -348,6 +348,38 @@ of_wire_buffer_u32_set(of_wire_buffer_t *wbuf, int offset, uint32_t value)
     buf_u32_set(OF_WIRE_BUFFER_INDEX(wbuf, offset), value);
 }
 
+
+/**
+ * Get a uint32_t scalar from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value Pointer to where to put value
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_ipv4_get(of_wire_buffer_t *wbuf, int offset, of_ipv4_t *value)
+{
+    of_wire_buffer_u32_get(wbuf, offset, value);
+}
+
+/**
+ * Set a ipv4 (uint32_t) scalar in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value The value to store
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_ipv4_set(of_wire_buffer_t *wbuf, int offset, of_ipv4_t value)
+{
+    of_wire_buffer_u32_set(wbuf, offset, value);
+}
+
+
 /**
  * Get a uint64_t scalar from a wire buffer
  * @param wbuf The pointer to the wire buffer structure

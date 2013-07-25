@@ -563,8 +563,8 @@ struct of_match_v1 {
     uint8_t ip_dscp;
     uint8_t ip_proto;
     pad(2);
-    uint32_t ipv4_src;
-    uint32_t ipv4_dst;
+    of_ipv4_t ipv4_src;
+    of_ipv4_t ipv4_dst;
     uint16_t tcp_src;
     uint16_t tcp_dst;
 };

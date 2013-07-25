@@ -90,6 +90,7 @@ check:
 	./utest/test_parser.py
 	./utest/test_frontend.py
 	./utest/test_test_data.py
+	./utest/test_generic_utils.py
 
 check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/generic_util.py

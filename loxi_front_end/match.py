@@ -147,7 +147,7 @@ of_match_members = dict(
         ),
     ipv4_src = dict(
         name="ipv4_src",
-        m_type="uint32_t",
+        m_type="of_ipv4_t",
         v1_wc_shift=8,
         print_type="PRIx32",
         conditions="is_ipv4(match)",
@@ -156,7 +156,7 @@ of_match_members = dict(
         ),
     ipv4_dst = dict(
         name="ipv4_dst",
-        m_type="uint32_t",
+        m_type="of_ipv4_t",
         v1_wc_shift=14,
         print_type="PRIx32",
         conditions="is_ipv4(match)",
