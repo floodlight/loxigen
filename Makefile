@@ -70,6 +70,7 @@ java: .loxi_ts.java
 
 .loxi_ts.java: ${LOXI_JAVA_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
+	cd loxi_output/openflowj; mvn package
 	touch $@
 
 
