@@ -42,35 +42,9 @@ define a single directory and generate everything in there.
 
 """
 
-import java_gen.java_code_gen as java_code_gen
+import java_gen.codegen as java_codegen
 
 
 targets = {
-    'base_java': java_code_gen.gen_all_java
+    'openflowj/README': java_codegen.gen_all_java
 }
-
-##
-# The list of files to produce.  These are the keywords used to index
-# the arrays below giving the external file names, the subdirectory locations
-# and the generating functions.
-
-target_files =  ["base_java" ]
-# Internal file name references to actual file names
-file_to_name_map = dict(
-    # LOCI source
-    base_java="README.openflowj", # not really used by java generator
-)
-
-##
-# The map from the internal file identifier to the function name
-# that generates the content of the file
-
-file_gen_map = dict(
-    base_java=java_code_gen.gen_all_java,
-)
-
-
-# Map from file references to target sub-directories
-file_to_subdir_map = dict(
-    base_java="openflowj/",
-)

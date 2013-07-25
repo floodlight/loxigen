@@ -2,7 +2,6 @@ package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortWrite;
 import org.openflow.protocol.OFObject;
 import org.openflow.util.HexString;
 
@@ -84,7 +83,7 @@ public class MacAddress implements OFObject {
     }
 
     @Override
-    public void writeTo(final ChannelBuffer bb) throws OFParseError, OFShortWrite {
+    public void writeTo(final ChannelBuffer bb) {
         bb.writeInt((int) (rawValue >> 16));
         bb.writeShort((int) rawValue & 0xFFFF);
     }

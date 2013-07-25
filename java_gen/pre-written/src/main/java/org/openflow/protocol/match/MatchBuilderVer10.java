@@ -1,8 +1,6 @@
 package org.openflow.protocol.match;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortWrite;
 import org.openflow.protocol.types.IpDscp;
 import org.openflow.types.EthType;
 import org.openflow.types.IPv4;
@@ -157,7 +155,7 @@ public class MatchBuilderVer10 implements MatchBuilder {
     }
 
     @Override
-    public void writeTo(final ChannelBuffer bb) throws OFParseError, OFShortWrite {
+    public void writeTo(final ChannelBuffer bb) {
         // TODO Auto-generated method stub
 
     }

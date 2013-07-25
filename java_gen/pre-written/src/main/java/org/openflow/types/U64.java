@@ -20,8 +20,7 @@ package org.openflow.types;
 import java.math.BigInteger;
 
 public class U64 {
-    private final static BigInteger TWO_POWER_64 = BigInteger.valueOf(Long.MAX_VALUE).add(
-            BigInteger.valueOf(1));
+    private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
 
     private final long raw;
 
@@ -38,8 +37,11 @@ public class U64 {
     }
 
     public BigInteger getBigInteger() {
-        return raw >= 0 ? BigInteger.valueOf(raw) : TWO_POWER_64.add(BigInteger
-                .valueOf(raw));
+        BigInteger bigInt = BigInteger.valueOf(raw & UNSIGNED_MASK);
+        if (raw < 0) {
+          bigInt = bigInt.setBit(Long.SIZE - 1);
+        }
+        return bigInt;
     }
 
     @Override
@@ -47,8 +49,12 @@ public class U64 {
         return getBigInteger().toString();
     }
 
-    public static BigInteger f(final long i) {
-        return new BigInteger(Long.toBinaryString(i), 2);
+    public static BigInteger f(final long value) {
+        BigInteger bigInt = BigInteger.valueOf(value & UNSIGNED_MASK);
+        if (value < 0) {
+          bigInt = bigInt.setBit(Long.SIZE - 1);
+        }
+        return bigInt;
     }
 
     public static long t(final BigInteger l) {

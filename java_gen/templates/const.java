@@ -31,33 +31,22 @@
 
 //:: include('_autogen.java')
 
-package org.openflow.protocol;
-import java.util.List;
-import org.openflow.protocol.match.*;
-import org.openflow.protocol.actions.OFAction;
-import org.openflow.protocol.instructions.OFInstruction;
-import org.openflow.types.*;
-import org.openflow.util.*;
-import org.openflow.exceptions.OFUnsupported;
+package ${package};
 
-public interface ${msg.interface_name} extends OFMessage {
-    int getXid();
-    boolean isXidSet();
-    OFType getType();
-    OFVersion getVersion();
+import org.openflow.protocol.OFVersion;
 
-//:: for prop in msg.all_properties():
-    ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else "throws UnsupportedOperationException"};
+public enum ${class_name} {
+//:: for i, entry in enumerate(enum.entries):
+//::     values = [ ("0x%x" % val) if val is not None else "-1" for val in entry.all_values(all_versions) ]
+     ${entry.name}(new int[] { ${ ", ".join( values) } } )${ ", " if i < len(enum.entries)-1 else ";" }
 //:: #endfor
 
-    Builder createBuilder();
+    private final int[] wireValues;
+    ${class_name}(int[] wireValues) {
+        this.wireValues = wireValues;
+    }
 
-    public interface Builder {
-        ${msg.interface_name} getMessage();
-//:: for prop in msg.all_properties():
-        ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else "throws UnsupportedOperationException"};
-        Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
-//:: #endfor
-
+    public int getWireValue(OFVersion version) {
+        return this.wireValues[version.getWireVersion()];
     }
 }

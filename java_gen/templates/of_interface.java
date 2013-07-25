@@ -31,21 +31,26 @@
 
 //:: include('_autogen.java')
 
-package org.openflow.types;
+package ${msg.package};
 
-import org.openflow.protocol.OFVersion;
+//:: include("_imports.java", msg=msg)
 
-public enum OFType {
-//:: for i, msg in enumerate(all_messages):
-     ${msg.constant_name}(new byte[] { ${ ", ".join( [str(msg.wire_type(version)) for version in all_versions ]) } } )${ ", " if i < len(all_messages)-1 else ";" }
+public interface ${msg.name} ${"extends %s" % msg.parent_interface if msg.parent_interface else ""} {
+//:: for prop in msg.members:
+    ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
 
-    byte[] wireTypes;
-    OFType(byte[] wireTypes) {
-        this.wireTypes = wireTypes;
-    }
+    int writeTo(ChannelBuffer channelBuffer);
 
-    public byte getWireType(OFVersion version) {
-        return this.wireTypes[version.getWireVersion()];
+    Builder createBuilder();
+    public interface Builder ${"extends %s.Builder" % msg.parent_interface if msg.parent_interface else ""} {
+        ${msg.name} getMessage();
+//:: for prop in msg.members:
+        ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
+//:: if prop.is_writeable:
+        Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
+//:: #endif
+//:: #endfor
+
     }
 }
