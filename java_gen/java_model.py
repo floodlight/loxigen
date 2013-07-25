@@ -209,7 +209,7 @@ class JavaOFInterface(object):
 
 class JavaOFClass(object):
     """ Models an OpenFlow Message class for the purpose of the java class.
-        Version agnostic, in contrast to the loxi_ir python model.
+        Version specific child of a JavaOFInterface
     """
     def __init__(self, interface, version, ir_class):
         self.interface = interface
