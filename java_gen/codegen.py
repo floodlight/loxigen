@@ -107,31 +107,6 @@ class JavaGenerator(object):
                         template='of_class.java', version=java_class.version, msg=java_class,
                         impl_class=java_class.name)
 
-
-def mkdir_p(path):
-    """ Emulates `mkdir -p` """
-    try:
-        os.makedirs(path)
-    except OSError as exc: # Python >2.5
-        if exc.errno == errno.EEXIST:
-            pass
-        else: raise
-
-def copy_file_with_boiler_plate(src_name, dst_name, with_boiler=True):
-    with open("java_gen/pre-written/%s" % src_name, "r") as src:
-        with open(dst_name, "w") as dst:
-            if with_boiler:
-                print_boiler_plate(os.path.basename(dst_name), dst)
-            dst.writelines(src.readlines())
-
-def frob(s, **kwargs):
-    """ Step through string s and for each key in kwargs,
-         replace $key with kwargs[key] in s.
-    """
-    for k,v in kwargs.iteritems():
-        s = s.replace('$%s' % k, v)
-    return s
-
 def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
        into $basedir"""
