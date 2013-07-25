@@ -35,7 +35,8 @@ import oftype
 from loxi_ir import *
 
 PyOFClass = namedtuple('PyOFClass', ['name', 'pyname', 'members', 'type_members',
-                                     'min_length', 'is_fixed_length'])
+                                     'min_length', 'is_fixed_length',
+                                     'has_internal_alignment', 'has_external_alignment'])
 
 # Return the name for the generated Python class
 def generate_pyname(cls):
@@ -92,7 +93,9 @@ def build_ofclasses(version):
                       members=members,
                       type_members=type_members,
                       min_length=of_g.base_length[(cls, version)],
-                      is_fixed_length=(cls, version) in of_g.is_fixed_length))
+                      is_fixed_length=(cls, version) in of_g.is_fixed_length,
+                      has_internal_alignment=cls == 'of_action_set_field',
+                      has_external_alignment=cls == 'of_match_v3'))
     return ofclasses
 
 def generate_init(out, name, version):
