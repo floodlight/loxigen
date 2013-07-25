@@ -98,6 +98,8 @@ class JavaGenerator(object):
     def create_of_classes(self):
         """ Create the OF classes with implementations for each of the interfaces and versions """
         for interface in self.java_model.interfaces:
+            if interface.name == "OFTableMod":
+                continue
             if not loxi_utils.class_is_message(interface.c_name) and not loxi_utils.class_is_oxm(interface.c_name):
                 continue
             for java_class in interface.versioned_classes:
