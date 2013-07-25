@@ -68,9 +68,3 @@ file_to_name_map = dict(
 file_gen_map = dict(
     base_java=java_codegen.gen_all_java,
 )
-
-
-# Map from file references to target sub-directories
-file_to_subdir_map = dict(
-    base_java="openflowj/",
-)

@@ -42,10 +42,7 @@ import loxi_utils.loxi_utils as loxi_utils
 import java_gen.java_model as java_model
 
 def gen_all_java(out, name):
-    target_dir='loxi_output/openflowj'
-    basedir="%s/%s/" % (
-            target_dir,
-            lang_java.file_to_subdir_map['base_java'])
+    basedir='loxi_output/openflowj'
     srcdir = "%s/src/main/java/" % basedir
     print "Outputting to %s" % basedir
     if os.path.exists(basedir):
@@ -137,5 +134,6 @@ def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
        into $basedir"""
     print "Copying pre-written files into %s" % basedir
-#    subprocess.call("cd java_gen/pre-written && tar cpf - . | ( cd ../../%s && tar xvpf - )" % basedir,
-#            shell=True)
+    #subprocess.call("cd java_gen/pre-written && tar cpf - pom.xml | ( cd ../../%s && tar xvpf - )" % basedir,
+    #        shell=True)
+    os.symlink(os.path.abspath("java_gen/pre-written/pom.xml"), "%s/pom.xml" % basedir)
