@@ -42,7 +42,7 @@ import loxi_utils.loxi_utils as loxi_utils
 import java_gen.java_model as java_model
 
 def gen_all_java(out, name):
-    basedir='loxi_output/openflowj'
+    basedir= '%s/openflowj' % of_g.options.install_dir
     srcdir = "%s/src/main/java/" % basedir
     print "Outputting to %s" % basedir
     if os.path.exists(basedir):
@@ -55,7 +55,7 @@ def gen_all_java(out, name):
     gen.create_of_classes()
     gen.create_of_const_enums()
 
-    with open('README.java-lang') as readme_src:
+    with open('%s/README.java-lang' % os.path.dirname(__file__)) as readme_src:
         out.writelines(readme_src.readlines())
     out.close()
 
@@ -138,4 +138,4 @@ def copy_prewrite_tree(basedir):
     print "Copying pre-written files into %s" % basedir
     #subprocess.call("cd java_gen/pre-written && tar cpf - pom.xml | ( cd ../../%s && tar xvpf - )" % basedir,
     #        shell=True)
-    os.symlink(os.path.abspath("java_gen/pre-written/pom.xml"), "%s/pom.xml" % basedir)
+    os.symlink(os.path.abspath("%s/pre-written/pom.xml" %  os.path.dirname(__file__)), "%s/pom.xml" % basedir)
