@@ -74,7 +74,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
  */
 #define LOCI_SHOW_u32_ipv6_flabel(writer, cookie, val)     LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u8_vlan_pcp(writer, cookie, val)         LOCI_SHOW_u8(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_src(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_src(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_ipv6_ipv6_dst(writer, cookie, val)       LOCI_SHOW_ipv6(writer, cookie, val)
 #define LOCI_SHOW_u32_arp_tpa(writer, cookie, val)         LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u8_icmpv6_type(writer, cookie, val)      LOCI_SHOW_u8(writer, cookie, val)
@@ -99,7 +99,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_u8_ip_ecn(writer, cookie, val)           LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u16_udp_dst(writer, cookie, val)         LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_port_no_in_phy_port(writer, cookie, val) LOCI_SHOW_port_no(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_dst(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_dst(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_src(writer, cookie, val)         LOCI_SHOW_mac(writer, cookie, val)
 #define LOCI_SHOW_u16_udp_src(writer, cookie, val)         LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_mac_ipv6_nd_tll(writer, cookie, val)     LOCI_SHOW_mac(writer, cookie, val)
@@ -266,8 +266,8 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u64_metadata_mask(writer, cookie, val) LOCI_SHOW_x64(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_src_mask(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_dst_mask(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_src_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_dst_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_src_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_dst_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u32_curr_speed(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_max_speed(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_match_bmap_match(writer, cookie, val) LOCI_SHOW_match_bmap(writer, cookie, val)
@@ -328,11 +328,12 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_service(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_status(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u16_subtype(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_addr(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_netmask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_addr(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_netmask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u8_l2_table_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u16_l2_table_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
-
+#define LOCI_SHOW_ipv4_value(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_value_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 
 
 #endif /* _LOCI_SHOW_H_ */
