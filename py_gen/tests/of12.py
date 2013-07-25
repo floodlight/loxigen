@@ -78,7 +78,9 @@ class TestAllOF12(unittest.TestCase):
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
-        expected_failures = []
+        expected_failures = [
+            ofp.action.set_field, # field defaults to None
+        ]
         for klass in self.klasses:
             def fn():
                 obj = klass()
