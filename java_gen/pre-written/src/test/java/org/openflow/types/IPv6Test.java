@@ -47,7 +47,7 @@ public class IPv6Test {
     public void testReadFrom() throws OFParseError, OFShortRead, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
-            IPv6 ip = IPv6.readFrom(ChannelBuffers.copiedBuffer(bytes));
+            IPv6 ip = IPv6.SERIALIZER_V12.readFrom(ChannelBuffers.copiedBuffer(bytes));
             assertEquals(testStrings[i], ip.toString());
             assertArrayEquals(bytes, ip.getBytes());
         }

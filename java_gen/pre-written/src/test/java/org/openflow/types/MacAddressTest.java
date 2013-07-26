@@ -64,7 +64,7 @@ public class MacAddressTest {
     @Test
     public void testReadFrom() throws OFParseError, OFShortRead {
         for(int i=0; i < testAddresses.length; i++ ) {
-            MacAddress ip = MacAddress.readFrom(ChannelBuffers.copiedBuffer(testAddresses[i]));
+            MacAddress ip = MacAddress.SERIALIZER_V10.readFrom(ChannelBuffers.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());

@@ -81,8 +81,8 @@ u32_list = JType('List<U32>', 'int[]',   size=4, read_op='bb.readInt()',
 u64 = JType('U64', 'U64', size=8, read_op='U64.of(bb.readLong())',
         write_op='bb.writeLong($name.getValue())')
 of_port= JType('OFPort',size=None,
-        read_op=lambda version: 'OFPort.ofShort(bb.readShort())' if version.int_version < 2 else 'OFPort.ofInt(bb.readInt())',
-        write_op=lambda version, name: 'bb.writeShort(%s.getShortPortNumber())' % name if version.int_version < 2 else 'bb.writeInt(%s.getPortNumber())' % name)
+        read_op = "OFPort.SERIALIZER_V$version.readFrom(bb)",
+        write_op = "OFPort.SERIALIZER_V$version.writeTo($name, bb)")
 one_byte_array = JType('byte[]', size=1,
         read_op = 'ChannelUtils.readBytes(bb, 1)',
         write_op = 'ChannelUtils.writeBytes(bb, $name)')
@@ -132,8 +132,8 @@ flow_mod_cmd = JType('OFFlowModCommand', 'short', size="$name.getLength()",
         read_op = lambda v: "bb.readShort()" if v.int_version == 1 else "bb.readByte()",
         write_op = lambda v, name: "bb.writeShort(%s)" % name if v.int_version == 1 else "bb.writeByte(%s)" % name)
 mac_addr = JType('MacAddress', 'byte[]', size=6,
-        read_op = 'MacAddress.readFrom(bb)',
-        write_op = '$name.writeTo(bb)')
+        read_op = "MacAddress.SERIALIZER_V$version.readFrom(bb)",
+        write_op = "MacAddress.SERIALIZER_V$version.writeTo($name, bb)")
 port_name = JType('String', size=16,
         read_op = 'ChannelUtils.readFixedLengthString(bb, 16)',
         write_op = 'ChannelUtils.writeFixedLengthString(bb, $name, 16)')
@@ -147,11 +147,11 @@ table_name = JType('String', size=32,
         read_op = 'ChannelUtils.readFixedLengthString(bb, 32)',
         write_op = 'ChannelUtils.writeFixedLengthString(bb, $name, 32)')
 ipv4 = JType("IPv4",
-        read_op = "IPv4.readFrom(bb)",
-        write_op = "$name.writeTo(bb)")
+        read_op = "IPv4.SERIALIZER_V$version.readFrom(bb)",
+        write_op = "IPv4.SERIALIZER_V$version.writeTo($name, bb)")
 ipv6 = JType("IPv6",
-        read_op = "IPv6.readFrom(bb)",
-        write_op = "$name.writeTo(bb)")
+        read_op = "IPv6.SERIALIZER_V$version.readFrom(bb)",
+        write_op = "IPv6.SERIALIZER_V$version.writeTo($name, bb)")
 
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,

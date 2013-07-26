@@ -67,7 +67,7 @@ public class IPv4Test {
     @Test
     public void testReadFrom() throws OFParseError, OFShortRead {
         for(int i=0; i < testAddresses.length; i++ ) {
-            IPv4 ip = IPv4.readFrom(ChannelBuffers.copiedBuffer(testAddresses[i]));
+            IPv4 ip = IPv4.SERIALIZER_V10.readFrom(ChannelBuffers.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getInt());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());

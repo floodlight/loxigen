@@ -1,6 +1,8 @@
 package org.openflow.types;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.annotations.Immutable;
+import org.openflow.exceptions.OFParseError;
 
 /**
  * Abstraction of an logical / OpenFlow switch port (ofp_port_no) in OpenFlow.
@@ -13,7 +15,9 @@ import org.openflow.annotations.Immutable;
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
 @Immutable
-public class OFPort {
+public class OFPort implements OFValueType {
+    static final int LENGTH = 4;
+    
     // private int constants (OF1.1+) to avoid duplication in the code
     // should not have to use these outside this class
     private static final int OFPP_ANY_INT = 0xFFffFFff;
@@ -488,4 +492,76 @@ public class OFPort {
         }
     }
 
+    @Override
+    public int getLength() {
+        return LENGTH;
+    }
+    
+    volatile byte[] bytesCache;
+    
+    @Override
+    public byte[] getBytes() {
+        if (bytesCache == null) {
+            synchronized (this) {
+                if (bytesCache == null) {
+                    bytesCache = new byte[] { (byte)(portNumber & 0xFF),
+                                              (byte)((portNumber >>> 8) & 0xFF),
+                                              (byte)((portNumber >>> 16) & 0xFF),
+                                              (byte)((portNumber >>> 24) & 0xFF) };
+                }
+            }
+        }
+        return bytesCache;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof OFPort))
+            return false;
+        OFPort other = (OFPort)obj;
+        if (other.portNumber != this.portNumber)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 53;
+        int result = 1;
+        result = prime * result + portNumber;
+        return result;
+    }
+
+    public static final Serializer<OFPort> SERIALIZER_V10 = new SerializerV10();
+    public static final Serializer<OFPort> SERIALIZER_V11 = new SerializerV11();
+    public static final Serializer<OFPort> SERIALIZER_V12 = SERIALIZER_V11;
+    public static final Serializer<OFPort> SERIALIZER_V13 = SERIALIZER_V11;
+
+    private static class SerializerV10 implements OFValueType.Serializer<OFPort> {
+
+        @Override
+        public void writeTo(OFPort value, ChannelBuffer c) {
+            c.writeShort(value.portNumber);
+        }
+
+        @Override
+        public OFPort readFrom(ChannelBuffer c) throws OFParseError {
+            return OFPort.of((c.readUnsignedShort() & 0x0FFFF));
+        }
+
+    }
+
+    private static class SerializerV11 implements OFValueType.Serializer<OFPort> {
+
+        @Override
+        public void writeTo(OFPort value, ChannelBuffer c) {
+            c.writeInt(value.portNumber);
+        }
+
+        @Override
+        public OFPort readFrom(ChannelBuffer c) throws OFParseError {
+            return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
+        }
+
+    }
 }

@@ -1,14 +1,15 @@
 package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.protocol.OFObject;
+import org.openflow.exceptions.OFParseError;
+
 
 /**
  * Wrapper around an IPv4 address
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4 implements OFObject {
+public class IPv4 implements OFValueType {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -55,6 +56,61 @@ public class IPv4 implements OFObject {
         }
         return IPv4.of(raw);
     }
+    
+    public static OFValueType ofPossiblyMasked(final String string) {
+        int start = 0;
+        int shift = 24;
+        int slashPos;
+
+        String ip = string;
+        int maskBits = 0;
+        if ((slashPos = string.indexOf('/')) != -1) {
+            ip = string.substring(0, slashPos);
+            try {
+                String suffix = string.substring(slashPos + 1);
+                if (suffix.length() == 0)
+                    throw new IllegalArgumentException("IP Address not well formed: " + string);
+                maskBits = Integer.parseInt(suffix);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("IP Address not well formed: " + string);
+            }
+            if (maskBits < 0 || maskBits > 32) {
+                throw new IllegalArgumentException("IP Address not well formed: " + string);
+            }
+        }
+        
+        int raw = 0;
+        while (shift >= 0) {
+            int end = ip.indexOf('.', start);
+            if (end == start || !((shift > 0) ^ (end < 0)))
+                throw new IllegalArgumentException("IP Address not well formed: " + string);
+
+            String substr =
+                    end > 0 ? ip.substring(start, end) : ip.substring(start);
+            int val;
+            try {
+                val = Integer.parseInt(substr);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("IP Address not well formed: " + string);
+            }
+            if (val < 0 || val > 255)
+                throw new IllegalArgumentException("IP Address not well formed: " + string);
+
+            raw |= val << shift;
+
+            shift -= 8;
+            start = end + 1;
+        }
+        
+        if (maskBits == 0) {
+            // No mask
+            return IPv4.of(raw);
+        } else {
+            // With mask
+            int mask = (-1) << (32 - maskBits);
+            return Masked.<IPv4>of(IPv4.of(raw), IPv4.of(mask));
+        }
+    }
 
     public int getInt() {
         return rawValue;
@@ -80,15 +136,6 @@ public class IPv4 implements OFObject {
     @Override
     public int getLength() {
         return LENGTH;
-    }
-
-    public static IPv4 readFrom(final ChannelBuffer bb) {
-        return IPv4.of(bb.readInt());
-    }
-
-    @Override
-    public void writeTo(final ChannelBuffer bb) {
-        bb.writeInt(rawValue);
     }
 
     @Override
@@ -122,5 +169,23 @@ public class IPv4 implements OFObject {
             return false;
         return true;
     }
+    
+    public static final Serializer<IPv4> SERIALIZER_V10 = new SerializerV10();
+    public static final Serializer<IPv4> SERIALIZER_V11 = SERIALIZER_V10;
+    public static final Serializer<IPv4> SERIALIZER_V12 = SERIALIZER_V10;
+    public static final Serializer<IPv4> SERIALIZER_V13 = SERIALIZER_V10;
+    
+    private static class SerializerV10 implements OFValueType.Serializer<IPv4> {
 
+        @Override
+        public void writeTo(IPv4 value, ChannelBuffer c) {
+            c.writeInt(value.rawValue);
+        }
+
+        @Override
+        public IPv4 readFrom(ChannelBuffer c) throws OFParseError {
+            return IPv4.of(c.readInt());
+        }
+        
+    }
 }
