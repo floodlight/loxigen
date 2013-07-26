@@ -28,23 +28,6 @@ public class OFPhysicalPort implements OFValueType {
     public int getLength() {
         return LENGTH;
     }
-    
-    volatile byte[] bytesCache;
-    
-    @Override
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache = new byte[] { (byte)(port & 0xFF),
-                                              (byte)((port >>> 8) & 0xFF),
-                                              (byte)((port >>> 16) & 0xFF),
-                                              (byte)((port >>> 24) & 0xFF)};
-                }
-            }
-        }
-        return bytesCache;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -69,22 +52,12 @@ public class OFPhysicalPort implements OFValueType {
         return Integer.toHexString(port);
     }
 
-    public static final Serializer<OFPhysicalPort> SERIALIZER_V11 = new SerializerV11();
-    public static final Serializer<OFPhysicalPort> SERIALIZER_V12 = SERIALIZER_V11;
-    public static final Serializer<OFPhysicalPort> SERIALIZER_V13 = SERIALIZER_V11;
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(this.port);
+    }
 
-    private static class SerializerV11 implements OFValueType.Serializer<OFPhysicalPort> {
-
-        @Override
-        public void writeTo(OFPhysicalPort value, ChannelBuffer c) {
-            c.writeInt(value.port);
-        }
-
-        @Override
-        public OFPhysicalPort readFrom(ChannelBuffer c) throws OFParseError {
-            return OFPhysicalPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
-        }
-
+    public static OFPhysicalPort read4Bytes(ChannelBuffer c) throws OFParseError {
+        return OFPhysicalPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
 
 }

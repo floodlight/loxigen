@@ -497,23 +497,6 @@ public class OFPort implements OFValueType {
         return LENGTH;
     }
     
-    volatile byte[] bytesCache;
-    
-    @Override
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache = new byte[] { (byte)(portNumber & 0xFF),
-                                              (byte)((portNumber >>> 8) & 0xFF),
-                                              (byte)((portNumber >>> 16) & 0xFF),
-                                              (byte)((portNumber >>> 24) & 0xFF) };
-                }
-            }
-        }
-        return bytesCache;
-    }
-
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof OFPort))
@@ -532,36 +515,19 @@ public class OFPort implements OFValueType {
         return result;
     }
 
-    public static final Serializer<OFPort> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<OFPort> SERIALIZER_V11 = new SerializerV11();
-    public static final Serializer<OFPort> SERIALIZER_V12 = SERIALIZER_V11;
-    public static final Serializer<OFPort> SERIALIZER_V13 = SERIALIZER_V11;
-
-    private static class SerializerV10 implements OFValueType.Serializer<OFPort> {
-
-        @Override
-        public void writeTo(OFPort value, ChannelBuffer c) {
-            c.writeShort(value.portNumber);
-        }
-
-        @Override
-        public OFPort readFrom(ChannelBuffer c) throws OFParseError {
-            return OFPort.of((c.readUnsignedShort() & 0x0FFFF));
-        }
-
+    public void write2Bytes(ChannelBuffer c) {
+        c.writeShort(this.portNumber);
     }
 
-    private static class SerializerV11 implements OFValueType.Serializer<OFPort> {
+    public static OFPort read2Bytes(ChannelBuffer c) throws OFParseError {
+        return OFPort.of((c.readUnsignedShort() & 0x0FFFF));
+    }
 
-        @Override
-        public void writeTo(OFPort value, ChannelBuffer c) {
-            c.writeInt(value.portNumber);
-        }
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(this.portNumber);
+    }
 
-        @Override
-        public OFPort readFrom(ChannelBuffer c) throws OFParseError {
-            return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
-        }
-
+    public static OFPort read4Bytes(ChannelBuffer c) throws OFParseError {
+        return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
 }

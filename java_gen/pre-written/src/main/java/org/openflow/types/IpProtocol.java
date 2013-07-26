@@ -1,7 +1,6 @@
 package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.exceptions.OFParseError;
 
 /**
  * IP-Protocol field representation
@@ -307,20 +306,6 @@ public class IpProtocol implements OFValueType {
     @Override
     public int getLength() {
         return LENGTH;
-    }
-
-    volatile byte[] bytesCache = null;
-
-    @Override
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache = new byte[] { (byte)proto };
-                }
-            }
-        }
-        return bytesCache;
     }
 
     public static IpProtocol of(short proto) {
@@ -639,24 +624,12 @@ public class IpProtocol implements OFValueType {
     public String toString() {
         return Integer.toHexString(proto);
     }
-
-    public static final Serializer<IpProtocol> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<IpProtocol> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<IpProtocol> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<IpProtocol> SERIALIZER_V13 = SERIALIZER_V10;
-
-    private static class SerializerV10 implements OFValueType.Serializer<IpProtocol> {
-
-        @Override
-        public void writeTo(IpProtocol value, ChannelBuffer c) {
-            c.writeByte(value.proto);
-        }
-
-        @Override
-        public IpProtocol readFrom(ChannelBuffer c) throws OFParseError {
-            return IpProtocol.of((short)(c.readUnsignedByte() & 0x00FF));
-        }
-
+    
+    public void writeByte(ChannelBuffer c) {
+        c.writeByte(this.proto);
     }
 
+    public static IpProtocol readByte(ChannelBuffer c) {
+        return IpProtocol.of(c.readUnsignedByte());
+    }
 }

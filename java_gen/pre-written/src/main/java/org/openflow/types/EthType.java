@@ -1,7 +1,7 @@
 package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.exceptions.OFParseError;
+
 
 /**
  * EtherType field representation.
@@ -108,23 +108,6 @@ public class EthType implements OFValueType {
     @Override
     public int getLength() {
         return LENGTH;
-    }
-
-    volatile byte[] bytesCache = null;
-
-    @Override
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache = new byte[] {
-                                             (byte) ((rawValue >>> 8) & 0xFF),
-                                             (byte) ((rawValue >>> 0) & 0xFF)
-                    };
-                }
-            }
-        }
-        return bytesCache;
     }
 
     public static EthType of(int type) {
@@ -243,24 +226,13 @@ public class EthType implements OFValueType {
     public String toString() {
         return Integer.toHexString(rawValue);
     }
-
-    public static final Serializer<EthType> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<EthType> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<EthType> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<EthType> SERIALIZER_V13 = SERIALIZER_V10;
-
-    private static class SerializerV10 implements OFValueType.Serializer<EthType> {
-
-        @Override
-        public void writeTo(EthType value, ChannelBuffer c) {
-            c.writeShort(value.rawValue);
-        }
-
-        @Override
-        public EthType readFrom(ChannelBuffer c) throws OFParseError {
-            return EthType.of(c.readUnsignedShort());
-        }
-
+    
+    public void write2Bytes(ChannelBuffer c) {
+        c.writeShort(this.rawValue);
+    }
+    
+    public static EthType read2Bytes(ChannelBuffer c) {
+        return EthType.of(c.readUnsignedShort());
     }
 
 }

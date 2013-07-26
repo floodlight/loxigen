@@ -66,23 +66,12 @@ public class VlanVid implements OFValueType {
         return bytesCache;
     }
     
-    public static final Serializer<VlanVid> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<VlanVid> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<VlanVid> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<VlanVid> SERIALIZER_V13 = SERIALIZER_V10;
-    
-    private static class SerializerV10 implements OFValueType.Serializer<VlanVid> {
+    public void write2Bytes(ChannelBuffer c) {
+        c.writeShort(this.vid);
+    }
 
-        @Override
-        public void writeTo(VlanVid value, ChannelBuffer c) {
-            c.writeShort(value.vid);
-        }
-
-        @Override
-        public VlanVid readFrom(ChannelBuffer c) throws OFParseError {
-            return VlanVid.of(c.readShort());
-        }
-        
+    public VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
+        return VlanVid.of(c.readShort());
     }
     
 }

@@ -49,38 +49,13 @@ public class VlanPcp implements OFValueType {
     public int getLength() {
         return LENGTH;
     }
-
-    volatile byte[] bytesCache = null;
-
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache =
-                            new byte[] { pcp };
-                }
-            }
-        }
-        return bytesCache;
+    
+    public void writeByte(ChannelBuffer c) {
+        c.writeShort(this.pcp);
     }
-    
-    public static final Serializer<VlanPcp> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<VlanPcp> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<VlanPcp> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<VlanPcp> SERIALIZER_V13 = SERIALIZER_V10;
-    
-    private static class SerializerV10 implements OFValueType.Serializer<VlanPcp> {
 
-        @Override
-        public void writeTo(VlanPcp value, ChannelBuffer c) {
-            c.writeShort(value.pcp);
-        }
-
-        @Override
-        public VlanPcp readFrom(ChannelBuffer c) throws OFParseError {
-            return VlanPcp.of((byte)(c.readUnsignedByte() & 0xFF));
-        }
-        
+    public static VlanPcp readByte(ChannelBuffer c) throws OFParseError {
+        return VlanPcp.of((byte)(c.readUnsignedByte() & 0xFF));
     }
     
 }

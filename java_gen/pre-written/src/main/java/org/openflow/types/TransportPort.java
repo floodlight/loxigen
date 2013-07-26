@@ -31,21 +31,6 @@ public class TransportPort implements OFValueType {
     public int getLength() {
         return LENGTH;
     }
-    
-    volatile byte[] bytesCache;
-    
-    @Override
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache = new byte[] { (byte)(port & 0xFF),
-                                              (byte)((port >>> 8) & 0xFF)};
-                }
-            }
-        }
-        return bytesCache;
-    }
 
     @Override
     public boolean equals(Object obj) {
@@ -70,23 +55,12 @@ public class TransportPort implements OFValueType {
         return Integer.toString(port);
     }
 
-    public static final Serializer<TransportPort> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<TransportPort> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<TransportPort> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<TransportPort> SERIALIZER_V13 = SERIALIZER_V10;
+    public void write2Bytes(ChannelBuffer c) {
+        c.writeShort(this.port);
+    }
 
-    private static class SerializerV10 implements OFValueType.Serializer<TransportPort> {
-
-        @Override
-        public void writeTo(TransportPort value, ChannelBuffer c) {
-            c.writeShort(value.port);
-        }
-
-        @Override
-        public TransportPort readFrom(ChannelBuffer c) throws OFParseError {
-            return TransportPort.of((c.readUnsignedShort() & 0x0FFFF));
-        }
-
+    public static TransportPort read2Bytes(ChannelBuffer c) throws OFParseError {
+        return TransportPort.of((c.readUnsignedShort() & 0x0FFFF));
     }
 
 }

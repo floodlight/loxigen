@@ -1,18 +1,24 @@
 package org.openflow.protocol.match;
 
+import org.openflow.types.ArpOpcode;
 import org.openflow.types.EthType;
-import org.openflow.types.IPv4;
-import org.openflow.types.IPv6;
+import org.openflow.types.ICMPv4Code;
+import org.openflow.types.ICMPv4Type;
+import org.openflow.types.IPv4WithMask;
+import org.openflow.types.IPv6FlowLabel;
+import org.openflow.types.IPv6WithMask;
+import org.openflow.types.IpDscp;
+import org.openflow.types.IpEcn;
 import org.openflow.types.IpProtocol;
 import org.openflow.types.MacAddress;
 import org.openflow.types.Masked;
 import org.openflow.types.OFPort;
-import org.openflow.types.U16;
-import org.openflow.types.U8;
+import org.openflow.types.OFValueType;
+import org.openflow.types.TransportPort;
 import org.openflow.types.VlanPcp;
 import org.openflow.types.VlanVid;
 
-public class MatchField<F, M> {
+public class MatchField<F extends OFValueType> {
     private final String name;
     public final int id;
 
@@ -26,78 +32,77 @@ public class MatchField<F, M> {
         this.id = id;
     }
 
-    public final static MatchField<OFPort, NoMatch> IN_PORT =
-            new MatchField<OFPort, NoMatch>("in_port", 0);
-    public final static MatchField<OFPort, NoMatch> IN_PHY_PORT =
-            new MatchField<OFPort, NoMatch>("in_phy_port");
-    public final static MatchField<OFPort, NoMatch> METADATA =
-            new MatchField<OFPort, NoMatch>("metadata");
+    public final static MatchField<OFPort> IN_PORT =
+            new MatchField<OFPort>("in_port", 0);
+    public final static MatchField<OFPort> IN_PHY_PORT =
+            new MatchField<OFPort>("in_phy_port");
+    public final static MatchField<OFPort> METADATA =
+            new MatchField<OFPort>("metadata");
 
-    public final static MatchField<MacAddress, Masked<MacAddress>> ETH_DST =
-            new MatchField<MacAddress, Masked<MacAddress>>("eth_dst");
-    public final static MatchField<MacAddress, Masked<MacAddress>> ETH_SRC =
-            new MatchField<MacAddress, Masked<MacAddress>>("eth_src", 1);
+    public final static MatchField<Masked<MacAddress>> ETH_DST =
+            new MatchField<Masked<MacAddress>>("eth_dst");
+    public final static MatchField<Masked<MacAddress>> ETH_SRC =
+            new MatchField<Masked<MacAddress>>("eth_src", 1);
 
-    public final static MatchField<EthType, NoMatch> ETH_TYPE =
-            new MatchField<EthType, NoMatch>("eth_type");
+    public final static MatchField<EthType> ETH_TYPE =
+            new MatchField<EthType>("eth_type");
     
-    public final static MatchField<VlanVid, Masked<VlanVid>> VLAN_VID =
-            new MatchField<VlanVid, Masked<VlanVid>>("vlan_vid");
-    public final static MatchField<VlanPcp, NoMatch> VLAN_PCP =
-            new MatchField<VlanPcp, NoMatch>("vlan_pcp");
+    public final static MatchField<Masked<VlanVid>> VLAN_VID =
+            new MatchField<Masked<VlanVid>>("vlan_vid");
+    public final static MatchField<VlanPcp> VLAN_PCP =
+            new MatchField<VlanPcp>("vlan_pcp");
     
     
-    public final static MatchField<NoMatch, NoMatch> IP_DSCP =
-            new MatchField<NoMatch, NoMatch>("ip_dscp");
-    public final static MatchField<NoMatch, NoMatch> IP_ECN =
-            new MatchField<NoMatch, NoMatch>("ip_dscp");
-    public final static MatchField<IpProtocol, NoMatch> IP_PROTO =
-            new MatchField<IpProtocol, NoMatch>("ip_proto");
+    public final static MatchField<IpDscp> IP_DSCP =
+            new MatchField<IpDscp>("ip_dscp");
+    public final static MatchField<IpEcn> IP_ECN =
+            new MatchField<IpEcn>("ip_dscp");
+    public final static MatchField<IpProtocol> IP_PROTO =
+            new MatchField<IpProtocol>("ip_proto");
 
-    public final static MatchField<IPv4, Masked<IPv4>> IPV4_SRC =
-            new MatchField<IPv4, Masked<IPv4>>("ipv4_src");
-    public final static MatchField<IPv4, Masked<IPv4>> IPV4_DST =
-            new MatchField<IPv4, Masked<IPv4>>("ipv4_dst");
+    public final static MatchField<IPv4WithMask> IPV4_SRC =
+            new MatchField<IPv4WithMask>("ipv4_src");
+    public final static MatchField<IPv4WithMask> IPV4_DST =
+            new MatchField<IPv4WithMask>("ipv4_dst");
 
-    public final static MatchField<U16, NoMatch> TCP_SRC = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
             "tcp_src");
-    public final static MatchField<U16, NoMatch> TCP_DST = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> TCP_DST = new MatchField<TransportPort>(
             "tcp_dst");
 
-    public final static MatchField<U16, NoMatch> UDP_SRC = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> UDP_SRC = new MatchField<TransportPort>(
             "udp_src");
-    public final static MatchField<U16, NoMatch> UDP_DST = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> UDP_DST = new MatchField<TransportPort>(
             "udp_dst");
 
-    public final static MatchField<U16, NoMatch> SCTP_SRC = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> SCTP_SRC = new MatchField<TransportPort>(
             "sctp_src");
-    public final static MatchField<U16, NoMatch> SCTP_DST = new MatchField<U16, NoMatch>(
+    public final static MatchField<TransportPort> SCTP_DST = new MatchField<TransportPort>(
             "sctp_dst");
 
-    public final static MatchField<U8, NoMatch> ICMPV4_TYPE = new MatchField<U8, NoMatch>(
+    public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
             "icmpv4_src");
-    public final static MatchField<U8, NoMatch> ICMPV4_CODE = new MatchField<U8, NoMatch>(
+    public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
             "icmpv4_dst");
 
-    public final static MatchField<U16, NoMatch> ARP_OP = new MatchField<U16, NoMatch>(
+    public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
             "arp_op");
-    public final static MatchField<IPv4, Masked<IPv4>> ARP_SPA =
-            new MatchField<IPv4, Masked<IPv4>>("arp_spa");
-    public final static MatchField<IPv4, Masked<IPv4>> ARP_TPA =
-            new MatchField<IPv4, Masked<IPv4>>("arp_tpa");
-    public final static MatchField<MacAddress, Masked<MacAddress>> ARP_SHA =
-            new MatchField<MacAddress, Masked<MacAddress>>("arp_sha");
-    public final static MatchField<MacAddress, Masked<MacAddress>> ARP_THA =
-            new MatchField<MacAddress, Masked<MacAddress>>("arp_tha");
+    public final static MatchField<IPv4WithMask> ARP_SPA =
+            new MatchField<IPv4WithMask>("arp_spa");
+    public final static MatchField<IPv4WithMask> ARP_TPA =
+            new MatchField<IPv4WithMask>("arp_tpa");
+    public final static MatchField<Masked<MacAddress>> ARP_SHA =
+            new MatchField<Masked<MacAddress>>("arp_sha");
+    public final static MatchField<Masked<MacAddress>> ARP_THA =
+            new MatchField<Masked<MacAddress>>("arp_tha");
 
-    public final static MatchField<IPv6, Masked<IPv6>> IPV6_SRC =
-            new MatchField<IPv6, Masked<IPv6>>("ipv6_src");
-    public final static MatchField<IPv6, Masked<IPv6>> IPV6_DST =
-            new MatchField<IPv6, Masked<IPv6>>("ipv6_dst");
+    public final static MatchField<IPv6WithMask> IPV6_SRC =
+            new MatchField<IPv6WithMask>("ipv6_src");
+    public final static MatchField<IPv6WithMask> IPV6_DST =
+            new MatchField<IPv6WithMask>("ipv6_dst");
 
-    // FIXME: Wrong masked type?
-    public final static MatchField<U8, Masked<IPv6>> IPV6_FLABEL =
-            new MatchField<U8, Masked<IPv6>>("ipv6_flabel");
+    public final static MatchField<Masked<IPv6FlowLabel>> IPV6_FLABEL =
+            new MatchField<Masked<IPv6FlowLabel>>("ipv6_flabel");
 
     public String getName() {
         return name;

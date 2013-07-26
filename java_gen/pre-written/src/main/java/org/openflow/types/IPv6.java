@@ -270,24 +270,12 @@ public class IPv6 implements OFValueType {
         return true;
     }
     
-    public static final Serializer<IPv6> SERIALIZER_V12 = new SerializerV12();
-    public static final Serializer<IPv6> SERIALIZER_V13 = SERIALIZER_V12;
-    
-    private static class SerializerV12 implements OFValueType.Serializer<IPv6> {
-
-        @Override
-        public void writeTo(IPv6 value, ChannelBuffer c) {
-            c.writeLong(value.raw1);
-            c.writeLong(value.raw2);            
-        }
-
-        @Override
-        public IPv6 readFrom(ChannelBuffer c) throws OFParseError {
-            return IPv6.of(c.readLong(), c.readLong());
-        }
-        
+    public void write16Bytes(ChannelBuffer c) {
+        c.writeLong(this.raw1);
+        c.writeLong(this.raw2);            
     }
-    
-    
 
+    public static IPv6 read16Bytes(ChannelBuffer c) throws OFParseError {
+        return IPv6.of(c.readLong(), c.readLong());
+    }
 }

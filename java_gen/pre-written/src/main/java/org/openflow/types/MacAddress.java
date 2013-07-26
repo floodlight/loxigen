@@ -107,28 +107,15 @@ public class MacAddress implements OFValueType {
         return rawValue;
     }
 
-    public static final Serializer<MacAddress> SERIALIZER_V10 = new SerializerV10();
-    public static final Serializer<MacAddress> SERIALIZER_V11 = SERIALIZER_V10;
-    public static final Serializer<MacAddress> SERIALIZER_V12 = SERIALIZER_V10;
-    public static final Serializer<MacAddress> SERIALIZER_V13 = SERIALIZER_V10;
-
-    private static class SerializerV10 implements OFValueType.Serializer<MacAddress> {
-
-        @Override
-        public void writeTo(MacAddress value, ChannelBuffer c) {
-            c.writeInt((int) (value.rawValue >> 16));
-            c.writeShort((int) value.rawValue & 0xFFFF);
-        }
-
-        @Override
-        public MacAddress readFrom(ChannelBuffer c) throws OFParseError {
-            long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
-            return MacAddress.of(raw);
-        }
-        
-        
+    public void write6Bytes(ChannelBuffer c) {
+        c.writeInt((int) (this.rawValue >> 16));
+        c.writeShort((int) this.rawValue & 0xFFFF);
     }
 
+    public static MacAddress read6Bytes(ChannelBuffer c) throws OFParseError {
+        long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
+        return MacAddress.of(raw);
+    }
     
     
 
