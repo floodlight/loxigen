@@ -40,3 +40,36 @@ ofp.flow_stats_entry(
     actions=[
         ofp.action.output(port=1),
         ofp.action.output(port=2)])
+-- c
+obj = of_flow_stats_entry_new(OF_VERSION_1_0);
+{
+    of_object_t list;
+    of_flow_stats_entry_actions_bind(obj, &list);
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 1);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 2);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+}
+of_flow_stats_entry_byte_count_set(obj, 1000);
+of_flow_stats_entry_cookie_set(obj, 81985529216486895);
+of_flow_stats_entry_duration_nsec_set(obj, 2);
+of_flow_stats_entry_duration_sec_set(obj, 1);
+of_flow_stats_entry_hard_timeout_set(obj, 10);
+of_flow_stats_entry_idle_timeout_set(obj, 5);
+{
+    of_match_t match = { OF_VERSION_1_0 };
+    of_flow_stats_entry_match_set(obj, &match);
+}
+of_flow_stats_entry_packet_count_set(obj, 10);
+of_flow_stats_entry_priority_set(obj, 100);
+of_flow_stats_entry_table_id_set(obj, 3);

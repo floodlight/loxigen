@@ -23,3 +23,31 @@ ofp.message.packet_out(
         ofp.action.output(port=1),
         ofp.action.output(port=2)],
     data='abc')
+-- c
+obj = of_packet_out_new(OF_VERSION_1_0);
+of_packet_out_buffer_id_set(obj, 2882400001);
+of_packet_out_in_port_set(obj, 65534);
+of_packet_out_xid_set(obj, 305419896);
+{
+    of_object_t *list = of_list_action_new(OF_VERSION_1_0);
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 1);
+        of_list_append(list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 2);
+        of_list_append(list, obj);
+        of_object_delete(obj);
+    }
+    of_packet_out_actions_set(obj, list);
+    of_object_delete(list);
+}
+{
+    of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
+    of_packet_out_data_set(obj, &data);
+}
