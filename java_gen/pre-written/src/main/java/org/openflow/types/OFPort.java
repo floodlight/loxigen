@@ -520,7 +520,7 @@ public class OFPort implements OFValueType {
     }
 
     public static OFPort read2Bytes(ChannelBuffer c) throws OFParseError {
-        return OFPort.of((c.readUnsignedShort() & 0x0FFFF));
+        return OFPort.ofShort(c.readShort());
     }
 
     public void write4Bytes(ChannelBuffer c) {
