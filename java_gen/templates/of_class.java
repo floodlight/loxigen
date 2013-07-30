@@ -206,6 +206,20 @@ class ${impl_class} implements ${msg.interface.name} {
     }
 
     @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder("${msg.name}(");
+        //:: for i, prop in enumerate(msg.data_members):
+        //:: if i > 0:
+        b.append(", ");
+        //:: #endif
+        b.append("${prop.name}=").append(${ "Arrays.toString(%s)" % prop.name if prop.java_type.is_array else prop.name });
+        //:: #endfor
+        b.append(")");
+        return b.toString();
+    }
+
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj)
             return true;
@@ -222,7 +236,7 @@ class ${impl_class} implements ${msg.interface.name} {
         //:: elif prop.java_type.is_array:
         if (!Arrays.equals(${prop.name}, other.${prop.name}))
                 return false;
-        // not primitive: ${prop.name}
+        //:: else:
         if (${prop.name} == null) {
             if (other.${prop.name} != null)
                 return false;
