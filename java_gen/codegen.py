@@ -36,6 +36,7 @@ import shutil
 import of_g
 from loxi_ir import *
 import lang_java
+import test_data
 
 import loxi_utils.loxi_utils as loxi_utils
 
@@ -43,14 +44,13 @@ import java_gen.java_model as java_model
 
 def gen_all_java(out, name):
     basedir= '%s/openflowj' % of_g.options.install_dir
-    srcdir = "%s/src/main/java/" % basedir
     print "Outputting to %s" % basedir
     if os.path.exists(basedir):
         shutil.rmtree(basedir)
     os.makedirs(basedir)
     copy_prewrite_tree(basedir)
 
-    gen = JavaGenerator(srcdir)
+    gen = JavaGenerator(basedir)
     gen.create_of_interfaces()
     gen.create_of_classes()
     gen.create_of_const_enums()
@@ -67,11 +67,14 @@ class JavaGenerator(object):
         self.basedir = basedir
         self.java_model = java_model.model
 
-    def render_class(self, clazz, template, **context):
+    def render_class(self, clazz, template, src_dir=None, **context):
+        if not src_dir:
+            src_dir = "src/main/java/"
+
         context['class_name'] = clazz.name
         context['package'] = clazz.package
 
-        filename = os.path.join(self.basedir, "%s/%s.java" % (clazz.package.replace(".", "/"), clazz.name))
+        filename = os.path.join(self.basedir, src_dir, "%s/%s.java" % (clazz.package.replace(".", "/"), clazz.name))
         dirname = os.path.dirname(filename)
         if not os.path.exists(dirname):
             os.makedirs(dirname)
@@ -106,6 +109,23 @@ class JavaGenerator(object):
                 self.render_class(clazz=java_class,
                         template='of_class.java', version=java_class.version, msg=java_class,
                         impl_class=java_class.name)
+
+                self.create_unit_test(java_class.unit_test)
+
+    def create_unit_test(self, unit_test):
+        if unit_test.has_test_data:
+            self.render_class(clazz=unit_test,
+                    template='unit_test.java', src_dir="src/test/java",
+                    version=unit_test.java_class.version,
+                    test=unit_test, msg=unit_test.java_class,
+                    test_data=unit_test.test_data)
+
+    def create_of_factories(self):
+        factory = self.java_model.of_factory
+        self.render_class(clazz=factory, template="of_factory_interface.java", factory=factory)
+        for factory_class in factory.factory_classes:
+            self.render_class(clazz=factory_class, template="of_factory_class.java", factory=factory_class, model=self.java_model)
+        self.render_class(clazz=java_model.OFGenericClass(package="org.openflow.protocol", name="OFFactories"), template="of_factories.java", versions=self.java_model.versions)
 
 def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write

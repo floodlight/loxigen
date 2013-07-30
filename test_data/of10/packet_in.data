@@ -27,3 +27,11 @@ of_packet_in_in_port_set(obj, 65534);
 of_packet_in_reason_set(obj, 1);
 of_packet_in_total_len_set(obj, 9);
 of_packet_in_xid_set(obj, 305419896);
+-- java
+builder
+   .setXid(0x12345678)
+   .setBufferId(0xabcdef01)
+   .setTotalLen(9)
+   .setInPort(OFPort.LOCAL)
+   .setReason(OFPacketInReason.ACTION)
+   .setData(new byte[] { 0x61, 0x62, 0x63 } );

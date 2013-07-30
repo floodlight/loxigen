@@ -21,18 +21,18 @@ def name_c_to_caps_camel(name):
         return camel
 
 
-ANY = 0xFFFFFFFFFFFFFFFF
+java_primitive_types = set("byte char short int long".split(" "))
 
+ANY = 0xFFFFFFFFFFFFFFFF
 
 class VersionOp:
     def __init__(self, version=ANY, read=None, write=None):
         self.version = version
         self.read = read
         self.write = write
-        
+
     def __str__(self):
         return "[Version: %d, Read: '%s', Write: '%s']" % (self.version, self.read, self.write)
-
 
 class JType(object):
     """ Wrapper class to hold C to Java type conversion information """
@@ -97,6 +97,15 @@ class JType(object):
             return _write_op(version, name)
         else:
             return _write_op.replace("$name", str(name)).replace("$version", version.of_version)
+
+    @property
+    def is_primitive(self):
+        return self.pub_type in java_primitive_types
+
+    @property
+    def is_array(self):
+        return self.pub_type.endswith("[]")
+
 
 hello_elem_list = JType("List<OFHelloElement>") \
         .op(read='ChannelUtils.readHelloElementList(bb)', write='ChannelUtils.writeHelloElementList(bb)')

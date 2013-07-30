@@ -45,6 +45,9 @@ def list_files():
                 result.append(dirname + '/' + filename)
     return sorted(result)
 
+def exists(name):
+    return os.path.exists(os.path.join(_test_data_dir, name))
+
 def read(name):
     """
     Read, parse, and return a test data file

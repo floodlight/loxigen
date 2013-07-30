@@ -218,6 +218,12 @@ class JavaOFClass(object):
         self.version = version
         self.constant_name = self.c_name.upper().replace("OF_", "")
         self.package = "org.openflow.protocol.ver%s" % version.of_version
+        self.generated = False
+
+    @property
+    @memoize
+    def unit_test(self):
+        return JavaUnitTest(self)
 
     @property
     def name(self):
@@ -440,6 +446,34 @@ class JavaMember(object):
         if other is None or type(self) != type(other):
             return False
         return (self.name,) == (other.name,)
+
+
+#######################################################################
+### Unit Test
+#######################################################################
+
+class JavaUnitTest(object):
+    def __init__(self, java_class):
+        self.java_class = java_class
+        self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+                                                     name=java_class.c_name[3:])
+    @property
+    def package(self):
+        return self.java_class.package
+
+    @property
+    def name(self):
+        return self.java_class.name + "Test"
+
+    @property
+    def has_test_data(self):
+        return test_data.exists(self.data_file_name)
+
+    @property
+    @memoize
+    def test_data(self):
+        return test_data.read(self.data_file_name)
+
 
 #######################################################################
 ### Enums
