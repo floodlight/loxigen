@@ -150,7 +150,7 @@ class JavaOFInterface(object):
             self.parent_interface = None
 
     def class_info(self):
-        if re.match(r'OFFlow(Add|Modify(Strict?)|Deleted(Strict?))', self.name):
+        if re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod")
         elif utils.class_is_message(self.c_name):
             return ("", "OFMessage")

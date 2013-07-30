@@ -1,14 +1,15 @@
 package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.protocol.OFObject;
+
+
 
 /**
  * Wrapper around an IPv4 address
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4 implements OFObject {
+public class IPv4 implements OFValueType {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -82,15 +83,6 @@ public class IPv4 implements OFObject {
         return LENGTH;
     }
 
-    public static IPv4 readFrom(final ChannelBuffer bb) {
-        return IPv4.of(bb.readInt());
-    }
-
-    @Override
-    public void writeTo(final ChannelBuffer bb) {
-        bb.writeInt(rawValue);
-    }
-
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
@@ -122,5 +114,13 @@ public class IPv4 implements OFObject {
             return false;
         return true;
     }
-
+    
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(rawValue);
+    }
+    
+    public static IPv4 read4Bytes(ChannelBuffer c) {
+        return IPv4.of(c.readInt());
+    }
+    
 }

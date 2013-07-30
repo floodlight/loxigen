@@ -1,6 +1,8 @@
 package org.openflow.types;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.annotations.Immutable;
+import org.openflow.exceptions.OFParseError;
 
 /**
  * Abstraction of an logical / OpenFlow switch port (ofp_port_no) in OpenFlow.
@@ -13,7 +15,9 @@ import org.openflow.annotations.Immutable;
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
 @Immutable
-public class OFPort {
+public class OFPort implements OFValueType {
+    static final int LENGTH = 4;
+    
     // private int constants (OF1.1+) to avoid duplication in the code
     // should not have to use these outside this class
     private static final int OFPP_ANY_INT = 0xFFffFFff;
@@ -488,4 +492,42 @@ public class OFPort {
         }
     }
 
+    @Override
+    public int getLength() {
+        return LENGTH;
+    }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof OFPort))
+            return false;
+        OFPort other = (OFPort)obj;
+        if (other.portNumber != this.portNumber)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 53;
+        int result = 1;
+        result = prime * result + portNumber;
+        return result;
+    }
+
+    public void write2Bytes(ChannelBuffer c) {
+        c.writeShort(this.portNumber);
+    }
+
+    public static OFPort read2Bytes(ChannelBuffer c) throws OFParseError {
+        return OFPort.of((c.readUnsignedShort() & 0x0FFFF));
+    }
+
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(this.portNumber);
+    }
+
+    public static OFPort read4Bytes(ChannelBuffer c) throws OFParseError {
+        return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
+    }
 }
