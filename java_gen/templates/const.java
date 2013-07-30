@@ -37,16 +37,7 @@ import org.openflow.protocol.OFVersion;
 
 public enum ${class_name} {
 //:: for i, entry in enumerate(enum.entries):
-//::     values = [ ("0x%x" % val) if val is not None else "-1" for val in entry.all_values(all_versions) ]
-     ${entry.name}(new int[] { ${ ", ".join( values) } } )${ ", " if i < len(enum.entries)-1 else ";" }
+     ${entry.name}${ ", " if i < len(enum.entries)-1 else ";" }
 //:: #endfor
 
-    private final int[] wireValues;
-    ${class_name}(int[] wireValues) {
-        this.wireValues = wireValues;
-    }
-
-    public int getWireValue(OFVersion version) {
-        return this.wireValues[version.getWireVersion()];
-    }
 }

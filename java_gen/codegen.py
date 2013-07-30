@@ -91,6 +91,10 @@ class JavaGenerator(object):
             self.render_class(clazz=enum,
                     template='const.java', enum=enum, all_versions=self.java_model.versions)
 
+            for version in enum.versions:
+                clazz = java_model.OFGenericClass(package="org.openflow.protocol.ver{}".format(version.of_version), name="{}SerializerVer{}".format(enum.name, version.of_version))
+                self.render_class(clazz=clazz, template="const_serializer.java", enum=enum, version=version)
+
     def create_of_interfaces(self):
         """ Create the base interfaces for of classes"""
         for interface in self.java_model.interfaces:

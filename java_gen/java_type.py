@@ -54,6 +54,21 @@ class JType(object):
         self.ops[version] = VersionOp(version, read, write)
         return self
 
+    def cast(self, min):
+        """ declares that the value has to be cast to itself for values >= min.
+            This is to deal with Java signedness """
+        def format_cast_value(value):
+            if value >= min:
+                return "(%s) 0x%x" % (self.pub_type, value)
+            else:
+                return "0x%x" % (value)
+
+        self.format_value = format_cast_value
+        return self
+
+    def format_value(self, value):
+        return value
+
     @property
     def public_type(self):
         """ return the public type """
@@ -185,6 +200,8 @@ ipv4 = JType("IPv4") \
 ipv6 = JType("IPv6") \
         .op(read="IPv6.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)")
+packetin_reason = JType("OFPacketInReason")\
+        .op(read="OFPacketInReasonSerializerVer$version.readFrom(bb)", write="OFPacketInReasonSerializerVer$version.writeTo(bb, $name)")
 
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,
@@ -222,11 +239,22 @@ default_mtype_to_jtype_convert_map = {
 
 ## This is where we drop in special case handling for certain types
 exceptions = {
-        'OFPacketIn': {
-            'data' : octets
+        'of_packet_in': {
+            'data' : octets,
+            'reason': packetin_reason
             },
 }
 
+
+enum_wire_types = {
+        "uint8_t": JType("byte").op(read="bb.readByte()", write="bb.writeByte($name)").cast(min=1<<7),
+        "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)").cast(min=1<<15),
+        "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)").cast(min=1<<31),
+        "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)").cast(min=1<<31)
+}
+
+def convert_enum_wire_type_to_jtype(wire_type):
+    return enum_wire_types[wire_type]
 
 def make_standard_list_jtype(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)

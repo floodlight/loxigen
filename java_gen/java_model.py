@@ -78,17 +78,18 @@ class JavaModel(object):
     @property
     @memoize
     def enums(self):
-        enum_entry_version_value_map = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.OrderedDict()))
+        name_version_enum_map = OrderedDefaultDict(lambda: OrderedDict())
 
         for version in self.versions:
             of_protocol = of_g.ir[version.int_version]
             for enum in of_protocol.enums:
-                for entry_name, entry_value in enum.values:
-                    enum_entry_version_value_map[enum.name][entry_name][version] = entry_value
+                name_version_enum_map[enum.name][version] = enum
 
-        enums = [ JavaEnum(name, entry_version_value_map) for name, entry_version_value_map
-                        in enum_entry_version_value_map.items() ]
+        enums = [ JavaEnum(name, version_enum_map) for name, version_enum_map,
+                        in name_version_enum_map.items() ]
 
+        # inelegant - need java name here
+        enums = [ enum for enum in enums if enum.name not in self.enum_blacklist ]
         return enums
 
     @memoize
@@ -531,16 +532,36 @@ class JavaUnitTest(object):
 #######################################################################
 
 class JavaEnum(object):
-    def __init__(self, c_name, entry_version_value_map):
+    def __init__(self, c_name, version_enum_map):
         self.c_name = c_name
         self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
 
         # Port_features has constants that start with digits
         self.name_prefix = "PF_" if self.name == "OFPortFeatures" else ""
 
+        self.version_enums = version_enum_map
+
+        entry_name_version_value_map = OrderedDefaultDict(lambda: OrderedDict())
+        for version, ir_enum in version_enum_map.items():
+            for ir_entry in ir_enum.entries:
+                if "virtual" in ir_entry.params:
+                    continue
+                entry_name_version_value_map[ir_entry.name][version] = ir_entry.value
+
         self.entries = [ JavaEnumEntry(self, name, version_value_map)
-                         for (name, version_value_map) in entry_version_value_map.items() ]
+                         for (name, version_value_map) in entry_name_version_value_map.items() ]
         self.package = "org.openflow.protocol"
+
+    def wire_type(self, version):
+        ir_enum = self.version_enums[version]
+        if "wire_type" in ir_enum.params:
+            return java_type.convert_enum_wire_type_to_jtype(ir_enum.params["wire_type"])
+        else:
+            return java_type.u8
+
+    @property
+    def versions(self):
+        return self.version_enums.keys()
 
     @memoize
     def entry_by_name(self, name):
@@ -566,11 +587,18 @@ class JavaEnum(object):
 # values: Map JavaVersion->Value
 class JavaEnumEntry(object):
     def __init__(self, enum, name, values):
+        self.enum = enum
         self.name = enum.name_prefix + "_".join(name.split("_")[1:]).upper()
         self.values = values
 
+    def has_value(self, version):
+        return version in self.values
+
     def value(self, version):
-        res = self.version_value_map[version]
+        return self.values[version]
+
+    def format_value(self, version):
+        res = self.enum.wire_type(version).format_value(self.values[version])
         return res
 
     def all_values(self, versions, not_present=None):
