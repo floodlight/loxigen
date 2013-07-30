@@ -66,6 +66,8 @@ from generic_utils import *
 import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
 import loxi_front_end.identifiers as identifiers
+import util
+import test_data
 
 def var_name_map(m_type):
     """
@@ -341,6 +343,7 @@ extern int run_validator_tests(void);
 extern int run_list_limits_tests(void);
 
 extern int test_ext_objs(void);
+extern int test_datafiles(void);
 
 """)
 
@@ -1967,3 +1970,16 @@ test_ident_macros(void)
 }
 """)
 
+def gen_datafiles_tests(out, name):
+    tests = []
+    for filename in test_data.list_files():
+        data = test_data.read(filename)
+        if not 'c' in data:
+            continue
+        name = filename[:-5].replace("/", "_")
+        tests.append(dict(name=name,
+                          filename=filename,
+                          c=data['c'],
+                          binary=data['binary']))
+
+    util.render_template(out, "test_data.c", tests=tests)

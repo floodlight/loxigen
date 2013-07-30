@@ -97,6 +97,7 @@ targets = {
     'locitest/src/test_msg.c': c_test_gen.gen_msg_test,
     'locitest/src/test_scalar_acc.c': c_test_gen.gen_message_scalar_test,
     'locitest/src/test_uni_acc.c': c_test_gen.gen_unified_accessor_tests,
+    'locitest/src/test_data.c': c_test_gen.gen_datafiles_tests,
 
     # Static locitest code
     'locitest/inc/locitest/unittest.h': static,
@@ -107,4 +108,5 @@ targets = {
     'locitest/src/test_utils.c': static,
     'locitest/src/test_validator.c': static,
     'locitest/src/main.c': static,
+    'locitest/Makefile': static,
 }

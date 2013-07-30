@@ -100,17 +100,9 @@ check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of12.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of13.py
 
-CTEST_EXEC = ${LOXI_OUTPUT_DIR}/locitest/locitest
-CTEST_SOURCE = ${LOXI_OUTPUT_DIR}/locitest/src/*.c
-CTEST_SOURCE += ${LOXI_OUTPUT_DIR}/loci/src/*.c
-CTEST_INC = -I ${LOXI_OUTPUT_DIR}/loci/inc
-CTEST_INC += -I ${LOXI_OUTPUT_DIR}/locitest/inc
-CTEST_INC += -I ${LOXI_OUTPUT_DIR}/loci/src
-CTEST_CFLAGS = -Wall -Werror -g
-
 check-c: c
-	gcc ${CTEST_CFLAGS} -o ${CTEST_EXEC} ${CTEST_SOURCE} ${CTEST_INC}
-	${CTEST_EXEC}
+	make -C ${LOXI_OUTPUT_DIR}/locitest
+	${LOXI_OUTPUT_DIR}/locitest/locitest
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
