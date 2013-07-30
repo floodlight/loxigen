@@ -205,5 +205,50 @@ class ${impl_class} implements ${msg.interface.name} {
         }
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ${msg.name} other = (${msg.name}) obj;
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive:
+        if( ${prop.name} != other.${prop.name})
+            return false;
+        //:: elif prop.java_type.is_array:
+        if (!Arrays.equals(${prop.name}, other.${prop.name}))
+                return false;
+        // not primitive: ${prop.name}
+        if (${prop.name} == null) {
+            if (other.${prop.name} != null)
+                return false;
+        } else if (!${prop.name}.equals(other.${prop.name}))
+            return false;
+        //:: #endif
+        //:: #endfor
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive:
+        result = prime * result + ${prop.name};
+        //:: elif prop.java_type.is_array:
+        result = prime * result + Arrays.hashCode(${prop.name});
+        //:: else:
+        result = prime * result + ((${prop.name} == null) ? 0 : ${prop.name}.hashCode());
+        //:: #endif
+        //:: #endfor
+        return result;
+    }
+
 
 }
