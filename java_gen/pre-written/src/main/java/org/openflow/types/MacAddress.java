@@ -2,7 +2,6 @@ package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.protocol.OFObject;
 import org.openflow.util.HexString;
 
 /**
@@ -11,7 +10,7 @@ import org.openflow.util.HexString;
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
 
-public class MacAddress implements OFObject {
+public class MacAddress implements OFValueType {
     static final int MacAddrLen = 6;
     private final long rawValue;
 
@@ -77,17 +76,6 @@ public class MacAddress implements OFObject {
         return MacAddrLen;
     }
 
-    public static MacAddress readFrom(final ChannelBuffer bb) throws OFParseError {
-        long raw = bb.readUnsignedInt() << 16 | bb.readUnsignedShort();
-        return MacAddress.of(raw);
-    }
-
-    @Override
-    public void writeTo(final ChannelBuffer bb) {
-        bb.writeInt((int) (rawValue >> 16));
-        bb.writeShort((int) rawValue & 0xFFFF);
-    }
-
     @Override
     public String toString() {
         return HexString.toHexString(rawValue, 6);
@@ -118,5 +106,17 @@ public class MacAddress implements OFObject {
     public long getLong() {
         return rawValue;
     }
+
+    public void write6Bytes(ChannelBuffer c) {
+        c.writeInt((int) (this.rawValue >> 16));
+        c.writeShort((int) this.rawValue & 0xFFFF);
+    }
+
+    public static MacAddress read6Bytes(ChannelBuffer c) throws OFParseError {
+        long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
+        return MacAddress.of(raw);
+    }
+    
+    
 
 }

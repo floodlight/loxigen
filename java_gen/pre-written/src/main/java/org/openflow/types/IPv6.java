@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.protocol.OFObject;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
@@ -12,7 +11,7 @@ import org.openflow.protocol.OFObject;
  *
  * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
  */
-public class IPv6 implements OFObject {
+public class IPv6 implements OFValueType {
     static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;
@@ -159,16 +158,6 @@ public class IPv6 implements OFObject {
         return LENGTH;
     }
 
-    public static IPv6 readFrom(final ChannelBuffer bb) throws OFParseError {
-        return IPv6.of(bb.readLong(), bb.readLong());
-    }
-
-    @Override
-    public void writeTo(final ChannelBuffer bb) {
-        bb.writeLong(raw1);
-        bb.writeLong(raw2);
-    }
-
     @Override
     public String toString() {
         return toString(true, false);
@@ -280,5 +269,13 @@ public class IPv6 implements OFObject {
             return false;
         return true;
     }
+    
+    public void write16Bytes(ChannelBuffer c) {
+        c.writeLong(this.raw1);
+        c.writeLong(this.raw2);            
+    }
 
+    public static IPv6 read16Bytes(ChannelBuffer c) throws OFParseError {
+        return IPv6.of(c.readLong(), c.readLong());
+    }
 }

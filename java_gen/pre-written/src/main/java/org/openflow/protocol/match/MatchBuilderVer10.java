@@ -1,12 +1,13 @@
 package org.openflow.protocol.match;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.protocol.types.IpDscp;
 import org.openflow.types.EthType;
 import org.openflow.types.IPv4;
+import org.openflow.types.IpDscp;
 import org.openflow.types.IpProtocol;
 import org.openflow.types.MacAddress;
 import org.openflow.types.OFPort;
+import org.openflow.types.OFValueType;
 import org.openflow.types.U16;
 import org.openflow.types.VlanPcp;
 import org.openflow.types.VlanVid;
@@ -65,7 +66,7 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <F> F get(final MatchField<F, ?> match) {
+    public <F extends OFValueType> F get(final MatchField<F> match) {
         switch (match.id) {
             case 0:
                 return (F) inputPort;
@@ -78,7 +79,7 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <F> MatchBuilder set(final MatchField<F, ?> match, final F value) {
+    public <F extends OFValueType> MatchBuilder set(final MatchField<F> match, final F value) {
         switch (match.id) {
             case 0:
                 inputPort = (OFPort) value;
@@ -107,37 +108,31 @@ public class MatchBuilderVer10 implements MatchBuilder {
     }
 
     @Override
-    public <M> M getMasked(final MatchField<?, M> match) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean supports(final MatchField<?, ?> field) {
+    public boolean supports(final MatchField<?> field) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean supportsMasked(final MatchField<?, ?> field) {
+    public boolean supportsMasked(final MatchField<?> field) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isExact(final MatchField<?, ?> field) {
+    public boolean isExact(final MatchField<?> field) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isFullyWildcarded(final MatchField<?, ?> field) {
+    public boolean isFullyWildcarded(final MatchField<?> field) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public boolean isPartiallyMasked(final MatchField<?, ?> field) {
+    public boolean isPartiallyMasked(final MatchField<?> field) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -159,13 +154,13 @@ public class MatchBuilderVer10 implements MatchBuilder {
         // TODO Auto-generated method stub
 
     }
-
+/*
     @Override
     public <M> void setMasked(final MatchField<?, M> match, final M value) {
         // TODO Auto-generated method stub
 
     }
-
+*/
     @Override
     public Match getMatch() {
         // TODO Auto-generated method stub
