@@ -22,9 +22,9 @@ import org.openflow.protocol.OFTableStatsEntry;
 import org.openflow.protocol.action.OFAction;
 import org.openflow.protocol.instruction.OFInstruction;
 import org.openflow.protocol.match.Match;
+import org.openflow.protocol.meterband.OFMeterBand;
 import org.openflow.types.OFFlowModCmd;
 import org.openflow.types.OFHelloElement;
-import org.openflow.types.OFMeterBand;
 import org.openflow.types.OFPhysicalPort;
 
 import com.google.common.base.Charsets;
@@ -43,18 +43,19 @@ public class ChannelUtils {
         return byteArray;
     }
 
-    static public void writeBytes(final ChannelBuffer bb, final byte byteArray[]) {
+    static public void writeBytes(final ChannelBuffer bb,
+            final byte byteArray[]) {
         bb.writeBytes(byteArray);
     }
 
-    public static List<OFPhysicalPort> readPhysicalPortList(final ChannelBuffer bb,
-            final int i) {
+    public static List<OFPhysicalPort> readPhysicalPortList(
+            final ChannelBuffer bb, final int i) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public static List<OFInstruction> readInstructionsList(final ChannelBuffer bb,
-            final int i) {
+    public static List<OFInstruction> readInstructionsList(
+            final ChannelBuffer bb, final int i) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -69,12 +70,14 @@ public class ChannelUtils {
         return null;
     }
 
-    public static List<OFAction> readActionsList(final ChannelBuffer bb, final int i) {
+    public static List<OFAction> readActionsList(final ChannelBuffer bb,
+            final int i) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public static List<OFBsnInterface> readBsnInterfaceList(final ChannelBuffer bb) {
+    public static List<OFBsnInterface> readBsnInterfaceList(
+            final ChannelBuffer bb) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -84,18 +87,20 @@ public class ChannelUtils {
         return null;
     }
 
-    public static List<OFPacketQueue> readPacketQueueList(final ChannelBuffer bb,
+    public static List<OFPacketQueue> readPacketQueueList(
+            final ChannelBuffer bb, final int i) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List<OFHelloElement> readHelloElementList(
+            final ChannelBuffer bb) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static List<OFBucket> readBucketList(final ChannelBuffer bb,
             final int i) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public static List<OFHelloElement> readHelloElementList(final ChannelBuffer bb) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public static List<OFBucket> readBucketList(final ChannelBuffer bb, final int i) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -126,18 +131,21 @@ public class ChannelUtils {
         return new String(dst, Charsets.US_ASCII);
     }
 
-    public static void writeFixedLengthString(ChannelBuffer bb, String string, int length) {
+    public static void writeFixedLengthString(ChannelBuffer bb, String string,
+            int length) {
         int l = string.length();
-        if(l > length) {
-            throw new IllegalArgumentException("Error writing string: length="+l+" > max Length="+length);
+        if (l > length) {
+            throw new IllegalArgumentException("Error writing string: length="
+                    + l + " > max Length=" + length);
         }
         bb.writeBytes(string.getBytes(Charsets.US_ASCII));
-        if(l < length) {
+        if (l < length) {
             bb.writeZero(length - l);
         }
     }
 
-    public static void writeBsnInterfaceList(ChannelBuffer bb, List<OFBsnInterface> interfaces) {
+    public static void writeBsnInterfaceList(ChannelBuffer bb,
+            List<OFBsnInterface> interfaces) {
         // TODO Auto-generated method stub
 
     }
@@ -311,6 +319,5 @@ public class ChannelUtils {
         // TODO Auto-generated method stub
 
     }
-
 
 }
