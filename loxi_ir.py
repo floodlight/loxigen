@@ -39,6 +39,7 @@ __all__ = [
     'OFFieldLengthMember',
     'OFPadMember',
     'OFEnum',
+    'OFEnumEntry'
 ]
 
 """
@@ -131,6 +132,13 @@ An OpenFlow enumeration
 All values are Python ints.
 
 @param name
-@param values List of (name, value) tuples in input order
+@param entries List of OFEnumEntry objects in input order
+@params dict of optional params. Currently defined:
+       - wire_type: the low_level type of the enum values (uint8,...)
 """
-OFEnum = namedtuple('OFEnum', ['name', 'values'])
+class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
+    @property
+    def values(self):
+        return [(e.name, e.value) for e in self.entries]
+
+OFEnumEntry = namedtuple('OFEnumEntry', ['name', 'value', 'params'])

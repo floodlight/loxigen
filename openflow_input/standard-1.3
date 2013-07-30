@@ -58,11 +58,11 @@ enum macro_definitions {
     OFPQ_MIN_RATE_UNCFG = 0xffff,
 };
 
-enum ofp_port_no {
+enum ofp_port_no(wire_type=uint32_t, complete=no) {
     OFPP_ANY = 0xffffffff,
 };
 
-enum ofp_port {
+enum ofp_port(wire_type=uint32_t) {
     OFPP_MAX = 0xffffff00,
     OFPP_IN_PORT = 0xfffffff8,
     OFPP_TABLE = 0xfffffff9,
@@ -73,7 +73,7 @@ enum ofp_port {
     OFPP_LOCAL = 0xfffffffe,
 };
 
-enum ofp_type {
+enum ofp_type(wire_type=uint8_t) {
     OFPT_HELLO = 0,
     OFPT_ERROR = 1,
     OFPT_ECHO_REQUEST = 2,
@@ -106,23 +106,23 @@ enum ofp_type {
     OFPT_METER_MOD = 29,
 };
 
-enum ofp_config_flags {
+enum ofp_config_flags(wire_type=uint16_t, bitmask=True) {
     OFPC_FRAG_NORMAL = 0,
     OFPC_FRAG_DROP = 1,
     OFPC_FRAG_REASM = 2,
     OFPC_FRAG_MASK = 3,
 };
 
-enum ofp_table_config {
+enum ofp_table_config(wire_type=uint32_t, bitmask=True) {
     OFPTC_DEPRECATED_MASK = 0x3,
 };
 
-enum ofp_table {
+enum ofp_table(wire_type=uint8_t, complete=False) {
     OFPTT_MAX = 0xfe,
     OFPTT_ALL = 0xff,
 };
 
-enum ofp_capabilities {
+enum ofp_capabilities(wire_type=uint32_t, bitmask=True) {
     OFPC_FLOW_STATS = 0x1,
     OFPC_TABLE_STATS = 0x2,
     OFPC_PORT_STATS = 0x4,
@@ -132,20 +132,20 @@ enum ofp_capabilities {
     OFPC_PORT_BLOCKED = 0x100,
 };
 
-enum ofp_port_config {
+enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_PORT_DOWN = 0x1,
     OFPPC_NO_RECV = 0x4,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
 };
 
-enum ofp_port_state {
+enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
     OFPPS_LINK_DOWN = 0x1,
     OFPPS_BLOCKED = 0x2,
     OFPPS_LIVE = 0x4,
 };
 
-enum ofp_port_features {
+enum ofp_port_features(wire_type=uint32_t, bitmask=True) {
     OFPPF_10MB_HD = 0x1,
     OFPPF_10MB_FD = 0x2,
     OFPPF_100MB_HD = 0x4,
@@ -164,30 +164,32 @@ enum ofp_port_features {
     OFPPF_PAUSE_ASYM = 0x8000,
 };
 
-enum ofp_port_reason {
+enum ofp_port_reason(wire_type=uint8_t) {
     OFPPR_ADD = 0,
     OFPPR_DELETE = 1,
     OFPPR_MODIFY = 2,
 };
 
-enum ofp_match_type {
+enum ofp_match_type(wire_type=uint16_t) {
     OFPMT_STANDARD = 0,
     OFPMT_OXM = 1,
 };
 
-enum ofp_oxm_class {
+enum ofp_oxm_class(wire_type=uint16_t) {
     OFPXMC_NXM_0 = 0,
     OFPXMC_NXM_1 = 1,
     OFPXMC_OPENFLOW_BASIC = 0x8000,
     OFPXMC_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_vlan_id {
+enum ofp_vlan_id(wire_type=uint16_t) {
     OFPVID_NONE = 0,
     OFPVID_PRESENT = 0x1000,
 };
 
-enum ofp_ipv6exthdr_flags {
+// FIXME: OF spec specified this as '9' bits, implicitly adding
+// to full byte
+enum ofp_ipv6exthdr_flags(wire_type=uint16_t, bitmask=True) {
     OFPIEH_NONEXT = 0x1,
     OFPIEH_ESP = 0x2,
     OFPIEH_AUTH = 0x4,
@@ -199,7 +201,7 @@ enum ofp_ipv6exthdr_flags {
     OFPIEH_UNSEQ = 0x100,
 };
 
-enum ofp_action_type {
+enum ofp_action_type(wire_type=uint16_t) {
     OFPAT_OUTPUT = 0,
     OFPAT_COPY_TTL_OUT = 0xb,
     OFPAT_COPY_TTL_IN = 0xc,
@@ -219,12 +221,12 @@ enum ofp_action_type {
     OFPAT_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_controller_max_len {
+enum ofp_controller_max_len(wire_type=uint16_t, complete=False) {
     OFPCML_MAX = 0xffe5,
     OFPCML_NO_BUFFER = 0xffff,
 };
 
-enum ofp_instruction_type {
+enum ofp_instruction_type(wire_type=uint16_t, bitmask=True) {
     OFPIT_GOTO_TABLE = 0x1,
     OFPIT_WRITE_METADATA = 0x2,
     OFPIT_WRITE_ACTIONS = 0x3,
@@ -234,7 +236,7 @@ enum ofp_instruction_type {
     OFPIT_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_flow_mod_command {
+enum ofp_flow_mod_command(wire_type=uint8_t) {
     OFPFC_ADD = 0,
     OFPFC_MODIFY = 1,
     OFPFC_MODIFY_STRICT = 2,
@@ -242,7 +244,7 @@ enum ofp_flow_mod_command {
     OFPFC_DELETE_STRICT = 4,
 };
 
-enum ofp_flow_mod_flags {
+enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_SEND_FLOW_REM = 0x1,
     OFPFF_CHECK_OVERLAP = 0x2,
     OFPFF_RESET_COUNTS = 0x4,
@@ -250,65 +252,65 @@ enum ofp_flow_mod_flags {
     OFPFF_NO_BYT_COUNTS = 0x10,
 };
 
-enum ofp_group {
+enum ofp_group(wire_type=uint32_t, complete=False) {
     OFPG_MAX = 0xffffff00,
     OFPG_ALL = 0xfffffffc,
     OFPG_ANY = 0xffffffff,
 };
 
-enum ofp_group_mod_command {
+enum ofp_group_mod_command(wire_type=uint16_t) {
     OFPGC_ADD = 0,
     OFPGC_MODIFY = 1,
     OFPGC_DELETE = 2,
 };
 
-enum ofp_group_type {
+enum ofp_group_type(wire_type=uint8_t) {
     OFPGT_ALL = 0,
     OFPGT_SELECT = 1,
     OFPGT_INDIRECT = 2,
     OFPGT_FF = 3,
 };
 
-enum ofp_packet_in_reason {
+enum ofp_packet_in_reason(wire_type=uint8_t) {
     OFPR_NO_MATCH = 0,
     OFPR_ACTION = 1,
     OFPR_INVALID_TTL = 2,
 };
 
-enum ofp_flow_removed_reason {
+enum ofp_flow_removed_reason(wire_type=uint8_t) {
     OFPRR_IDLE_TIMEOUT = 0,
     OFPRR_HARD_TIMEOUT = 1,
     OFPRR_DELETE = 2,
     OFPRR_GROUP_DELETE = 3,
 };
 
-enum ofp_meter {
+enum ofp_meter(wire_type=uint32_t, complete=False) {
     OFPM_MAX = 0xffff0000,
     OFPM_SLOWPATH = 0xfffffffd,
     OFPM_CONTROLLER = 0xfffffffe,
     OFPM_ALL = 0xffffffff,
 };
 
-enum ofp_meter_band_type {
+enum ofp_meter_band_type(wire_type=uint16_t) {
     OFPMBT_DROP = 0x1,
     OFPMBT_DSCP_REMARK = 0x2,
     OFPMBT_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_meter_mod_command {
+enum ofp_meter_mod_command(wire_type=uint16_t) {
     OFPMC_ADD = 0,
     OFPMC_MODIFY = 1,
     OFPMC_DELETE = 2,
 };
 
-enum ofp_meter_flags {
+enum ofp_meter_flags(wire_type=uint16_t, bitmask=True) {
     OFPMF_KBPS = 0x1,
     OFPMF_PKTPS = 0x2,
     OFPMF_BURST = 0x4,
     OFPMF_STATS = 0x8,
 };
 
-enum ofp_error_type {
+enum ofp_error_type(wire_type=uint16_t) {
     OFPET_HELLO_FAILED = 0,
     OFPET_BAD_REQUEST = 1,
     OFPET_BAD_ACTION = 2,
@@ -326,12 +328,12 @@ enum ofp_error_type {
     OFPET_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_hello_failed_code {
+enum ofp_hello_failed_code(wire_type=uint16_t) {
     OFPHFC_INCOMPATIBLE = 0,
     OFPHFC_EPERM = 1,
 };
 
-enum ofp_bad_request_code {
+enum ofp_bad_request_code(wire_type=uint16_t) {
     OFPBRC_BAD_VERSION = 0,
     OFPBRC_BAD_TYPE = 1,
     OFPBRC_BAD_MULTIPART = 2,
@@ -348,7 +350,7 @@ enum ofp_bad_request_code {
     OFPBRC_MULTIPART_BUFFER_OVERFLOW = 13,
 };
 
-enum ofp_bad_action_code {
+enum ofp_bad_action_code(wire_type=uint16_t) {
     OFPBAC_BAD_TYPE = 0,
     OFPBAC_BAD_LEN = 1,
     OFPBAC_BAD_EXPERIMENTER = 2,
@@ -367,7 +369,7 @@ enum ofp_bad_action_code {
     OFPBAC_BAD_SET_ARGUMENT = 15,
 };
 
-enum ofp_bad_instruction_code {
+enum ofp_bad_instruction_code(wire_type=uint16_t) {
     OFPBIC_UNKNOWN_INST = 0,
     OFPBIC_UNSUP_INST = 1,
     OFPBIC_BAD_TABLE_ID = 2,
@@ -379,7 +381,7 @@ enum ofp_bad_instruction_code {
     OFPBIC_EPERM = 8,
 };
 
-enum ofp_bad_match_code {
+enum ofp_bad_match_code(wire_type=uint16_t) {
     OFPBMC_BAD_TYPE = 0,
     OFPBMC_BAD_LEN = 1,
     OFPBMC_BAD_TAG = 2,
@@ -394,7 +396,7 @@ enum ofp_bad_match_code {
     OFPBMC_EPERM = 11,
 };
 
-enum ofp_flow_mod_failed_code {
+enum ofp_flow_mod_failed_code(wire_type=uint16_t) {
     OFPFMFC_UNKNOWN = 0,
     OFPFMFC_TABLE_FULL = 1,
     OFPFMFC_BAD_TABLE_ID = 2,
@@ -405,7 +407,7 @@ enum ofp_flow_mod_failed_code {
     OFPFMFC_BAD_FLAGS = 7,
 };
 
-enum ofp_group_mod_failed_code {
+enum ofp_group_mod_failed_code(wire_type=uint16_t) {
     OFPGMFC_GROUP_EXISTS = 0,
     OFPGMFC_INVALID_GROUP = 1,
     OFPGMFC_WEIGHT_UNSUPPORTED = 2,
@@ -423,7 +425,7 @@ enum ofp_group_mod_failed_code {
     OFPGMFC_EPERM = 14,
 };
 
-enum ofp_port_mod_failed_code {
+enum ofp_port_mod_failed_code(wire_type=uint16_t) {
     OFPPMFC_BAD_PORT = 0,
     OFPPMFC_BAD_HW_ADDR = 1,
     OFPPMFC_BAD_CONFIG = 2,
@@ -431,31 +433,31 @@ enum ofp_port_mod_failed_code {
     OFPPMFC_EPERM = 4,
 };
 
-enum ofp_table_mod_failed_code {
+enum ofp_table_mod_failed_code(wire_type=uint16_t) {
     OFPTMFC_BAD_TABLE = 0,
     OFPTMFC_BAD_CONFIG = 1,
     OFPTMFC_EPERM = 2,
 };
 
-enum ofp_queue_op_failed_code {
+enum ofp_queue_op_failed_code(wire_type=uint16_t) {
     OFPQOFC_BAD_PORT = 0,
     OFPQOFC_BAD_QUEUE = 1,
     OFPQOFC_EPERM = 2,
 };
 
-enum ofp_switch_config_failed_code {
+enum ofp_switch_config_failed_code(wire_type=uint16_t) {
     OFPSCFC_BAD_FLAGS = 0,
     OFPSCFC_BAD_LEN = 1,
     OFPSCFC_EPERM = 2,
 };
 
-enum ofp_role_request_failed_code {
+enum ofp_role_request_failed_code(wire_type=uint16_t){
     OFPRRFC_STALE = 0,
     OFPRRFC_UNSUP = 1,
     OFPRRFC_BAD_ROLE = 2,
 };
 
-enum ofp_meter_mod_failed_code {
+enum ofp_meter_mod_failed_code(wire_type=uint16_t) {
     OFPMMFC_UNKNOWN = 0,
     OFPMMFC_METER_EXISTS = 1,
     OFPMMFC_INVALID_METER = 2,
@@ -470,7 +472,7 @@ enum ofp_meter_mod_failed_code {
     OFPMMFC_OUT_OF_BANDS = 11,
 };
 
-enum ofp_table_features_failed_code {
+enum ofp_table_features_failed_code(wire_type=uint16_t) {
     OFPTFFC_BAD_TABLE = 0,
     OFPTFFC_BAD_METADATA = 1,
     OFPTFFC_BAD_TYPE = 2,
@@ -479,7 +481,7 @@ enum ofp_table_features_failed_code {
     OFPTFFC_EPERM = 5,
 };
 
-enum ofp_multipart_types {
+enum ofp_multipart_types(wire_type=uint16_t) {
     OFPMP_DESC = 0,
     OFPMP_FLOW = 1,
     OFPMP_AGGREGATE = 2,
@@ -497,15 +499,15 @@ enum ofp_multipart_types {
     OFPMP_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_multipart_request_flags {
+enum ofp_multipart_request_flags(wire_type=uint16_t, bitmask=True) {
     OFPMPF_REQ_MORE = 0x1,
 };
 
-enum ofp_multipart_reply_flags {
+enum ofp_multipart_reply_flags(wire_type=uint16_t, bitmask=True) {
     OFPMPF_REPLY_MORE = 0x1,
 };
 
-enum ofp_table_feature_prop_type {
+enum ofp_table_feature_prop_type(wire_type=uint16_t) {
     OFPTFPT_INSTRUCTIONS = 0,
     OFPTFPT_INSTRUCTIONS_MISS = 1,
     OFPTFPT_NEXT_TABLES = 2,
@@ -524,27 +526,27 @@ enum ofp_table_feature_prop_type {
     OFPTFPT_EXPERIMENTER_MISS = 0xffff,
 };
 
-enum ofp_group_capabilities {
+enum ofp_group_capabilities(wire_type=uint32_t, bitmask=True) {
     OFPGFC_SELECT_WEIGHT = 0x1,
     OFPGFC_SELECT_LIVENESS = 0x2,
     OFPGFC_CHAINING = 0x4,
     OFPGFC_CHAINING_CHECKS = 0x8,
 };
 
-enum ofp_queue_properties {
+enum ofp_queue_properties(wire_type=uint16_t) {
     OFPQT_MIN_RATE = 0x1,
     OFPQT_MAX_RATE = 0x2,
     OFPQT_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_controller_role {
+enum ofp_controller_role(wire_type=uint32_t) {
     OFPCR_ROLE_NOCHANGE = 0,
     OFPCR_ROLE_EQUAL = 1,
     OFPCR_ROLE_MASTER = 2,
     OFPCR_ROLE_SLAVE = 3,
 };
 
-enum ofp_hello_elem_type {
+enum ofp_hello_elem_type(wire_type=uint16_t) {
     OFPHET_VERSIONBITMAP = 1,
 };
 

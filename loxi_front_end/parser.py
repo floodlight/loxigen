@@ -59,10 +59,20 @@ struct = kw('struct') - identifier - s('{') + \
          s('}') - s(';')
 
 # Enums
-enum_member = P.Group(identifier + s('=') + integer)
+enum_param_name = kw("wire_type") | kw("bitmask") | kw("complete")
+enum_param = P.Group(enum_param_name  - s('=') - any_type)
+enum_param_list = P.Forward()
+enum_param_list << enum_param + P.Optional(s(',') + P.Optional(enum_param_list))
+
+enum_member_param_name = kw("virtual")
+enum_member_param = P.Group(enum_member_param_name  - s('=') - any_type)
+enum_member_param_list = P.Forward()
+enum_member_param_list << enum_member_param + P.Optional(s(',') + P.Optional(enum_member_param_list))
+
+enum_member = P.Group(identifier - P.Group(P.Optional(s('(') - enum_member_param_list - s(')'))) - s('=') + integer)
 enum_list = P.Forward()
 enum_list << enum_member + P.Optional(s(',') + P.Optional(enum_list))
-enum = kw('enum') - identifier - s('{') + \
+enum = kw('enum') - identifier - P.Group(P.Optional(s('(') - enum_param_list - s(')'))) - s('{') + \
          P.Group(P.Optional(enum_list)) + \
          s('}') - s(';')
 

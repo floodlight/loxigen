@@ -64,7 +64,14 @@ def create_ofinput(ast):
             ofclass = OFClass(name=decl_ast[1], members=members)
             ofinput.classes.append(ofclass)
         if decl_ast[0] == 'enum':
-            enum = OFEnum(name=decl_ast[1], values=[(x[0], x[1]) for x in decl_ast[2]])
+            # 0: "enum"
+            # 1: name
+            # 2: potentially list of [param_name, param_value]
+            # 3: list of [constant_name, constant_value]+
+            enum = OFEnum(name=decl_ast[1],
+                    entries=[OFEnumEntry(name=x[0], value=x[2], params={param:value for param, value in x[1] }) for x in decl_ast[3]],
+                    params = { param: value for param, value in decl_ast[2] }
+                    )
             ofinput.enums.append(enum)
         elif decl_ast[0] == 'metadata':
             if decl_ast[1] == 'version':
