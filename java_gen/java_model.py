@@ -29,24 +29,26 @@
 # A lot of this stuff could/should probably be merged with the python utilities
 
 import collections
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, OrderedDict
 import logging
 import os
 import pdb
 import re
 
-from generic_utils import find, memoize, OrderedSet
+from generic_utils import find, memoize, OrderedSet, OrderedDefaultDict
 import of_g
 from loxi_ir import *
 import loxi_front_end.type_maps as type_maps
-import loxi_utils.loxi_utils as utils
+import loxi_utils.loxi_utils as loxi_utils
 import py_gen.util as py_utils
+import test_data
 
 import java_gen.java_type as java_type
 
 class JavaModel(object):
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)))
-    virtual_interfaces = set(['OFOxm' ])
+    enum_blacklist = set(("OFDefinitions","OFFlowWildcards"))
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)))
+    virtual_interfaces = set(['OFOxm', 'OFAction' ])
 
     @property
     @memoize
@@ -56,12 +58,15 @@ class JavaModel(object):
     @property
     @memoize
     def interfaces(self):
-        version_map_per_class = collections.defaultdict(lambda: {})
+        version_map_per_class = collections.OrderedDict()
 
         for raw_version, of_protocol in of_g.ir.items():
             jversion = JavaOFVersion(of_protocol.wire_version)
 
             for of_class in of_protocol.classes:
+                if not of_class.name in version_map_per_class:
+                    version_map_per_class[of_class.name] = collections.OrderedDict()
+
                 version_map_per_class[of_class.name][jversion] = of_class
 
         interfaces = []
@@ -92,6 +97,41 @@ class JavaModel(object):
             return find(self.enums, lambda e: e.name == name)
         except KeyError:
             raise KeyError("Could not find enum with name %s" % name)
+
+    @property
+    @memoize
+    def of_factory(self):
+           return OFFactory(
+                    package="org.openflow.protocol",
+                    name="OFFactory",
+                    members=self.interfaces)
+
+    def generate_class(self, clazz):
+        if clazz.interface.is_virtual:
+            return False
+        if clazz.interface.name == "OFTableMod":
+            return False
+        if loxi_utils.class_is_message(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_oxm(clazz.interface.c_name):
+            return True
+        else:
+            return False
+
+
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members"))):
+    @property
+    def factory_classes(self):
+            return [ OFFactoryClass(
+                    package="org.openflow.protocol.ver{}".format(version.of_version),
+                    name="OFFactoryVer{}".format(version.of_version),
+                    interface=self,
+                    version=version
+                    ) for version in model.versions ]
+
+
+OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
+OFFactoryClass = namedtuple("OFFactory", ("package", "name", "interface", "version"))
 
 model = JavaModel()
 
@@ -139,7 +179,7 @@ class JavaOFInterface(object):
         self.c_name = c_name
         self.version_map = version_map
         self.name = java_type.name_c_to_caps_camel(c_name)
-        self.builder_name = self.name + "Builder"
+        self.variable_name = self.name[2].lower() + self.name[3:]
         self.constant_name = c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface = self.class_info()
@@ -152,15 +192,15 @@ class JavaOFInterface(object):
     def class_info(self):
         if re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod")
-        elif utils.class_is_message(self.c_name):
+        elif loxi_utils.class_is_message(self.c_name):
             return ("", "OFMessage")
-        elif utils.class_is_action(self.c_name):
+        elif loxi_utils.class_is_action(self.c_name):
             return ("action", "OFAction")
-        elif utils.class_is_oxm(self.c_name):
+        elif loxi_utils.class_is_oxm(self.c_name):
             return ("oxm", "OFOxm")
-        elif utils.class_is_instruction(self.c_name):
+        elif loxi_utils.class_is_instruction(self.c_name):
             return ("instruction", "OFInstruction")
-        elif utils.class_is_meter_band(self.c_name):
+        elif loxi_utils.class_is_meter_band(self.c_name):
             return ("meterband", "OFMeterBand")
         else:
             return ("", None)
@@ -188,9 +228,16 @@ class JavaOFInterface(object):
         return self.name in model.virtual_interfaces
 
     @property
+    def is_universal(self):
+        return len(self.all_versions) == len(model.versions)
+
+    @property
     @memoize
     def all_versions(self):
         return self.version_map.keys()
+
+    def has_version(self, version):
+        return version in self.version_map
 
     def versioned_class(self, version):
         return JavaOFClass(self, version, self.version_map[version])
@@ -228,6 +275,10 @@ class JavaOFClass(object):
     @property
     def name(self):
         return "%sVer%s" % (self.interface.name, self.version.of_version)
+
+    @property
+    def variable_name(self):
+        return self.name[3:]
 
     @property
     def length(self):
@@ -409,7 +460,7 @@ class JavaMember(object):
         if hasattr(self.member, "length"):
             return self.member.length
         else:
-            count, base = utils.type_dec_to_count_base(self.member.type)
+            count, base = loxi_utils.type_dec_to_count_base(self.member.type)
             return of_g.of_base_types[base]['bytes'] * count
 
     @staticmethod

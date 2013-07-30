@@ -54,6 +54,7 @@ def gen_all_java(out, name):
     gen.create_of_interfaces()
     gen.create_of_classes()
     gen.create_of_const_enums()
+    gen.create_of_factories()
 
     with open('%s/README.java-lang' % os.path.dirname(__file__)) as readme_src:
         out.writelines(readme_src.readlines())
@@ -101,11 +102,9 @@ class JavaGenerator(object):
     def create_of_classes(self):
         """ Create the OF classes with implementations for each of the interfaces and versions """
         for interface in self.java_model.interfaces:
-            if interface.name == "OFTableMod":
-                continue
-            if not loxi_utils.class_is_message(interface.c_name) and not loxi_utils.class_is_oxm(interface.c_name):
-                continue
             for java_class in interface.versioned_classes:
+                if not self.java_model.generate_class(java_class):
+                    continue
                 self.render_class(clazz=java_class,
                         template='of_class.java', version=java_class.version, msg=java_class,
                         impl_class=java_class.name)

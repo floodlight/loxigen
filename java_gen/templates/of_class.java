@@ -65,11 +65,11 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
 
 
-    public ${msg.name}.Builder createBuilder() {
-        return new BuilderImplWithParent(this);
+    public ${msg.interface.name}.Builder createBuilder() {
+        return new BuilderWithParent(this);
     }
 
-    static class BuilderImplWithParent implements ${msg.interface.name}.Builder {
+    static class BuilderWithParent implements ${msg.interface.name}.Builder {
         final ${impl_class} parentMessage;
 
         // OF message fields
@@ -78,7 +78,7 @@ class ${impl_class} implements ${msg.interface.name} {
         private ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
 
-        BuilderImplWithParent(${impl_class} parentMessage) {
+        BuilderWithParent(${impl_class} parentMessage) {
             this.parentMessage = parentMessage;
         }
 
@@ -94,7 +94,7 @@ class ${impl_class} implements ${msg.interface.name} {
         }
     }
 
-    static class BuilderImpl implements ${msg.interface.name}.Builder {
+    static class Builder implements ${msg.interface.name}.Builder {
         // OF message fields
 //:: for prop in msg.data_members:
         private boolean ${prop.name}Set;
