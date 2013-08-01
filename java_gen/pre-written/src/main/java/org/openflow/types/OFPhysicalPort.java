@@ -10,7 +10,7 @@ import org.openflow.exceptions.OFParseError;
  * @author capveg
  */
 
-public class OFPhysicalPort implements OFValueType {
+public class OFPhysicalPort implements OFValueType<OFPhysicalPort> {
 
     static final int LENGTH = 4;
     
@@ -60,4 +60,12 @@ public class OFPhysicalPort implements OFValueType {
         return OFPhysicalPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
 
+    @Override
+    public OFPhysicalPort applyMask(OFPhysicalPort mask) {
+        return OFPhysicalPort.of(this.port & mask.port);
+    }
+
+    public int getPortNumber() {
+        return port;
+    }
 }

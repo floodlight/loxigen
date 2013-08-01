@@ -7,7 +7,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * 
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
-public class IpProtocol implements OFValueType {
+public class IpProtocol implements OFValueType<IpProtocol> {
 
     static final short MAX_PROTO = 0xFF;
     static final int LENGTH = 1;
@@ -632,4 +632,14 @@ public class IpProtocol implements OFValueType {
     public static IpProtocol readByte(ChannelBuffer c) {
         return IpProtocol.of(c.readUnsignedByte());
     }
+
+    @Override
+    public IpProtocol applyMask(IpProtocol mask) {
+        return IpProtocol.of((short)(this.proto & mask.proto));
+    }
+
+    public short getIpProtocolNumber() {
+        return proto;
+    }
+    
 }

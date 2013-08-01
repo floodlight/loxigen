@@ -11,7 +11,7 @@ import org.openflow.exceptions.OFParseError;
  *
  * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
  */
-public class IPv6 implements OFValueType {
+public class IPv6 implements OFValueType<IPv6> {
     static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;
@@ -277,5 +277,10 @@ public class IPv6 implements OFValueType {
 
     public static IPv6 read16Bytes(ChannelBuffer c) throws OFParseError {
         return IPv6.of(c.readLong(), c.readLong());
+    }
+
+    @Override
+    public IPv6 applyMask(IPv6 mask) {
+        return IPv6.of(this.raw1 & mask.raw1, this.raw2 & mask.raw2);
     }
 }

@@ -3,7 +3,7 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 
-public enum IpEcn implements OFValueType {
+public enum IpEcn implements OFValueType<IpEcn> {
     ECN_00((byte)0),
     ECN_01((byte)1),
     ECN_10((byte)2),
@@ -50,4 +50,12 @@ public enum IpEcn implements OFValueType {
         return IpEcn.of((byte)(c.readUnsignedByte()));
     }
 
+    @Override
+    public IpEcn applyMask(IpEcn mask) {
+        return IpEcn.of((byte)(this.ecn & mask.ecn));
+    }
+
+    public byte getEcnValue() {
+        return ecn;
+    }
 }

@@ -2,12 +2,12 @@ package org.openflow.types;
 
 
 
-public class Masked<T extends OFValueType> implements OFValueType {
+public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> {
     protected T value;
     protected T mask;
     
     protected Masked(T value, T mask) {
-        this.value = value;
+        this.value = value.applyMask(mask);
         this.mask = mask;
     }
     
@@ -47,6 +47,11 @@ public class Masked<T extends OFValueType> implements OFValueType {
         StringBuilder sb = new StringBuilder();
         sb.append(value.toString()).append('/').append(mask.toString());
         return sb.toString();
+    }
+
+    @Override
+    public Masked<T> applyMask(Masked<T> mask) {
+        return this;
     }
     
 }

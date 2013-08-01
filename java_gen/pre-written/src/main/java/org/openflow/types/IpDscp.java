@@ -3,7 +3,7 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 
-public enum IpDscp implements OFValueType {
+public enum IpDscp implements OFValueType<IpDscp> {
     DSCP_0((byte)0),
     DSCP_1((byte)1),
     DSCP_2((byte)2),
@@ -230,4 +230,12 @@ public enum IpDscp implements OFValueType {
         return IpDscp.of((byte)(c.readUnsignedByte()));
     }
 
+    @Override
+    public IpDscp applyMask(IpDscp mask) {
+        return IpDscp.of((byte)(this.dscp & mask.dscp));
+    }
+
+    public byte getDscpValue() {
+        return dscp;
+    }
 }

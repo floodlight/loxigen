@@ -22,33 +22,6 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     // public static Map<MatchField<?,?>, BuilderParamHandler<?>>
     // handlerMap = new HashMap();
-    static BuilderParamHandler<?>[] handlers = new BuilderParamHandler<?>[2];
-
-    static {
-        handlers[MatchField.IN_PORT.id] = new BuilderParamHandler<OFPort>() {
-            @Override
-            public void set(final MatchBuilderVer10 builder, final OFPort value) {
-                builder.inputPort = value;
-            }
-
-            @Override
-            public OFPort get(final MatchBuilderVer10 builder) {
-                return builder.inputPort;
-            }
-        };
-
-        handlers[MatchField.ETH_SRC.id] = new BuilderParamHandler<MacAddress>() {
-            @Override
-            public void set(final MatchBuilderVer10 builder, final MacAddress value) {
-                builder.dataLayerSource = value;
-            }
-
-            @Override
-            public MacAddress get(final MatchBuilderVer10 builder) {
-                return builder.dataLayerSource;
-            }
-        };
-    }
 
     protected int wildcards;
     protected OFPort inputPort;
@@ -66,29 +39,36 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <F extends OFValueType> F get(final MatchField<F> match) {
+    public <F extends OFValueType<F>> F get(final MatchField<F> match) {
         switch (match.id) {
-            case 0:
+            case IN_PORT:
                 return (F) inputPort;
-            case 1:
+            case ETH_SRC:
                 return (F) dataLayerSource;
             default:
                 return null;
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <F extends OFValueType> MatchBuilder set(final MatchField<F> match, final F value) {
+    public <F extends OFValueType<F>> MatchBuilder set(final MatchField<F> match, final F value) {
         switch (match.id) {
-            case 0:
+            case IN_PORT:
                 inputPort = (OFPort) value;
                 break;
-            case 1:
+            case ETH_SRC:
                 dataLayerSource = (MacAddress) value;
+                break;
+            default:
                 break;
         }
         return this;
+    }
+    
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder unset(final MatchField<F> match) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public OFPort getInputPort() {
