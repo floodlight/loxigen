@@ -1,6 +1,7 @@
 package org.openflow.protocol.match;
 
 import org.openflow.protocol.OFObject;
+import org.openflow.types.Masked;
 import org.openflow.types.OFValueType;
 
 public interface Match extends OFObject {
@@ -25,6 +26,15 @@ public interface Match extends OFObject {
      * @return Value of match field
      */
     public <F extends OFValueType<F>> F get(MatchField<F> field) throws UnsupportedOperationException;
+
+    /**
+     * Returns the masked value for the given field from this match.
+     * Precondition: field is partially wildcarded.
+     * 
+     * @param field Match field to retrieve
+     * @return Masked value of match field or null if no mask
+     */
+    public <F extends OFValueType<F>> Masked<F> getMasked(MatchField<F> field) throws UnsupportedOperationException;
 
     /**
      * Returns true if this match object supports the given match field.

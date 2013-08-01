@@ -18,6 +18,10 @@ public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> 
     public T getMask() {
         return mask;
     }
+    
+    public static <T extends OFValueType<T>> Masked<T> of(T value, T mask) {
+        return new Masked<T>(value, mask);
+    }
 
     @Override
     public int getLength() {

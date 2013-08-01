@@ -11,7 +11,6 @@ import org.openflow.types.IpDscp;
 import org.openflow.types.IpEcn;
 import org.openflow.types.IpProtocol;
 import org.openflow.types.MacAddress;
-import org.openflow.types.Masked;
 import org.openflow.types.OFPort;
 import org.openflow.types.OFValueType;
 import org.openflow.types.TransportPort;
@@ -34,16 +33,16 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<OFPort> METADATA =
             new MatchField<OFPort>("metadata", MatchFields.METADATA);
 
-    public final static MatchField<Masked<MacAddress>> ETH_DST =
-            new MatchField<Masked<MacAddress>>("eth_dst", MatchFields.ETH_DST);
-    public final static MatchField<Masked<MacAddress>> ETH_SRC =
-            new MatchField<Masked<MacAddress>>("eth_src", MatchFields.ETH_SRC);
+    public final static MatchField<MacAddress> ETH_DST =
+            new MatchField<MacAddress>("eth_dst", MatchFields.ETH_DST);
+    public final static MatchField<MacAddress> ETH_SRC =
+            new MatchField<MacAddress>("eth_src", MatchFields.ETH_SRC);
 
     public final static MatchField<EthType> ETH_TYPE =
             new MatchField<EthType>("eth_type", MatchFields.ETH_TYPE);
     
-    public final static MatchField<Masked<VlanVid>> VLAN_VID =
-            new MatchField<Masked<VlanVid>>("vlan_vid", MatchFields.VLAN_VID);
+    public final static MatchField<VlanVid> VLAN_VID =
+            new MatchField<VlanVid>("vlan_vid", MatchFields.VLAN_VID);
     public final static MatchField<VlanPcp> VLAN_PCP =
             new MatchField<VlanPcp>("vlan_pcp", MatchFields.VLAN_PCP);
     
@@ -55,10 +54,10 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<IpProtocol> IP_PROTO =
             new MatchField<IpProtocol>("ip_proto", MatchFields.IP_PROTO);
 
-    public final static MatchField<Masked<IPv4>> IPV4_SRC =
-            new MatchField<Masked<IPv4>>("ipv4_src", MatchFields.IPV4_SRC);
-    public final static MatchField<Masked<IPv4>> IPV4_DST =
-            new MatchField<Masked<IPv4>>("ipv4_dst", MatchFields.IPV4_DST);
+    public final static MatchField<IPv4> IPV4_SRC =
+            new MatchField<IPv4>("ipv4_src", MatchFields.IPV4_SRC);
+    public final static MatchField<IPv4> IPV4_DST =
+            new MatchField<IPv4>("ipv4_dst", MatchFields.IPV4_DST);
 
     public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
             "tcp_src", MatchFields.TCP_SRC);
@@ -82,22 +81,22 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
             "arp_op", MatchFields.ARP_OP);
-    public final static MatchField<Masked<IPv4>> ARP_SPA =
-            new MatchField<Masked<IPv4>>("arp_spa", MatchFields.ARP_SPA);
-    public final static MatchField<Masked<IPv4>> ARP_TPA =
-            new MatchField<Masked<IPv4>>("arp_tpa", MatchFields.ARP_TPA);
-    public final static MatchField<Masked<MacAddress>> ARP_SHA =
-            new MatchField<Masked<MacAddress>>("arp_sha", MatchFields.ARP_SHA);
-    public final static MatchField<Masked<MacAddress>> ARP_THA =
-            new MatchField<Masked<MacAddress>>("arp_tha", MatchFields.ARP_THA);
+    public final static MatchField<IPv4> ARP_SPA =
+            new MatchField<IPv4>("arp_spa", MatchFields.ARP_SPA);
+    public final static MatchField<IPv4> ARP_TPA =
+            new MatchField<IPv4>("arp_tpa", MatchFields.ARP_TPA);
+    public final static MatchField<MacAddress> ARP_SHA =
+            new MatchField<MacAddress>("arp_sha", MatchFields.ARP_SHA);
+    public final static MatchField<MacAddress> ARP_THA =
+            new MatchField<MacAddress>("arp_tha", MatchFields.ARP_THA);
 
-    public final static MatchField<Masked<IPv6>> IPV6_SRC =
-            new MatchField<Masked<IPv6>>("ipv6_src", MatchFields.IPV6_SRC);
-    public final static MatchField<Masked<IPv6>> IPV6_DST =
-            new MatchField<Masked<IPv6>>("ipv6_dst", MatchFields.IPV6_DST);
+    public final static MatchField<IPv6> IPV6_SRC =
+            new MatchField<IPv6>("ipv6_src", MatchFields.IPV6_SRC);
+    public final static MatchField<IPv6> IPV6_DST =
+            new MatchField<IPv6>("ipv6_dst", MatchFields.IPV6_DST);
 
-    public final static MatchField<Masked<IPv6FlowLabel>> IPV6_FLABEL =
-            new MatchField<Masked<IPv6FlowLabel>>("ipv6_flabel", MatchFields.IPV6_FLOWLABEL);
+    public final static MatchField<IPv6FlowLabel> IPV6_FLABEL =
+            new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLOWLABEL);
 
     public String getName() {
         return name;

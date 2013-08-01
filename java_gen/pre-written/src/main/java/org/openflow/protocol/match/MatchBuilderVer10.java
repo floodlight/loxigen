@@ -6,6 +6,7 @@ import org.openflow.types.IPv4;
 import org.openflow.types.IpDscp;
 import org.openflow.types.IpProtocol;
 import org.openflow.types.MacAddress;
+import org.openflow.types.Masked;
 import org.openflow.types.OFPort;
 import org.openflow.types.OFValueType;
 import org.openflow.types.U16;
@@ -51,7 +52,15 @@ public class MatchBuilderVer10 implements MatchBuilder {
     }
 
     @Override
-    public <F extends OFValueType<F>> MatchBuilder set(final MatchField<F> match, final F value) {
+    public <F extends OFValueType<F>> Masked<F>
+            getMasked(MatchField<F> field)
+                                        throws UnsupportedOperationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder setExact(final MatchField<F> match, final F value) {
         switch (match.id) {
             case IN_PORT:
                 inputPort = (OFPort) value;
@@ -66,7 +75,21 @@ public class MatchBuilderVer10 implements MatchBuilder {
     }
     
     @Override
-    public <F extends OFValueType<F>> MatchBuilder unset(final MatchField<F> match) {
+    public <F extends OFValueType<F>> MatchBuilder
+            setMasked(MatchField<F> field, Masked<F> valueWithMask) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder
+            setMasked(MatchField<F> field, F value, F mask) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder wildcard(final MatchField<F> match) {
         // TODO Auto-generated method stub
         return null;
     }
