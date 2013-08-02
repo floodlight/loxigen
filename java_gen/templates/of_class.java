@@ -153,6 +153,11 @@ class ${impl_class} implements ${msg.interface.name} {
     // fixme: todo ${prop.name}
 //:: #endif
 //:: #endfor
+            //:: if msg.align:
+            // align message to ${msg.align} bytes
+            bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
+
             return new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
@@ -205,13 +210,14 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: #endif
 //:: #endfor
 
-//:: if msg.is_fixed_length:
-            return LENGTH;
-//:: else:
+//:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
             bb.setShort(startIndex + 2, length);
-            return length;
+            //:: if msg.align:
+            // align message to ${msg.align} bytes
+            bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);
+            //:: #endif
 //:: #end
 
         }

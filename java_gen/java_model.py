@@ -354,6 +354,10 @@ class JavaOFClass(object):
     def is_extension(self):
         return type_maps.message_is_extension(self.c_name, -1)
 
+    @property
+    def align(self):
+        return int(self.ir_class.params['align']) if 'align' in self.ir_class.params else 0
+
 #######################################################################
 ### Member
 #######################################################################
