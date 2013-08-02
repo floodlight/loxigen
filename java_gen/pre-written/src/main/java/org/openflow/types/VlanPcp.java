@@ -3,7 +3,7 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 
-public class VlanPcp implements OFValueType {
+public class VlanPcp implements OFValueType<VlanPcp> {
     
     private static final byte VALIDATION_MASK = 0x07;
     static final int LENGTH = 1; 
@@ -56,6 +56,11 @@ public class VlanPcp implements OFValueType {
 
     public static VlanPcp readByte(ChannelBuffer c) throws OFParseError {
         return VlanPcp.of((byte)(c.readUnsignedByte() & 0xFF));
+    }
+
+    @Override
+    public VlanPcp applyMask(VlanPcp mask) {
+        return VlanPcp.of((byte)(this.pcp & mask.pcp));
     }
     
 }

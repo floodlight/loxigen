@@ -31,7 +31,7 @@ public class IPv6WithMask extends Masked<IPv6> {
         return res.toString();
     }
     
-    public static OFValueType ofPossiblyMasked(final String string) {
+    public static OFValueType<?> ofPossiblyMasked(final String string) {
         int slashPos;
         String ip = string;
         int maskBits = 0;

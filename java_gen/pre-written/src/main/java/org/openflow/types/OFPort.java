@@ -15,7 +15,7 @@ import org.openflow.exceptions.OFParseError;
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
 @Immutable
-public class OFPort implements OFValueType {
+public class OFPort implements OFValueType<OFPort> {
     static final int LENGTH = 4;
     
     // private int constants (OF1.1+) to avoid duplication in the code
@@ -529,5 +529,10 @@ public class OFPort implements OFValueType {
 
     public static OFPort read4Bytes(ChannelBuffer c) throws OFParseError {
         return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
+    }
+
+    @Override
+    public OFPort applyMask(OFPort mask) {
+        return OFPort.of(this.portNumber & mask.portNumber);
     }
 }
