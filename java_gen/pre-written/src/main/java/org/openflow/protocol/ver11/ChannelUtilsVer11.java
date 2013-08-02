@@ -1,4 +1,4 @@
-package org.openflow.util;
+package org.openflow.protocol.ver11;
 
 import java.util.List;
 
@@ -13,16 +13,19 @@ import org.openflow.protocol.OFGroupStatsEntry;
 import org.openflow.protocol.OFHelloElem;
 import org.openflow.protocol.OFMeterFeatures;
 import org.openflow.protocol.OFMeterStats;
+import org.openflow.protocol.OFObject;
 import org.openflow.protocol.OFPacketQueue;
 import org.openflow.protocol.OFPortStatsEntry;
 import org.openflow.protocol.OFQueueStatsEntry;
 import org.openflow.protocol.OFTableFeature;
 import org.openflow.protocol.OFTableFeatures;
 import org.openflow.protocol.OFTableStatsEntry;
+import org.openflow.protocol.Wildcards;
 import org.openflow.protocol.action.OFAction;
 import org.openflow.protocol.instruction.OFInstruction;
 import org.openflow.protocol.match.Match;
 import org.openflow.protocol.meterband.OFMeterBand;
+import org.openflow.protocol.oxm.OFOxm;
 import org.openflow.types.OFFlowModCmd;
 import org.openflow.types.OFHelloElement;
 import org.openflow.types.OFPhysicalPort;
@@ -35,7 +38,7 @@ import com.google.common.base.Charsets;
  * @author capveg
  */
 
-public class ChannelUtils {
+public class ChannelUtilsVer11 {
 
     static public byte[] readBytes(final ChannelBuffer bb, final int length) {
         byte byteArray[] = new byte[length];
@@ -77,7 +80,7 @@ public class ChannelUtils {
     }
 
     public static List<OFBsnInterface> readBsnInterfaceList(
-            final ChannelBuffer bb) {
+            final ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -100,12 +103,12 @@ public class ChannelUtils {
     }
 
     public static List<OFBucket> readBucketList(final ChannelBuffer bb,
-            final int i) {
+            final int length) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public static List<OFMeterBand> readMeterBandList(final ChannelBuffer bb) {
+    public static List<OFMeterBand> readMeterBandList(final ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -115,9 +118,10 @@ public class ChannelUtils {
 
     }
 
-    public static void writeList(ChannelBuffer bb, List<?> ports) {
-        // TODO Auto-generated method stub
-
+    public static void writeList(ChannelBuffer bb, List<? extends OFObject> objects) {
+        for(OFObject o : objects) {
+            o.writeTo(bb);
+        }
     }
 
     public static void writeOFFlowModCmd(ChannelBuffer bb, OFFlowModCmd command) {
@@ -180,12 +184,12 @@ public class ChannelUtils {
     }
 
     public static List<OFTableStatsEntry> readTableStatsEntryList(
-            ChannelBuffer bb) {
+            ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public static List<OFFlowStatsEntry> readFlowStatsEntryList(ChannelBuffer bb) {
+    public static List<OFFlowStatsEntry> readFlowStatsEntryList(ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -203,7 +207,7 @@ public class ChannelUtils {
     }
 
     public static List<OFGroupDescStatsEntry> readGroupDescStatsEntryList(
-            ChannelBuffer bb) {
+            ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -241,7 +245,7 @@ public class ChannelUtils {
 
     }
 
-    public static List<OFPortStatsEntry> readPortStatsEntryList(ChannelBuffer bb) {
+    public static List<OFPortStatsEntry> readPortStatsEntryList(ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -252,7 +256,7 @@ public class ChannelUtils {
 
     }
 
-    public static List<OFHelloElem> readHelloElemList(ChannelBuffer bb) {
+    public static List<OFHelloElem> readHelloElemList(ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -264,7 +268,7 @@ public class ChannelUtils {
     }
 
     public static List<OFGroupStatsEntry> readGroupStatsEntryList(
-            ChannelBuffer bb) {
+            ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -276,7 +280,7 @@ public class ChannelUtils {
     }
 
     public static List<OFQueueStatsEntry> readQueueStatsEntryList(
-            ChannelBuffer bb) {
+            ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -298,7 +302,7 @@ public class ChannelUtils {
 
     }
 
-    public static List<OFMeterStats> readMeterStatsList(ChannelBuffer bb) {
+    public static List<OFMeterStats> readMeterStatsList(ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -309,13 +313,49 @@ public class ChannelUtils {
 
     }
 
-    public static List<OFTableFeatures> readTableFeaturesList(ChannelBuffer bb) {
+    public static List<OFTableFeatures> readTableFeaturesList(ChannelBuffer bb, int length) {
         // TODO Auto-generated method stub
         return null;
     }
 
     public static void writeTableFeaturesList(ChannelBuffer bb,
             List<OFTableFeatures> entries) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public static OFOxm readOFOxm(ChannelBuffer bb) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static void writeOFOxm(ChannelBuffer bb, OFOxm field) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public static void writeOxmList(ChannelBuffer bb, List<OFOxm> oxmList) {
+        for(OFOxm o: oxmList) {
+            o.writeTo(bb);
+        }
+    }
+
+    public static List<OFOxm> readOxmList(ChannelBuffer bb, int length) {
+        return null;
+    }
+
+    public static void writePhysicalPortList(ChannelBuffer bb,
+            List<OFPhysicalPort> ports) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public static Wildcards readWildcards(ChannelBuffer bb) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public static void writeWildcards(ChannelBuffer bb, Wildcards wildcards) {
         // TODO Auto-generated method stub
 
     }
