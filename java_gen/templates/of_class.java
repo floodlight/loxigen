@@ -26,6 +26,7 @@
 //:: # under the EPL.
 //::
 //:: from loxi_ir import *
+//:: import os
 //:: import itertools
 //:: import of_g
 //:: include('_copyright.java')
@@ -64,6 +65,9 @@ class ${impl_class} implements ${msg.interface.name} {
     // Accessors for OF message fields
 //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
 
+    //:: if os.path.exists("%s/custom/%s.java" % (template_dir, msg.name)):
+    //:: include("custom/%s.java" % msg.name, msg=msg)
+    //:: #endif
 
     public ${msg.interface.name}.Builder createBuilder() {
         return new BuilderWithParent(this);
@@ -92,6 +96,10 @@ class ${impl_class} implements ${msg.interface.name} {
                              for prop in msg.data_members])}
                     );
         }
+        //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: #endif
+
     }
 
     static class Builder implements ${msg.interface.name}.Builder {
@@ -111,6 +119,10 @@ class ${impl_class} implements ${msg.interface.name} {
                          for prop in msg.data_members])}
                 );
         }
+        //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: #endif
+
     }
 
     final static Reader READER = new Reader();
