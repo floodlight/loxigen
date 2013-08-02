@@ -745,6 +745,7 @@ list_setup_%(cls)s_%(v_name)s(
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -792,6 +793,7 @@ list_check_%(cls)s_%(v_name)s(
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -1083,6 +1085,8 @@ def gen_msg_test(out, name):
         for cls in of_g.ordered_messages:
             if not (cls, version) in of_g.base_length:
                 continue
+            if type_maps.class_is_virtual(cls):
+                continue
             bytes = of_g.base_length[(cls, version)] + of_g.extra_length.get((cls, version), 0)
             out.write("""
 static int
@@ -1136,6 +1140,8 @@ run_message_tests(void)
         for cls in of_g.ordered_messages:
             if not (cls, version) in of_g.base_length:
                 continue
+            if type_maps.class_is_virtual(cls):
+                continue
             test_name = "%s_create_%s" % (cls, loxi_utils.version_to_name(version))
             out.write("    RUN_TEST(%s);\n" % test_name)
 
@@ -1166,6 +1172,7 @@ int
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:
@@ -1224,6 +1231,7 @@ int
 
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
+    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
     if len(sub_classes) == 0:

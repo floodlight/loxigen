@@ -90,7 +90,7 @@ struct of_packet_queue {
                 ['OFPPC_NO_FWD', 32],
                 ['OFPPC_NO_PACKET_IN', 64]]],
             ['metadata', 'version', '2'],
-            ['struct', 'of_echo_reply', [
+            ['struct', 'of_echo_reply', None, [
                 ['data', 'uint8_t', 'version'],
                 ['type', 'uint8_t', 'type', 3],
                 ['data', 'uint16_t', 'length'],
@@ -100,7 +100,7 @@ struct of_packet_queue {
                 ['OFPQOFC_BAD_PORT', 0],
                 ['OFPQOFC_BAD_QUEUE', 1],
                 ['OFPQOFC_EPERM', 2]]],
-            ['struct', 'of_packet_queue', [
+            ['struct', 'of_packet_queue', None, [
                 ['data', 'uint32_t', 'queue_id'],
                 ['data', 'uint16_t', 'len'],
                 ['pad', 2],
@@ -111,13 +111,13 @@ struct of_packet_queue {
         ofinput = frontend.create_ofinput(ast)
         self.assertEquals(set([1, 2]), ofinput.wire_versions)
         expected_classes = [
-            OFClass('of_echo_reply', [
+            OFClass('of_echo_reply', None, [
                 OFDataMember('version', 'uint8_t'), # XXX
                 OFTypeMember('type', 'uint8_t', 3),
                 OFLengthMember('length', 'uint16_t'),
                 OFDataMember('xid', 'uint32_t'),
                 OFDataMember('data', 'of_octets_t')]),
-            OFClass('of_packet_queue', [
+            OFClass('of_packet_queue', None, [
                 OFDataMember('queue_id', 'uint32_t'),
                 OFLengthMember('len', 'uint16_t'),
                 OFPadMember(2),
@@ -139,6 +139,58 @@ struct of_packet_queue {
                 ('OFPQOFC_EPERM', 2)]),
         ]
         self.assertEquals(expected_enums, ofinput.enums)
+
+    def test_inheritance(self):
+        ast = parser.parse("""
+#version 1
+
+struct of_queue_prop {
+    uint16_t type;
+    uint16_t len;
+    pad(4);
+};
+
+struct of_queue_prop_min_rate : of_queue_prop {
+    uint16_t type == 1;
+    uint16_t len;
+    pad(4);
+    uint16_t rate;
+    pad(6);
+};
+""")
+
+        # Not testing the parser, just making sure the AST is what we expect
+        expected_ast = [
+            ['metadata', 'version', '1'],
+
+            ['struct', 'of_queue_prop', None, [
+                ['data', 'uint16_t', 'type'],
+                ['data', 'uint16_t', 'len'],
+                ['pad', 4]]],
+
+            ['struct', 'of_queue_prop_min_rate', 'of_queue_prop', [
+                ['type', 'uint16_t', 'type', 1],
+                ['data', 'uint16_t', 'len'],
+                ['pad', 4],
+                ['data', 'uint16_t', 'rate'],
+                ['pad', 6]]],
+        ]
+        self.assertEquals(expected_ast, ast)
+
+        ofinput = frontend.create_ofinput(ast)
+        expected_classes = [
+            OFClass('of_queue_prop', None, [
+                OFDataMember('type', 'uint16_t'),
+                OFLengthMember('len', 'uint16_t'),
+                OFPadMember(4)]),
+            OFClass('of_queue_prop_min_rate', 'of_queue_prop', [
+                OFTypeMember('type', 'uint16_t', 1),
+                OFLengthMember('len', 'uint16_t'),
+                OFPadMember(4),
+                OFDataMember('rate', 'uint16_t'),
+                OFPadMember(6)]),
+        ]
+        self.assertEquals(expected_classes, ofinput.classes)
 
 if __name__ == '__main__':
     unittest.main()

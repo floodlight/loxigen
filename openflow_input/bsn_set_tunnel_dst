@@ -28,7 +28,7 @@
 #version any
 
 // BSN set tunnel destination IP action
-struct of_action_bsn_set_tunnel_dst {
+struct of_action_bsn_set_tunnel_dst : of_action_bsn {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == 0x5c16c7;
