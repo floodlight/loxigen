@@ -46,9 +46,10 @@ import test_data
 import java_gen.java_type as java_type
 
 class JavaModel(object):
-    enum_blacklist = set(("OFDefinitions","OFFlowWildcards"))
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)))
-    virtual_interfaces = set(['OFOxm', 'OFAction' ])
+    enum_blacklist = set(("OFDefinitions",))
+    enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)))
+    virtual_interfaces = set(['OFOxm', 'OFAction', 'OFInstruction' ])
 
     @property
     @memoize
@@ -112,9 +113,15 @@ class JavaModel(object):
             return False
         if clazz.interface.name == "OFTableMod":
             return False
+        if clazz.interface.name.startswith("OFMatchV"):
+            return True
         if loxi_utils.class_is_message(clazz.interface.c_name):
             return True
         if loxi_utils.class_is_oxm(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_action(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_instruction(clazz.interface.c_name):
             return True
         else:
             return False
@@ -193,6 +200,8 @@ class JavaOFInterface(object):
     def class_info(self):
         if re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod")
+        elif re.match(r'OFMatch.*', self.name):
+            return ("", "Match")
         elif loxi_utils.class_is_message(self.c_name):
             return ("", "OFMessage")
         elif loxi_utils.class_is_action(self.c_name):
@@ -550,6 +559,8 @@ class JavaEnum(object):
 
         self.entries = [ JavaEnumEntry(self, name, version_value_map)
                          for (name, version_value_map) in entry_name_version_value_map.items() ]
+
+        self.entries = [ e for e in self.entries if e.name not in model.enum_entry_blacklist[self.name] ]
         self.package = "org.openflow.protocol"
 
     def wire_type(self, version):
