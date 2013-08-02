@@ -74,6 +74,7 @@ class JavaGenerator(object):
 
         context['class_name'] = clazz.name
         context['package'] = clazz.package
+        context['template_dir'] = self.templates_dir
 
         filename = os.path.join(self.basedir, src_dir, "%s/%s.java" % (clazz.package.replace(".", "/"), clazz.name))
         dirname = os.path.dirname(filename)
