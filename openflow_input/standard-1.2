@@ -598,7 +598,7 @@ struct of_port_mod {
     pad(4);
 };
 
-struct of_match_v3 {
+struct of_match_v3(align=8) {
     uint16_t type == 1;
     uint16_t length;
     list(of_oxm_t) oxm_list;

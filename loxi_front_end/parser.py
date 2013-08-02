@@ -53,8 +53,14 @@ any_type = (array_type | list_type | scalar_type).setName("type name")
 pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
 type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
+
+struct_param_name = kw("align")
+struct_param = P.Group(struct_param_name - s('=') - any_type)
+struct_param_list = P.Forward()
+struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))
+
 struct_member = pad_member | type_member | data_member;
-struct = kw('struct') - identifier - s('{') + \
+struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_list - s(')'))) - P.Group(P.Optional(s('<') - word)) - s('{') + \
          P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 

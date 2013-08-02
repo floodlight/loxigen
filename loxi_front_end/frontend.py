@@ -62,8 +62,15 @@ def create_ofinput(ast):
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':
-            members = [create_member(m_ast) for m_ast in decl_ast[2]]
-            ofclass = OFClass(name=decl_ast[1], members=members)
+            # 0: "enum"
+            # 1: name
+            # 2: potentially list of [param_name, param_value]
+            # 3: [ super_class] or []
+            # 4: list of [constant_name, constant_value]+
+            super_class = decl_ast[3][0] if decl_ast[3] else ""
+            members = [create_member(m_ast) for m_ast in decl_ast[4]]
+            ofclass = OFClass(name=decl_ast[1], members=members, super_class=super_class,
+                    params = { param: value for param, value in decl_ast[2] })
             ofinput.classes.append(ofclass)
         if decl_ast[0] == 'enum':
             # 0: "enum"
