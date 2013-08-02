@@ -54,7 +54,8 @@ pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
 type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
 struct_member = pad_member | type_member | data_member;
-struct = kw('struct') - identifier - s('{') + \
+parent = (s(':') - identifier) | tag(None)
+struct = kw('struct') - identifier - parent - s('{') + \
          P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 

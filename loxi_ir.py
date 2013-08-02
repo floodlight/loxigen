@@ -72,7 +72,7 @@ The members are in the same order as on the wire.
 @param name
 @param members List of *Member objects
 """
-OFClass = namedtuple('OFClass', ['name', 'members'])
+OFClass = namedtuple('OFClass', ['name', 'superclass', 'members'])
 
 """
 Normal field

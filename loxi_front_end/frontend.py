@@ -60,8 +60,8 @@ def create_ofinput(ast):
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':
-            members = [create_member(m_ast) for m_ast in decl_ast[2]]
-            ofclass = OFClass(name=decl_ast[1], members=members)
+            members = [create_member(m_ast) for m_ast in decl_ast[3]]
+            ofclass = OFClass(name=decl_ast[1], superclass=decl_ast[2], members=members)
             ofinput.classes.append(ofclass)
         if decl_ast[0] == 'enum':
             enum = OFEnum(name=decl_ast[1], values=[(x[0], x[1]) for x in decl_ast[2]])

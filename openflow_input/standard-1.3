@@ -548,6 +548,7 @@ enum ofp_hello_elem_type {
     OFPHET_VERSIONBITMAP = 1,
 };
 
+/* XXX rename to of_message */
 struct of_header {
     uint8_t version;
     uint8_t type;
@@ -570,13 +571,13 @@ struct of_hello_elem {
     uint16_t length;
 };
 
-struct of_hello_elem_versionbitmap {
+struct of_hello_elem_versionbitmap : of_hello_elem {
     uint16_t type == 1;
     uint16_t length;
     list(of_uint32_t) bitmaps;
 };
 
-struct of_hello {
+struct of_hello : of_header {
     uint8_t version;
     uint8_t type == 0;
     uint16_t length;
@@ -584,7 +585,7 @@ struct of_hello {
     list(of_hello_elem_t) elements;
 };
 
-struct of_echo_request {
+struct of_echo_request : of_header {
     uint8_t version;
     uint8_t type == 2;
     uint16_t length;
@@ -592,7 +593,7 @@ struct of_echo_request {
     of_octets_t data;
 };
 
-struct of_echo_reply {
+struct of_echo_reply : of_header {
     uint8_t version;
     uint8_t type == 3;
     uint16_t length;
@@ -600,7 +601,7 @@ struct of_echo_reply {
     of_octets_t data;
 };
 
-struct of_experimenter {
+struct of_experimenter : of_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -610,28 +611,28 @@ struct of_experimenter {
     of_octets_t data;
 };
 
-struct of_barrier_request {
+struct of_barrier_request : of_header {
     uint8_t version;
     uint8_t type == 20;
     uint16_t length;
     uint32_t xid;
 };
 
-struct of_barrier_reply {
+struct of_barrier_reply : of_header {
     uint8_t version;
     uint8_t type == 21;
     uint16_t length;
     uint32_t xid;
 };
 
-struct of_get_config_request {
+struct of_get_config_request : of_header {
     uint8_t version;
     uint8_t type == 7;
     uint16_t length;
     uint32_t xid;
 };
 
-struct of_get_config_reply {
+struct of_get_config_reply : of_header {
     uint8_t version;
     uint8_t type == 8;
     uint16_t length;
@@ -640,7 +641,7 @@ struct of_get_config_reply {
     uint16_t miss_send_len;
 };
 
-struct of_set_config {
+struct of_set_config : of_header {
     uint8_t version;
     uint8_t type == 9;
     uint16_t length;
@@ -649,7 +650,7 @@ struct of_set_config {
     uint16_t miss_send_len;
 };
 
-struct of_table_mod {
+struct of_table_mod : of_header {
     uint8_t version;
     uint8_t type == 17;
     uint16_t length;
@@ -675,14 +676,14 @@ struct of_port_desc {
     uint32_t max_speed;
 };
 
-struct of_features_request {
+struct of_features_request : of_header {
     uint8_t version;
     uint8_t type == 5;
     uint16_t length;
     uint32_t xid;
 };
 
-struct of_features_reply {
+struct of_features_reply : of_header {
     uint8_t version;
     uint8_t type == 6;
     uint16_t length;
@@ -696,7 +697,7 @@ struct of_features_reply {
     uint32_t reserved;
 };
 
-struct of_port_status {
+struct of_port_status : of_header {
     uint8_t version;
     uint8_t type == 12;
     uint16_t length;
@@ -706,7 +707,7 @@ struct of_port_status {
     of_port_desc_t desc;
 };
 
-struct of_port_mod {
+struct of_port_mod : of_header {
     uint8_t version;
     uint8_t type == 16;
     uint16_t length;
@@ -736,7 +737,7 @@ struct of_action_id {
     pad(4);
 };
 
-struct of_action_output {
+struct of_action_output : of_action {
     uint16_t type == 0;
     uint16_t len;
     of_port_no_t port;
@@ -744,103 +745,103 @@ struct of_action_output {
     pad(6);
 };
 
-struct of_action_copy_ttl_out {
+struct of_action_copy_ttl_out : of_action {
     uint16_t type == 11;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_copy_ttl_in {
+struct of_action_copy_ttl_in : of_action {
     uint16_t type == 12;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_set_mpls_ttl {
+struct of_action_set_mpls_ttl : of_action {
     uint16_t type == 15;
     uint16_t len;
     uint8_t mpls_ttl;
     pad(3);
 };
 
-struct of_action_dec_mpls_ttl {
+struct of_action_dec_mpls_ttl : of_action {
     uint16_t type == 16;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_push_vlan {
+struct of_action_push_vlan : of_action {
     uint16_t type == 17;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
-struct of_action_pop_vlan {
+struct of_action_pop_vlan : of_action {
     uint16_t type == 18;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_push_mpls {
+struct of_action_push_mpls : of_action {
     uint16_t type == 19;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
-struct of_action_pop_mpls {
+struct of_action_pop_mpls : of_action {
     uint16_t type == 20;
     uint16_t len;
     uint16_t ethertype;
     pad(2);
 };
 
-struct of_action_set_queue {
+struct of_action_set_queue : of_action {
     uint16_t type == 21;
     uint16_t len;
     uint32_t queue_id;
 };
 
-struct of_action_group {
+struct of_action_group : of_action {
     uint16_t type == 22;
     uint16_t len;
     uint32_t group_id;
 };
 
-struct of_action_set_nw_ttl {
+struct of_action_set_nw_ttl : of_action {
     uint16_t type == 23;
     uint16_t len;
     uint8_t nw_ttl;
     pad(3);
 };
 
-struct of_action_dec_nw_ttl {
+struct of_action_dec_nw_ttl : of_action {
     uint16_t type == 24;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_set_field {
+struct of_action_set_field : of_action {
     uint16_t type == 25;
     uint16_t len;
     of_oxm_t field;
 };
 
-struct of_action_experimenter {
+struct of_action_experimenter : of_action {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct of_action_pop_pbb {
+struct of_action_pop_pbb : of_action {
     uint16_t type == 27;
     uint16_t len;
     pad(4);
 };
 
-struct of_action_push_pbb {
+struct of_action_push_pbb : of_action {
     uint16_t type == 26;
     uint16_t len;
     uint16_t ethertype;
@@ -858,14 +859,14 @@ struct of_instruction {
     uint16_t len;
 };
 
-struct of_instruction_goto_table {
+struct of_instruction_goto_table : of_instruction {
     uint16_t type == 1;
     uint16_t len;
     uint8_t table_id;
     pad(3);
 };
 
-struct of_instruction_write_metadata {
+struct of_instruction_write_metadata : of_instruction {
     uint16_t type == 2;
     uint16_t len;
     pad(4);
@@ -873,40 +874,61 @@ struct of_instruction_write_metadata {
     uint64_t metadata_mask;
 };
 
-struct of_instruction_write_actions {
+struct of_instruction_write_actions : of_instruction {
     uint16_t type == 3;
     uint16_t len;
     pad(4);
     list(of_action_t) actions;
 };
 
-struct of_instruction_apply_actions {
+struct of_instruction_apply_actions : of_instruction {
     uint16_t type == 4;
     uint16_t len;
     pad(4);
     list(of_action_t) actions;
 };
 
-struct of_instruction_clear_actions {
+struct of_instruction_clear_actions : of_instruction {
     uint16_t type == 5;
     uint16_t len;
     pad(4);
 };
 
-struct of_instruction_meter {
+struct of_instruction_meter : of_instruction {
     uint16_t type == 6;
     uint16_t len;
     uint32_t meter_id;
 };
 
-struct of_instruction_experimenter {
+struct of_instruction_experimenter : of_instruction {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter;
     of_octets_t data;
 };
 
-struct of_flow_add {
+struct of_flow_mod : of_header {
+    uint8_t version;
+    uint8_t type == 14;
+    uint16_t length;
+    uint32_t xid;
+    uint64_t cookie;
+    uint64_t cookie_mask;
+    uint8_t table_id;
+    of_fm_cmd_t _command;
+    uint16_t idle_timeout;
+    uint16_t hard_timeout;
+    uint16_t priority;
+    uint32_t buffer_id;
+    of_port_no_t out_port;
+    uint32_t out_group;
+    uint16_t flags;
+    pad(2);
+    of_match_t match;
+    list(of_instruction_t) instructions;
+};
+
+struct of_flow_add : of_flow_mod {
     uint8_t version;
     uint8_t type == 14;
     uint16_t length;
@@ -927,7 +949,7 @@ struct of_flow_add {
     list(of_instruction_t) instructions;
 };
 
-struct of_flow_modify {
+struct of_flow_modify : of_flow_mod {
     uint8_t version;
     uint8_t type == 14;
     uint16_t length;
@@ -948,7 +970,7 @@ struct of_flow_modify {
     list(of_instruction_t) instructions;
 };
 
-struct of_flow_modify_strict {
+struct of_flow_modify_strict : of_flow_mod {
     uint8_t version;
     uint8_t type == 14;
     uint16_t length;
@@ -969,7 +991,7 @@ struct of_flow_modify_strict {
     list(of_instruction_t) instructions;
 };
 
-struct of_flow_delete {
+struct of_flow_delete : of_flow_mod {
     uint8_t version;
     uint8_t type == 14;
     uint16_t length;
@@ -990,7 +1012,7 @@ struct of_flow_delete {
     list(of_instruction_t) instructions;
 };
 
-struct of_flow_delete_strict {
+struct of_flow_delete_strict : of_flow_mod {
     uint8_t version;
     uint8_t type == 14;
     uint16_t length;
@@ -1020,7 +1042,7 @@ struct of_bucket {
     list(of_action_t) actions;
 };
 
-struct of_group_mod {
+struct of_group_mod : of_header {
     uint8_t version;
     uint8_t type == 15;
     uint16_t length;
@@ -1032,7 +1054,7 @@ struct of_group_mod {
     list(of_bucket_t) buckets;
 };
 
-struct of_packet_out {
+struct of_packet_out : of_header {
     uint8_t version;
     uint8_t type == 13;
     uint16_t length;
@@ -1045,7 +1067,7 @@ struct of_packet_out {
     of_octets_t data;
 };
 
-struct of_packet_in {
+struct of_packet_in : of_header {
     uint8_t version;
     uint8_t type == 10;
     uint16_t length;
@@ -1060,7 +1082,7 @@ struct of_packet_in {
     of_octets_t data; /* FIXME: Ensure total_len gets updated */
 };
 
-struct of_flow_removed {
+struct of_flow_removed : of_header {
     uint8_t version;
     uint8_t type == 11;
     uint16_t length;
@@ -1085,7 +1107,7 @@ struct of_meter_band {
 //    uint32_t        burst_size;  // These are excluded b/c this is the header
 };
 
-struct of_meter_band_drop {
+struct of_meter_band_drop : of_meter_band {
     uint16_t        type == 1;
     uint16_t        len;
     uint32_t        rate;
@@ -1093,7 +1115,7 @@ struct of_meter_band_drop {
     pad(4);
 };
 
-struct of_meter_band_dscp_remark {
+struct of_meter_band_dscp_remark : of_meter_band {
     uint16_t        type == 2;
     uint16_t        len;
     uint32_t        rate;
@@ -1102,7 +1124,7 @@ struct of_meter_band_dscp_remark {
     pad(3);
 };
 
-struct of_meter_band_experimenter {
+struct of_meter_band_experimenter : of_meter_band {
     uint16_t        type == 65535;
     uint16_t        len;
     uint32_t        rate;
@@ -1110,7 +1132,7 @@ struct of_meter_band_experimenter {
     uint32_t        experimenter;
 };
 
-struct of_meter_mod {
+struct of_meter_mod : of_header {
     uint8_t version;
     uint8_t type == 29;
     uint16_t length;
@@ -1121,7 +1143,7 @@ struct of_meter_mod {
     list(of_meter_band_t) meters;
 };
 
-struct of_error_msg {
+struct of_error_msg : of_header {
     uint8_t version;
     uint8_t type == 1;
     uint16_t length;
@@ -1228,7 +1250,27 @@ struct of_group_desc_stats_entry {
 // STATS: 
 //  Desc, flow, agg, table, port, queue, group, group_desc, group_feat, experi
 
-struct of_desc_stats_request {
+struct of_stats_request : of_header {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type;
+    uint16_t flags;
+    pad(4);
+};
+
+struct of_stats_reply : of_header {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type;
+    uint16_t flags;
+    pad(4);
+};
+
+struct of_desc_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1238,7 +1280,7 @@ struct of_desc_stats_request {
     pad(4);
 };
 
-struct of_desc_stats_reply {
+struct of_desc_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1253,7 +1295,7 @@ struct of_desc_stats_reply {
     of_desc_str_t dp_desc;
 };
 
-struct of_flow_stats_request {
+struct of_flow_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1271,7 +1313,7 @@ struct of_flow_stats_request {
     of_match_t match;
 };
 
-struct of_flow_stats_reply {
+struct of_flow_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1282,7 +1324,7 @@ struct of_flow_stats_reply {
     list(of_flow_stats_entry_t) entries;
 };
 
-struct of_aggregate_stats_request {
+struct of_aggregate_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1300,7 +1342,7 @@ struct of_aggregate_stats_request {
     of_match_t match;
 };
 
-struct of_aggregate_stats_reply {
+struct of_aggregate_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1314,7 +1356,7 @@ struct of_aggregate_stats_reply {
     pad(4);
 };
 
-struct of_table_stats_request {
+struct of_table_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1324,7 +1366,7 @@ struct of_table_stats_request {
     pad(4);
 };
 
-struct of_table_stats_reply {
+struct of_table_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1342,92 +1384,92 @@ struct of_table_feature_prop {
     uint16_t         length;
 };
 
-struct of_table_feature_prop_instructions {
+struct of_table_feature_prop_instructions : of_table_feature_prop {
     uint16_t         type == 0;
     uint16_t         length;
     // FIXME Check if instruction_t is right for ids here
     list(of_instruction_t)   instruction_ids;
 };
 
-struct of_table_feature_prop_instructions_miss {
+struct of_table_feature_prop_instructions_miss : of_table_feature_prop {
     uint16_t         type == 1;
     uint16_t         length;
     list(of_instruction_t)   instruction_ids;
 };
 
-struct of_table_feature_prop_next_tables {
+struct of_table_feature_prop_next_tables : of_table_feature_prop {
     uint16_t         type == 2;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct of_table_feature_prop_next_tables_miss {
+struct of_table_feature_prop_next_tables_miss : of_table_feature_prop {
     uint16_t         type == 3;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct of_table_feature_prop_write_actions {
+struct of_table_feature_prop_write_actions : of_table_feature_prop {
     uint16_t         type == 4;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_write_actions_miss {
+struct of_table_feature_prop_write_actions_miss : of_table_feature_prop {
     uint16_t         type == 5;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_apply_actions {
+struct of_table_feature_prop_apply_actions : of_table_feature_prop {
     uint16_t         type == 6;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_apply_actions_miss {
+struct of_table_feature_prop_apply_actions_miss : of_table_feature_prop {
     uint16_t         type == 7;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_match {
+struct of_table_feature_prop_match : of_table_feature_prop {
     uint16_t         type == 8;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_wildcards {
+struct of_table_feature_prop_wildcards : of_table_feature_prop {
     uint16_t         type == 10;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_write_setfield {
+struct of_table_feature_prop_write_setfield : of_table_feature_prop {
     uint16_t         type == 12;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_write_setfield_miss {
+struct of_table_feature_prop_write_setfield_miss : of_table_feature_prop {
     uint16_t         type == 13;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_apply_setfield {
+struct of_table_feature_prop_apply_setfield : of_table_feature_prop {
     uint16_t         type == 14;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_apply_setfield_miss {
+struct of_table_feature_prop_apply_setfield_miss : of_table_feature_prop {
     uint16_t         type == 15;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_experimenter {
+struct of_table_feature_prop_experimenter : of_table_feature_prop {
     uint16_t         type == 65535;
     uint16_t         length;
     uint32_t         experimenter;
@@ -1436,7 +1478,7 @@ struct of_table_feature_prop_experimenter {
 };
 
 // Not yet supported
-// struct of_table_feature_prop_experimenter_miss {
+// struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
 //     uint16_t         type;
 //     uint16_t         length;
 //     uint32_t         experimenter;
@@ -1465,7 +1507,7 @@ struct of_meter_features {
     pad(2);
 };
 
-struct of_port_stats_request {
+struct of_port_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1477,7 +1519,7 @@ struct of_port_stats_request {
     pad(4);
 };
 
-struct of_port_stats_reply {
+struct of_port_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1488,7 +1530,7 @@ struct of_port_stats_reply {
     list(of_port_stats_entry_t) entries;
 };
 
-struct of_queue_stats_request {
+struct of_queue_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1500,7 +1542,7 @@ struct of_queue_stats_request {
     uint32_t queue_id;
 };
 
-struct of_queue_stats_reply {
+struct of_queue_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1511,7 +1553,7 @@ struct of_queue_stats_reply {
     list(of_queue_stats_entry_t) entries;
 };
 
-struct of_group_stats_request {
+struct of_group_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1523,7 +1565,7 @@ struct of_group_stats_request {
     pad(4);
 };
 
-struct of_group_stats_reply {
+struct of_group_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1534,7 +1576,7 @@ struct of_group_stats_reply {
     list(of_group_stats_entry_t) entries;
 };
 
-struct of_group_desc_stats_request {
+struct of_group_desc_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1544,7 +1586,7 @@ struct of_group_desc_stats_request {
     pad(4);
 };
 
-struct of_group_desc_stats_reply {
+struct of_group_desc_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1555,7 +1597,7 @@ struct of_group_desc_stats_reply {
     list(of_group_desc_stats_entry_t) entries;
 };
 
-struct of_group_features_stats_request {
+struct of_group_features_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1565,7 +1607,7 @@ struct of_group_features_stats_request {
     pad(4);
 };
 
-struct of_group_features_stats_reply {
+struct of_group_features_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1585,7 +1627,7 @@ struct of_group_features_stats_reply {
     uint32_t actions_ff;
 };
 
-struct of_meter_stats_request {
+struct of_meter_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1597,7 +1639,7 @@ struct of_meter_stats_request {
     pad(4);
 };
 
-struct of_meter_stats_reply {
+struct of_meter_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1608,7 +1650,7 @@ struct of_meter_stats_reply {
     list(of_meter_stats_t) entries;
 };
 
-struct of_meter_config_stats_request {
+struct of_meter_config_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1620,7 +1662,7 @@ struct of_meter_config_stats_request {
     pad(4);
 };
 
-struct of_meter_config_stats_reply {
+struct of_meter_config_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1632,7 +1674,7 @@ struct of_meter_config_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct of_meter_features_stats_request {
+struct of_meter_features_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1643,7 +1685,7 @@ struct of_meter_features_stats_request {
 };
 
 // FIXME stats added to get things working
-struct of_meter_features_stats_reply {
+struct of_meter_features_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1655,7 +1697,7 @@ struct of_meter_features_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct of_table_features_stats_request {
+struct of_table_features_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1667,7 +1709,7 @@ struct of_table_features_stats_request {
 };
 
 // FIXME stats added to get things working
-struct of_table_features_stats_reply {
+struct of_table_features_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1679,7 +1721,7 @@ struct of_table_features_stats_reply {
 };
 
 // FIXME stats added to get things working
-struct of_port_desc_stats_request {
+struct of_port_desc_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1690,7 +1732,7 @@ struct of_port_desc_stats_request {
 };
 
 // FIXME stats added to get things working
-struct of_port_desc_stats_reply {
+struct of_port_desc_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1738,7 +1780,7 @@ struct of_queue_prop {
     pad(4);
 };
 
-struct of_queue_prop_min_rate {
+struct of_queue_prop_min_rate : of_queue_prop {
     uint16_t type == 1;
     uint16_t len;
     pad(4);
@@ -1746,7 +1788,7 @@ struct of_queue_prop_min_rate {
     pad(6);
 };
 
-struct of_queue_prop_max_rate {
+struct of_queue_prop_max_rate : of_queue_prop {
     uint16_t type == 2;
     uint16_t len;
     pad(4);
@@ -1754,7 +1796,7 @@ struct of_queue_prop_max_rate {
     pad(6);
 };
 
-struct of_queue_prop_experimenter {
+struct of_queue_prop_experimenter : of_queue_prop {
     uint16_t type == 65535;
     uint16_t len;
     pad(4);
@@ -1771,7 +1813,7 @@ struct of_packet_queue {
     list(of_queue_prop_t) properties;
 };
 
-struct of_queue_get_config_request {
+struct of_queue_get_config_request : of_header {
     uint8_t version;
     uint8_t type == 22;
     uint16_t length;
@@ -1780,7 +1822,7 @@ struct of_queue_get_config_request {
     pad(4);
 };
 
-struct of_queue_get_config_reply {
+struct of_queue_get_config_reply : of_header {
     uint8_t version;
     uint8_t type == 23;
     uint16_t length;
@@ -1790,7 +1832,7 @@ struct of_queue_get_config_reply {
     list(of_packet_queue_t) queues;
 };
 
-struct of_role_request {
+struct of_role_request : of_header {
     uint8_t version;
     uint8_t type == 24;
     uint16_t length;
@@ -1800,7 +1842,7 @@ struct of_role_request {
     uint64_t generation_id;
 };
 
-struct of_role_reply {
+struct of_role_reply : of_header {
     uint8_t version;
     uint8_t type == 25;
     uint16_t length;
@@ -1815,7 +1857,7 @@ struct of_role_reply {
 //   while uint32_t[1] is interest for slave
 ////////////////////////////////////////////////////////////////
 
-struct of_async_get_request {
+struct of_async_get_request : of_header {
     uint8_t version;
     uint8_t type == 26;
     uint16_t length;
@@ -1828,7 +1870,7 @@ struct of_async_get_request {
     uint32_t flow_removed_mask_slave;
 };
 
-struct of_async_get_reply {
+struct of_async_get_reply : of_header {
     uint8_t version;
     uint8_t type == 27;
     uint16_t length;
@@ -1841,7 +1883,7 @@ struct of_async_get_reply {
     uint32_t flow_removed_mask_slave;
 };
 
-struct of_async_set {
+struct of_async_set : of_header {
     uint8_t version;
     uint8_t type == 28;
     uint16_t length;

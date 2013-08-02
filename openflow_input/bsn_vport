@@ -53,7 +53,7 @@ struct of_bsn_vport {
 
 // Q-in-Q virtual port specification
 
-struct of_bsn_vport_q_in_q {
+struct of_bsn_vport_q_in_q : of_bsn_vport {
     uint16_t type == 0;
     uint16_t length;  /* 16 */
     uint32_t port_no;     /* OF port number of parent; usually phys port */
@@ -64,7 +64,7 @@ struct of_bsn_vport_q_in_q {
 };
 
 // Request from controller to switch to create vport
-struct of_bsn_virtual_port_create_request {
+struct of_bsn_virtual_port_create_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -78,7 +78,7 @@ struct of_bsn_virtual_port_create_request {
 
 // Reply from switch to controller indicating port number created
 // vport_no must be 16 bits to be compatible with 1.0
-struct of_bsn_virtual_port_create_reply {
+struct of_bsn_virtual_port_create_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -90,7 +90,7 @@ struct of_bsn_virtual_port_create_reply {
 };
 
 // Request from controller to switch to remove a vport
-struct of_bsn_virtual_port_remove_request {
+struct of_bsn_virtual_port_remove_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -101,7 +101,7 @@ struct of_bsn_virtual_port_remove_request {
 };
 
 // Request from controller to switch to remove a vport
-struct of_bsn_virtual_port_remove_reply {
+struct of_bsn_virtual_port_remove_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;

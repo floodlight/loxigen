@@ -117,7 +117,7 @@ test_validate_all(void)
 ::        for cls in reversed(of_g.standard_class_order):
 ::            if not loxi_utils.class_in_version(cls, version):
 ::                continue
-::            elif cls in type_maps.inheritance_map:
+::            elif type_maps.class_is_virtual(cls):
 ::                continue
 ::            elif not loxi_utils.class_is_message(cls):
 ::                continue

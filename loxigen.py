@@ -359,10 +359,6 @@ def order_and_assign_object_ids():
         else:
             of_g.ordered_non_messages.append(cls)
 
-    of_g.ordered_pseudo_objects.append("of_stats_request")
-    of_g.ordered_pseudo_objects.append("of_stats_reply")
-    of_g.ordered_pseudo_objects.append("of_flow_mod")
-
     of_g.ordered_messages.sort()
     of_g.ordered_pseudo_objects.sort()
     of_g.ordered_non_messages.sort()
@@ -481,7 +477,7 @@ def populate_type_maps():
     def find_experimenter(parent, cls):
         for experimenter in sorted(of_g.experimenter_name_to_id.keys(), reverse=True):
             prefix = parent + '_' + experimenter
-            if cls.startswith(prefix):
+            if cls.startswith(prefix) and cls != prefix:
                 return experimenter
         return None
 
@@ -520,7 +516,7 @@ def populate_type_maps():
             # HACK (though this is what loxi_utils.class_is_message() does)
             if not [x for x in ofclass.members if isinstance(x, OFDataMember) and x.name == 'xid']:
                 continue
-            if cls == 'of_header':
+            if type_maps.class_is_virtual(cls):
                 continue
             subcls = cls[3:]
             val = find_type_value(ofclass, 'type')

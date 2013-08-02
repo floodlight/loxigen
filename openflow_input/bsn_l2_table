@@ -28,7 +28,7 @@
 #version 1
 
 // BSN L2 table configuration messages
-struct of_bsn_set_l2_table_request {
+struct of_bsn_set_l2_table_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -41,7 +41,7 @@ struct of_bsn_set_l2_table_request {
     pad(4);
 };
 
-struct of_bsn_set_l2_table_reply {
+struct of_bsn_set_l2_table_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -54,7 +54,7 @@ struct of_bsn_set_l2_table_reply {
     uint32_t status; // 0 means success
 };
 
-struct of_bsn_get_l2_table_request {
+struct of_bsn_get_l2_table_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -63,7 +63,7 @@ struct of_bsn_get_l2_table_request {
     uint32_t subtype == 13;
 };
 
-struct of_bsn_get_l2_table_reply {
+struct of_bsn_get_l2_table_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;

@@ -154,6 +154,9 @@ def class_is_virtual(cls):
         return True
     if loxi_utils.class_is_list(cls):
         return True
+    # TODO get this from the input file when we have virtual class syntax
+    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira"]:
+        return True
     return False
 
 ################################################################
