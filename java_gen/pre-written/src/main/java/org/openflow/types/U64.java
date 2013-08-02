@@ -32,6 +32,10 @@ public class U64 {
         return new U64(raw);
     }
 
+    public static U64 parseHex(String hex) {
+        return new U64(new BigInteger(hex, 16).longValue());
+    }
+
     public long getValue() {
         return raw;
     }
