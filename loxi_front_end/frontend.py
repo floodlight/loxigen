@@ -65,9 +65,9 @@ def create_ofinput(ast):
             # 0: "enum"
             # 1: name
             # 2: potentially list of [param_name, param_value]
-            # 3: [ super_class] or []
+            # 3: super_class
             # 4: list of [constant_name, constant_value]+
-            super_class = decl_ast[3][0] if decl_ast[3] else ""
+            super_class = decl_ast[3]
             members = [create_member(m_ast) for m_ast in decl_ast[4]]
             ofclass = OFClass(name=decl_ast[1], members=members, super_class=super_class,
                     params = { param: value for param, value in decl_ast[2] })

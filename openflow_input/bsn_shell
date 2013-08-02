@@ -27,7 +27,7 @@
 
 #version 1
 
-struct of_bsn_shell_command {
+struct of_bsn_shell_command : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -38,7 +38,7 @@ struct of_bsn_shell_command {
     of_octets_t data;
 };
 
-struct of_bsn_shell_output {
+struct of_bsn_shell_output : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -48,7 +48,7 @@ struct of_bsn_shell_output {
     of_octets_t data;
 };
 
-struct of_bsn_shell_status {
+struct of_bsn_shell_status : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;

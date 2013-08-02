@@ -60,7 +60,8 @@ struct_param_list = P.Forward()
 struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))
 
 struct_member = pad_member | type_member | data_member;
-struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_list - s(')'))) - P.Group(P.Optional(s('<') - word)) - s('{') + \
+parent = (s(':') - identifier) | tag(None)
+struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_list - s(')'))) - parent - s('{') + \
          P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 

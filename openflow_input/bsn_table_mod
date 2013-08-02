@@ -29,7 +29,7 @@
 
 // This is the 1.1+ table mod message which we back port to 1.0
 // for use inside components
-struct of_table_mod {
+struct of_table_mod : of_header {
     uint8_t version;
     uint8_t type == 22;
     uint16_t length;

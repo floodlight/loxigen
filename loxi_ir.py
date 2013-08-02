@@ -76,7 +76,7 @@ The members are in the same order as on the wire.
 @param super_class name of the super class
 @param params optional dictionary of parameters
 """
-class OFClass(namedtuple('OFClass', ['name', 'members', 'super_class', 'params'])):
+class OFClass(namedtuple('OFClass', ['name', 'members', 'superclass', 'params'])):
     def member_by_name(self, name):
         return find(self.members, lambda m: hasattr(m, "name") and m.name == name)
 
