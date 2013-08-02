@@ -50,3 +50,23 @@ ofp.message.flow_add(
     instructions=[
         ofp.instruction.goto_table(table_id=4),
         ofp.instruction.goto_table(table_id=7)])
+-- java
+builder.setXid(0x12345678)
+    .setCookie(U64.parseHex("FEDCBA9876543210"))
+    .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
+    .setTableId((byte) 3)
+    .setIdleTimeout(5)
+    .setHardTimeout(10)
+    .setPriority(6000)
+    .setBufferId(50)
+    .setOutPort(OFPort.of(6))
+    .setOutGroup(8)
+    .setFlags(0)
+    .setMatch(factory.createMatchV3Builder().getMessage()) // FIXME: @yotam: replace once we have generic ofmatch
+    .setInstructions(
+        ImmutableList.<OFInstruction>of(
+            factory.createInstructionGotoTableBuilder().setTableId((byte) 4).getMessage(),
+            factory.createInstructionGotoTableBuilder().setTableId((byte) 7).getMessage()
+        )
+    );
+
