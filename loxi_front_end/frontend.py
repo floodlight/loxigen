@@ -46,6 +46,8 @@ def create_member(m_ast):
             return OFFieldLengthMember(name=m_ast[2], oftype=m_ast[1], field_name='actions')
         else:
             return OFDataMember(name=m_ast[2], oftype=m_ast[1])
+    else:
+        raise Exception("Dont know how to create member: %s" % m_ast[0])
 
 def create_ofinput(ast):
     """
