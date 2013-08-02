@@ -1,6 +1,6 @@
 package org.openflow.protocol;
 
-public interface OFMessage {
+public interface OFMessage extends OFObject {
     int getXid();
 
     OFType getType();

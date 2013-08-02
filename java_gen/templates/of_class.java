@@ -155,7 +155,7 @@ class ${impl_class} implements ${msg.interface.name} {
     final static Writer WRITER = new Writer();
     static class Writer implements OFMessageWriter<${impl_class}> {
         @Override
-        public int write(ChannelBuffer bb, ${impl_class} message) {
+        public void write(ChannelBuffer bb, ${impl_class} message) {
 //:: if not msg.is_fixed_length:
             int startIndex = bb.writerIndex();
 //:: #end
