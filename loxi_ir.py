@@ -36,6 +36,7 @@ __all__ = [
     'OFClass',
     'OFDataMember',
     'OFTypeMember',
+    'OFDiscriminatorMember',
     'OFLengthMember',
     'OFFieldLengthMember',
     'OFPadMember',
@@ -72,11 +73,11 @@ uniformly represented by this class.
 The members are in the same order as on the wire.
 
 @param name
+@param superclass name of the super class
 @param members List of *Member objects
-@param super_class name of the super class
 @param params optional dictionary of parameters
 """
-class OFClass(namedtuple('OFClass', ['name', 'members', 'superclass', 'params'])):
+class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params'])):
     def member_by_name(self, name):
         return find(self.members, lambda m: hasattr(m, "name") and m.name == name)
 
@@ -89,6 +90,16 @@ Normal field
 Example: packet_in.buffer_id
 """
 OFDataMember = namedtuple('OFDataMember', ['name', 'oftype'])
+
+"""
+Field that declares that this is an abstract super-class and
+that the sub classes will be discriminated based on this field.
+E.g., 'type' is the discriminator member of the abstract superclass
+of_action.
+
+@param name
+"""
+OFDiscriminatorMember = namedtuple('OFDiscrminatorMember', ['name', 'oftype'])
 
 """
 Field used to determine the type of an OpenFlow object
