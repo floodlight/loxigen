@@ -3,7 +3,7 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 
-public class IPv6FlowLabel implements OFValueType {
+public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
 
     static final int LENGTH = 4;
     
@@ -53,4 +53,12 @@ public class IPv6FlowLabel implements OFValueType {
         return IPv6FlowLabel.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
 
+    @Override
+    public IPv6FlowLabel applyMask(IPv6FlowLabel mask) {
+        return IPv6FlowLabel.of(this.label & mask.label);
+    }
+
+    public int getIPv6FlowLabelValue() {
+        return label;
+    }
 }

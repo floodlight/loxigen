@@ -148,8 +148,8 @@ class ${impl_class} implements ${msg.interface.name} {
         }
     }
 
-    public int writeTo(ChannelBuffer bb) {
-        return WRITER.write(bb, this);
+    public void writeTo(ChannelBuffer bb) {
+        WRITER.write(bb, this);
     }
 
     final static Writer WRITER = new Writer();

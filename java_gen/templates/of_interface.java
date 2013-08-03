@@ -40,7 +40,7 @@ public interface ${msg.name} ${"extends %s" % msg.parent_interface if msg.parent
     ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
 
-    int writeTo(ChannelBuffer channelBuffer);
+    void writeTo(ChannelBuffer channelBuffer);
 
     Builder createBuilder();
     public interface Builder ${"extends %s.Builder" % msg.parent_interface if msg.parent_interface else ""} {

@@ -6,6 +6,7 @@ import org.openflow.types.IPv4;
 import org.openflow.types.IpDscp;
 import org.openflow.types.IpProtocol;
 import org.openflow.types.MacAddress;
+import org.openflow.types.Masked;
 import org.openflow.types.OFPort;
 import org.openflow.types.OFValueType;
 import org.openflow.types.U16;
@@ -22,33 +23,6 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     // public static Map<MatchField<?,?>, BuilderParamHandler<?>>
     // handlerMap = new HashMap();
-    static BuilderParamHandler<?>[] handlers = new BuilderParamHandler<?>[2];
-
-    static {
-        handlers[MatchField.IN_PORT.id] = new BuilderParamHandler<OFPort>() {
-            @Override
-            public void set(final MatchBuilderVer10 builder, final OFPort value) {
-                builder.inputPort = value;
-            }
-
-            @Override
-            public OFPort get(final MatchBuilderVer10 builder) {
-                return builder.inputPort;
-            }
-        };
-
-        handlers[MatchField.ETH_SRC.id] = new BuilderParamHandler<MacAddress>() {
-            @Override
-            public void set(final MatchBuilderVer10 builder, final MacAddress value) {
-                builder.dataLayerSource = value;
-            }
-
-            @Override
-            public MacAddress get(final MatchBuilderVer10 builder) {
-                return builder.dataLayerSource;
-            }
-        };
-    }
 
     protected int wildcards;
     protected OFPort inputPort;
@@ -66,29 +40,58 @@ public class MatchBuilderVer10 implements MatchBuilder {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <F extends OFValueType> F get(final MatchField<F> match) {
+    public <F extends OFValueType<F>> F get(final MatchField<F> match) {
         switch (match.id) {
-            case 0:
+            case IN_PORT:
                 return (F) inputPort;
-            case 1:
+            case ETH_SRC:
                 return (F) dataLayerSource;
             default:
                 return null;
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <F extends OFValueType> MatchBuilder set(final MatchField<F> match, final F value) {
+    public <F extends OFValueType<F>> Masked<F>
+            getMasked(MatchField<F> field)
+                                        throws UnsupportedOperationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder setExact(final MatchField<F> match, final F value) {
         switch (match.id) {
-            case 0:
+            case IN_PORT:
                 inputPort = (OFPort) value;
                 break;
-            case 1:
+            case ETH_SRC:
                 dataLayerSource = (MacAddress) value;
+                break;
+            default:
                 break;
         }
         return this;
+    }
+    
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder
+            setMasked(MatchField<F> field, Masked<F> valueWithMask) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder
+            setMasked(MatchField<F> field, F value, F mask) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <F extends OFValueType<F>> MatchBuilder wildcard(final MatchField<F> match) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public OFPort getInputPort() {

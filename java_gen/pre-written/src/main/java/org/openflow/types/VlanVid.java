@@ -3,7 +3,7 @@ package org.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
 
-public class VlanVid implements OFValueType {
+public class VlanVid implements OFValueType<VlanVid> {
     
     private static final short VALIDATION_MASK = 0x0FFF;
     final static int LENGTH = 2;
@@ -72,6 +72,11 @@ public class VlanVid implements OFValueType {
 
     public VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
         return VlanVid.of(c.readShort());
+    }
+
+    @Override
+    public VlanVid applyMask(VlanVid mask) {
+        return VlanVid.of((short)(this.vid & mask.vid));
     }
     
 }

@@ -2,7 +2,7 @@ package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class ICMPv4Type implements OFValueType {
+public class ICMPv4Type implements OFValueType<ICMPv4Type> {
 
     final static int LENGTH = 1;
 
@@ -155,4 +155,10 @@ public class ICMPv4Type implements OFValueType {
         return ICMPv4Type.of(c.readUnsignedByte());
     }
 
+    @Override
+    public ICMPv4Type applyMask(ICMPv4Type mask) {
+        return ICMPv4Type.of((short)(this.type & mask.type));
+    }
+
+    
 }
