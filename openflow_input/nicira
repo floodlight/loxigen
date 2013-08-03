@@ -34,7 +34,7 @@ struct of_nicira_header : of_experimenter {
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x2320;
-    uint32_t subtype;
+    uint32_t subtype == ?;
 };
 
 // Nicira extension action
@@ -42,7 +42,7 @@ struct of_action_nicira: of_action_experimenter {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == 0x2320;
-    uint16_t subtype;
+    uint16_t subtype == ?;
     pad(2);
     pad(4);
 };

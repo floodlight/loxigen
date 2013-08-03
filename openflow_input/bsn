@@ -34,7 +34,7 @@ struct of_bsn_header : of_experimenter {
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
-    uint32_t subtype;
+    uint32_t subtype == ?;
 };
 
 // BSN extension action
@@ -42,7 +42,7 @@ struct of_action_bsn : of_action_experimenter {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == 0x5c16c7;
-    uint32_t subtype;
+    uint32_t subtype == ?;
     pad(4);
 };
 

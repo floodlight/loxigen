@@ -42,18 +42,19 @@ LOXI_PY_FILES=$(shell find . \( -name loxi_output -prune \
 LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
 INPUT_FILES = $(wildcard openflow_input/*)
+TEST_DATA = $(shell find test_data -name '*.data')
 
 all: c python
 
 c: .loxi_ts.c
 
-.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c
 	touch $@
 
 python: .loxi_ts.python
 
-.loxi_ts.python: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+.loxi_ts.python: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=python
 	touch $@
 
@@ -68,11 +69,13 @@ python-doc: python
 
 java: .loxi_ts.java
 
-.loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+.loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
-	cd ${LOXI_OUTPUT_DIR}/openflowj; mvn package
 	touch $@
 
+java-eclipse: java
+	mkdir -p java-eclipse
+	rsync --checksum --delete -rv loxi_output/openflowj/ java_eclipse/
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory

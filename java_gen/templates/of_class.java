@@ -26,6 +26,7 @@
 //:: # under the EPL.
 //::
 //:: from loxi_ir import *
+//:: import os
 //:: import itertools
 //:: import of_g
 //:: include('_copyright.java')
@@ -64,12 +65,15 @@ class ${impl_class} implements ${msg.interface.name} {
     // Accessors for OF message fields
 //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
 
+    //:: if os.path.exists("%s/custom/%s.java" % (template_dir, msg.name)):
+    //:: include("custom/%s.java" % msg.name, msg=msg)
+    //:: #endif
 
-    public ${msg.name}.Builder createBuilder() {
-        return new BuilderImplWithParent(this);
+    public ${msg.interface.name}.Builder createBuilder() {
+        return new BuilderWithParent(this);
     }
 
-    static class BuilderImplWithParent implements ${msg.interface.name}.Builder {
+    static class BuilderWithParent implements ${msg.interface.name}.Builder {
         final ${impl_class} parentMessage;
 
         // OF message fields
@@ -78,7 +82,7 @@ class ${impl_class} implements ${msg.interface.name} {
         private ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
 
-        BuilderImplWithParent(${impl_class} parentMessage) {
+        BuilderWithParent(${impl_class} parentMessage) {
             this.parentMessage = parentMessage;
         }
 
@@ -92,9 +96,13 @@ class ${impl_class} implements ${msg.interface.name} {
                              for prop in msg.data_members])}
                     );
         }
+        //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: #endif
+
     }
 
-    static class BuilderImpl implements ${msg.interface.name}.Builder {
+    static class Builder implements ${msg.interface.name}.Builder {
         // OF message fields
 //:: for prop in msg.data_members:
         private boolean ${prop.name}Set;
@@ -111,36 +119,46 @@ class ${impl_class} implements ${msg.interface.name} {
                          for prop in msg.data_members])}
                 );
         }
+        //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: #endif
+
     }
 
     final static Reader READER = new Reader();
     static class Reader implements OFMessageReader<${msg.interface.name}> {
         @Override
         public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
+            int start = bb.readerIndex();
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.is_data:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version,
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True,
                     length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None)};
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.skipBytes(${prop.length});
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
-            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version)};
-            if(${prop.name} != ${prop.value})
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            if(${prop.name} != ${prop.priv_value})
                 throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
 //:: elif prop.is_length_value:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version)};
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
 //:: elif prop.is_field_length_value:
 //::        fields_with_length_member[prop.member.field_name] = prop.name
-            int ${prop.name} = ${prop.java_type.read_op(version)};
+            int ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
 //:: else:
     // fixme: todo ${prop.name}
 //:: #endif
 //:: #endfor
+            //:: if msg.align:
+            // align message to ${msg.align} bytes
+            bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
+
             return new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
@@ -155,33 +173,34 @@ class ${impl_class} implements ${msg.interface.name} {
     final static Writer WRITER = new Writer();
     static class Writer implements OFMessageWriter<${impl_class}> {
         @Override
-        public int write(ChannelBuffer bb, ${impl_class} message) {
-//:: if not msg.is_fixed_length:
+        public void write(ChannelBuffer bb, ${impl_class} message) {
             int startIndex = bb.writerIndex();
-//:: #end
-
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.c_name in fields_with_length_member:
             int ${prop.name}StartIndex = bb.writerIndex();
 //:: #endif
 //:: if prop.is_data:
-            ${prop.java_type.write_op(version, "message." + prop.name)};
+            ${prop.java_type.write_op(version, "message." + prop.name, pub_type=True)};
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.writeZero(${prop.length});
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} = ${prop.value}
-            ${prop.java_type.write_op(version, prop.value)};
+            ${prop.java_type.write_op(version, prop.value, pub_type=False)};
 //:: elif prop.is_length_value:
             // ${prop.name} is length of variable message, will be updated at the end
+//:: if not msg.is_fixed_length:
+            int lengthIndex = bb.writerIndex();
+//:: #end
             ${prop.java_type.write_op(version, 0)};
+
 //:: elif prop.is_field_length_value:
 //::        fields_with_length_member[prop.member.field_name] = prop.name
             // ${prop.name} is length indicator for ${prop.member.field_name}, will be
             // udpated when ${prop.member.field_name} has been written
             int ${prop.name}Index = bb.writerIndex();
-            ${prop.java_type.write_op(version, 0)};
+            ${prop.java_type.write_op(version, 0, pub_type=False)};
 //:: else:
             // FIXME: todo write ${prop.name}
 //:: #endif
@@ -193,16 +212,76 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: #endif
 //:: #endfor
 
-//:: if msg.is_fixed_length:
-            return LENGTH;
-//:: else:
+//:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
-            bb.setShort(startIndex + 2, length);
-            return length;
+            bb.setShort(lengthIndex, length);
+            //:: if msg.align:
+            // align message to ${msg.align} bytes
+            bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);
+            //:: #endif
 //:: #end
 
         }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder b = new StringBuilder("${msg.name}(");
+        //:: for i, prop in enumerate(msg.data_members):
+        //:: if i > 0:
+        b.append(", ");
+        //:: #endif
+        b.append("${prop.name}=").append(${ "Arrays.toString(%s)" % prop.name if prop.java_type.is_array else prop.name });
+        //:: #endfor
+        b.append(")");
+        return b.toString();
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ${msg.name} other = (${msg.name}) obj;
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive:
+        if( ${prop.name} != other.${prop.name})
+            return false;
+        //:: elif prop.java_type.is_array:
+        if (!Arrays.equals(${prop.name}, other.${prop.name}))
+                return false;
+        //:: else:
+        if (${prop.name} == null) {
+            if (other.${prop.name} != null)
+                return false;
+        } else if (!${prop.name}.equals(other.${prop.name}))
+            return false;
+        //:: #endif
+        //:: #endfor
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive:
+        result = prime * result + ${prop.name};
+        //:: elif prop.java_type.is_array:
+        result = prime * result + Arrays.hashCode(${prop.name});
+        //:: else:
+        result = prime * result + ((${prop.name} == null) ? 0 : ${prop.name}.hashCode());
+        //:: #endif
+        //:: #endfor
+        return result;
     }
 
 

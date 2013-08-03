@@ -1,3 +1,4 @@
+import loxi_utils.loxi_utils as loxi_utils
 import os
 import errno
 import re
@@ -21,18 +22,42 @@ def name_c_to_caps_camel(name):
         return camel
 
 
-ANY = 0xFFFFFFFFFFFFFFFF
+java_primitive_types = set("byte char short int long".split(" "))
+java_primitives_info = {
+        'byte' : (True, 8),
+        'char' : (False, 16),
+        'short' : (True, 16),
+        'int' : (True, 32),
+        'long' : (True, 64),
+}
 
+def format_primitive_value(t, value):
+    signed, bits = java_primitives_info[t]
+    max = (1 << bits)-1
+    if value > max:
+        raise Exception("Value %d to large for type %s" % (value, t))
+
+    if signed:
+        max_pos = (1 << (bits-1)) - 1
+
+        if  value > max_pos:
+            if t == "long":
+                return str((1 << bits) - value)
+            else:
+                return "(%s) 0x%x" % (t, value)
+        else:
+            return "0x%x" % value
+
+ANY = 0xFFFFFFFFFFFFFFFF
 
 class VersionOp:
     def __init__(self, version=ANY, read=None, write=None):
         self.version = version
         self.read = read
         self.write = write
-        
+
     def __str__(self):
         return "[Version: %d, Read: '%s', Write: '%s']" % (self.version, self.read, self.write)
-
 
 class JType(object):
     """ Wrapper class to hold C to Java type conversion information """
@@ -44,15 +69,24 @@ class JType(object):
         self.size = size            # bytes on the wire; None == variable length or hard to calc
         self.ops = {}
 #        if read_op is None:
-#            read_op = 'ChannelUtils.read%s(bb)' % self.pub_type
+#            read_op = 'ChannelUtilsVer$version.read%s(bb)' % self.pub_type
 #        if write_op is None:
-#            write_op = 'ChannelUtils.write%s(bb, $name)'  % self.pub_type
+#            write_op = 'ChannelUtilsVer$version.write%s(bb, $name)'  % self.pub_type
 #        self._read_op = read_op
 #        self._write_op = write_op
 
-    def op(self, version=ANY, read=None, write=None):
-        self.ops[version] = VersionOp(version, read, write)
+    def op(self, version=ANY, read=None, write=None, pub_type=ANY):
+        pub_types = [ pub_type ] if pub_type is not ANY else [ False, True ]
+        for pub_type in pub_types:
+            self.ops[(version,pub_type)] = VersionOp(version, read, write)
         return self
+
+    def format_value(self, value, pub_type=True):
+        t = self.pub_type if pub_type else self.priv_type
+        if t in java_primitive_types:
+            return format_primitive_value(t, value)
+        else:
+            return value
 
     @property
     def public_type(self):
@@ -67,91 +101,98 @@ class JType(object):
         """ Is the private type different from the public one?"""
         return self.pub_type != self.priv_type
 
-    def read_op(self, version=None, length=None):
+    def read_op(self, version=None, length=None, pub_type=True):
         if length is None:
-            length = "length - bb.readerIndex()";
+            length = "length - (bb.readerIndex() - start)";
 
         ver = ANY if version is None else version.int_version
         _read_op = None
-        if ver in self.ops:
-            _read_op = self.ops[ver].read or self.ops[ANY].read 
-        elif ANY in self.ops:
-            _read_op = self.ops[ANY].read
+        if (ver, pub_type) in self.ops:
+            _read_op = self.ops[(ver, pub_type)].read or self.ops[(ANY, pub_type)].read
+        elif (ANY, pub_type) in self.ops:
+            _read_op = self.ops[(ANY, pub_type)].read
         if _read_op is None:
-            _read_op = 'ChannelUtils.read%s(bb)' % self.pub_type
+            _read_op = 'ChannelUtilsVer$version.read%s(bb)' % self.pub_type
         if callable(_read_op):
             return _read_op(version)
         else:
             return _read_op.replace("$length", str(length)).replace("$version", version.of_version)
 
-    def write_op(self, version=None, name=None):
+    def write_op(self, version=None, name=None, pub_type=True):
         ver = ANY if version is None else version.int_version
         _write_op = None
-        if ver in self.ops:
-            _write_op = self.ops[ver].write or self.ops[ANY].write
-        elif ANY in self.ops:
-            _write_op = self.ops[ANY].write
+        if (ver, pub_type) in self.ops:
+            _write_op = self.ops[(ver, pub_type)].write or self.ops[(ANY, pub_type)].write
+        elif (ANY, pub_type) in self.ops:
+            _write_op = self.ops[(ANY, pub_type)].write
         if _write_op is None:
-            _write_op = 'ChannelUtils.write%s(bb, $name)' % self.pub_type
+            _write_op = 'ChannelUtilsVer$version.write%s(bb, $name)' % self.pub_type
         if callable(_write_op):
             return _write_op(version, name)
         else:
             return _write_op.replace("$name", str(name)).replace("$version", version.of_version)
 
-hello_elem_list = JType("List<OFHelloElement>") \
-        .op(read='ChannelUtils.readHelloElementList(bb)', write='ChannelUtils.writeHelloElementList(bb)')
+    def skip_op(self, version=None, length=None):
+        return self.read_op(version, length)
+
+    @property
+    def is_primitive(self):
+        return self.pub_type in java_primitive_types
+
+    @property
+    def is_array(self):
+        return self.pub_type.endswith("[]")
+
+
 u8 =  JType('byte',  size=1) \
         .op(read='bb.readByte()', write='bb.writeByte($name)')
 u8_list =  JType('List<U8>',  size=1) \
-        .op(read='bb.readByte()', write='bb.writeByte($name)')
+        .op(read='ChannelUtils.readList(bb, $length, U8.READER)', write='ChannelUtils.writeList(bb, $name)')
 u16 = JType('int', 'int', size=2) \
         .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))')
 u32 = JType('int', 'int', size=4) \
         .op(read='bb.readInt()', write='bb.writeInt($name)')
 u32_list = JType('List<U32>', 'int[]', size=4) \
-        .op(read='bb.readInt()', write='bb.writeInt($name)')
+        .op(read='ChannelUtils.readList(bb, $length, U32.READER)', write='ChannelUtils.writeList(bb, $name)')
 u64 = JType('U64', 'U64', size=8) \
         .op(read='U64.of(bb.readLong())', write='bb.writeLong($name.getValue())')
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)")
 one_byte_array = JType('byte[]', size=1) \
-        .op(read='ChannelUtils.readBytes(bb, 1)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 1)', write='bb.writeBytes($name)')
 two_byte_array = JType('byte[]', size=2) \
-        .op(read='ChannelUtils.readBytes(bb, 2)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 2)', write='bb.writeBytes($name)')
 three_byte_array = JType('byte[]', size=3) \
-        .op(read='ChannelUtils.readBytes(bb, 3)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 3)', write='bb.writeBytes($name)')
 four_byte_array = JType('byte[]', size=4) \
-        .op(read='ChannelUtils.readBytes(bb, 4)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 4)', write='bb.writeBytes($name)')
 five_byte_array = JType('byte[]', size=5) \
-        .op(read='ChannelUtils.readBytes(bb, 5)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 5)', write='bb.writeBytes($name)')
 six_byte_array = JType('byte[]', size=6) \
-        .op(read='ChannelUtils.readBytes(bb, 6)', write='ChannelUtils.writeBytes(bb, $name)')
+        .op(read='ChannelUtils.readBytes(bb, 6)', write='bb.writeBytes($name)')
 seven_byte_array = JType('byte[]', size=7) \
-        .op(read='ChannelUtils.readBytes(bb, 7)', write='ChannelUtils.writeBytes(bb, $name)')
-actions_list = JType('List<OFAction>', size='ChannelUtils.calcListSize($name)') \
-        .op(read='ChannelUtils.readActionsList(bb, $length)', write='ChannelUtils.writeActionsList(bb, $name);')
-instructions_list = JType('List<OFInstruction>', size='ChannelUtils.calcListSize($name)') \
-        .op(read='ChannelUtils.readInstructionsList(bb, $length)', \
+        .op(read='ChannelUtils.readBytes(bb, 7)', write='bb.writeBytes($name)')
+actions_list = JType('List<OFAction>') \
+        .op(read='ChannelUtils.readList(bb, $length, OFActionVer$version.READER)', write='ChannelUtils.writeList(bb, $name);')
+instructions_list = JType('List<OFInstruction>') \
+        .op(read='ChannelUtils.readList(bb, $length, OFInstructionVer$version.READER)', \
             write='ChannelUtils.writeList(bb, $name)')
-buckets_list = JType('List<OFBucket>', size='ChannelUtils.calcListSize($name)') \
-        .op(read='ChannelUtils.readBucketList(bb, $length)', \
-            write='ChannelUtils.writeList(bb, $name)')
-port_desc_list = JType('List<OFPhysicalPort>', size='ChannelUtils.calcListSize($name)') \
-        .op(read='ChannelUtils.readPhysicalPortList(bb, $length)', \
-            write='ChannelUtils.writeList(bb, $name)')
+buckets_list = JType('List<OFBucket>', size='ChannelUtilsVer$version.calcListSize($name)') \
+        .op(read='ChannelUtils.readList(bb, $length, OFBucketVer$version.READER)', write='ChannelUtils.writeList(bb, $name)')
+port_desc_list = JType('List<OFPhysicalPort>', size='ChannelUtilsVer$version.calcListSize($name)') \
+        .op(read='ChannelUtils.readList(bb, $length, OFPhysicalPort.READER)', write='ChannelUtils.writeList(bb, $name)')
 port_desc = JType('OFPortDesc', size='$name.getLength()') \
-        .op(read='null; // TODO OFPortDescVer$version.READER.read(bb)', \
+        .op(read='OFPortDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
-packet_queue_list = JType('List<OFPacketQueue>', size='ChannelUtils.calcListSize($name)') \
-        .op(read='ChannelUtils.readPacketQueueList(bb, $length)', \
-            write='ChannelUtils.writeList(bb, $name)')
+packet_queue_list = JType('List<OFPacketQueue>', size='ChannelUtilsVer$version.calcListSize($name)') \
+        .op(read='ChannelUtils.readList(bb, $length, OFPacketQueueVer$version.READER)', write='ChannelUtils.writeList(bb, $name);')
 octets = JType('byte[]', size="$length") \
         .op(read='ChannelUtils.readBytes(bb, $length)', \
             write='bb.writeBytes($name)')
 of_match = JType('Match', size="$name.getLength()") \
-        .op(read='ChannelUtils.readOFMatch(bb)', \
-            write='ChannelUtils.writeOFMatch(bb, $name)')
+        .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
+            write='$name.writeTo(bb)');
 flow_mod_cmd = JType('OFFlowModCommand', 'short', size="$name.getLength()") \
         .op(version=1, read="bb.readShort()", write="bb.writeShort($name)") \
         .op(version=ANY, read="bb.readByte()", write="bb.writeByte($name)")
@@ -176,6 +217,17 @@ ipv4 = JType("IPv4") \
 ipv6 = JType("IPv6") \
         .op(read="IPv6.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)")
+packetin_reason = JType("OFPacketInReason")\
+        .op(read="OFPacketInReasonSerializerVer$version.readFrom(bb)", write="OFPacketInReasonSerializerVer$version.writeTo(bb, $name)")
+wildcards = JType("Wildcards")\
+        .op(read="Wildcards.of(bb.readInt())", write="bb.writeInt($name.getInt())");
+transport_port = JType("TransportPort")\
+        .op(read="TransportPort.read2Bytes(bb)", write="$name.write2Bytes(bb)")
+oxm = JType("OFOxm")\
+        .op(read="OFOxmVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
+meter_features = JType("OFMeterFeatures")\
+        .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
+
 
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,
@@ -208,16 +260,32 @@ default_mtype_to_jtype_convert_map = {
         'of_table_name_t': table_name,
         'of_ipv4_t': ipv4,
         'of_ipv6_t': ipv6,
-        'of_wc_bmap_t': JType("Wildcards")
+        'of_wc_bmap_t': wildcards,
+        'of_oxm_t': oxm,
+        'of_meter_features_t': meter_features,
         }
 
 ## This is where we drop in special case handling for certain types
 exceptions = {
-        'OFPacketIn': {
-            'data' : octets
+        'of_packet_in': {
+            'data' : octets,
+            'reason': packetin_reason
+            },
+        'of_oxm_tcp_src' : {
+            'value' : transport_port
             },
 }
 
+
+enum_wire_types = {
+        "uint8_t": JType("byte").op(read="bb.readByte()", write="bb.writeByte($name)"),
+        "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
+        "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
+        "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+}
+
+def convert_enum_wire_type_to_jtype(wire_type):
+    return enum_wire_types[wire_type]
 
 def make_standard_list_jtype(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
@@ -226,20 +294,21 @@ def make_standard_list_jtype(c_type):
     base_name = m.group(1)
     java_base_name = name_c_to_caps_camel(base_name)
     return JType("List<OF%s>" % java_base_name) \
-        .op(read='ChannelUtils.read%sList(bb)' % java_base_name, \
-            write='ChannelUtils.write%sList(bb, $name)' % java_base_name)
+        .op(read= 'ChannelUtils.readList(bb, $length, OF%sVer$version.READER)' % java_base_name, \
+            write='ChannelUtils.writeList(bb, $name)')
 
 def convert_to_jtype(obj_name, field_name, c_type):
     """ Convert from a C type ("uint_32") to a java type ("U32")
     and return a JType object with the size, internal type, and marshalling functions"""
     if obj_name in exceptions and field_name in exceptions[obj_name]:
         return exceptions[obj_name][field_name]
-    elif field_name == "type" and c_type == "uint8_t":
+    elif ( obj_name == "of_header" or loxi_utils.class_is_message(obj_name)) and field_name == "type" and c_type == "uint8_t":
         return JType("OFType", 'byte', size=1) \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
     elif field_name == "type" and re.match(r'of_action.*', obj_name):
         return JType("OFActionType", 'short', size=2) \
-            .op(read='bb.readShort()', write='bb.writeShort($name)')
+            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
+            .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
     elif field_name == "version" and c_type == "uint8_t":
         return JType("OFVersion", 'byte', size=1) \
             .op(read='bb.readByte()', write='bb.writeByte($name)')

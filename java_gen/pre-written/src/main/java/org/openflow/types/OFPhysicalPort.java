@@ -2,6 +2,8 @@ package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.openflow.exceptions.OFParseError;
+import org.openflow.protocol.OFMessageReader;
+import org.openflow.protocol.Writeable;
 
 /**
  * A wrapper around the OpenFlow physical port description. The interfaces to
@@ -10,16 +12,16 @@ import org.openflow.exceptions.OFParseError;
  * @author capveg
  */
 
-public class OFPhysicalPort implements OFValueType<OFPhysicalPort> {
+public class OFPhysicalPort implements OFValueType<OFPhysicalPort>, Writeable {
 
     static final int LENGTH = 4;
-    
+
     private final int port;
-    
+
     private OFPhysicalPort(int port) {
         this.port = port;
     }
-    
+
     public static OFPhysicalPort of(int port) {
         return new OFPhysicalPort(port);
     }
@@ -56,6 +58,11 @@ public class OFPhysicalPort implements OFValueType<OFPhysicalPort> {
         c.writeInt(this.port);
     }
 
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        write4Bytes(bb);
+    }
+
     public static OFPhysicalPort read4Bytes(ChannelBuffer c) throws OFParseError {
         return OFPhysicalPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
@@ -67,5 +74,14 @@ public class OFPhysicalPort implements OFValueType<OFPhysicalPort> {
 
     public int getPortNumber() {
         return port;
+    }
+
+    public final static Reader READER = new Reader();
+    private static class Reader implements OFMessageReader<OFPhysicalPort> {
+        @Override
+        public OFPhysicalPort readFrom(ChannelBuffer bb) throws OFParseError {
+            return OFPhysicalPort.read4Bytes(bb);
+        }
+
     }
 }
