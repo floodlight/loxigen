@@ -64,4 +64,27 @@ public class U64 {
     public static long t(final BigInteger l) {
         return l.longValue();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (raw ^ (raw >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        U64 other = (U64) obj;
+        if (raw != other.raw)
+            return false;
+        return true;
+    }
+
 }
