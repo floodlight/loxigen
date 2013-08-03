@@ -45,7 +45,7 @@ enum ofp_bsn_vport_q_in_q_untagged(wire_type=uint16_t, complete=False) {
 // BSN Virtual port object header
 // FIXME For now, inheritance is not exercised.  See below.
 struct of_bsn_vport {
-    uint16_t type;  /* Discriminate virtual port type */
+    uint16_t type == ?;  /* Discriminate virtual port type */
     uint16_t length; /* Length in bytes of this structure with this header */
     /* Remainder of data is specific to the port type */
 };
