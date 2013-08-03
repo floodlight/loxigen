@@ -7,6 +7,7 @@ import org.openflow.protocol.meterband.*;
 import org.openflow.protocol.instruction.*;
 import org.openflow.protocol.match.*;
 import org.openflow.protocol.oxm.*;
+import org.openflow.protocol.queueprop.*;
 import org.openflow.types.*;
 import org.openflow.types.*;
 import org.openflow.util.*;

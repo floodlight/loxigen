@@ -51,6 +51,5 @@ public interface ${msg.name} extends OFObject${", %s" % msg.parent_interface if 
         Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endif
 //:: #endfor
-
     }
 }

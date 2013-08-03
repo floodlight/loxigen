@@ -77,7 +77,7 @@ public class ${test.name} {
         // FIXME should invoke the overall reader once implemented
         ${var_type} ${var_name}Read = ${msg.name}.READER.readFrom(input);
 
-        assertEquals(${var_name}Read, ${var_name}Built);
+        assertEquals(${var_name}Built, ${var_name}Read);
    }
    //:: else:
    // FIXME: No java stanza in test_data for this class. Add for more comprehensive unit testing

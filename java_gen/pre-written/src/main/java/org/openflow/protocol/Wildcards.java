@@ -288,7 +288,7 @@ public class Wildcards {
      * @return
      */
     public static Wildcards of(int paramFlags) {
-        int flags = sanitizeInt(paramFlags);
+        int flags = paramFlags; //sanitizeInt(paramFlags);
         switch(flags) {
             case 0x0000:
                 return EXACT;

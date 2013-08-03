@@ -108,13 +108,23 @@ class JavaGenerator(object):
         """ Create the OF classes with implementations for each of the interfaces and versions """
         for interface in self.java_model.interfaces:
             for java_class in interface.versioned_classes:
-                if not self.java_model.generate_class(java_class):
-                    continue
-                self.render_class(clazz=java_class,
-                        template='of_class.java', version=java_class.version, msg=java_class,
-                        impl_class=java_class.name)
+                if self.java_model.generate_class(java_class):
+                    if not java_class.is_virtual:
+                        self.render_class(clazz=java_class,
+                                template='of_class.java', version=java_class.version, msg=java_class,
+                                impl_class=java_class.name)
 
-                self.create_unit_test(java_class.unit_test)
+                        self.create_unit_test(java_class.unit_test)
+                    else:
+                        disc = java_class.discriminator
+                        if disc:
+                            self.render_class(clazz=java_class,
+                                template='of_virtual_class.java', version=java_class.version, msg=java_class,
+                                impl_class=java_class.name, model=self.java_model)
+                        else:
+                            print "Class %s virtual but no discriminator" % java_class.name
+                else:
+                    print "Class %s ignored by generate_class" % java_class.name
 
     def create_unit_test(self, unit_test):
         if unit_test.has_test_data:

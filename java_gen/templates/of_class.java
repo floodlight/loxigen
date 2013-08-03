@@ -129,26 +129,27 @@ class ${impl_class} implements ${msg.interface.name} {
     static class Reader implements OFMessageReader<${msg.interface.name}> {
         @Override
         public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
+            int start = bb.readerIndex();
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.is_data:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version,
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True,
                     length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None)};
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.skipBytes(${prop.length});
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
-            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version)};
-            if(${prop.name} != ${prop.value})
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            if(${prop.name} != ${prop.priv_value})
                 throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
 //:: elif prop.is_length_value:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version)};
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
 //:: elif prop.is_field_length_value:
 //::        fields_with_length_member[prop.member.field_name] = prop.name
-            int ${prop.name} = ${prop.java_type.read_op(version)};
+            int ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
 //:: else:
     // fixme: todo ${prop.name}
 //:: #endif
@@ -173,32 +174,33 @@ class ${impl_class} implements ${msg.interface.name} {
     static class Writer implements OFMessageWriter<${impl_class}> {
         @Override
         public void write(ChannelBuffer bb, ${impl_class} message) {
-//:: if not msg.is_fixed_length:
             int startIndex = bb.writerIndex();
-//:: #end
-
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.c_name in fields_with_length_member:
             int ${prop.name}StartIndex = bb.writerIndex();
 //:: #endif
 //:: if prop.is_data:
-            ${prop.java_type.write_op(version, "message." + prop.name)};
+            ${prop.java_type.write_op(version, "message." + prop.name, pub_type=True)};
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.writeZero(${prop.length});
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} = ${prop.value}
-            ${prop.java_type.write_op(version, prop.value)};
+            ${prop.java_type.write_op(version, prop.value, pub_type=False)};
 //:: elif prop.is_length_value:
             // ${prop.name} is length of variable message, will be updated at the end
+//:: if not msg.is_fixed_length:
+            int lengthIndex = bb.writerIndex();
+//:: #end
             ${prop.java_type.write_op(version, 0)};
+
 //:: elif prop.is_field_length_value:
 //::        fields_with_length_member[prop.member.field_name] = prop.name
             // ${prop.name} is length indicator for ${prop.member.field_name}, will be
             // udpated when ${prop.member.field_name} has been written
             int ${prop.name}Index = bb.writerIndex();
-            ${prop.java_type.write_op(version, 0)};
+            ${prop.java_type.write_op(version, 0, pub_type=False)};
 //:: else:
             // FIXME: todo write ${prop.name}
 //:: #endif
@@ -213,7 +215,7 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
-            bb.setShort(startIndex + 2, length);
+            bb.setShort(lengthIndex, length);
             //:: if msg.align:
             // align message to ${msg.align} bytes
             bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);

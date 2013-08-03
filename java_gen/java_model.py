@@ -48,8 +48,8 @@ import java_gen.java_type as java_type
 class JavaModel(object):
     enum_blacklist = set(("OFDefinitions",))
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)))
-    virtual_interfaces = set(['OFOxm', 'OFAction', 'OFInstruction' ])
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
+    virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
     @property
     @memoize
@@ -75,6 +75,11 @@ class JavaModel(object):
             interfaces.append(JavaOFInterface(class_name, version_map))
 
         return interfaces
+
+    @property
+    @memoize
+    def all_classes(self):
+        return [clazz for interface in self.interfaces for clazz in interface.versioned_classes]
 
     @property
     @memoize
@@ -109,12 +114,11 @@ class JavaModel(object):
                     members=self.interfaces)
 
     def generate_class(self, clazz):
-        if clazz.interface.is_virtual:
-            return False
-        if clazz.interface.name == "OFTableMod":
-            return False
         if clazz.interface.name.startswith("OFMatchV"):
             return True
+        elif clazz.name == "OFTableModVer10":
+            # tablemod ver 10 is a hack and has no oftype defined
+            return False
         if loxi_utils.class_is_message(clazz.interface.c_name):
             return True
         if loxi_utils.class_is_oxm(clazz.interface.c_name):
@@ -124,7 +128,7 @@ class JavaModel(object):
         if loxi_utils.class_is_instruction(clazz.interface.c_name):
             return True
         else:
-            return False
+            return True
 
 
 class OFFactory(namedtuple("OFFactory", ("package", "name", "members"))):
@@ -186,7 +190,7 @@ class JavaOFInterface(object):
     def __init__(self, c_name, version_map):
         self.c_name = c_name
         self.version_map = version_map
-        self.name = java_type.name_c_to_caps_camel(c_name)
+        self.name = java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
         self.variable_name = self.name[2].lower() + self.name[3:]
         self.constant_name = c_name.upper().replace("OF_", "")
 
@@ -198,20 +202,39 @@ class JavaOFInterface(object):
             self.parent_interface = None
 
     def class_info(self):
-        if re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
+        if re.match(r'OF.+StatsRequest$', self.name):
+            return ("", "OFStatsRequest")
+        elif re.match(r'OF.+StatsReply$', self.name):
+            return ("", "OFStatsReply")
+        elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod")
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name):
+            return ("", "OFBsnHeader")
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name):
+            return ("", "OFNiciraHeader")
         elif re.match(r'OFMatch.*', self.name):
             return ("", "Match")
         elif loxi_utils.class_is_message(self.c_name):
             return ("", "OFMessage")
         elif loxi_utils.class_is_action(self.c_name):
-            return ("action", "OFAction")
+            if re.match(r'OFActionBsn.*', self.name):
+                return ("action", "OFActionBsn")
+            elif re.match(r'OFActionNicira.*', self.name):
+                return ("action", "OFActionNicira")
+            else:
+                return ("action", "OFAction")
+        elif re.match(r'OFBsnVport.+$', self.name):
+            return ("", "OFBsnVport")
         elif loxi_utils.class_is_oxm(self.c_name):
             return ("oxm", "OFOxm")
         elif loxi_utils.class_is_instruction(self.c_name):
             return ("instruction", "OFInstruction")
         elif loxi_utils.class_is_meter_band(self.c_name):
             return ("meterband", "OFMeterBand")
+        elif loxi_utils.class_is_queue_prop(self.c_name):
+            return ("queueprop", "OFQueueProp")
+        elif loxi_utils.class_is_hello_elem(self.c_name):
+            return ("", "OFHelloElem")
         else:
             return ("", None)
 
@@ -235,7 +258,7 @@ class JavaOFInterface(object):
     @property
     @memoize
     def is_virtual(self):
-        return self.name in model.virtual_interfaces
+        return self.name in model.virtual_interfaces or all(ir_class.virtual for ir_class in self.version_map.values())
 
     @property
     def is_universal(self):
@@ -255,9 +278,6 @@ class JavaOFInterface(object):
     @property
     @memoize
     def versioned_classes(self):
-        if self.is_virtual:
-            return []
-        else:
             return [ self.versioned_class(version) for version in self.all_versions ]
 
 #######################################################################
@@ -448,6 +468,10 @@ class JavaMember(object):
         return isinstance(self.member, OFFieldLengthMember)
 
     @property
+    def is_discriminator(self):
+        return isinstance(self.member, OFDiscriminatorMember)
+
+    @property
     def is_length_value(self):
         return isinstance(self.member, OFLengthMember)
 
@@ -471,10 +495,18 @@ class JavaMember(object):
             return self.msg.version.int_version
         elif self.name == "length" or self.name == "len":
             return self.msg.length
-        elif self.java_type.public_type in ("int", "short", "byte") and self.member.value > 100:
-            return "0x%x" % self.member.value
         else:
-            return self.member.value
+            return self.java_type.format_value(self.member.value)
+
+    @property
+    def priv_value(self):
+        if self.name == "version":
+            return self.msg.version.int_version
+        elif self.name == "length" or self.name == "len":
+            return self.msg.length
+        else:
+            return self.java_type.format_value(self.member.value, pub_type=False)
+
 
     @property
     def is_writeable(self):
