@@ -216,12 +216,22 @@ class OrderedDefaultDict(collections.OrderedDict):
                                         collections.OrderedDict.__repr__(self))
 
 
-def find(iterable, func):
+def find(func, iterable):
     """
     find the first item in iterable for which func returns something true'ish.
-    @raise KeyError if no item in iterable fulfills the condition
+    @returns None if no item in iterable fulfills the condition
     """
     for i in iterable:
         if func(i):
             return i
-    raise KeyError("Couldn't find value that matches: %s" % repr(func))
+    return None
+
+def count(func, iteratable):
+    """
+    count how the number of items in iterable for which func returns something true'ish.
+    """
+    c = 0
+    for i in iterable:
+        if func(i):
+            c +=1
+    return c

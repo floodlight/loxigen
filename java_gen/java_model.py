@@ -95,10 +95,10 @@ class JavaModel(object):
 
     @memoize
     def enum_by_name(self, name):
-        try:
-            return find(self.enums, lambda e: e.name == name)
-        except KeyError:
+        res = find(lambda e: e.name == name, self.enums)
+        if not res:
             raise KeyError("Could not find enum with name %s" % name)
+        return res
 
     @property
     @memoize
@@ -348,7 +348,11 @@ class JavaOFClass(object):
 
     @property
     def is_virtual(self):
-        return type_maps.class_is_virtual(self.c_name)
+        return self.ir_class.virtual # type_maps.class_is_virtual(self.c_name) or self.ir_class.virtual
+
+    @property
+    def discriminator(self):
+        return find(lambda m: isinstance(m, OFDiscriminatorMember), self.ir_class.members)
 
     @property
     def is_extension(self):
@@ -357,6 +361,16 @@ class JavaOFClass(object):
     @property
     def align(self):
         return int(self.ir_class.params['align']) if 'align' in self.ir_class.params else 0
+
+    @property
+    @memoize
+    def superclass(self):
+        return find(lambda c: c.version == self.version and c.c_name == self.ir_class.superclass, model.all_classes)
+
+    @property
+    @memoize
+    def subclasses(self):
+        return [ c for c in model.all_classes if c.version == self.version and c.ir_class.superclass == self.c_name ]
 
 #######################################################################
 ### Member
@@ -580,23 +594,26 @@ class JavaEnum(object):
 
     @memoize
     def entry_by_name(self, name):
-        try:
-            return find(self.entries, lambda e: e.name == name)
-        except KeyError:
+        res = find(lambda e: e.name == name, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with name %s" % (self.name, name))
 
     @memoize
     def entry_by_c_name(self, name):
-        try:
-            return find(self.entries, lambda e: e.c_name == name)
-        except KeyError:
+        res = find(lambda e: e.c_name == name, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with c_name %s" % (self.name, name))
 
     @memoize
     def entry_by_version_value(self, version, value):
-        try:
-            return find(self.entries, lambda e: e.values[version] == value if version in e.values else False )
-        except KeyError:
+        res = find(lambda e: e.values[version] == value if version in e.values else False, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with version %s, value %s" % (self.name, version, value))
 
 # values: Map JavaVersion->Value
