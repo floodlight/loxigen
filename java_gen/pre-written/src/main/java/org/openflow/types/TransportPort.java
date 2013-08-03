@@ -8,7 +8,7 @@ import org.openflow.exceptions.OFParseError;
  * 
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
-public class TransportPort implements OFValueType {
+public class TransportPort implements OFValueType<TransportPort> {
     
     static final int LENGTH = 2;
     static final int MAX_PORT = 0xFFFF;
@@ -30,6 +30,10 @@ public class TransportPort implements OFValueType {
     @Override
     public int getLength() {
         return LENGTH;
+    }
+    
+    public int getPort() {
+        return port;
     }
 
     @Override
@@ -63,4 +67,9 @@ public class TransportPort implements OFValueType {
         return TransportPort.of((c.readUnsignedShort() & 0x0FFFF));
     }
 
+    @Override
+    public TransportPort applyMask(TransportPort mask) {
+        return TransportPort.of(this.port & mask.port);
+    }
+    
 }

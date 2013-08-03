@@ -9,7 +9,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4 implements OFValueType {
+public class IPv4 implements OFValueType<IPv4> {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -122,5 +122,11 @@ public class IPv4 implements OFValueType {
     public static IPv4 read4Bytes(ChannelBuffer c) {
         return IPv4.of(c.readInt());
     }
+
+    @Override
+    public IPv4 applyMask(IPv4 mask) {
+        return IPv4.of(this.rawValue & mask.rawValue);
+    }
+
     
 }

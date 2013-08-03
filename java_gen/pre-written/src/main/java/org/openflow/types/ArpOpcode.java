@@ -2,7 +2,7 @@ package org.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class ArpOpcode implements OFValueType {
+public class ArpOpcode implements OFValueType<ArpOpcode> {
 
     final static int LENGTH = 2;
 
@@ -142,4 +142,14 @@ public class ArpOpcode implements OFValueType {
     public static ArpOpcode read2Bytes(ChannelBuffer c) {
         return ArpOpcode.of(c.readUnsignedShort());
     }
+
+    @Override
+    public ArpOpcode applyMask(ArpOpcode mask) {
+        return ArpOpcode.of(this.opcode & mask.opcode);
+    }
+    
+    public int getOpCode() {
+        return opcode;
+    }
+    
 }

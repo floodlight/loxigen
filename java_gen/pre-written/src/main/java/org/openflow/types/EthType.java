@@ -8,7 +8,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * 
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
-public class EthType implements OFValueType {
+public class EthType implements OFValueType<EthType> {
     static final int LENGTH = 2;
 
     private final int rawValue;
@@ -235,4 +235,14 @@ public class EthType implements OFValueType {
         return EthType.of(c.readUnsignedShort());
     }
 
+    @Override
+    public EthType applyMask(EthType mask) {
+        return EthType.of(this.rawValue & mask.rawValue);
+    }
+    
+    public int getValue() {
+        return rawValue;
+    }
+
+    
 }

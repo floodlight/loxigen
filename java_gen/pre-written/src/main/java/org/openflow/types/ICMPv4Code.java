@@ -7,7 +7,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  *
  */
-public class ICMPv4Code implements OFValueType {
+public class ICMPv4Code implements OFValueType<ICMPv4Code> {
 
     final static int LENGTH = 1;
     final static short MAX_CODE = 0xFF;
@@ -41,4 +41,10 @@ public class ICMPv4Code implements OFValueType {
         return ICMPv4Code.of(c.readUnsignedByte());
     }
 
+    @Override
+    public ICMPv4Code applyMask(ICMPv4Code mask) {
+        return ICMPv4Code.of((short)(this.code & mask.code));
+    }
+
+    
 }

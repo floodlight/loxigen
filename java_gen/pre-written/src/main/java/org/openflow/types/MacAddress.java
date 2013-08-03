@@ -10,7 +10,7 @@ import org.openflow.util.HexString;
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
 
-public class MacAddress implements OFValueType {
+public class MacAddress implements OFValueType<MacAddress> {
     static final int MacAddrLen = 6;
     private final long rawValue;
 
@@ -115,6 +115,11 @@ public class MacAddress implements OFValueType {
     public static MacAddress read6Bytes(ChannelBuffer c) throws OFParseError {
         long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
         return MacAddress.of(raw);
+    }
+
+    @Override
+    public MacAddress applyMask(MacAddress mask) {
+        return MacAddress.of(this.rawValue & mask.rawValue);
     }
     
     
