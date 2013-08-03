@@ -553,7 +553,7 @@ enum ofp_hello_elem_type(wire_type=uint16_t) {
 /* XXX rename to of_message */
 struct of_header {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == ?;
     uint16_t length;
     uint32_t xid;
 };
@@ -851,13 +851,13 @@ struct of_action_push_pbb : of_action {
 };
 
 struct of_action {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
     pad(4);
 };
 
 struct of_instruction {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
 };
 
@@ -917,7 +917,7 @@ struct of_flow_mod : of_header {
     uint64_t cookie;
     uint64_t cookie_mask;
     uint8_t table_id;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == ?;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -1257,7 +1257,7 @@ struct of_stats_request : of_header {
     uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == ?;
     uint16_t flags;
     pad(4);
 };
@@ -1267,7 +1267,7 @@ struct of_stats_reply : of_header {
     uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == ?;
     uint16_t flags;
     pad(4);
 };
@@ -1777,7 +1777,7 @@ struct of_experimenter_multipart_header {
 // END OF STATS OBJECTS
 
 struct of_queue_prop {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
     pad(4);
 };

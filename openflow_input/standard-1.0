@@ -302,7 +302,7 @@ enum ofp_queue_op_failed_code(wire_type=uint16_t) {
 /* XXX rename to of_message */
 struct of_header {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == ?;
     uint16_t length;
     uint32_t xid;
 };
@@ -538,7 +538,7 @@ struct of_action_enqueue : of_action {
 };
 
 struct of_action {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
     pad(4);
 };
@@ -580,7 +580,7 @@ struct of_flow_mod : of_header {
     uint32_t xid;
     of_match_t match;
     uint64_t cookie;
-    of_fm_cmd_t _command;
+    of_fm_cmd_t _command == ?;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint16_t priority;
@@ -765,7 +765,7 @@ struct of_stats_request : of_header {
     uint8_t type == 16;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == ?;
     uint16_t flags;
 };
 
@@ -774,7 +774,7 @@ struct of_stats_reply : of_header {
     uint8_t type == 17;
     uint16_t length;
     uint32_t xid;
-    uint16_t stats_type;
+    uint16_t stats_type == ?;
     uint16_t flags;
 };
 
@@ -937,7 +937,7 @@ struct of_experimenter_stats_reply : of_stats_reply {
 // END OF STATS OBJECTS
 
 struct of_queue_prop {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
     pad(4);
 };
