@@ -71,9 +71,11 @@ java: .loxi_ts.java
 
 .loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
-	cd ${LOXI_OUTPUT_DIR}/openflowj; mvn package
 	touch $@
 
+java-eclipse: java
+	mkdir -p java-eclipse
+	rsync --checksum --delete -rv loxi_output/openflowj/ java_eclipse/
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
