@@ -46,6 +46,10 @@ def create_member(m_ast):
             return OFFieldLengthMember(name=m_ast[2], oftype=m_ast[1], field_name='actions')
         else:
             return OFDataMember(name=m_ast[2], oftype=m_ast[1])
+    elif m_ast[0] == 'discriminator':
+        return OFDiscriminatorMember(name=m_ast[2], oftype=m_ast[1])
+    else:
+        raise InputError("Dont know how to create member: %s" % m_ast[0])
 
 def create_ofinput(ast):
     """
@@ -60,11 +64,31 @@ def create_ofinput(ast):
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':
-            members = [create_member(m_ast) for m_ast in decl_ast[3]]
-            ofclass = OFClass(name=decl_ast[1], superclass=decl_ast[2], members=members)
+            # 0: "struct"
+            # 1: name
+            # 2: potentially list of [param_name, param_value]
+            # 3: super_class or None
+            # 4: list of members
+            superclass = decl_ast[3]
+            members = [create_member(m_ast) for m_ast in decl_ast[4]]
+
+            discriminators = [ m for m in members if isinstance(m, OFDiscriminatorMember) ]
+            if len(discriminators) > 1:
+                raise InputError("%s: Cannot support more than one discriminator by class - got %s" %
+                        (decl_ast[1], repr(discriminators)))
+            ofclass = OFClass(name=decl_ast[1], members=members, superclass=superclass,
+                    virtual = len(discriminators) > 0,
+                    params = { param: value for param, value in decl_ast[2] })
             ofinput.classes.append(ofclass)
         if decl_ast[0] == 'enum':
-            enum = OFEnum(name=decl_ast[1], values=[(x[0], x[1]) for x in decl_ast[2]])
+            # 0: "enum"
+            # 1: name
+            # 2: potentially list of [param_name, param_value]
+            # 3: list of [constant_name, constant_value]+
+            enum = OFEnum(name=decl_ast[1],
+                    entries=[OFEnumEntry(name=x[0], value=x[2], params={param:value for param, value in x[1] }) for x in decl_ast[3]],
+                    params = { param: value for param, value in decl_ast[2] }
+                    )
             ofinput.enums.append(enum)
         elif decl_ast[0] == 'metadata':
             if decl_ast[1] == 'version':

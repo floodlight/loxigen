@@ -29,24 +29,27 @@
 # A lot of this stuff could/should probably be merged with the python utilities
 
 import collections
-from collections import namedtuple, defaultdict
+from collections import namedtuple, defaultdict, OrderedDict
 import logging
 import os
 import pdb
 import re
 
-from generic_utils import find, memoize, OrderedSet
+from generic_utils import find, memoize, OrderedSet, OrderedDefaultDict
 import of_g
 from loxi_ir import *
 import loxi_front_end.type_maps as type_maps
-import loxi_utils.loxi_utils as utils
+import loxi_utils.loxi_utils as loxi_utils
 import py_gen.util as py_utils
+import test_data
 
 import java_gen.java_type as java_type
 
 class JavaModel(object):
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)))
-    virtual_interfaces = set(['OFOxm' ])
+    enum_blacklist = set(("OFDefinitions",))
+    enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
+    virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
     @property
     @memoize
@@ -56,12 +59,15 @@ class JavaModel(object):
     @property
     @memoize
     def interfaces(self):
-        version_map_per_class = collections.defaultdict(lambda: {})
+        version_map_per_class = collections.OrderedDict()
 
         for raw_version, of_protocol in of_g.ir.items():
             jversion = JavaOFVersion(of_protocol.wire_version)
 
             for of_class in of_protocol.classes:
+                if not of_class.name in version_map_per_class:
+                    version_map_per_class[of_class.name] = collections.OrderedDict()
+
                 version_map_per_class[of_class.name][jversion] = of_class
 
         interfaces = []
@@ -72,26 +78,72 @@ class JavaModel(object):
 
     @property
     @memoize
+    def all_classes(self):
+        return [clazz for interface in self.interfaces for clazz in interface.versioned_classes]
+
+    @property
+    @memoize
     def enums(self):
-        enum_entry_version_value_map = collections.defaultdict(lambda: collections.defaultdict(lambda: collections.OrderedDict()))
+        name_version_enum_map = OrderedDefaultDict(lambda: OrderedDict())
 
         for version in self.versions:
             of_protocol = of_g.ir[version.int_version]
             for enum in of_protocol.enums:
-                for entry_name, entry_value in enum.values:
-                    enum_entry_version_value_map[enum.name][entry_name][version] = entry_value
+                name_version_enum_map[enum.name][version] = enum
 
-        enums = [ JavaEnum(name, entry_version_value_map) for name, entry_version_value_map
-                        in enum_entry_version_value_map.items() ]
+        enums = [ JavaEnum(name, version_enum_map) for name, version_enum_map,
+                        in name_version_enum_map.items() ]
 
+        # inelegant - need java name here
+        enums = [ enum for enum in enums if enum.name not in self.enum_blacklist ]
         return enums
 
     @memoize
     def enum_by_name(self, name):
-        try:
-            return find(self.enums, lambda e: e.name == name)
-        except KeyError:
+        res = find(lambda e: e.name == name, self.enums)
+        if not res:
             raise KeyError("Could not find enum with name %s" % name)
+        return res
+
+    @property
+    @memoize
+    def of_factory(self):
+           return OFFactory(
+                    package="org.openflow.protocol",
+                    name="OFFactory",
+                    members=self.interfaces)
+
+    def generate_class(self, clazz):
+        if clazz.interface.name.startswith("OFMatchV"):
+            return True
+        elif clazz.name == "OFTableModVer10":
+            # tablemod ver 10 is a hack and has no oftype defined
+            return False
+        if loxi_utils.class_is_message(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_oxm(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_action(clazz.interface.c_name):
+            return True
+        if loxi_utils.class_is_instruction(clazz.interface.c_name):
+            return True
+        else:
+            return True
+
+
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members"))):
+    @property
+    def factory_classes(self):
+            return [ OFFactoryClass(
+                    package="org.openflow.protocol.ver{}".format(version.of_version),
+                    name="OFFactoryVer{}".format(version.of_version),
+                    interface=self,
+                    version=version
+                    ) for version in model.versions ]
+
+
+OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
+OFFactoryClass = namedtuple("OFFactory", ("package", "name", "interface", "version"))
 
 model = JavaModel()
 
@@ -138,8 +190,8 @@ class JavaOFInterface(object):
     def __init__(self, c_name, version_map):
         self.c_name = c_name
         self.version_map = version_map
-        self.name = java_type.name_c_to_caps_camel(c_name)
-        self.builder_name = self.name + "Builder"
+        self.name = java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
+        self.variable_name = self.name[2].lower() + self.name[3:]
         self.constant_name = c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface = self.class_info()
@@ -150,18 +202,39 @@ class JavaOFInterface(object):
             self.parent_interface = None
 
     def class_info(self):
-        if re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
+        if re.match(r'OF.+StatsRequest$', self.name):
+            return ("", "OFStatsRequest")
+        elif re.match(r'OF.+StatsReply$', self.name):
+            return ("", "OFStatsReply")
+        elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod")
-        elif utils.class_is_message(self.c_name):
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name):
+            return ("", "OFBsnHeader")
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name):
+            return ("", "OFNiciraHeader")
+        elif re.match(r'OFMatch.*', self.name):
+            return ("", "Match")
+        elif loxi_utils.class_is_message(self.c_name):
             return ("", "OFMessage")
-        elif utils.class_is_action(self.c_name):
-            return ("action", "OFAction")
-        elif utils.class_is_oxm(self.c_name):
+        elif loxi_utils.class_is_action(self.c_name):
+            if re.match(r'OFActionBsn.*', self.name):
+                return ("action", "OFActionBsn")
+            elif re.match(r'OFActionNicira.*', self.name):
+                return ("action", "OFActionNicira")
+            else:
+                return ("action", "OFAction")
+        elif re.match(r'OFBsnVport.+$', self.name):
+            return ("", "OFBsnVport")
+        elif loxi_utils.class_is_oxm(self.c_name):
             return ("oxm", "OFOxm")
-        elif utils.class_is_instruction(self.c_name):
+        elif loxi_utils.class_is_instruction(self.c_name):
             return ("instruction", "OFInstruction")
-        elif utils.class_is_meter_band(self.c_name):
+        elif loxi_utils.class_is_meter_band(self.c_name):
             return ("meterband", "OFMeterBand")
+        elif loxi_utils.class_is_queue_prop(self.c_name):
+            return ("queueprop", "OFQueueProp")
+        elif loxi_utils.class_is_hello_elem(self.c_name):
+            return ("", "OFHelloElem")
         else:
             return ("", None)
 
@@ -185,12 +258,19 @@ class JavaOFInterface(object):
     @property
     @memoize
     def is_virtual(self):
-        return self.name in model.virtual_interfaces
+        return self.name in model.virtual_interfaces or all(ir_class.virtual for ir_class in self.version_map.values())
+
+    @property
+    def is_universal(self):
+        return len(self.all_versions) == len(model.versions)
 
     @property
     @memoize
     def all_versions(self):
         return self.version_map.keys()
+
+    def has_version(self, version):
+        return version in self.version_map
 
     def versioned_class(self, version):
         return JavaOFClass(self, version, self.version_map[version])
@@ -198,9 +278,6 @@ class JavaOFInterface(object):
     @property
     @memoize
     def versioned_classes(self):
-        if self.is_virtual:
-            return []
-        else:
             return [ self.versioned_class(version) for version in self.all_versions ]
 
 #######################################################################
@@ -218,10 +295,20 @@ class JavaOFClass(object):
         self.version = version
         self.constant_name = self.c_name.upper().replace("OF_", "")
         self.package = "org.openflow.protocol.ver%s" % version.of_version
+        self.generated = False
+
+    @property
+    @memoize
+    def unit_test(self):
+        return JavaUnitTest(self)
 
     @property
     def name(self):
         return "%sVer%s" % (self.interface.name, self.version.of_version)
+
+    @property
+    def variable_name(self):
+        return self.name[3:]
 
     @property
     def length(self):
@@ -281,11 +368,29 @@ class JavaOFClass(object):
 
     @property
     def is_virtual(self):
-        return type_maps.class_is_virtual(self.c_name)
+        return self.ir_class.virtual # type_maps.class_is_virtual(self.c_name) or self.ir_class.virtual
+
+    @property
+    def discriminator(self):
+        return find(lambda m: isinstance(m, OFDiscriminatorMember), self.ir_class.members)
 
     @property
     def is_extension(self):
         return type_maps.message_is_extension(self.c_name, -1)
+
+    @property
+    def align(self):
+        return int(self.ir_class.params['align']) if 'align' in self.ir_class.params else 0
+
+    @property
+    @memoize
+    def superclass(self):
+        return find(lambda c: c.version == self.version and c.c_name == self.ir_class.superclass, model.all_classes)
+
+    @property
+    @memoize
+    def subclasses(self):
+        return [ c for c in model.all_classes if c.version == self.version and c.ir_class.superclass == self.c_name ]
 
 #######################################################################
 ### Member
@@ -363,6 +468,10 @@ class JavaMember(object):
         return isinstance(self.member, OFFieldLengthMember)
 
     @property
+    def is_discriminator(self):
+        return isinstance(self.member, OFDiscriminatorMember)
+
+    @property
     def is_length_value(self):
         return isinstance(self.member, OFLengthMember)
 
@@ -386,10 +495,18 @@ class JavaMember(object):
             return self.msg.version.int_version
         elif self.name == "length" or self.name == "len":
             return self.msg.length
-        elif self.java_type.public_type in ("int", "short", "byte") and self.member.value > 100:
-            return "0x%x" % self.member.value
         else:
-            return self.member.value
+            return self.java_type.format_value(self.member.value)
+
+    @property
+    def priv_value(self):
+        if self.name == "version":
+            return self.msg.version.int_version
+        elif self.name == "length" or self.name == "len":
+            return self.msg.length
+        else:
+            return self.java_type.format_value(self.member.value, pub_type=False)
+
 
     @property
     def is_writeable(self):
@@ -403,7 +520,7 @@ class JavaMember(object):
         if hasattr(self.member, "length"):
             return self.member.length
         else:
-            count, base = utils.type_dec_to_count_base(self.member.type)
+            count, base = loxi_utils.type_dec_to_count_base(self.member.type)
             return of_g.of_base_types[base]['bytes'] * count
 
     @staticmethod
@@ -441,51 +558,111 @@ class JavaMember(object):
             return False
         return (self.name,) == (other.name,)
 
+
+#######################################################################
+### Unit Test
+#######################################################################
+
+class JavaUnitTest(object):
+    def __init__(self, java_class):
+        self.java_class = java_class
+        self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+                                                     name=java_class.c_name[3:])
+    @property
+    def package(self):
+        return self.java_class.package
+
+    @property
+    def name(self):
+        return self.java_class.name + "Test"
+
+    @property
+    def has_test_data(self):
+        return test_data.exists(self.data_file_name)
+
+    @property
+    @memoize
+    def test_data(self):
+        return test_data.read(self.data_file_name)
+
+
 #######################################################################
 ### Enums
 #######################################################################
 
 class JavaEnum(object):
-    def __init__(self, c_name, entry_version_value_map):
+    def __init__(self, c_name, version_enum_map):
         self.c_name = c_name
         self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
 
         # Port_features has constants that start with digits
         self.name_prefix = "PF_" if self.name == "OFPortFeatures" else ""
 
+        self.version_enums = version_enum_map
+
+        entry_name_version_value_map = OrderedDefaultDict(lambda: OrderedDict())
+        for version, ir_enum in version_enum_map.items():
+            for ir_entry in ir_enum.entries:
+                if "virtual" in ir_entry.params:
+                    continue
+                entry_name_version_value_map[ir_entry.name][version] = ir_entry.value
+
         self.entries = [ JavaEnumEntry(self, name, version_value_map)
-                         for (name, version_value_map) in entry_version_value_map.items() ]
+                         for (name, version_value_map) in entry_name_version_value_map.items() ]
+
+        self.entries = [ e for e in self.entries if e.name not in model.enum_entry_blacklist[self.name] ]
         self.package = "org.openflow.protocol"
+
+    def wire_type(self, version):
+        ir_enum = self.version_enums[version]
+        if "wire_type" in ir_enum.params:
+            return java_type.convert_enum_wire_type_to_jtype(ir_enum.params["wire_type"])
+        else:
+            return java_type.u8
+
+    @property
+    def versions(self):
+        return self.version_enums.keys()
 
     @memoize
     def entry_by_name(self, name):
-        try:
-            return find(self.entries, lambda e: e.name == name)
-        except KeyError:
+        res = find(lambda e: e.name == name, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with name %s" % (self.name, name))
 
     @memoize
     def entry_by_c_name(self, name):
-        try:
-            return find(self.entries, lambda e: e.c_name == name)
-        except KeyError:
+        res = find(lambda e: e.c_name == name, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with c_name %s" % (self.name, name))
 
     @memoize
     def entry_by_version_value(self, version, value):
-        try:
-            return find(self.entries, lambda e: e.values[version] == value if version in e.values else False )
-        except KeyError:
+        res = find(lambda e: e.values[version] == value if version in e.values else False, self.entries)
+        if res:
+            return res
+        else:
             raise KeyError("Enum %s: no entry with version %s, value %s" % (self.name, version, value))
 
 # values: Map JavaVersion->Value
 class JavaEnumEntry(object):
     def __init__(self, enum, name, values):
+        self.enum = enum
         self.name = enum.name_prefix + "_".join(name.split("_")[1:]).upper()
         self.values = values
 
+    def has_value(self, version):
+        return version in self.values
+
     def value(self, version):
-        res = self.version_value_map[version]
+        return self.values[version]
+
+    def format_value(self, version):
+        res = self.enum.wire_type(version).format_value(self.values[version])
         return res
 
     def all_values(self, versions, not_present=None):

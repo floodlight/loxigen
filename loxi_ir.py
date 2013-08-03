@@ -25,6 +25,7 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+from generic_utils import find
 from collections import namedtuple
 
 # This module is intended to be imported like this: from loxi_ir import *
@@ -35,10 +36,12 @@ __all__ = [
     'OFClass',
     'OFDataMember',
     'OFTypeMember',
+    'OFDiscriminatorMember',
     'OFLengthMember',
     'OFFieldLengthMember',
     'OFPadMember',
     'OFEnum',
+    'OFEnumEntry'
 ]
 
 """
@@ -70,9 +73,13 @@ uniformly represented by this class.
 The members are in the same order as on the wire.
 
 @param name
+@param superclass name of the super class
 @param members List of *Member objects
+@param params optional dictionary of parameters
 """
-OFClass = namedtuple('OFClass', ['name', 'superclass', 'members'])
+class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params'])):
+    def member_by_name(self, name):
+        return find(self.members, lambda m: hasattr(m, "name") and m.name == name)
 
 """
 Normal field
@@ -83,6 +90,16 @@ Normal field
 Example: packet_in.buffer_id
 """
 OFDataMember = namedtuple('OFDataMember', ['name', 'oftype'])
+
+"""
+Field that declares that this is an abstract super-class and
+that the sub classes will be discriminated based on this field.
+E.g., 'type' is the discriminator member of the abstract superclass
+of_action.
+
+@param name
+"""
+OFDiscriminatorMember = namedtuple('OFDiscriminatorMember', ['name', 'oftype'])
 
 """
 Field used to determine the type of an OpenFlow object
@@ -131,6 +148,13 @@ An OpenFlow enumeration
 All values are Python ints.
 
 @param name
-@param values List of (name, value) tuples in input order
+@param entries List of OFEnumEntry objects in input order
+@params dict of optional params. Currently defined:
+       - wire_type: the low_level type of the enum values (uint8,...)
 """
-OFEnum = namedtuple('OFEnum', ['name', 'values'])
+class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
+    @property
+    def values(self):
+        return [(e.name, e.value) for e in self.entries]
+
+OFEnumEntry = namedtuple('OFEnumEntry', ['name', 'value', 'params'])

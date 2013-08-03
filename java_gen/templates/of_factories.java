@@ -31,13 +31,19 @@
 
 //:: include('_autogen.java')
 
-package ${package};
+package org.openflow.protocol;
 
-import org.openflow.protocol.OFVersion;
+//:: include("_imports.java")
 
-public enum ${class_name} {
-//:: for i, entry in enumerate(enum.entries):
-     ${entry.name}${ ", " if i < len(enum.entries)-1 else ";" }
-//:: #endfor
-
+public final class OFFactories {
+    public static OFFactory getFactory(OFVersion version) {
+        switch(version) {
+            //:: for v in versions:
+            case ${v.constant_version}:
+                return org.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.getInstance();
+            //:: #endfor
+            default:
+                throw new IllegalArgumentException("Unknown version: "+version);
+            }
+    }
 }

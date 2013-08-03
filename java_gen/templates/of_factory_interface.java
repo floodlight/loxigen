@@ -31,13 +31,15 @@
 
 //:: include('_autogen.java')
 
-package ${package};
+package org.openflow.protocol;
 
-import org.openflow.protocol.OFVersion;
+//:: include("_imports.java")
 
-public enum ${class_name} {
-//:: for i, entry in enumerate(enum.entries):
-     ${entry.name}${ ", " if i < len(enum.entries)-1 else ";" }
+public interface ${factory.name} {
+//:: for i in factory.members:
+    //:: if i.is_virtual:
+    //::    continue
+    //:: #endif
+    ${i.name}.Builder create${i.name[2:]}Builder()${ "" if i.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
-
 }

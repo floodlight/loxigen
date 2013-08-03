@@ -447,10 +447,10 @@ def read_input():
                 versions[version_name]['classes'][ofclass.name] = legacy_members
 
             for enum in ofinput.enums:
-                for name, value in enum.values:
+                for entry in enum.entries:
                     identifiers.add_identifier(
-                        translation.loxi_name(name),
-                        name, enum.name, value, wire_version,
+                        translation.loxi_name(entry.name),
+                        entry.name, enum.name, entry.value, wire_version,
                         of_g.identifiers, of_g.identifiers_by_group)
 
         for wire_version, ofinputs in ofinputs_by_version.items():

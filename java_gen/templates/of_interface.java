@@ -35,7 +35,7 @@ package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
 
-public interface ${msg.name} ${"extends %s" % msg.parent_interface if msg.parent_interface else ""} {
+public interface ${msg.name} extends OFObject${", %s" % msg.parent_interface if msg.parent_interface else ""}{
 //:: for prop in msg.members:
     ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
@@ -51,6 +51,5 @@ public interface ${msg.name} ${"extends %s" % msg.parent_interface if msg.parent
         Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endif
 //:: #endfor
-
     }
 }

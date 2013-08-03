@@ -81,26 +81,26 @@ struct of_packet_queue {
         # Not testing the parser, just making sure the AST is what we expect
         expected_ast = [
             ['metadata', 'version', '1'],
-            ['enum', 'ofp_port_config', [
-                ['OFPPC_PORT_DOWN', 1],
-                ['OFPPC_NO_STP', 2],
-                ['OFPPC_NO_RECV', 4],
-                ['OFPPC_NO_RECV_STP', 8],
-                ['OFPPC_NO_FLOOD', 16],
-                ['OFPPC_NO_FWD', 32],
-                ['OFPPC_NO_PACKET_IN', 64]]],
+            ['enum', 'ofp_port_config', [], [
+                ['OFPPC_PORT_DOWN', [], 1],
+                ['OFPPC_NO_STP', [], 2],
+                ['OFPPC_NO_RECV', [], 4],
+                ['OFPPC_NO_RECV_STP', [], 8],
+                ['OFPPC_NO_FLOOD', [], 16],
+                ['OFPPC_NO_FWD', [], 32],
+                ['OFPPC_NO_PACKET_IN', [], 64]]],
             ['metadata', 'version', '2'],
-            ['struct', 'of_echo_reply', None, [
+            ['struct', 'of_echo_reply', [], None, [
                 ['data', 'uint8_t', 'version'],
                 ['type', 'uint8_t', 'type', 3],
                 ['data', 'uint16_t', 'length'],
                 ['data', 'uint32_t', 'xid'],
                 ['data', 'of_octets_t', 'data']]],
-            ['enum', 'ofp_queue_op_failed_code', [
-                ['OFPQOFC_BAD_PORT', 0],
-                ['OFPQOFC_BAD_QUEUE', 1],
-                ['OFPQOFC_EPERM', 2]]],
-            ['struct', 'of_packet_queue', None, [
+            ['enum', 'ofp_queue_op_failed_code', [], [
+                ['OFPQOFC_BAD_PORT', [], 0],
+                ['OFPQOFC_BAD_QUEUE', [], 1],
+                ['OFPQOFC_EPERM', [], 2]]],
+            ['struct', 'of_packet_queue', [], None, [
                 ['data', 'uint32_t', 'queue_id'],
                 ['data', 'uint16_t', 'len'],
                 ['pad', 2],
@@ -111,32 +111,32 @@ struct of_packet_queue {
         ofinput = frontend.create_ofinput(ast)
         self.assertEquals(set([1, 2]), ofinput.wire_versions)
         expected_classes = [
-            OFClass('of_echo_reply', None, [
+            OFClass(name='of_echo_reply', superclass=None, members=[
                 OFDataMember('version', 'uint8_t'), # XXX
                 OFTypeMember('type', 'uint8_t', 3),
                 OFLengthMember('length', 'uint16_t'),
                 OFDataMember('xid', 'uint32_t'),
-                OFDataMember('data', 'of_octets_t')]),
-            OFClass('of_packet_queue', None, [
+                OFDataMember('data', 'of_octets_t')], virtual=False, params={}),
+            OFClass(name='of_packet_queue', superclass=None, members=[
                 OFDataMember('queue_id', 'uint32_t'),
                 OFLengthMember('len', 'uint16_t'),
                 OFPadMember(2),
-                OFDataMember('properties', 'list(of_queue_prop_t)')]),
+                OFDataMember('properties', 'list(of_queue_prop_t)')], virtual=False, params={}),
         ]
         self.assertEquals(expected_classes, ofinput.classes)
         expected_enums = [
-            OFEnum('ofp_port_config', [
-                ('OFPPC_PORT_DOWN', 1),
-                ('OFPPC_NO_STP', 2),
-                ('OFPPC_NO_RECV', 4),
-                ('OFPPC_NO_RECV_STP', 8),
-                ('OFPPC_NO_FLOOD', 16),
-                ('OFPPC_NO_FWD', 32),
-                ('OFPPC_NO_PACKET_IN', 64)]),
-            OFEnum('ofp_queue_op_failed_code', [
-                ('OFPQOFC_BAD_PORT', 0),
-                ('OFPQOFC_BAD_QUEUE', 1),
-                ('OFPQOFC_EPERM', 2)]),
+            OFEnum(name='ofp_port_config', entries=[
+                OFEnumEntry('OFPPC_PORT_DOWN', 1, {}),
+                OFEnumEntry('OFPPC_NO_STP', 2, {}),
+                OFEnumEntry('OFPPC_NO_RECV', 4, {}),
+                OFEnumEntry('OFPPC_NO_RECV_STP', 8, {}),
+                OFEnumEntry('OFPPC_NO_FLOOD', 16, {}),
+                OFEnumEntry('OFPPC_NO_FWD', 32, {}),
+                OFEnumEntry('OFPPC_NO_PACKET_IN', 64, {})], params={}),
+            OFEnum(name='ofp_queue_op_failed_code', entries=[
+                OFEnumEntry('OFPQOFC_BAD_PORT', 0, {}),
+                OFEnumEntry('OFPQOFC_BAD_QUEUE', 1, {}),
+                OFEnumEntry('OFPQOFC_EPERM', 2, {})], params={}),
         ]
         self.assertEquals(expected_enums, ofinput.enums)
 
@@ -145,7 +145,7 @@ struct of_packet_queue {
 #version 1
 
 struct of_queue_prop {
-    uint16_t type;
+    uint16_t type == ?;
     uint16_t len;
     pad(4);
 };
@@ -163,12 +163,12 @@ struct of_queue_prop_min_rate : of_queue_prop {
         expected_ast = [
             ['metadata', 'version', '1'],
 
-            ['struct', 'of_queue_prop', None, [
-                ['data', 'uint16_t', 'type'],
+            ['struct', 'of_queue_prop', [], None, [
+                ['discriminator', 'uint16_t', 'type'],
                 ['data', 'uint16_t', 'len'],
                 ['pad', 4]]],
 
-            ['struct', 'of_queue_prop_min_rate', 'of_queue_prop', [
+            ['struct', 'of_queue_prop_min_rate', [], 'of_queue_prop', [
                 ['type', 'uint16_t', 'type', 1],
                 ['data', 'uint16_t', 'len'],
                 ['pad', 4],
@@ -179,16 +179,16 @@ struct of_queue_prop_min_rate : of_queue_prop {
 
         ofinput = frontend.create_ofinput(ast)
         expected_classes = [
-            OFClass('of_queue_prop', None, [
-                OFDataMember('type', 'uint16_t'),
+            OFClass(name='of_queue_prop', superclass=None, members=[
+                OFDiscriminatorMember('type', 'uint16_t'),
                 OFLengthMember('len', 'uint16_t'),
-                OFPadMember(4)]),
-            OFClass('of_queue_prop_min_rate', 'of_queue_prop', [
+                OFPadMember(4)], virtual=True, params={}),
+            OFClass(name='of_queue_prop_min_rate', superclass='of_queue_prop', members= [
                 OFTypeMember('type', 'uint16_t', 1),
                 OFLengthMember('len', 'uint16_t'),
                 OFPadMember(4),
                 OFDataMember('rate', 'uint16_t'),
-                OFPadMember(6)]),
+                OFPadMember(6)], virtual=False, params= {}),
         ]
         self.assertEquals(expected_classes, ofinput.classes)
 

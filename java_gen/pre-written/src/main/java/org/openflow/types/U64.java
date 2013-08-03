@@ -32,6 +32,10 @@ public class U64 {
         return new U64(raw);
     }
 
+    public static U64 parseHex(String hex) {
+        return new U64(new BigInteger(hex, 16).longValue());
+    }
+
     public long getValue() {
         return raw;
     }
@@ -60,4 +64,27 @@ public class U64 {
     public static long t(final BigInteger l) {
         return l.longValue();
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + (int) (raw ^ (raw >>> 32));
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        U64 other = (U64) obj;
+        if (raw != other.raw)
+            return false;
+        return true;
+    }
+
 }

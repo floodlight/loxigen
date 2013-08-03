@@ -31,13 +31,26 @@
 
 //:: include('_autogen.java')
 
-package ${package};
+package ${factory.package};
 
-import org.openflow.protocol.OFVersion;
+//:: include("_imports.java")
 
-public enum ${class_name} {
-//:: for i, entry in enumerate(enum.entries):
-     ${entry.name}${ ", " if i < len(enum.entries)-1 else ";" }
+public class ${factory.name} implements ${factory.interface.name} {
+//:: for i in factory.interface.members:
+    //:: if i.is_virtual:
+    //::    continue
+    //:: #endif
+
+//::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
+    public ${i.name}.Builder create${i.name[2:]}Builder() {
+        return new ${i.versioned_class(factory.version).name}.Builder();
+    }
+//:: else:
+    public ${i.name}.Builder create${i.name[2:]}Builder() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
+    }
+//:: #endif
 //:: #endfor
 
+    //:: include("_singleton.java", msg=factory)
 }
