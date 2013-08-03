@@ -99,7 +99,7 @@ of_action.
 
 @param name
 """
-OFDiscriminatorMember = namedtuple('OFDiscrminatorMember', ['name', 'oftype'])
+OFDiscriminatorMember = namedtuple('OFDiscriminatorMember', ['name', 'oftype'])
 
 """
 Field used to determine the type of an OpenFlow object
