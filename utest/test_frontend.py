@@ -56,7 +56,7 @@ enum ofp_port_config {
 
 #version 2
 
-struct of_echo_reply {
+struct of_echo_reply(align=8) {
     uint8_t version;
     uint8_t type == 3;
     uint16_t length;
@@ -64,7 +64,7 @@ struct of_echo_reply {
     of_octets_t data;
 };
 
-enum ofp_queue_op_failed_code {
+enum ofp_queue_op_failed_code(wire_type=uint32, bitmask=False, complete=True) {
     OFPQOFC_BAD_PORT = 0,
     OFPQOFC_BAD_QUEUE = 1,
     OFPQOFC_EPERM = 2,
@@ -90,13 +90,14 @@ struct of_packet_queue {
                 ['OFPPC_NO_FWD', [], 32],
                 ['OFPPC_NO_PACKET_IN', [], 64]]],
             ['metadata', 'version', '2'],
-            ['struct', 'of_echo_reply', [], None, [
+            ['struct', 'of_echo_reply', [['align', '8']], None, [
                 ['data', 'uint8_t', 'version'],
                 ['type', 'uint8_t', 'type', 3],
                 ['data', 'uint16_t', 'length'],
                 ['data', 'uint32_t', 'xid'],
                 ['data', 'of_octets_t', 'data']]],
-            ['enum', 'ofp_queue_op_failed_code', [], [
+            ['enum', 'ofp_queue_op_failed_code',
+                [['wire_type', 'uint32'], ['bitmask','False'], ['complete', 'True']], [
                 ['OFPQOFC_BAD_PORT', [], 0],
                 ['OFPQOFC_BAD_QUEUE', [], 1],
                 ['OFPQOFC_EPERM', [], 2]]],
@@ -116,7 +117,8 @@ struct of_packet_queue {
                 OFTypeMember('type', 'uint8_t', 3),
                 OFLengthMember('length', 'uint16_t'),
                 OFDataMember('xid', 'uint32_t'),
-                OFDataMember('data', 'of_octets_t')], virtual=False, params={}),
+                OFDataMember('data', 'of_octets_t')], virtual=False,
+                params={'align': '8'}),
             OFClass(name='of_packet_queue', superclass=None, members=[
                 OFDataMember('queue_id', 'uint32_t'),
                 OFLengthMember('len', 'uint16_t'),
@@ -136,7 +138,8 @@ struct of_packet_queue {
             OFEnum(name='ofp_queue_op_failed_code', entries=[
                 OFEnumEntry('OFPQOFC_BAD_PORT', 0, {}),
                 OFEnumEntry('OFPQOFC_BAD_QUEUE', 1, {}),
-                OFEnumEntry('OFPQOFC_EPERM', 2, {})], params={}),
+                OFEnumEntry('OFPQOFC_EPERM', 2, {})],
+                params={'wire_type': 'uint32', 'bitmask': 'False', 'complete': 'True'}),
         ]
         self.assertEquals(expected_enums, ofinput.enums)
 
