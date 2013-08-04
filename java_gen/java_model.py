@@ -114,6 +114,10 @@ class JavaModel(object):
                     members=self.interfaces)
 
     def generate_class(self, clazz):
+        """ return wether or not to generate implementation class clazz.
+            Now true for everything except OFTableModVer10.
+            @param clazz JavaOFClass instance
+        """
         if clazz.interface.name.startswith("OFMatchV"):
             return True
         elif clazz.name == "OFTableModVer10":
@@ -188,10 +192,17 @@ class JavaOFInterface(object):
         Version agnostic, in contrast to the loxi_ir python model.
     """
     def __init__(self, c_name, version_map):
+        """"
+        @param c_name: loxi style name (e.g., of_flow_add)
+        @param version_map map of { JavaOFVersion: OFClass (from loxi_ir) }
+        """
         self.c_name = c_name
         self.version_map = version_map
+        # name: the Java Type name, e.g., OFFlowAdd
         self.name = java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
+        # variable_name name to use for variables of this type. i.e., flowAdd
         self.variable_name = self.name[2].lower() + self.name[3:]
+        # name for use in constants: FLOW_ADD
         self.constant_name = c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface = self.class_info()
@@ -202,6 +213,10 @@ class JavaOFInterface(object):
             self.parent_interface = None
 
     def class_info(self):
+        """ return tuple of (package_prefix, parent_class) for the current JavaOFInterface"""
+        # FIXME: This duplicates inheritance information that is now available in the loxi_ir
+        # model (note, that the loxi model is on versioned classes). Should check/infer the
+        # inheritance information from the versioned lox_ir classes.
         if re.match(r'OF.+StatsRequest$', self.name):
             return ("", "OFStatsRequest")
         elif re.match(r'OF.+StatsReply$', self.name):
@@ -241,6 +256,9 @@ class JavaOFInterface(object):
     @property
     @memoize
     def members(self):
+        """return a list of all members to be exposed by this interface. Corresponds to
+           the union of the members of the vesioned classes without length, fieldlength
+           and pads (those are handled automatically during (de)serialization and not exposed"""
         all_versions = []
         member_map = collections.OrderedDict()
 
@@ -258,15 +276,18 @@ class JavaOFInterface(object):
     @property
     @memoize
     def is_virtual(self):
+        """ Is this interface virtual. If so, do not generate a builder interface """
         return self.name in model.virtual_interfaces or all(ir_class.virtual for ir_class in self.version_map.values())
 
     @property
     def is_universal(self):
+        """ Is this interface universal, i.e., does it exist in all OF versions? """
         return len(self.all_versions) == len(model.versions)
 
     @property
     @memoize
     def all_versions(self):
+        """ return list of all versions that this interface exists in """
         return self.version_map.keys()
 
     def has_version(self, version):
@@ -289,6 +310,11 @@ class JavaOFClass(object):
         Version specific child of a JavaOFInterface
     """
     def __init__(self, interface, version, ir_class):
+        """
+        @param interface JavaOFInterface instance of the parent interface
+        @param version JavaOFVersion
+        @param ir_class OFClass from loxi_ir
+        """
         self.interface = interface
         self.ir_class = ir_class
         self.c_name = self.ir_class.name
@@ -319,11 +345,13 @@ class JavaOFClass(object):
 
     @property
     def min_length(self):
+        """ @return the minimum wire length of an instance of this class in bytes """
         id_tuple = (self.ir_class.name, self.version.int_version)
         return of_g.base_length[id_tuple] if id_tuple in of_g.base_length else -1
 
     @property
     def is_fixed_length(self):
+        """ true iff this class serializes to a fixed length on the wire """
         return (self.ir_class.name, self.version.int_version) in of_g.is_fixed_length
 
     def all_properties(self):

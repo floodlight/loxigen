@@ -21,8 +21,10 @@ def name_c_to_caps_camel(name):
     else:
         return camel
 
-
 java_primitive_types = set("byte char short int long".split(" "))
+
+### info table about java primitive types, for casting literals in the source code
+# { name : (signed?, length_in_bits) }
 java_primitives_info = {
         'byte' : (True, 8),
         'char' : (False, 16),
@@ -31,7 +33,12 @@ java_primitives_info = {
         'long' : (True, 64),
 }
 
-def format_primitive_value(t, value):
+def format_primitive_literal(t, value):
+    """ Format a primitive numeric literal for inclusion in the
+        java source code. Takes care of casting the literal
+        apropriately for correct representation despite Java's
+        signed-craziness
+    """
     signed, bits = java_primitives_info[t]
     max = (1 << bits)-1
     if value > max:
@@ -59,8 +66,13 @@ class VersionOp:
     def __str__(self):
         return "[Version: %d, Read: '%s', Write: '%s']" % (self.version, self.read, self.write)
 
+### FIXME: This class should really be cleaned up
 class JType(object):
-    """ Wrapper class to hold C to Java type conversion information """
+    """ Wrapper class to hold C to Java type conversion information. JTypes can have a 'public'
+        and or 'private' java type associated with them and can define how those types can be
+        read from and written to ChannelBuffers.
+
+    """
     def __init__(self, pub_type, priv_type=None, size=None, read_op=None, write_op=None):
         self.pub_type = pub_type    # the type we expose externally, e.g. 'U8'
         if priv_type is None:
@@ -76,15 +88,31 @@ class JType(object):
 #        self._write_op = write_op
 
     def op(self, version=ANY, read=None, write=None, pub_type=ANY):
+        """
+        define operations to be performed for reading and writing this type
+        (when read_op, write_op is called). The operations 'read' and 'write'
+        can either be strings ($name, and $version and $length will be replaced),
+        or callables (name, version and length) will be passed.
+
+        @param version int      OF version to define operation for, or ANY for all
+        @param pub_type boolean whether to define operations for the public type (True), the
+                                private type(False) or both (ALL)
+        @param read read expression (either string or callable)s
+        @param write write expression (either string or callable)
+        """
+
         pub_types = [ pub_type ] if pub_type is not ANY else [ False, True ]
         for pub_type in pub_types:
             self.ops[(version,pub_type)] = VersionOp(version, read, write)
         return self
 
     def format_value(self, value, pub_type=True):
+        # Format a constant value of this type, for inclusion in the java source code
+        # For primitive types, takes care of casting the value appropriately, to
+        # cope with java's signedness limitation
         t = self.pub_type if pub_type else self.priv_type
         if t in java_primitive_types:
-            return format_primitive_value(t, value)
+            return format_primitive_literal(t, value)
         else:
             return value
 
@@ -102,7 +130,18 @@ class JType(object):
         return self.pub_type != self.priv_type
 
     def read_op(self, version=None, length=None, pub_type=True):
+        """ return a Java stanza that reads a value of this JType from ChannelBuffer bb.
+        @param version int - OF wire version to generate expression for
+        @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
+        @param length string, for operations that need it (e.g., read a list of unknown length)
+               Java expression evaluating to the byte length to be read. Defaults to the remainig
+               length of the message.
+        @return string containing generated Java expression.
+        """
         if length is None:
+             # assumes that
+             # (1) length of the message has been read to 'length'
+             # (2) readerIndex at the start of the message has been stored in 'start'
             length = "length - (bb.readerIndex() - start)";
 
         ver = ANY if version is None else version.int_version
@@ -119,6 +158,13 @@ class JType(object):
             return _read_op.replace("$length", str(length)).replace("$version", version.of_version)
 
     def write_op(self, version=None, name=None, pub_type=True):
+        """ return a Java stanza that writes a value of this JType contained in Java expression
+        'name' to ChannelBuffer bb.
+        @param name string containing Java expression that evaluations to the value to be written
+        @param version int - OF wire version to generate expression for
+        @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
+        @return string containing generated Java expression.
+        """
         ver = ANY if version is None else version.int_version
         _write_op = None
         if (ver, pub_type) in self.ops:
@@ -126,6 +172,7 @@ class JType(object):
         elif (ANY, pub_type) in self.ops:
             _write_op = self.ops[(ANY, pub_type)].write
         if _write_op is None:
+
             _write_op = 'ChannelUtilsVer$version.write%s(bb, $name)' % self.pub_type
         if callable(_write_op):
             return _write_op(version, name)
@@ -133,16 +180,27 @@ class JType(object):
             return _write_op.replace("$name", str(name)).replace("$version", version.of_version)
 
     def skip_op(self, version=None, length=None):
+        """ return a java stanza that skips an instance of JType in the input ChannelBuffer 'bb'.
+            This is used in the Reader implementations for virtual classes (because after the
+            discriminator field, the concrete Reader instance will re-read all the fields)
+            Currently just delegates to read_op + throws away the result."""
         return self.read_op(version, length)
 
     @property
     def is_primitive(self):
+        """ return true if the pub_type is a java primitive type (and thus needs
+        special treatment, because it doesn't have methods)"""
         return self.pub_type in java_primitive_types
 
     @property
     def is_array(self):
+        """ return true iff the pub_type is a Java array (and thus requires special
+        treament for equals / toString etc.) """
         return self.pub_type.endswith("[]")
 
+
+##### Predefined JType mappings
+# FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('byte',  size=1) \
         .op(read='bb.readByte()', write='bb.writeByte($name)')
@@ -265,7 +323,8 @@ default_mtype_to_jtype_convert_map = {
         'of_meter_features_t': meter_features,
         }
 
-## This is where we drop in special case handling for certain types
+## Map that defines exceptions from the standard loxi->java mapping scheme
+# map of {<loxi_class_name> : { <loxi_member_name> : <JType instance> } }
 exceptions = {
         'of_packet_in': {
             'data' : octets,
@@ -277,25 +336,25 @@ exceptions = {
 }
 
 
-enum_wire_types = {
-        "uint8_t": JType("byte").op(read="bb.readByte()", write="bb.writeByte($name)"),
-        "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
-        "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
-        "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
-}
-
-def convert_enum_wire_type_to_jtype(wire_type):
-    return enum_wire_types[wire_type]
-
+# Create a default mapping for a list type. Type defauls to List<${java_mapping_of_name}>
 def make_standard_list_jtype(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
     if not m:
         raise Exception("Not a recgonized standard list type declaration: %s" % c_type)
     base_name = m.group(1)
     java_base_name = name_c_to_caps_camel(base_name)
+
+    # read op assumes the class has a public final static field READER that implements
+    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
+    # write op assumes class implements Writeable
     return JType("List<OF%s>" % java_base_name) \
-        .op(read= 'ChannelUtils.readList(bb, $length, OF%sVer$version.READER)' % java_base_name, \
+        .op(
+            read= 'ChannelUtils.readList(bb, $length, OF%sVer$version.READER)' % java_base_name, \
             write='ChannelUtils.writeList(bb, $name)')
+
+
+#### main entry point for conversion of LOXI types (c_types) Java types.
+# FIXME: This badly needs a refactoring
 
 def convert_to_jtype(obj_name, field_name, c_type):
     """ Convert from a C type ("uint_32") to a java type ("U32")
@@ -320,3 +379,15 @@ def convert_to_jtype(obj_name, field_name, c_type):
         print "WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name)
         jtype = name_c_to_caps_camel(re.sub(r'_t$', "", c_type))
         return JType(jtype)
+
+
+#### Enum specific wiretype definitions
+enum_wire_types = {
+        "uint8_t": JType("byte").op(read="bb.readByte()", write="bb.writeByte($name)"),
+        "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
+        "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
+        "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+}
+
+def convert_enum_wire_type_to_jtype(wire_type):
+    return enum_wire_types[wire_type]
