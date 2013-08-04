@@ -48,6 +48,8 @@ import java_gen.java_type as java_type
 class JavaModel(object):
     enum_blacklist = set(("OFDefinitions",))
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
+    # OFUint structs are there for god-knows what in loci. We certainly don't need them.
+    interface_blacklist = set( ("OFUint8", "OFUint32",))
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
@@ -73,6 +75,8 @@ class JavaModel(object):
         interfaces = []
         for class_name, version_map in version_map_per_class.items():
             interfaces.append(JavaOFInterface(class_name, version_map))
+
+        interfaces = [ i for i in interfaces if i.name not in self.interface_blacklist ]
 
         return interfaces
 
@@ -621,7 +625,11 @@ class JavaUnitTest(object):
 class JavaEnum(object):
     def __init__(self, c_name, version_enum_map):
         self.c_name = c_name
-        self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
+
+        if c_name == "of_stats_types":
+            self.name = "OFStatsType"
+        else:
+            self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
 
         # Port_features has constants that start with digits
         self.name_prefix = "PF_" if self.name == "OFPortFeatures" else ""
