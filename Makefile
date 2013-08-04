@@ -79,7 +79,7 @@ java-eclipse: java
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
-	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python
+	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python .loxi_ts.java
 
 debug:
 	@echo "LOXI_OUTPUT_DIR=\"${LOXI_OUTPUT_DIR}\""
@@ -106,6 +106,12 @@ check-py: python
 check-c: c
 	make -C ${LOXI_OUTPUT_DIR}/locitest
 	${LOXI_OUTPUT_DIR}/locitest/locitest
+
+check-java: java
+	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn compile test-compile test
+
+package-java: java
+	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn package
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
