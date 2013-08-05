@@ -178,6 +178,18 @@ typedef struct of_match_s {
 } of_match_t;
 
 /**
+ * Mask the values in the match structure according to its fields
+ */
+static inline void of_match_values_mask(of_match_t *match)
+{
+    int idx;
+
+    for (idx = 0; idx < sizeof(of_match_fields_t); idx++) {
+        ((uint8_t *)&match->fields)[idx] &= ((uint8_t *)&match->masks)[idx];
+    }
+}
+
+/**
  * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
  * indices into the map below.
  *
@@ -682,26 +694,14 @@ of_match_v1_to_match(of_match_v1_t *src, of_match_t *dst)
 
     of_match_v1_wildcards_get(src, &wc);
 """)
-    # Deal with nw fields first
-    out.write("""
-    /* Handle L3 src and dst wildcarding first */
-    /* @fixme Check mask values are properly treated for ipv4 src/dst */
-    if ((count = OF_MATCH_V1_WC_IPV4_DST_GET(wc)) < 32) {
-        of_match_v1_ipv4_dst_get(src, &dst->fields.ipv4_dst);
-        if (count > 0) { /* Not exact match */
-            dst->masks.ipv4_dst = ~(((uint32_t)1 << count) - 1);
-        } else {
-            OF_MATCH_MASK_IPV4_DST_EXACT_SET(dst);
-        }
-    }
-""")
     for key in sorted(match.of_v1_keys):
         if key in ["ipv4_src", "ipv4_dst"]: # Special cases for masks here
             out.write("""
     count = OF_MATCH_V1_WC_%(ku)s_GET(wc);
     dst->masks.%(key)s = of_ip_index_to_mask(count);
-    /* @todo Review if we should only get the addr when masks.%(key)s != 0 */
     of_match_v1_%(key)s_get(src, &dst->fields.%(key)s);
+    /* Clear the bits not indicated by mask; IP addrs are special for 1.0 */
+    dst->fields.%(key)s &= dst->masks.%(key)s;
 """ % dict(ku=key.upper(), key=key))
         else:
             out.write("""
@@ -749,6 +749,9 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
 """ % dict(ku=key.upper(), key=key))
 
     out.write("""
+    /* Clear values outside of masks */
+    of_match_values_mask(dst);
+
     return OF_ERROR_NONE;
 }
 """)
@@ -807,6 +810,9 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
         } /* end switch */
         rv = of_list_oxm_next(&oxm_list, &oxm_entry);
     } /* end OXM iteration */
+
+    /* Clear values outside of masks */
+    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
