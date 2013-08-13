@@ -187,7 +187,7 @@ class ${impl_class} implements ${msg.interface.name} {
             bb.writeZero(${prop.length});
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} = ${prop.value}
-            ${prop.java_type.write_op(version, prop.value, pub_type=False)};
+            ${prop.java_type.write_op(version, prop.priv_value, pub_type=False)};
 //:: elif prop.is_length_value:
             // ${prop.name} is length of variable message, will be updated at the end
 //:: if not msg.is_fixed_length:
@@ -273,7 +273,9 @@ class ${impl_class} implements ${msg.interface.name} {
         int result = 1;
 
         //:: for prop in msg.data_members:
-        //:: if prop.java_type.is_primitive:
+        //:: if prop.java_type.pub_type == 'long':
+        result = prime *  (int) (${prop.name} ^ (${prop.name} >>> 32));
+        //:: elif prop.java_type.is_primitive:
         result = prime * result + ${prop.name};
         //:: elif prop.java_type.is_array:
         result = prime * result + Arrays.hashCode(${prop.name});

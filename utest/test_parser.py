@@ -54,6 +54,16 @@ struct foo {
         self.assertEquals(ast,
             [['struct', 'foo', [], None, [['data', 'uint32_t', 'bar']]]])
 
+    def test_struct_align_arg(self):
+        src = """\
+struct foo(align=8) {
+    uint32_t bar;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [['align', '8']], None, [['data', 'uint32_t', 'bar']]]])
+
     def test_multiple_fields(self):
         src = """\
 struct foo {
@@ -119,6 +129,16 @@ struct foo : bar {
         self.assertEquals(ast,
             [['struct', 'foo', [], 'bar', [['type', 'uint16_t', 'foo', 0x10]]]])
 
+    def test_discriminator(self):
+        src = """\
+struct foo {
+    uint16_t foo == ?;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['discriminator', 'uint16_t', 'foo']]]])
+
 class EnumTests(unittest.TestCase):
     def test_empty(self):
         src = """\
@@ -136,6 +156,17 @@ enum foo {
 """
         ast = parser.parse(src)
         self.assertEquals(ast, [['enum', 'foo', [], [['BAR', [], 1]]]])
+
+    def test_params(self):
+        src = """\
+enum foo(wire_type=uint32, bitmask=False, complete=False) {
+    BAR = 1
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast, [['enum', 'foo',
+            [ ['wire_type', 'uint32'], ['bitmask','False'], ['complete', 'False']],
+            [['BAR', [], 1]]]])
 
     def test_multiple(self):
         src = """\
