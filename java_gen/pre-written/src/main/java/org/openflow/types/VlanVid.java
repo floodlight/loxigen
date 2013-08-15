@@ -70,7 +70,7 @@ public class VlanVid implements OFValueType<VlanVid> {
         c.writeShort(this.vid);
     }
 
-    public VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
+    public static VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
         return VlanVid.of(c.readShort());
     }
 

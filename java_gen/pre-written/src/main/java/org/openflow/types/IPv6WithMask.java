@@ -31,7 +31,7 @@ public class IPv6WithMask extends Masked<IPv6> {
         return res.toString();
     }
     
-    public static OFValueType<?> ofPossiblyMasked(final String string) {
+    public static IPv6WithMask of(final String string) {
         int slashPos;
         String ip = string;
         int maskBits = 0;
@@ -67,7 +67,7 @@ public class IPv6WithMask extends Masked<IPv6> {
             return IPv6WithMask.of(ipv6, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return ipv6;
+            return IPv6WithMask.of(ipv6, IPv6.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl));
         } else {
             // With mask
             BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);

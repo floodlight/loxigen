@@ -1,5 +1,6 @@
 package org.openflow.protocol.match;
 
+// MUST BE ORDERED BY THE ORDER OF OF SPEC!!!
 public enum MatchFields {
     IN_PORT,
     PHYSICAL_PORT,

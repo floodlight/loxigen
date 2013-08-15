@@ -58,31 +58,25 @@ public class IPv6Test {
     @Test
     public void testMasked() throws UnknownHostException {
         for(int i=0; i < ipsWithMask.length; i++ ) {
-            OFValueType value = IPv6WithMask.ofPossiblyMasked(ipsWithMask[i]);
-            if (value instanceof IPv6 && !hasMask[i]) {
-                // Types OK, check values
-                IPv6 ip = (IPv6)value;
+            IPv6WithMask value = IPv6WithMask.of(ipsWithMask[i]);
+            if (!hasMask[i]) {
+                IPv6 ip = value.getValue();
                 InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i]);
 
                 assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
                 assertEquals(ipsWithMask[i], ip.toString());
             } else if (value instanceof IPv6WithMask && hasMask[i]) {
-                IPv6WithMask ip = null;
-                try {
-                    ip = (IPv6WithMask)value;
-                } catch (ClassCastException e) {
-                    fail("Invalid Masked<T> type.");
-                }
-                // Types OK, check values
                 InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i].substring(0, ipsWithMask[i].indexOf('/')));
 
-                assertArrayEquals(ip.value.getBytes(), inetAddress.getAddress());
-                assertEquals(ipsWithMask[i].substring(0, ipsWithMask[i].indexOf('/')), ip.value.toString());
-                assertArrayEquals(masks[i], ip.mask.getBytes());
-            } else if (value instanceof IPv6) {
-                fail("Expected masked IPv6, got unmasked IPv6.");
-            } else {
-                fail("Expected unmasked IPv6, got masked IPv6.");
+                byte[] address = inetAddress.getAddress();
+                assertEquals(address.length, value.getValue().getBytes().length);
+                
+                for (int j = 0; j < address.length; j++) {
+                    address[j] &= masks[i][j];
+                }
+                
+                assertArrayEquals(value.getValue().getBytes(), address);
+                assertArrayEquals(masks[i], value.getMask().getBytes());
             }
         }
     }

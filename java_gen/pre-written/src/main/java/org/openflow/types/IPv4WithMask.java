@@ -36,7 +36,7 @@ public class IPv4WithMask extends Masked<IPv4> {
         return res.toString();
     }
     
-    public static OFValueType<?> ofPossiblyMasked(final String string) {
+    public static IPv4WithMask of(final String string) {
         int slashPos;
         String ip = string;
         int maskBits = 0;
@@ -72,7 +72,7 @@ public class IPv4WithMask extends Masked<IPv4> {
             return IPv4WithMask.of(ipv4, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return ipv4;
+            return IPv4WithMask.of(ipv4, IPv4.of(0xFFFFFFFF));
         } else {
             // With mask
             int mask = (-1) << (32 - maskBits);
