@@ -42,4 +42,6 @@ public interface ${factory.name} {
     //:: #endif
     ${i.name}.Builder create${i.name[2:]}Builder()${ "" if i.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
+
+    OFMessageReader<OFMessage> getMessageReader();
 }
