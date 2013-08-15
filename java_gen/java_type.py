@@ -1,6 +1,6 @@
+import errno
 import loxi_utils.loxi_utils as loxi_utils
 import os
-import errno
 import re
 import subprocess
 import time
@@ -223,6 +223,28 @@ wildcards = JType("Wildcards")\
         .op(read="Wildcards.of(bb.readInt())", write="bb.writeInt($name.getInt())");
 transport_port = JType("TransportPort")\
         .op(read="TransportPort.read2Bytes(bb)", write="$name.write2Bytes(bb)")
+eth_type = JType("EthType")\
+        .op(read="EthType.read2Bytes(bb)", write="$name.write2Bytes(bb)")
+vlan_vid = JType("VlanVid")\
+        .op(read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)")
+vlan_pcp = JType("VlanPcp")\
+        .op(read="VlanPcp.readByte(bb)", write="$name.writeByte(bb)")
+ip_dscp = JType("IpDscp")\
+        .op(read="IpDscp.readByte(bb)", write="$name.writeByte(bb)")
+ip_ecn = JType("IpEcn")\
+        .op(read="IpEcn.readByte(bb)", write="$name.writeByte(bb)")
+ip_proto = JType("IpProtocol")\
+        .op(read="IpProtocol.readByte(bb)", write="$name.writeByte(bb)")
+icmpv4_type = JType("ICMPv4Type")\
+        .op(read="ICMPv4Type.readByte(bb)", write="$name.writeByte(bb)")
+icmpv4_code = JType("ICMPv4Code")\
+        .op(read="ICMPv4Code.readByte(bb)", write="$name.writeByte(bb)")
+arp_op = JType("ArpOpcode")\
+        .op(read="ArpOpcode.read2Bytes(bb)", write="$name.write2Bytes(bb)")
+ipv6_flabel = JType("IPv6FlowLabel")\
+        .op(read="IPv6FlowLabel.read4Bytes(bb)", write="$name.write4Bytes(bb)")
+metadata = JType("OFMetadata")\
+        .op(read="OFMetadata.read8Bytes(bb)", write="$name.write8Bytes(bb)")
 oxm = JType("OFOxm")\
         .op(read="OFOxmVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
 meter_features = JType("OFMeterFeatures")\
@@ -267,13 +289,45 @@ default_mtype_to_jtype_convert_map = {
 
 ## This is where we drop in special case handling for certain types
 exceptions = {
-        'of_packet_in': {
-            'data' : octets,
-            'reason': packetin_reason
-            },
-        'of_oxm_tcp_src' : {
-            'value' : transport_port
-            },
+        'of_packet_in': { 'data' : octets, 'reason': packetin_reason },
+        'of_oxm_tcp_src' : { 'value' : transport_port },
+        'of_oxm_tcp_src_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_tcp_dst' : { 'value' : transport_port },
+        'of_oxm_tcp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_udp_src' : { 'value' : transport_port },
+        'of_oxm_udp_src_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_udp_dst' : { 'value' : transport_port },
+        'of_oxm_udp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_sctp_src' : { 'value' : transport_port },
+        'of_oxm_sctp_src_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_sctp_dst' : { 'value' : transport_port },
+        'of_oxm_sctp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_eth_type' : { 'value' : eth_type },
+        'of_oxm_eth_type_masked' : { 'value' : eth_type, 'value_mask' : eth_type },
+        'of_oxm_vlan_vid' : { 'value' : vlan_vid },
+        'of_oxm_vlan_vid_masked' : { 'value' : vlan_vid, 'value_mask' : vlan_vid },
+        'of_oxm_vlan_pcp' : { 'value' : vlan_pcp },
+        'of_oxm_vlan_pcp_masked' : { 'value' : vlan_pcp, 'value_mask' : vlan_pcp },
+        'of_oxm_ip_dscp' : { 'value' : ip_dscp },
+        'of_oxm_ip_dscp_masked' : { 'value' : ip_dscp, 'value_mask' : ip_dscp },
+        'of_oxm_ip_ecn' : { 'value' : ip_ecn },
+        'of_oxm_ip_ecn_masked' : { 'value' : ip_ecn, 'value_mask' : ip_ecn },
+        'of_oxm_ip_proto' : { 'value' : ip_proto },
+        'of_oxm_ip_proto_masked' : { 'value' : ip_proto, 'value_mask' : ip_proto },
+        'of_oxm_icmpv4_type' : { 'value' : icmpv4_type },
+        'of_oxm_icmpv4_type_masked' : { 'value' : icmpv4_type, 'value_mask' : icmpv4_type },
+        'of_oxm_icmpv4_code' : { 'value' : icmpv4_code },
+        'of_oxm_icmpv4_code_masked' : { 'value' : icmpv4_code, 'value_mask' : icmpv4_code },
+        'of_oxm_arp_op' : { 'value' : arp_op },
+        'of_oxm_arp_op_masked' : { 'value' : arp_op, 'value_mask' : arp_op },
+        'of_oxm_arp_spa' : { 'value' : ipv4 },
+        'of_oxm_arp_spa_masked' : { 'value' : ipv4, 'value_mask' : ipv4 },
+        'of_oxm_arp_tpa' : { 'value' : ipv4 },
+        'of_oxm_arp_tpa_masked' : { 'value' : ipv4, 'value_mask' : ipv4 },
+        'of_oxm_ipv6_flabel' : { 'value' : ipv6_flabel },
+        'of_oxm_ipv6_flabel_masked' : { 'value' : ipv6_flabel, 'value_mask' : ipv6_flabel },
+        'of_oxm_metadata' : { 'value' : metadata },
+        'of_oxm_metadata_masked' : { 'value' : metadata, 'value_mask' : metadata },
 }
 
 
