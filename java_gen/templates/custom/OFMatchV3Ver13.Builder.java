@@ -44,28 +44,28 @@
     }
 
     @Override
-    public <F extends OFValueType<F>> MatchBuilder setExact(
+    public <F extends OFValueType<F>> Match.Builder setExact(
             MatchField<F> field, F value) {
         // FIXME yotam - please replace with real implementation
         return null;
     }
 
     @Override
-    public <F extends OFValueType<F>> MatchBuilder setMasked(
+    public <F extends OFValueType<F>> Match.Builder setMasked(
             MatchField<F> field, F value, F mask) {
         // FIXME yotam - please replace with real implementation
         return null;
     }
 
     @Override
-    public <F extends OFValueType<F>> MatchBuilder setMasked(
+    public <F extends OFValueType<F>> Match.Builder setMasked(
             MatchField<F> field, Masked<F> valueWithMask) {
         // FIXME yotam - please replace with real implementation
         return null;
     }
 
     @Override
-    public <F extends OFValueType<F>> MatchBuilder wildcard(MatchField<F> field) {
+    public <F extends OFValueType<F>> Match.Builder wildcard(MatchField<F> field) {
         // FIXME yotam - please replace with real implementation
         return null;
     }
@@ -75,3 +75,14 @@
         // FIXME yotam - please replace with real implementation
         return null;
     }
+    
+    @Override
+    public Builder createBuilder() {
+        return this;
+    }
+
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        // FIXME yotam - please replace with real implementation        
+    }
+
