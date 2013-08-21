@@ -67,7 +67,7 @@ public class IPv6WithMask extends Masked<IPv6> {
             return IPv6WithMask.of(ipv6, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return IPv6WithMask.of(ipv6, IPv6.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl));
+            return IPv6WithMask.of(ipv6, IPv6.NO_MASK);
         } else {
             // With mask
             BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);

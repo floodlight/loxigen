@@ -14,8 +14,8 @@ public class TransportPort implements OFValueType<TransportPort> {
     static final int MAX_PORT = 0xFFFF;
     static final int MIN_PORT = 0;
     
-    public static final TransportPort FULL_MASK = TransportPort.of(0xFFFFFFFF);
-    public static final TransportPort NO_MASK = TransportPort.of(0x0);
+    public static final TransportPort NO_MASK = TransportPort.of(0xFFFFFFFF);
+    public static final TransportPort FULL_MASK = TransportPort.of(0x0);
 
     private final int port;
     

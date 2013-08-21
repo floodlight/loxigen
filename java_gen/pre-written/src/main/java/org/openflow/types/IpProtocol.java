@@ -298,8 +298,8 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     public static final IpProtocol IP_PROTO_HIP = new IpProtocol(IP_PROTO_NUM_HIP);
     public static final IpProtocol IP_PROTO_SHIM6 = new IpProtocol(IP_PROTO_NUM_SHIM6);
 
-    public static final IpProtocol FULL_MASK = IP_PROTO_HOPOPT;
-    public static final IpProtocol NO_MASK = new IpProtocol((short)0x0000);
+    public static final IpProtocol NO_MASK = IP_PROTO_HOPOPT;
+    public static final IpProtocol FULL_MASK = new IpProtocol((short)0x0000);
 
     private IpProtocol(short version) {
         this.proto = version;

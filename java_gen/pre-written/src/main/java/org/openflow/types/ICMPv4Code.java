@@ -14,8 +14,8 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
 
     private final short code;
     
-    public static final ICMPv4Code FULL_MASK = new ICMPv4Code((short)0xFFFF);
-    public static final ICMPv4Code NO_MASK = new ICMPv4Code((short)0x0000);
+    public static final ICMPv4Code NO_MASK = new ICMPv4Code((short)0xFFFF);
+    public static final ICMPv4Code FULL_MASK = new ICMPv4Code((short)0x0000);
 
     private ICMPv4Code(short code) {
         this.code = code;

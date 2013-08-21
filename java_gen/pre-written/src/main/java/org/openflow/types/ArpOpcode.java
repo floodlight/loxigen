@@ -61,8 +61,8 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
     private static final int MIN_OPCODE = 0;
     private static final int MAX_OPCODE = 0xFFFF;
     
-    public static final ArpOpcode FULL_MASK = new ArpOpcode(0xFFFFFFFF);
-    public static final ArpOpcode NO_MASK = new ArpOpcode(0x00000000);
+    public static final ArpOpcode NO_MASK = new ArpOpcode(0xFFFFFFFF);
+    public static final ArpOpcode FULL_MASK = new ArpOpcode(0x00000000);
 
     private final int opcode;
 

@@ -16,8 +16,8 @@ public class IPv6 implements OFValueType<IPv6> {
     private final long raw1;
     private final long raw2;
     
-    public static final IPv6 FULL_MASK = IPv6.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
-    public static final IPv6 NO_MASK = IPv6.of(0x0, 0x0);
+    public static final IPv6 NO_MASK = IPv6.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
+    public static final IPv6 FULL_MASK = IPv6.of(0x0, 0x0);
 
     private IPv6(final long raw1, final long raw2) {
         this.raw1 = raw1;

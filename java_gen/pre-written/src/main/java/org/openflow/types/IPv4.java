@@ -13,8 +13,8 @@ public class IPv4 implements OFValueType<IPv4> {
     static final int LENGTH = 4;
     private final int rawValue;
     
-    public static final IPv4 FULL_MASK = IPv4.of(0xFFFFFFFF);
-    public static final IPv4 NO_MASK = IPv4.of(0x00000000);
+    public static final IPv4 NO_MASK = IPv4.of(0xFFFFFFFF);
+    public static final IPv4 FULL_MASK = IPv4.of(0x00000000);
 
     private IPv4(final int rawValue) {
         this.rawValue = rawValue;
