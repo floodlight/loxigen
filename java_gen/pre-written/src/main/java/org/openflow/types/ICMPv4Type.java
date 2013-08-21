@@ -64,6 +64,9 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     public static final ICMPv4Type ICMPV4_TYPE_PHOTURIS = new ICMPv4Type(ICMPV4_TYPE_VAL_PHOTURIS);
     public static final ICMPv4Type ICMPV4_TYPE_EXPERIMENTAL_MOBILITY    = new ICMPv4Type(ICMPV4_TYPE_VAL_EXPERIMENTAL_MOBILITY);
 
+    public static final ICMPv4Type FULL_MASK = new ICMPv4Type((short)0xFFFF);
+    public static final ICMPv4Type NO_MASK = new ICMPv4Type((short)0x0000);
+
     private final short type;
     
     private static final int MIN_TYPE = 0;

@@ -108,29 +108,23 @@ public class IPv4Test {
         }
     }
     
-    @SuppressWarnings("unchecked")
     @Test
-    public void testOfPossiblyMasked() throws OFParseError, OFShortRead {
+    public void testOfMasked() throws OFParseError, OFShortRead {
         for (int i = 0; i < ipsWithMask.length; i++) {
-            OFValueType value = IPv4WithMask.ofPossiblyMasked(ipsWithMask[i]);
-            if (value instanceof IPv4 && !hasMask[i]) {
-                // Types OK, check values
-                IPv4 ip = (IPv4)value;
+            IPv4WithMask value = IPv4WithMask.of(ipsWithMask[i]);
+            if (!hasMask[i]) {
+                IPv4 ip = value.getValue();
                 assertArrayEquals(ipsWithMaskValues[i][0], ip.getBytes());
-            } else if (value instanceof Masked && hasMask[i]) {
-                Masked<IPv4> ip = null;
-                try {
-                    ip = (Masked<IPv4>)value;
-                } catch (ClassCastException e) {
-                    fail("Invalid Masked<T> type.");
+            } else if (hasMask[i]) {
+                byte[] ipBytes = new byte[4];
+                System.arraycopy(ipsWithMaskValues[i][0], 0, ipBytes, 0, 4);
+                assertEquals(ipBytes.length, value.getValue().getBytes().length);
+                for (int j = 0; j < ipBytes.length; j++) {
+                    ipBytes[j] &= ipsWithMaskValues[i][1][j];
                 }
-                // Types OK, check values
-                assertArrayEquals(ipsWithMaskValues[i][0], ip.getValue().getBytes());
-                assertArrayEquals(ipsWithMaskValues[i][1], ip.getMask().getBytes());
-            } else if (value instanceof IPv4) {
-                fail("Expected masked IPv4, got unmasked IPv4.");
-            } else {
-                fail("Expected unmasked IPv4, got masked IPv4.");
+                
+                assertArrayEquals(ipBytes, value.getValue().getBytes());
+                assertArrayEquals(ipsWithMaskValues[i][1], value.getMask().getBytes());
             }
         }
     }
