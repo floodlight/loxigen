@@ -11,7 +11,7 @@ Usage
 =====
 
 You can run LoxiGen directly from the repository. There's no need to install it,
-and it has no dependencies beyond Python 2.6+.
+and it has no dependencies beyond Python 2.7+.
 
 To generate the libraries for all languages:
 
