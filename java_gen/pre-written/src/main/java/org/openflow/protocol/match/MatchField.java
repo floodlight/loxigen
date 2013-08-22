@@ -34,7 +34,7 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<OFPort>("in_port", MatchFields.IN_PORT);
     
     public final static MatchField<OFPort> IN_PHY_PORT =
-            new MatchField<OFPort>("in_phy_port", MatchFields.PHYSICAL_PORT,
+            new MatchField<OFPort>("in_phy_port", MatchFields.IN_PHY_PORT,
                     new Prerequisite<OFPort>(MatchField.IN_PORT));
     
     public final static MatchField<OFMetadata> METADATA =
@@ -137,7 +137,7 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
 
     public final static MatchField<IPv6FlowLabel> IPV6_FLABEL =
-            new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLOWLABEL,
+            new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLABEL,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
 
     public String getName() {

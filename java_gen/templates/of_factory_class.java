@@ -85,4 +85,60 @@ public class ${factory.name} implements ${factory.interface.name} {
 //:: #endif
     }
 
+//:: if factory.interface.name == 'OFOxms':
+    @SuppressWarnings("unchecked")
+    public <F extends OFValueType<F>> OFOxm<F> fromValue(F value, MatchField<F> field) {
+        switch (field.id) {
+            //:: for oxm_name in model.oxm_map:
+            //::    type_name, value, masked = model.oxm_map[oxm_name]
+            //::    if masked:
+            //::        continue
+            //::    #endif
+            //::    method_name = oxm_name.replace('OFOxm', '')
+            //::    method_name = method_name[0].lower() + method_name[1:]
+            case ${value}:
+                return (OFOxm<F>)${method_name}((${type_name})value);
+            //:: #endfor
+            default:
+                return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <F extends OFValueType<F>> OFOxm<F> fromValueAndMask(F value, F mask, MatchField<F> field) {
+        switch (field.id) {
+            //:: for oxm_name in model.oxm_map:
+            //::    type_name, value, masked = model.oxm_map[oxm_name]
+            //::    if not masked:
+            //::        continue
+            //::    #endif
+            //::    method_name = oxm_name.replace('OFOxm', '')
+            //::    method_name = method_name[0].lower() + method_name[1:]
+            case ${value}:
+                return (OFOxm<F>)${method_name}((${type_name})value, (${type_name})mask);
+            //:: #endfor
+            default:
+                return null;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public <F extends OFValueType<F>> OFOxm<F> fromMasked(Masked<F> masked, MatchField<F> field) {
+        switch (field.id) {
+            //:: for oxm_name in model.oxm_map:
+            //::    type_name, value, masked = model.oxm_map[oxm_name]
+            //::    if not masked:
+            //::        continue
+            //::    #endif
+            //::    method_name = oxm_name.replace('OFOxm', '')
+            //::    method_name = method_name[0].lower() + method_name[1:]
+            case ${value}:
+                return (OFOxm<F>)${method_name}((${type_name})(masked.getValue()), (${type_name})(masked.getMask()));
+            //:: #endfor
+            default:
+                return null;
+        }
+    }
+//:: #endif
+
 }
