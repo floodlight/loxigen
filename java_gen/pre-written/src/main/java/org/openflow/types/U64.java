@@ -19,7 +19,10 @@ package org.openflow.types;
 
 import java.math.BigInteger;
 
-public class U64 {
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.protocol.Writeable;
+
+public class U64 implements Writeable, OFValueType<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
 
     private final long raw;
@@ -28,7 +31,11 @@ public class U64 {
         this.raw = raw;
     }
 
-    public static U64 of(final long raw) {
+    public static U64 of(long raw) {
+        return ofRaw(raw);
+    }
+
+    public static U64 ofRaw(final long raw) {
         return new U64(raw);
     }
 
@@ -85,6 +92,21 @@ public class U64 {
         if (raw != other.raw)
             return false;
         return true;
+    }
+
+    @Override
+    public int getLength() {
+        return 8;
+    }
+
+    @Override
+    public U64 applyMask(U64 mask) {
+        return ofRaw(raw & mask.raw);
+    }
+
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        bb.writeLong(raw);
     }
 
 }

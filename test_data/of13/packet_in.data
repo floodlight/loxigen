@@ -30,6 +30,8 @@ ofp.message.packet_in(
         ofp.oxm.in_port_masked(value=4, value_mask=5)]),
     data="abc")
 -- java
+OFOxms oxms = factory.oxms();
+
 builder
    .setXid(0x12345678)
    .setBufferId(100)
@@ -38,12 +40,12 @@ builder
    .setTableId((byte) 20)
    .setCookie(U64.parseHex("FEDCBA9876543210"))
    .setMatch(
-        factory.createMatchV3Builder().setOxmList(
-            ImmutableList.of(
-                factory.createOxmArpOpBuilder().setValue(1).getMessage(),
-                factory.createOxmInPortMaskedBuilder().setValue(OFPort.of(4)).setValueMask(OFPort.of(5)).getMessage()
+        factory.buildMatchV3().setOxmList(
+            OFOxmList.of(
+                oxms.arpOp(ArpOpcode.ARP_OPCODE_REQUEST),
+                oxms.inPortMasked(OFPort.of(4), OFPort.of(5))
             )
-        ).getMessage()
+        ).build()
     )
     .setData(new byte[] { 97, 98, 99 } );
 

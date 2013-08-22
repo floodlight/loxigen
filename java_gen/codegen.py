@@ -147,11 +147,11 @@ class JavaGenerator(object):
                             test_data=unit_test.test_data)
 
     def create_of_factories(self):
-        factory = self.java_model.of_factory
-        self.render_class(clazz=factory, template="of_factory_interface.java", factory=factory)
-        for factory_class in factory.factory_classes:
-            self.render_class(clazz=factory_class, template="of_factory_class.java", factory=factory_class, model=self.java_model)
-        self.render_class(clazz=java_model.OFGenericClass(package="org.openflow.protocol", name="OFFactories"), template="of_factories.java", versions=self.java_model.versions)
+        for factory in self.java_model.of_factories:
+            self.render_class(clazz=factory, template="of_factory_interface.java", factory=factory)
+            for factory_class in factory.factory_classes:
+                self.render_class(clazz=factory_class, template="of_factory_class.java", factory=factory_class, model=self.java_model)
+            self.render_class(clazz=java_model.OFGenericClass(package="org.openflow.protocol", name="OFFactories"), template="of_factories.java", versions=self.java_model.versions)
 
 def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
