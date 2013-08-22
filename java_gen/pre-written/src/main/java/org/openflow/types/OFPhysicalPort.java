@@ -18,6 +18,9 @@ public class OFPhysicalPort implements OFValueType<OFPhysicalPort>, Writeable {
 
     private final int port;
 
+    public static final OFPhysicalPort NO_MASK = OFPhysicalPort.of(0xFFFFFFFF);
+    public static final OFPhysicalPort FULL_MASK = OFPhysicalPort.of(0x0);
+
     private OFPhysicalPort(int port) {
         this.port = port;
     }

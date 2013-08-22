@@ -8,6 +8,9 @@ public class VlanVid implements OFValueType<VlanVid> {
     private static final short VALIDATION_MASK = 0x0FFF;
     final static int LENGTH = 2;
     
+    public static final VlanVid NO_MASK = VlanVid.of((short)0xFFFF);
+    public static final VlanVid FULL_MASK = VlanVid.of((short)0x0);
+
     private final short vid;
     
     private VlanVid(short vid) {
@@ -70,7 +73,7 @@ public class VlanVid implements OFValueType<VlanVid> {
         c.writeShort(this.vid);
     }
 
-    public VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
+    public static VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
         return VlanVid.of(c.readShort());
     }
 

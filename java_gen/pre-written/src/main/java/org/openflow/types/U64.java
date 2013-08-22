@@ -24,7 +24,7 @@ public class U64 {
 
     private final long raw;
 
-    private U64(final long raw) {
+    protected U64(final long raw) {
         this.raw = raw;
     }
 

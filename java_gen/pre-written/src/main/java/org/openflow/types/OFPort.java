@@ -86,6 +86,9 @@ public class OFPort implements OFValueType<OFPort> {
      */
     public final static OFPort ANY = new NamedPort(OFPP_ANY_INT, "any");
 
+    public static final OFPort NO_MASK = OFPort.of(0xFFFFFFFF);
+    public static final OFPort FULL_MASK = OFPort.of(0x0);
+    
     /** cache of frequently used ports */
     private static class PrecachedPort {
         private final static OFPort p1 = new OFPort(1);

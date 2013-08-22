@@ -215,7 +215,7 @@ class JavaOFInterface(object):
             self.parent_interface = parent_interface
         else:
             self.parent_interface = None
-
+            
     def class_info(self):
         """ return tuple of (package_prefix, parent_class) for the current JavaOFInterface"""
         # FIXME: This duplicates inheritance information that is now available in the loxi_ir
@@ -330,7 +330,7 @@ class JavaOFClass(object):
     @property
     @memoize
     def unit_test(self):
-        return JavaUnitTest(self)
+        return JavaUnitTestSet(self)
 
     @property
     def name(self):
@@ -595,18 +595,58 @@ class JavaMember(object):
 ### Unit Test
 #######################################################################
 
-class JavaUnitTest(object):
+class JavaUnitTestSet(object):
     def __init__(self, java_class):
         self.java_class = java_class
-        self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+        first_data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
                                                      name=java_class.c_name[3:])
+        data_file_template = "of{version}/{name}.".format(version=java_class.version.of_version,
+                                                     name=java_class.c_name[3:]) + "{i}.data"
+        test_class_name = self.java_class.name + "Test"
+        self.test_units = []
+        if test_data.exists(first_data_file_name):
+            self.test_units.append(JavaUnitTest(java_class, first_data_file_name, test_class_name))
+        i = 1
+        while test_data.exists(data_file_template.format(i=i)):
+            self.test_units.append(JavaUnitTest(java_class, data_file_template.format(i=i), test_class_name + str(i)))
+            i = i + 1
+        
+    @property
+    def package(self):
+        return self.java_class.package
+
+    @property
+    def has_test_data(self):
+        return len(self.test_units) > 0
+
+    @property
+    def length(self):
+        return len(self.test_units)
+    
+    def get_test_unit(self, i):
+        return self.test_units[i]
+
+
+class JavaUnitTest(object):
+    def __init__(self, java_class, file_name=None, test_class_name=None):
+        self.java_class = java_class
+        if file_name is None:
+            self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+                                                         name=java_class.c_name[3:])
+        else:
+            self.data_file_name = file_name
+        if test_class_name is None:
+            self.test_class_name = self.java_class.name + "Test"
+        else:
+            self.test_class_name = test_class_name
+        
     @property
     def package(self):
         return self.java_class.package
 
     @property
     def name(self):
-        return self.java_class.name + "Test"
+        return self.test_class_name
 
     @property
     def has_test_data(self):

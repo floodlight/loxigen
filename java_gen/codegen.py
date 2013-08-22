@@ -37,6 +37,7 @@ import of_g
 from loxi_ir import *
 import lang_java
 import test_data
+from import_cleaner import ImportCleaner
 
 import loxi_utils.loxi_utils as loxi_utils
 
@@ -84,6 +85,14 @@ class JavaGenerator(object):
         print "filename: %s" % filename
         with open(filename, "w") as f:
             loxi_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
+        
+        try:
+            cleaner = ImportCleaner(filename)
+            cleaner.find_used_imports()
+            cleaner.rewrite_file(filename)
+        except:
+            print 'Cannot clean imports from file %s' % filename
+        
 
     def create_of_const_enums(self):
         for enum in self.java_model.enums:
@@ -126,13 +135,16 @@ class JavaGenerator(object):
                 else:
                     print "Class %s ignored by generate_class" % java_class.name
 
-    def create_unit_test(self, unit_test):
-        if unit_test.has_test_data:
-            self.render_class(clazz=unit_test,
-                    template='unit_test.java', src_dir="src/test/java",
-                    version=unit_test.java_class.version,
-                    test=unit_test, msg=unit_test.java_class,
-                    test_data=unit_test.test_data)
+    def create_unit_test(self, unit_tests):
+        if unit_tests.has_test_data:
+            for i in range(unit_tests.length):
+                unit_test = unit_tests.get_test_unit(i)
+                if unit_test.has_test_data:
+                    self.render_class(clazz=unit_test,
+                            template='unit_test.java', src_dir="src/test/java",
+                            version=unit_test.java_class.version,
+                            test=unit_test, msg=unit_test.java_class,
+                            test_data=unit_test.test_data)
 
     def create_of_factories(self):
         factory = self.java_model.of_factory
