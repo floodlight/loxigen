@@ -617,10 +617,14 @@ class JavaMember(object):
 
         if self.is_fixed_value:
             return self.enum_value
+        elif java_type == "OFOxmList":
+            return "OFOxmList.EMPTY"
         elif re.match(r'List.*', java_type):
             return "Collections.emptyList()"
         elif java_type == "boolean":
             return "false";
+        elif self.java_type.is_array:
+            return "new %s[0]" % java_type[:-2]
         elif java_type in ("byte", "char", "short", "int", "long"):
             return "({0}) 0".format(java_type);
         else:

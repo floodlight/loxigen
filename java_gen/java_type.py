@@ -219,7 +219,7 @@ u8obj = JType('U8', 'U8') \
 u32obj = JType('U32', 'U32') \
         .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())')
 u64 = JType('U64', 'U64') \
-        .op(read='U64.of(bb.readLong())', write='bb.writeLong($name.getValue())')
+        .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())')
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)")

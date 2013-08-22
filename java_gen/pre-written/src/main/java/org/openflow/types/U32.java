@@ -22,7 +22,7 @@ import org.openflow.exceptions.OFParseError;
 import org.openflow.protocol.OFMessageReader;
 import org.openflow.protocol.Writeable;
 
-public class U32 implements Writeable {
+public class U32 implements Writeable, OFValueType<U32> {
     private final int raw;
 
     private U32(int raw) {
@@ -69,6 +69,7 @@ public class U32 implements Writeable {
         U32 other = (U32) obj;
         if (raw != other.raw)
             return false;
+
         return true;
     }
 
@@ -92,6 +93,16 @@ public class U32 implements Writeable {
         public U32 readFrom(ChannelBuffer bb) throws OFParseError {
             return new U32(bb.readInt());
         }
+    }
+
+    @Override
+    public int getLength() {
+        return 4;
+    }
+
+    @Override
+    public U32 applyMask(U32 mask) {
+        return ofRaw(raw & mask.raw);
     }
 
 }

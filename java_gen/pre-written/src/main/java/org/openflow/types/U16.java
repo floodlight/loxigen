@@ -17,12 +17,92 @@
 
 package org.openflow.types;
 
-public class U16 {
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.openflow.exceptions.OFParseError;
+import org.openflow.protocol.OFMessageReader;
+import org.openflow.protocol.Writeable;
+
+public class U16 implements Writeable, OFValueType<U16> {
     public static int f(final short i) {
         return i & 0xffff;
     }
 
     public static short t(final int l) {
         return (short) l;
+    }
+
+    private final short raw;
+
+    private U16(short raw) {
+        this.raw = raw;
+    }
+
+    public static final U16 of(int value) {
+        return new U16(t(value));
+    }
+
+    public static final U16 ofRaw(short value) {
+        return new U16(value);
+    }
+
+    public int getValue() {
+        return f(raw);
+    }
+
+    public short getRaw() {
+        return raw;
+    }
+
+    @Override
+    public String toString() {
+        return "" + f(raw);
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + raw;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        U16 other = (U16) obj;
+        if (raw != other.raw)
+            return false;
+        return true;
+    }
+
+
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        bb.writeShort(raw);
+    }
+
+
+    public final static Reader READER = new Reader();
+
+    private static class Reader implements OFMessageReader<U16> {
+        @Override
+        public U16 readFrom(ChannelBuffer bb) throws OFParseError {
+            return ofRaw(bb.readShort());
+        }
+    }
+
+    @Override
+    public int getLength() {
+        return 2;
+    }
+
+    @Override
+    public U16 applyMask(U16 mask) {
+        return ofRaw( (short) (raw & mask.raw));
     }
 }
