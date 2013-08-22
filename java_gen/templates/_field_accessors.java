@@ -1,6 +1,6 @@
 //:: for prop in msg.interface.members:
     @Override
-    public ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop in msg.members else "throws UnsupportedOperationException"} {
+    public ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop in msg.members else "throws UnsupportedOperationException"} {
 //:: if prop in msg.members:
 //::    version_prop = msg.get_member(prop.name)
 //::    if version_prop.is_fixed_value:
@@ -20,7 +20,7 @@
 
 //:: if generate_setters and prop.is_writeable:
     @Override
-    public ${msg.interface.name}.Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop in msg.members else " throws UnsupportedOperationException"} {
+    public ${msg.interface.name}.Builder ${prop.setter_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop in msg.members else " throws UnsupportedOperationException"} {
 //:: if prop in msg.members:
         this.${prop.name} = ${prop.name};
         this.${prop.name}Set = true;
