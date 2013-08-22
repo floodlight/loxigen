@@ -31,17 +31,27 @@
 
 //:: include('_autogen.java')
 
-package org.openflow.protocol;
+package ${factory.package};
 
 //:: include("_imports.java")
 
 public interface ${factory.name} {
+    // Subfactories
+//:: for name, clazz in factory.sub_factories.items():
+    ${clazz} ${name}();
+//:: #endfor
+
 //:: for i in factory.members:
     //:: if i.is_virtual:
     //::    continue
     //:: #endif
-    ${i.name}.Builder create${i.name[2:]}Builder()${ "" if i.is_universal else " throws UnsupportedOperationException"};
+    //:: if len(i.writeable_members) > 0:
+    ${i.name}.Builder ${factory.method_name(i, builder=True)}()${ "" if i.is_universal else " throws UnsupportedOperationException"};
+    //:: #endif
+    //:: if len(i.writeable_members) <= 2:
+    ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)});
+    //:: #endif
 //:: #endfor
 
-    OFMessageReader<OFMessage> getMessageReader();
+    OFMessageReader<${factory.base_class}> getReader();
 }

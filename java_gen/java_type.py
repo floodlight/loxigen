@@ -5,6 +5,13 @@ import re
 import subprocess
 import time
 
+def erase_type_annotation(class_name):
+    m=re.match(r'(.*)<.*>', class_name)
+    if m:
+        return m.group(1)
+    else:
+        return class_name
+
 def name_c_to_camel(name):
     """ 'of_stats_reply' -> 'ofStatsReply' """
     name = re.sub(r'^_','', name)
@@ -212,7 +219,7 @@ u8obj = JType('U8', 'U8') \
 u32obj = JType('U32', 'U32') \
         .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())')
 u64 = JType('U64', 'U64') \
-        .op(read='U64.of(bb.readLong())', write='bb.writeLong($name.getValue())')
+        .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())')
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)")
@@ -288,10 +295,19 @@ ipv6_flabel = JType("IPv6FlowLabel")\
         .op(read="IPv6FlowLabel.read4Bytes(bb)", write="$name.write4Bytes(bb)")
 metadata = JType("OFMetadata")\
         .op(read="OFMetadata.read8Bytes(bb)", write="$name.write8Bytes(bb)")
-oxm = JType("OFOxm")\
-        .op(read="OFOxmVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
+oxm = JType("OFOxm<?>")\
+        .op(  read="OFOxmVer$version.READER.readFrom(bb)",
+              write="$name.writeTo(bb)")
+oxm_list = JType("OFOxmList") \
+        .op(
+            read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', \
+            write='$name.writeTo(bb)')
 meter_features = JType("OFMeterFeatures")\
         .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
+
+boolean = JType("boolean")
+
+generic_t = JType("T")
 
 
 default_mtype_to_jtype_convert_map = {
@@ -307,6 +323,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_packet_queue_t)' : packet_queue_list,
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
+        'list(of_oxm_t)' : oxm_list,
         'of_octets_t' : octets,
         'of_match_t': of_match,
         'of_fm_cmd_t': flow_mod_cmd,
@@ -375,6 +392,9 @@ exceptions = {
         'of_oxm_mpls_tc' : { 'value' : u8obj },
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
 }
+
+def make_match_field_jtype(sub_type_name="?"):
+    return JType("MatchField<{}>".format(sub_type_name))
 
 
 # Create a default mapping for a list type. Type defauls to List<${java_mapping_of_name}>

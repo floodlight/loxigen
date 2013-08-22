@@ -261,6 +261,9 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
         match->masks.ipv4_src = 0xffff0000;
         match->masks.ipv4_dst = 0xfffff800;
     }
+
+    /* Restrict values according to masks */
+    of_match_values_mask(match);
     return value;
 }
 

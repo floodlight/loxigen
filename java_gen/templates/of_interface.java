@@ -26,6 +26,7 @@
 //:: # under the EPL.
 //::
 //:: import itertools
+//:: import re
 //:: import of_g
 //:: include('_copyright.java')
 
@@ -35,20 +36,21 @@ package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
 
-public interface ${msg.name} extends OFObject${", %s" % msg.parent_interface if msg.parent_interface else ""}{
+public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} extends OFObject${", %s" % msg.parent_interface if msg.parent_interface else ""}{
 //:: for prop in msg.members:
-    ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
+    ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
 
     void writeTo(ChannelBuffer channelBuffer);
 
-    Builder createBuilder();
-    public interface Builder ${"extends %s.Builder" % msg.parent_interface if msg.parent_interface else ""} {
-        ${msg.name} getMessage();
+    Builder${msg.type_variable} createBuilder();
+    //:: simple_type, annotation = re.match(r'(\w+)(<.*>)?', msg.parent_interface).groups() if msg.parent_interface else ("", "")
+    public interface Builder${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} ${"extends %s.Builder" % simple_type if msg.parent_interface else ""}${annotation if annotation else ""} {
+        ${msg.name}${msg.type_variable} build();
 //:: for prop in msg.members:
-        ${prop.java_type.public_type} get${prop.title_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
+        ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: if prop.is_writeable:
-        Builder set${prop.title_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
+        Builder ${prop.setter_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endif
 //:: #endfor
     }

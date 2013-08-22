@@ -55,9 +55,9 @@ public class ${test.name} {
     //:: if "java" in test_data:
     @Test
     public void testWrite() {
-        ${var_type}.Builder builder = factory.create${var_type[2:]}Builder();
+        ${var_type}.Builder builder = factory.build${var_type[2:]}();
         ${test_data["java"]};
-        ${var_type} ${var_name} = builder.getMessage();
+        ${var_type} ${var_name} = builder.build();
         ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
         ${var_name}.writeTo(bb);
         byte[] written = new byte[bb.readableBytes()];
@@ -68,9 +68,9 @@ public class ${test.name} {
 
     @Test
     public void testRead() throws Exception {
-        ${var_type}.Builder builder = factory.create${var_type[2:]}Builder();
+        ${var_type}.Builder builder = factory.build${var_type[2:]}();
         ${test_data["java"]};
-        ${var_type} ${var_name}Built = builder.getMessage();
+        ${var_type} ${var_name}Built = builder.build();
 
         ChannelBuffer input = ChannelBuffers.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
