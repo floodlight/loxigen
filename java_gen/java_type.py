@@ -207,6 +207,10 @@ u32 = JType('long', 'int') \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
 u32_list = JType('List<U32>', 'int[]') \
         .op(read='ChannelUtils.readList(bb, $length, U32.READER)', write='ChannelUtils.writeList(bb, $name)')
+u8obj = JType('U8', 'U8') \
+        .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())')
+u32obj = JType('U32', 'U32') \
+        .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())')
 u64 = JType('U64', 'U64') \
         .op(read='U64.of(bb.readLong())', write='bb.writeLong($name.getValue())')
 of_port = JType("OFPort") \
@@ -361,6 +365,15 @@ exceptions = {
         'of_oxm_ipv6_flabel_masked' : { 'value' : ipv6_flabel, 'value_mask' : ipv6_flabel },
         'of_oxm_metadata' : { 'value' : metadata },
         'of_oxm_metadata_masked' : { 'value' : metadata, 'value_mask' : metadata },
+
+        'of_oxm_icmpv6_code' : { 'value' : u8obj },
+        'of_oxm_icmpv6_code_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        'of_oxm_icmpv6_type' : { 'value' : u8obj },
+        'of_oxm_icmpv6_type_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        'of_oxm_mpls_label' : { 'value' : u32obj },
+        'of_oxm_mpls_label_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        'of_oxm_mpls_tc' : { 'value' : u8obj },
+        'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
 }
 
 

@@ -6,8 +6,8 @@ public class OFMetadata extends U64 implements OFValueType<OFMetadata> {
     
     private static int LENGTH = 8;
 
-    public static final OFMetadata FULL_MASK = OFMetadata.of(0xFFFFFFFFFFFFFFFFl);
-    public static final OFMetadata NO_MASK = OFMetadata.of(0x0);
+    public static final OFMetadata NO_MASK = OFMetadata.of(0xFFFFFFFFFFFFFFFFl);
+    public static final OFMetadata FULL_MASK = OFMetadata.of(0x0);
 
     protected OFMetadata(long raw) {
         super(raw);

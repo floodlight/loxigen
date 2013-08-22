@@ -37,11 +37,11 @@ public class U32 implements Writeable {
         return new U32(value);
     }
 
-    long getValue() {
+    public long getValue() {
         return f(raw);
     }
 
-    int getRaw() {
+    public int getRaw() {
         return raw;
     }
 

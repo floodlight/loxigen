@@ -146,7 +146,7 @@ public class MatchField<F extends OFValueType<F>> {
     
     public boolean arePrerequisitesOK(Match match) {
         for (Prerequisite<?> p : this.prerequisites) {
-            if (!p.isStaisfied(match)) {
+            if (!p.isSatisfied(match)) {
                 return false;
             }
         }

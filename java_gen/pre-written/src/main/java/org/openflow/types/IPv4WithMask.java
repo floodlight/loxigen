@@ -72,7 +72,7 @@ public class IPv4WithMask extends Masked<IPv4> {
             return IPv4WithMask.of(ipv4, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return IPv4WithMask.of(ipv4, IPv4.of(0xFFFFFFFF));
+            return IPv4WithMask.of(ipv4, IPv4.NO_MASK);
         } else {
             // With mask
             int mask = (-1) << (32 - maskBits);

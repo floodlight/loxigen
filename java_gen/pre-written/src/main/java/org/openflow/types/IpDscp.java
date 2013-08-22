@@ -68,12 +68,12 @@ public enum IpDscp implements OFValueType<IpDscp> {
     DSCP_61((byte)61),
     DSCP_62((byte)62),
     DSCP_63((byte)63),
-    DSCP_FULL_MASK((byte)0xFF);
+    DSCP_NO_MASK((byte)0xFF);
     
     static final int LENGTH = 1;
     
-    public static final IpDscp FULL_MASK = DSCP_FULL_MASK;
-    public static final IpDscp NO_MASK = DSCP_0;
+    public static final IpDscp NO_MASK = DSCP_NO_MASK;
+    public static final IpDscp FULL_MASK = DSCP_0;
     
     private final byte dscp;
     

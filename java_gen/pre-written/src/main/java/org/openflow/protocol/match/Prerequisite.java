@@ -29,7 +29,7 @@ public class Prerequisite<T extends OFValueType<T>> {
      * @param match Match object
      * @return true iff prerequisite is satisfied.
      */
-    public boolean isStaisfied(Match match) {
+    public boolean isSatisfied(Match match) {
         OFValueType<T> res = match.get(this.field);
         if (res == null)
             return false;
