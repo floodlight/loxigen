@@ -14,11 +14,11 @@ fe dc ba 98 76 54 32 10 # cookie
 00 00 00 00 00 00 00 02 # byte_count
 00 01 # match.type
 00 16 # match.length
-80 00 2A 02 # match.oxm_list[0].type_len
-00 01 # match.oxm_list[0].value
-80 00 01 08 # match.oxm_list[1].type_len
-00 00 00 04 # match.oxm_list[1].value
-00 00 00 05 # match.oxm_list[1].mask
+80 00 01 08 # match.oxm_list[0].type_len
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+80 00 2A 02 # match.oxm_list[1].type_len
+00 01 # match.oxm_list[1].value
 00 00 # match.pad
 -- python
 ofp.message.flow_removed(
@@ -34,5 +34,6 @@ ofp.message.flow_removed(
     packet_count=1,
     byte_count=2,
     match=ofp.match(oxm_list=[
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
         ofp.oxm.arp_op(value=1),
-        ofp.oxm.in_port_masked(value=4, value_mask=5)]))
+    ]))
