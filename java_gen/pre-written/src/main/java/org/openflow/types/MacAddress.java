@@ -14,6 +14,9 @@ public class MacAddress implements OFValueType<MacAddress> {
     static final int MacAddrLen = 6;
     private final long rawValue;
 
+    public static final MacAddress NO_MASK = MacAddress.of(0xFFFFFFFFFFFFFFFFl);
+    public static final MacAddress FULL_MASK = MacAddress.of(0x0);
+
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
     }

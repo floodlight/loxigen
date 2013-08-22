@@ -32,34 +32,37 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
     private static final int ARP_OPCODE_VAL_OP_EXP1   = 24;
     private static final int ARP_OPCODE_VAL_OP_EXP2   = 25;
 
-    public static ArpOpcode ARP_OPCODE_REQUEST  = new ArpOpcode(ARP_OPCODE_VAL_REQUEST);
-    public static ArpOpcode ARP_OPCODE_REPLY    = new ArpOpcode(ARP_OPCODE_VAL_REPLY);
-    public static ArpOpcode ARP_OPCODE_REQUEST_REVERSE  = new ArpOpcode(ARP_OPCODE_VAL_REQUEST_REVERSE);
-    public static ArpOpcode ARP_OPCODE_REPLY_REVERSE    = new ArpOpcode(ARP_OPCODE_VAL_REPLY_REVERSE);
-    public static ArpOpcode ARP_OPCODE_DRARP_REQUEST    = new ArpOpcode(ARP_OPCODE_VAL_DRARP_REQUEST);
-    public static ArpOpcode ARP_OPCODE_DRARP_REPLY  = new ArpOpcode(ARP_OPCODE_VAL_DRARP_REPLY);
-    public static ArpOpcode ARP_OPCODE_DRARP_ERROR  = new ArpOpcode(ARP_OPCODE_VAL_DRARP_ERROR);
-    public static ArpOpcode ARP_OPCODE_INARP_REQUEST    = new ArpOpcode(ARP_OPCODE_VAL_INARP_REQUEST);
-    public static ArpOpcode ARP_OPCODE_INARP_REPLY  = new ArpOpcode(ARP_OPCODE_VAL_INARP_REPLY);
-    public static ArpOpcode ARP_OPCODE_ARP_NAK  = new ArpOpcode(ARP_OPCODE_VAL_ARP_NAK);
-    public static ArpOpcode ARP_OPCODE_MARS_REQUEST = new ArpOpcode(ARP_OPCODE_VAL_MARS_REQUEST);
-    public static ArpOpcode ARP_OPCODE_MARS_MULTI   = new ArpOpcode(ARP_OPCODE_VAL_MARS_MULTI);
-    public static ArpOpcode ARP_OPCODE_MARS_MSERV   = new ArpOpcode(ARP_OPCODE_VAL_MARS_MSERV);
-    public static ArpOpcode ARP_OPCODE_MARS_JOIN    = new ArpOpcode(ARP_OPCODE_VAL_MARS_JOIN);
-    public static ArpOpcode ARP_OPCODE_MARS_LEAVE   = new ArpOpcode(ARP_OPCODE_VAL_MARS_LEAVE);
-    public static ArpOpcode ARP_OPCODE_MARS_NAK = new ArpOpcode(ARP_OPCODE_VAL_MARS_NAK);
-    public static ArpOpcode ARP_OPCODE_MARS_UNSERV  = new ArpOpcode(ARP_OPCODE_VAL_MARS_UNSERV);
-    public static ArpOpcode ARP_OPCODE_MARS_SJOIN   = new ArpOpcode(ARP_OPCODE_VAL_MARS_SJOIN);
-    public static ArpOpcode ARP_OPCODE_MARS_SLEAVE  = new ArpOpcode(ARP_OPCODE_VAL_MARS_SLEAVE);
-    public static ArpOpcode ARP_OPCODE_MARS_GROUPLIST_REQUEST   = new ArpOpcode(ARP_OPCODE_VAL_MARS_GROUPLIST_REQUEST);
-    public static ArpOpcode ARP_OPCODE_MARS_GROUPLIST_REPLY = new ArpOpcode(ARP_OPCODE_VAL_MARS_GROUPLIST_REPLY);
-    public static ArpOpcode ARP_OPCODE_MARS_REDIRECT_MAP    = new ArpOpcode(ARP_OPCODE_VAL_MARS_REDIRECT_MAP);
-    public static ArpOpcode ARP_OPCODE_MAPOS_UNARP  = new ArpOpcode(ARP_OPCODE_VAL_MAPOS_UNARP);
-    public static ArpOpcode ARP_OPCODE_OP_EXP1  = new ArpOpcode(ARP_OPCODE_VAL_OP_EXP1);
-    public static ArpOpcode ARP_OPCODE_OP_EXP2  = new ArpOpcode(ARP_OPCODE_VAL_OP_EXP2);
+    public static final ArpOpcode ARP_OPCODE_REQUEST  = new ArpOpcode(ARP_OPCODE_VAL_REQUEST);
+    public static final ArpOpcode ARP_OPCODE_REPLY    = new ArpOpcode(ARP_OPCODE_VAL_REPLY);
+    public static final ArpOpcode ARP_OPCODE_REQUEST_REVERSE  = new ArpOpcode(ARP_OPCODE_VAL_REQUEST_REVERSE);
+    public static final ArpOpcode ARP_OPCODE_REPLY_REVERSE    = new ArpOpcode(ARP_OPCODE_VAL_REPLY_REVERSE);
+    public static final ArpOpcode ARP_OPCODE_DRARP_REQUEST    = new ArpOpcode(ARP_OPCODE_VAL_DRARP_REQUEST);
+    public static final ArpOpcode ARP_OPCODE_DRARP_REPLY  = new ArpOpcode(ARP_OPCODE_VAL_DRARP_REPLY);
+    public static final ArpOpcode ARP_OPCODE_DRARP_ERROR  = new ArpOpcode(ARP_OPCODE_VAL_DRARP_ERROR);
+    public static final ArpOpcode ARP_OPCODE_INARP_REQUEST    = new ArpOpcode(ARP_OPCODE_VAL_INARP_REQUEST);
+    public static final ArpOpcode ARP_OPCODE_INARP_REPLY  = new ArpOpcode(ARP_OPCODE_VAL_INARP_REPLY);
+    public static final ArpOpcode ARP_OPCODE_ARP_NAK  = new ArpOpcode(ARP_OPCODE_VAL_ARP_NAK);
+    public static final ArpOpcode ARP_OPCODE_MARS_REQUEST = new ArpOpcode(ARP_OPCODE_VAL_MARS_REQUEST);
+    public static final ArpOpcode ARP_OPCODE_MARS_MULTI   = new ArpOpcode(ARP_OPCODE_VAL_MARS_MULTI);
+    public static final ArpOpcode ARP_OPCODE_MARS_MSERV   = new ArpOpcode(ARP_OPCODE_VAL_MARS_MSERV);
+    public static final ArpOpcode ARP_OPCODE_MARS_JOIN    = new ArpOpcode(ARP_OPCODE_VAL_MARS_JOIN);
+    public static final ArpOpcode ARP_OPCODE_MARS_LEAVE   = new ArpOpcode(ARP_OPCODE_VAL_MARS_LEAVE);
+    public static final ArpOpcode ARP_OPCODE_MARS_NAK = new ArpOpcode(ARP_OPCODE_VAL_MARS_NAK);
+    public static final ArpOpcode ARP_OPCODE_MARS_UNSERV  = new ArpOpcode(ARP_OPCODE_VAL_MARS_UNSERV);
+    public static final ArpOpcode ARP_OPCODE_MARS_SJOIN   = new ArpOpcode(ARP_OPCODE_VAL_MARS_SJOIN);
+    public static final ArpOpcode ARP_OPCODE_MARS_SLEAVE  = new ArpOpcode(ARP_OPCODE_VAL_MARS_SLEAVE);
+    public static final ArpOpcode ARP_OPCODE_MARS_GROUPLIST_REQUEST   = new ArpOpcode(ARP_OPCODE_VAL_MARS_GROUPLIST_REQUEST);
+    public static final ArpOpcode ARP_OPCODE_MARS_GROUPLIST_REPLY = new ArpOpcode(ARP_OPCODE_VAL_MARS_GROUPLIST_REPLY);
+    public static final ArpOpcode ARP_OPCODE_MARS_REDIRECT_MAP    = new ArpOpcode(ARP_OPCODE_VAL_MARS_REDIRECT_MAP);
+    public static final ArpOpcode ARP_OPCODE_MAPOS_UNARP  = new ArpOpcode(ARP_OPCODE_VAL_MAPOS_UNARP);
+    public static final ArpOpcode ARP_OPCODE_OP_EXP1  = new ArpOpcode(ARP_OPCODE_VAL_OP_EXP1);
+    public static final ArpOpcode ARP_OPCODE_OP_EXP2  = new ArpOpcode(ARP_OPCODE_VAL_OP_EXP2);
 
     private static final int MIN_OPCODE = 0;
     private static final int MAX_OPCODE = 0xFFFF;
+    
+    public static final ArpOpcode NO_MASK = new ArpOpcode(0xFFFFFFFF);
+    public static final ArpOpcode FULL_MASK = new ArpOpcode(0x00000000);
 
     private final int opcode;
 

@@ -52,5 +52,9 @@ public class ${factory.name} implements ${factory.interface.name} {
 //:: #endif
 //:: #endfor
 
+    public OFMessageReader<OFMessage> getMessageReader() {
+        return OFMessageVer${factory.version.of_version}.READER;
+    }
+
     //:: include("_singleton.java", msg=factory)
 }

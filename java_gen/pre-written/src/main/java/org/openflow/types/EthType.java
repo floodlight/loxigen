@@ -101,6 +101,9 @@ public class EthType implements OFValueType<EthType> {
     public static final EthType ETH_TYPE_Q_IN_Q             = new EthType(ETH_TYPE_VAL_Q_IN_Q );
     public static final EthType ETH_TYPE_LLT                = new EthType(ETH_TYPE_VAL_LLT );
 
+    public static final EthType NO_MASK = new EthType(0xFFFFFFFF);
+    public static final EthType FULL_MASK = new EthType(0x00000000);
+
     private EthType(int type) {
         this.rawValue = type;
     }
