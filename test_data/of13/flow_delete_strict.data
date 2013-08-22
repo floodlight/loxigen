@@ -8,7 +8,7 @@ fe dc ba 98 76 54 32 10 # cookie
 ff 00 ff 00 ff 00 ff 00 # cookie_mask
 
 03 # table_id
-00 # _command
+04 # _command
 00 05 # idle_timeout
 00 0a # hard_timeout
 17 70 # priority
@@ -49,7 +49,7 @@ FF FF FF FF FF F0 FF FF 1C 2C 3C 00 00 00 00 00 # match.oxm_list[3].mask
 07 # instructions[1].table_id
 00 00 00 # pad
 -- python
-ofp.message.flow_add(
+ofp.message.flow_delete_strict(
     xid=0x12345678,
     cookie=0xFEDCBA9876543210,
     cookie_mask=0xFF00FF00FF00FF00,
