@@ -37,7 +37,7 @@ package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
 
-abstract class ${msg.name} implements ${msg.interface.name} {
+abstract class ${msg.name} {
     // version: ${version}
     private final static byte WIRE_VERSION = ${version.int_version};
 //:: if msg.is_fixed_length:
@@ -49,7 +49,7 @@ abstract class ${msg.name} implements ${msg.interface.name} {
 
     public final static ${msg.name}.Reader READER = new Reader();
 
-    static class Reader implements OFMessageReader<${msg.interface.name}> {
+    static class Reader implements OFMessageReader<${msg.interface.inherited_declaration()}> {
         @Override
         public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
             int start = bb.readerIndex();
