@@ -71,12 +71,6 @@
     }
 
     @Override
-    public Match getMatch() {
-        // FIXME yotam - please replace with real implementation
-        return null;
-    }
-    
-    @Override
     public Builder createBuilder() {
         return this;
     }
