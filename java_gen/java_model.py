@@ -44,6 +44,7 @@ import py_gen.util as py_utils
 import test_data
 
 import java_gen.java_type as java_type
+from java_gen.java_type import erase_type_annotation
 
 class JavaModel(object):
     enum_blacklist = set(("OFDefinitions",))
@@ -52,6 +53,9 @@ class JavaModel(object):
     interface_blacklist = set( ("OFUint8", "OFUint32",))
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
+
+    OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
+    oxm_map = { "OFOxmInPortMasked": OxmMapEntry("OFPort", "IN_PORT", True) }
 
     @property
     @memoize
@@ -79,6 +83,10 @@ class JavaModel(object):
         interfaces = [ i for i in interfaces if i.name not in self.interface_blacklist ]
 
         return interfaces
+
+    @memoize
+    def interface_by_name(self, name):
+        return find(lambda i: erase_type_annotation(i.name) == erase_type_annotation(name), self.interfaces)
 
     @property
     @memoize
@@ -111,11 +119,40 @@ class JavaModel(object):
 
     @property
     @memoize
-    def of_factory(self):
-           return OFFactory(
-                    package="org.openflow.protocol",
+    def of_factories(self):
+        prefix = "org.openflow.protocol"
+
+        factories = OrderedDict()
+
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp")
+        for base_class in sub_factory_classes:
+            package = base_class[2:].lower()
+            remove_prefix = base_class[2].lower() + base_class[3:]
+
+            # HACK need to have a better way to deal with parameterized base classes
+            annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
+
+            factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={})
+
+        factories[""] = OFFactory(
+                    package=prefix,
                     name="OFFactory",
-                    members=self.interfaces)
+                    remove_prefix="",
+                    members=[], base_class="OFMessage", sub_factories=OrderedDict(
+                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ))
+
+        for i in self.interfaces:
+            for n, factory in factories.items():
+                if n == "":
+                    factory.members.append(i)
+                    break
+                else:
+                    super_class = self.interface_by_name(n)
+                    if i.is_instance_of(super_class):
+                        factory.members.append(i)
+                        break
+        return factories.values()
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -139,19 +176,39 @@ class JavaModel(object):
             return True
 
 
-class OFFactory(namedtuple("OFFactory", ("package", "name", "members"))):
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories"))):
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
                     package="org.openflow.protocol.ver{}".format(version.of_version),
-                    name="OFFactoryVer{}".format(version.of_version),
+                    name="{}Ver{}".format(self.name, version.of_version),
                     interface=self,
                     version=version
                     ) for version in model.versions ]
 
+    def method_name(self, member, builder=True):
+        n = member.variable_name
+        if n.startswith(self.remove_prefix):
+            n = n[len(self.remove_prefix):]
+            n = n[0].lower() + n[1:]
+        if builder:
+            return "build" + n[0].upper() + n[1:]
+        else:
+            return n
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
-OFFactoryClass = namedtuple("OFFactory", ("package", "name", "interface", "version"))
+class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
+    @property
+    def base_class(self):
+        return self.interface.base_class
+
+    @property
+    def versioned_base_class(self):
+        base_class_interface = model.interface_by_name(self.interface.base_class)
+        if base_class_interface and base_class_interface.has_version(self.version):
+            return base_class_interface.versioned_class(self.version)
+        else:
+            return None
 
 model = JavaModel()
 
@@ -206,60 +263,106 @@ class JavaOFInterface(object):
         self.name = java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
         # variable_name name to use for variables of this type. i.e., flowAdd
         self.variable_name = self.name[2].lower() + self.name[3:]
+        self.title_name = self.variable_name[0].upper() + self.variable_name[1:]
         # name for use in constants: FLOW_ADD
         self.constant_name = c_name.upper().replace("OF_", "")
 
-        pck_suffix, parent_interface = self.class_info()
+        pck_suffix, parent_interface, self.type_annotation = self.class_info()
         self.package = "org.openflow.protocol.%s" % pck_suffix if pck_suffix else "org.openflow.protocol"
         if self.name != parent_interface:
             self.parent_interface = parent_interface
         else:
             self.parent_interface = None
-            
+
+    def is_instance_of(self, other_class):
+        if self == other_class:
+            return True
+        parent = self.super_class
+        if parent is None:
+            return False
+        else:
+            return parent.is_instance_of(other_class)
+
+    @property
+    def super_class(self):
+        if not self.parent_interface:
+            return None
+        else:
+            return model.interface_by_name(self.parent_interface)
+
+
+    def inherited_declaration(self, type_spec="?"):
+        if self.type_annotation:
+            return "%s<%s>" % (self.name, type_spec)
+        else:
+            return "%s" % self.name
+
+    @property
+    def type_variable(self):
+        if self.type_annotation:
+            return "<T>"
+        else:
+            return "";
+
     def class_info(self):
         """ return tuple of (package_prefix, parent_class) for the current JavaOFInterface"""
         # FIXME: This duplicates inheritance information that is now available in the loxi_ir
         # model (note, that the loxi model is on versioned classes). Should check/infer the
         # inheritance information from the versioned lox_ir classes.
         if re.match(r'OF.+StatsRequest$', self.name):
-            return ("", "OFStatsRequest")
+            return ("", "OFStatsRequest", None)
         elif re.match(r'OF.+StatsReply$', self.name):
-            return ("", "OFStatsReply")
+            return ("", "OFStatsReply", None)
         elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
-            return ("", "OFFlowMod")
+            return ("", "OFFlowMod", None)
         elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name):
-            return ("", "OFBsnHeader")
+            return ("", "OFBsnHeader", None)
         elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name):
-            return ("", "OFNiciraHeader")
+            return ("", "OFNiciraHeader", None)
         elif re.match(r'OFMatch.*', self.name):
-            return ("", "Match")
+            return ("", "Match", None)
         elif loxi_utils.class_is_message(self.c_name):
-            return ("", "OFMessage")
+            return ("", "OFMessage", None)
         elif loxi_utils.class_is_action(self.c_name):
-            if re.match(r'OFActionBsn.*', self.name):
-                return ("action", "OFActionBsn")
-            elif re.match(r'OFActionNicira.*', self.name):
-                return ("action", "OFActionNicira")
+            if re.match(r'OFActionBsn.+', self.name):
+                return ("action", "OFActionBsn", None)
+            elif re.match(r'OFActionNicira.+', self.name):
+                return ("action", "OFActionNicira", None)
             else:
-                return ("action", "OFAction")
+                return ("action", "OFAction", None)
         elif re.match(r'OFBsnVport.+$', self.name):
-            return ("", "OFBsnVport")
+            return ("", "OFBsnVport", None)
+        elif self.name == "OFOxm":
+            return ("oxm", None, "T extends OFValueType<T>")
         elif loxi_utils.class_is_oxm(self.c_name):
-            return ("oxm", "OFOxm")
+            if self.name in model.oxm_map:
+                return ("oxm", "OFOxm<%s>" % model.oxm_map[self.name].type_name, None)
+            else:
+                return ("oxm", "OFOxm", None)
         elif loxi_utils.class_is_instruction(self.c_name):
-            return ("instruction", "OFInstruction")
+            return ("instruction", "OFInstruction", None)
         elif loxi_utils.class_is_meter_band(self.c_name):
-            return ("meterband", "OFMeterBand")
+            return ("meterband", "OFMeterBand", None)
         elif loxi_utils.class_is_queue_prop(self.c_name):
-            return ("queueprop", "OFQueueProp")
+            return ("queueprop", "OFQueueProp", None)
         elif loxi_utils.class_is_hello_elem(self.c_name):
-            return ("", "OFHelloElem")
+            return ("", "OFHelloElem", None)
         else:
-            return ("", None)
+            return ("", None, None)
+
+    @property
+    @memoize
+    def writeable_members(self):
+        return [ m for m in self.members if m.is_writeable ]
 
     @property
     @memoize
     def members(self):
+        return self.ir_model_members + self.virtual_members
+
+    @property
+    @memoize
+    def ir_model_members(self):
         """return a list of all members to be exposed by this interface. Corresponds to
            the union of the members of the vesioned classes without length, fieldlength
            and pads (those are handled automatically during (de)serialization and not exposed"""
@@ -275,7 +378,33 @@ class JavaOFInterface(object):
                 if of_member.name not in member_map:
                     member_map[of_member.name] = JavaMember.for_of_member(self, of_member)
 
-        return member_map.values()
+        return tuple(member_map.values())
+
+    @property
+    def virtual_members(self):
+        if self.name == "OFOxm":
+            return (
+                    JavaVirtualMember(self, "value", java_type.generic_t),
+                    JavaVirtualMember(self, "mask", java_type.generic_t),
+                    JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype("T")),
+                    JavaVirtualMember(self, "masked", java_type.boolean),
+                   )
+        elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
+            field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
+                if self.name in model.oxm_map \
+                else java_type.make_match_field_jtype()
+
+            return (
+                    JavaVirtualMember(self, "matchField", field_type),
+                    JavaVirtualMember(self, "masked", java_type.boolean),
+                   ) \
+                   + \
+                   (
+                           ( JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type), ) if not find(lambda x: x.name == "mask", self.ir_model_members) else
+                    ()
+                   )
+        else:
+            return ()
 
     @property
     @memoize
@@ -384,8 +513,29 @@ class JavaOFClass(object):
     @property
     @memoize
     def members(self):
+        return self.ir_model_members + self.virtual_members
+
+    @property
+    def ir_model_members(self):
         members = [ JavaMember.for_of_member(self, of_member) for of_member in self.ir_class.members ]
-        return members
+        return tuple(members)
+
+    @property
+    def virtual_members(self):
+        if self.interface.parent_interface and self.interface.parent_interface.startswith("OFOxm"):
+            if self.interface.name in model.oxm_map:
+                oxm_entry = model.oxm_map[self.interface.name]
+                return (
+                    JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
+                    JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
+                   )
+            else:
+                return (
+                    JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
+                    JavaVirtualMember(self, "masked", java_type.boolean, "false"),
+                   )
+        else:
+            return ()
 
     def all_versions(self):
         return [ JavaOFVersion(int_version)
@@ -447,6 +597,14 @@ class JavaMember(object):
         return self.c_name.upper()
 
     @property
+    def getter_name(self):
+        return ("is" if self.java_type.public_type == "boolean" else "get") + self.title_name
+
+    @property
+    def setter_name(self):
+        return "set" + self.title_name
+
+    @property
     def default_name(self):
         if self.is_fixed_value:
             return self.constant_name
@@ -459,10 +617,14 @@ class JavaMember(object):
 
         if self.is_fixed_value:
             return self.enum_value
+        elif java_type == "OFOxmList":
+            return "OFOxmList.EMPTY"
         elif re.match(r'List.*', java_type):
             return "Collections.emptyList()"
         elif java_type == "boolean":
             return "false";
+        elif self.java_type.is_array:
+            return "new %s[0]" % java_type[:-2]
         elif java_type in ("byte", "char", "short", "int", "long"):
             return "({0}) 0".format(java_type);
         else:
@@ -562,6 +724,8 @@ class JavaMember(object):
         else:
             if member.name == 'len':
                 name = 'length'
+            elif member.name == 'value_mask':
+                name = 'mask'
             else:
                 name = java_type.name_c_to_camel(member.name)
             j_type = java_type.convert_to_jtype(java_class.c_name, member.name, member.oftype)
@@ -582,6 +746,10 @@ class JavaMember(object):
                 return False
         return True
 
+    @property
+    def is_virtual(self):
+        return False
+
     def __hash__(self):
         return hash(self.name)
 
@@ -590,6 +758,32 @@ class JavaMember(object):
             return False
         return (self.name,) == (other.name,)
 
+class JavaVirtualMember(JavaMember):
+    """ Models a virtual property (member) of an openflow class that is not backed by a loxi ir member """
+    def __init__(self, msg, name, java_type, value=None):
+        JavaMember.__init__(self, msg, name, java_type, member=None)
+        self._value = value
+
+    @property
+    def is_fixed_value(self):
+        return True
+
+    @property
+    def value(self):
+        return self._value
+
+    @property
+    def priv_value(self):
+        return self._value
+
+
+    @property
+    def is_universal(self):
+        return True
+
+    @property
+    def is_virtual(self):
+        return True
 
 #######################################################################
 ### Unit Test

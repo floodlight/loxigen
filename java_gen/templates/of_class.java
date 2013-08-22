@@ -37,7 +37,7 @@ package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
 
-class ${impl_class} implements ${msg.interface.name} {
+class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     // version: ${version}
     private final static byte WIRE_VERSION = ${version.int_version};
 //:: if msg.is_fixed_length:
@@ -55,20 +55,29 @@ class ${impl_class} implements ${msg.interface.name} {
     private final ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
 
+    //:: if msg.data_members:
+    // package private constructor - used by readers, builders, and factory
     ${impl_class}(${
         ", ".join("%s %s" %(prop.java_type.public_type, prop.name) for prop in msg.data_members) }) {
 //:: for prop in msg.data_members:
         this.${prop.name} = ${prop.name};
 //:: #endfor
     }
+    //:: else:
+    final static ${impl_class} INSTANCE = new ${impl_class}();
+    // private empty constructor - use shared instance!
+    private ${impl_class}() {
+    }
+    //:: #endif
 
     // Accessors for OF message fields
-//:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
+    //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
 
     //:: if os.path.exists("%s/custom/%s.java" % (template_dir, msg.name)):
     //:: include("custom/%s.java" % msg.name, msg=msg)
     //:: #endif
 
+    //:: if msg.data_members:
     public ${msg.interface.name}.Builder createBuilder() {
         return new BuilderWithParent(this);
     }
@@ -89,7 +98,7 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True)
 
         @Override
-        public ${msg.interface.name} getMessage() {
+        public ${msg.interface.name} build() {
                 return new ${impl_class}(
                     ${",\n                      ".join(
                          [ "this.{0}Set ? this.{0} : parentMessage.{0}".format(prop.name)
@@ -112,7 +121,7 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True)
 //
         @Override
-        public ${msg.interface.name} getMessage() {
+        public ${msg.interface.name} build() {
             return new ${impl_class}(
                 ${",\n                      ".join(
                      [ "this.{0}Set ? this.{0} : {1}.{2}".format(prop.name, impl_class, prop.default_name)
@@ -124,6 +133,13 @@ class ${impl_class} implements ${msg.interface.name} {
         //:: #endif
 
     }
+    //:: else:
+    // no data members - do not support builder
+    public ${msg.interface.name}.Builder createBuilder() {
+        throw new UnsupportedOperationException("${impl_class} has no mutable properties -- builder unneeded");
+    }
+    //:: #endif
+
 
     final static Reader READER = new Reader();
     static class Reader implements OFMessageReader<${msg.interface.name}> {
@@ -132,7 +148,9 @@ class ${impl_class} implements ${msg.interface.name} {
             int start = bb.readerIndex();
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
-//:: if prop.is_data:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
             ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True,
                     length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None)};
 //:: elif prop.is_pad:
@@ -159,10 +177,14 @@ class ${impl_class} implements ${msg.interface.name} {
             bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
             //:: #endif
 
+            //:: if msg.data_members:
             return new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
                     );
+            //:: else:
+            return INSTANCE;
+            //:: #endif
         }
     }
 
@@ -180,7 +202,9 @@ class ${impl_class} implements ${msg.interface.name} {
 //:: if prop.c_name in fields_with_length_member:
             int ${prop.name}StartIndex = bb.writerIndex();
 //:: #endif
-//:: if prop.is_data:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
             ${prop.java_type.write_op(version, "message." + prop.name, pub_type=True)};
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes

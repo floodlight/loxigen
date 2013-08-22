@@ -36,25 +36,53 @@ package ${factory.package};
 //:: include("_imports.java")
 
 public class ${factory.name} implements ${factory.interface.name} {
+    public final static ${factory.name} INSTANCE = new ${factory.name}();
+    private ${factory.name}() {}
+
+    //:: for name, clazz in factory.interface.sub_factories.items():
+    public ${clazz} ${name}() {
+        return ${clazz}Ver${factory.version.of_version}.INSTANCE;
+    }
+    //:: #endfor
+
 //:: for i in factory.interface.members:
     //:: if i.is_virtual:
     //::    continue
     //:: #endif
 
-//::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
-    public ${i.name}.Builder create${i.name[2:]}Builder() {
+    //:: if len(i.writeable_members) > 0:
+    public ${i.name}.Builder ${factory.interface.method_name(i, builder=True)}() {
+        //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
         return new ${i.versioned_class(factory.version).name}.Builder();
-    }
-//:: else:
-    public ${i.name}.Builder create${i.name[2:]}Builder() throws UnsupportedOperationException {
+        //:: else:
         throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
+        //:: #endif
     }
-//:: #endif
+    //:: #endif
+    //:: if len(i.writeable_members) <= 2:
+    public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)}) {
+        //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
+        //:: if len(i.writeable_members) > 0:
+        return new ${i.versioned_class(factory.version).name}(
+                ${",\n                      ".join(
+                         [ prop.name for prop in i.versioned_class(factory.version).data_members])}
+                    );
+        //:: else:
+        return ${i.versioned_class(factory.version).name}.INSTANCE;
+        //:: #endif
+        //:: else:
+        throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
+        //:: #endif
+    }
+    //:: #endif
 //:: #endfor
 
-    public OFMessageReader<OFMessage> getMessageReader() {
-        return OFMessageVer${factory.version.of_version}.READER;
+    public OFMessageReader<${factory.base_class}> getReader() {
+//:: if factory.versioned_base_class:
+        return ${factory.versioned_base_class.name}.READER;
+//:: else:
+        throw new UnsupportedOperationException("Reader<${factory.base_class}> not supported in version ${factory.version}");
+//:: #endif
     }
 
-    //:: include("_singleton.java", msg=factory)
 }
