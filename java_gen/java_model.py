@@ -44,6 +44,7 @@ import py_gen.util as py_utils
 import test_data
 
 import java_gen.java_type as java_type
+from java_gen.java_type import erase_type_annotation
 
 class JavaModel(object):
     enum_blacklist = set(("OFDefinitions",))
@@ -83,6 +84,10 @@ class JavaModel(object):
 
         return interfaces
 
+    @memoize
+    def interface_by_name(self, name):
+        return find(lambda i: erase_type_annotation(i.name) == erase_type_annotation(name), self.interfaces)
+
     @property
     @memoize
     def all_classes(self):
@@ -114,11 +119,40 @@ class JavaModel(object):
 
     @property
     @memoize
-    def of_factory(self):
-           return OFFactory(
-                    package="org.openflow.protocol",
+    def of_factories(self):
+        prefix = "org.openflow.protocol"
+
+        factories = OrderedDict()
+
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp")
+        for base_class in sub_factory_classes:
+            package = base_class[2:].lower()
+            remove_prefix = base_class[2].lower() + base_class[3:]
+
+            # HACK need to have a better way to deal with parameterized base classes
+            annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
+
+            factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={})
+
+        factories[""] = OFFactory(
+                    package=prefix,
                     name="OFFactory",
-                    members=self.interfaces)
+                    remove_prefix="",
+                    members=[], base_class="OFMessage", sub_factories=OrderedDict(
+                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ))
+
+        for i in self.interfaces:
+            for n, factory in factories.items():
+                if n == "":
+                    factory.members.append(i)
+                    break
+                else:
+                    super_class = self.interface_by_name(n)
+                    if i.is_instance_of(super_class):
+                        factory.members.append(i)
+                        break
+        return factories.values()
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -142,19 +176,39 @@ class JavaModel(object):
             return True
 
 
-class OFFactory(namedtuple("OFFactory", ("package", "name", "members"))):
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories"))):
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
                     package="org.openflow.protocol.ver{}".format(version.of_version),
-                    name="OFFactoryVer{}".format(version.of_version),
+                    name="{}Ver{}".format(self.name, version.of_version),
                     interface=self,
                     version=version
                     ) for version in model.versions ]
 
+    def method_name(self, member, builder=True):
+        n = member.variable_name
+        if n.startswith(self.remove_prefix):
+            n = n[len(self.remove_prefix):]
+            n = n[0].lower() + n[1:]
+        if builder:
+            return "build" + n[0].upper() + n[1:]
+        else:
+            return n
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
-OFFactoryClass = namedtuple("OFFactory", ("package", "name", "interface", "version"))
+class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
+    @property
+    def base_class(self):
+        return self.interface.base_class
+
+    @property
+    def versioned_base_class(self):
+        base_class_interface = model.interface_by_name(self.interface.base_class)
+        if base_class_interface and base_class_interface.has_version(self.version):
+            return base_class_interface.versioned_class(self.version)
+        else:
+            return None
 
 model = JavaModel()
 
