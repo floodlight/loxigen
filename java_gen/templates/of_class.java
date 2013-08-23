@@ -106,7 +106,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                     );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
-        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, has_parent=True)
         //:: #endif
 
     }
@@ -129,7 +129,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
-        //:: include("custom/%s.Builder.java" % msg.name, msg=msg)
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, has_parent=False)
         //:: #endif
 
     }
