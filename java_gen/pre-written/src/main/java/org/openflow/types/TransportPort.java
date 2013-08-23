@@ -5,24 +5,24 @@ import org.openflow.exceptions.OFParseError;
 
 /**
  * Represents L4 (Transport Layer) port (TCP, UDP, etc.)
- * 
+ *
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
 public class TransportPort implements OFValueType<TransportPort> {
-    
+
     static final int LENGTH = 2;
     static final int MAX_PORT = 0xFFFF;
     static final int MIN_PORT = 0;
-    
-    public static final TransportPort NO_MASK = TransportPort.of(0xFFFFFFFF);
+
+    public static final TransportPort NO_MASK = new TransportPort(0xFFFFFFFF);
     public static final TransportPort FULL_MASK = TransportPort.of(0x0);
 
     private final int port;
-    
+
     private TransportPort(int port) {
         this.port = port;
     }
-    
+
     public static TransportPort of(int port) {
         if (port < MIN_PORT || port > MAX_PORT) {
             throw new IllegalArgumentException("Illegal transport layer port number: " + port);
@@ -34,7 +34,7 @@ public class TransportPort implements OFValueType<TransportPort> {
     public int getLength() {
         return LENGTH;
     }
-    
+
     public int getPort() {
         return port;
     }
@@ -74,5 +74,5 @@ public class TransportPort implements OFValueType<TransportPort> {
     public TransportPort applyMask(TransportPort mask) {
         return TransportPort.of(this.port & mask.port);
     }
-    
+
 }

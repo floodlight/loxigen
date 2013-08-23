@@ -41,4 +41,26 @@ public class OFMetadata implements OFValueType<OFMetadata> {
         return OFMetadata.of(this.u64.applyMask(mask.u64));
     }
 
+    @Override
+    public boolean equals(Object arg0) {
+        if (!(arg0 instanceof OFMetadata))
+            return false;
+        OFMetadata other = (OFMetadata)arg0;
+
+        return this.u64.equals(other.u64);
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 53;
+        return this.u64.hashCode() * prime;
+    }
+
+    @Override
+    public String toString() {
+        return "Metadata: " + u64.toString();
+    }
+
+
+
 }
