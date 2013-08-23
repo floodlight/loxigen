@@ -97,7 +97,8 @@ public class ${factory.name} implements ${factory.interface.name} {
             //::    method_name = oxm_name.replace('OFOxm', '')
             //::    method_name = method_name[0].lower() + method_name[1:]
             case ${value}:
-                return (OFOxm<F>)${method_name}((${type_name})value);
+                //:: # The cast to Object is done to avoid some javac bug that in some versions cannot handle cast from generic type to other types but Object
+                return (OFOxm<F>)((Object)${method_name}((${type_name})((Object)value)));
             //:: #endfor
             default:
                 return null;
@@ -115,7 +116,8 @@ public class ${factory.name} implements ${factory.interface.name} {
             //::    method_name = oxm_name.replace('OFOxm', '')
             //::    method_name = method_name[0].lower() + method_name[1:]
             case ${value}:
-                return (OFOxm<F>)${method_name}((${type_name})value, (${type_name})mask);
+                //:: # The cast to Object is done to avoid some javac bug that in some versions cannot handle cast from generic type to other types but Object
+                return (OFOxm<F>)((Object)${method_name}((${type_name})((Object)value), (${type_name})((Object)mask)));
             //:: #endfor
             default:
                 return null;
@@ -133,7 +135,8 @@ public class ${factory.name} implements ${factory.interface.name} {
             //::    method_name = oxm_name.replace('OFOxm', '')
             //::    method_name = method_name[0].lower() + method_name[1:]
             case ${value}:
-                return (OFOxm<F>)${method_name}((${type_name})(masked.getValue()), (${type_name})(masked.getMask()));
+                //:: # The cast to Object is done to avoid some javac bug that in some versions cannot handle cast from generic type to other types but Object
+                return (OFOxm<F>)((Object)${method_name}((${type_name})((Object)(masked.getValue())), (${type_name})((Object)(masked.getMask()))));
             //:: #endfor
             default:
                 return null;
