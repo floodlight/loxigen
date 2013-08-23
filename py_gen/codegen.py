@@ -54,13 +54,10 @@ def generate_pyname(cls):
 # Create intermediate representation, extended from the LOXI IR
 # HACK the oftype member attribute is replaced with an OFType instance
 def build_ofclasses(version):
-    blacklist = ["of_experimenter", "of_action_experimenter"]
     ofclasses = []
     for ofclass in of_g.ir[version].classes:
         cls = ofclass.name
-        if type_maps.class_is_virtual(cls):
-            continue
-        if cls in blacklist:
+        if ofclass.virtual:
             continue
 
         members = []
