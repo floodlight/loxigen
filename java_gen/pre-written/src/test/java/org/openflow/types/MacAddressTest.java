@@ -9,7 +9,6 @@ import java.util.Arrays;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortRead;
 
 public class MacAddressTest {
     byte[][] testAddresses = new byte[][] {
@@ -62,7 +61,7 @@ public class MacAddressTest {
     }
 
     @Test
-    public void testReadFrom() throws OFParseError, OFShortRead {
+    public void testReadFrom() throws OFParseError {
         for(int i=0; i < testAddresses.length; i++ ) {
             MacAddress ip = MacAddress.read6Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getLong());
@@ -73,7 +72,7 @@ public class MacAddressTest {
 
 
     @Test
-    public void testInvalidMacss() throws OFParseError, OFShortRead {
+    public void testInvalidMacss() throws OFParseError {
         for(String invalid : invalidMacs) {
             try {
                 MacAddress.of(invalid);

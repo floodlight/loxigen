@@ -7,7 +7,6 @@ import static org.junit.Assert.fail;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortRead;
 
 public class IPv4Test {
     byte[][] testAddresses = new byte[][] {
@@ -42,21 +41,21 @@ public class IPv4Test {
             "1.x.3.4",
             "1.2x.3.4"
     };
-    
+
     String[] ipsWithMask = {
                             "1.2.3.4/24",
                             "192.168.130.140/255.255.192.0",
                             "127.0.0.1/8",
                             "8.8.8.8",
     };
-    
+
     boolean[] hasMask = {
                          true,
                          true,
                          true,
                          false
     };
-    
+
     byte[][][] ipsWithMaskValues = {
                              new byte[][] { new byte[] { (byte)0x01, (byte)0x02, (byte)0x03, (byte)0x04 }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0x00 } },
                              new byte[][] { new byte[] { (byte)0xC0, (byte)0xA8, (byte)0x82, (byte)0x8C }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xC0, (byte)0x00 } },
@@ -86,7 +85,7 @@ public class IPv4Test {
     }
 
     @Test
-    public void testReadFrom() throws OFParseError, OFShortRead {
+    public void testReadFrom() throws OFParseError {
         for(int i=0; i < testAddresses.length; i++ ) {
             IPv4 ip = IPv4.read4Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getInt());
@@ -97,7 +96,7 @@ public class IPv4Test {
 
 
     @Test
-    public void testInvalidIPs() throws OFParseError, OFShortRead {
+    public void testInvalidIPs() throws OFParseError {
         for(String invalid : invalidIPs) {
             try {
                 IPv4.of(invalid);
@@ -107,9 +106,9 @@ public class IPv4Test {
             }
         }
     }
-    
+
     @Test
-    public void testOfMasked() throws OFParseError, OFShortRead {
+    public void testOfMasked() throws OFParseError {
         for (int i = 0; i < ipsWithMask.length; i++) {
             IPv4WithMask value = IPv4WithMask.of(ipsWithMask[i]);
             if (!hasMask[i]) {
@@ -122,7 +121,7 @@ public class IPv4Test {
                 for (int j = 0; j < ipBytes.length; j++) {
                     ipBytes[j] &= ipsWithMaskValues[i][1][j];
                 }
-                
+
                 assertArrayEquals(ipBytes, value.getValue().getBytes());
                 assertArrayEquals(ipsWithMaskValues[i][1], value.getMask().getBytes());
             }
