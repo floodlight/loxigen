@@ -104,14 +104,3 @@
         updateOxmList();
         return this;
     }
-
-    @Override
-    public Builder createBuilder() {
-        return this;
-    }
-
-    @Override
-    public void writeTo(ChannelBuffer bb) {
-        // TODO: What should this write?
-        throw new UnsupportedOperationException("Builder cannot be written");
-    }
