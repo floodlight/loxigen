@@ -1177,7 +1177,8 @@ struct of_flow_stats_entry {
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    pad(6);
+    uint16_t flags;
+    pad(4);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
