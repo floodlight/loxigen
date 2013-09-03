@@ -142,7 +142,21 @@ public interface Match extends OFObject {
      *
      * @author Yotam Harchol (yotam.harchol@bigswitch.com)
      */
-    interface Builder extends Match {
+    interface Builder {
+        public <F extends OFValueType<F>> F get(MatchField<F> field) throws UnsupportedOperationException;
+
+        public <F extends OFValueType<F>> Masked<F> getMasked(MatchField<F> field) throws UnsupportedOperationException;
+
+        public boolean supports(MatchField<?> field);
+
+        public boolean supportsMasked(MatchField<?> field) throws UnsupportedOperationException;
+
+        public boolean isExact(MatchField<?> field) throws UnsupportedOperationException;
+
+        public boolean isFullyWildcarded(MatchField<?> field) throws UnsupportedOperationException;
+
+        public boolean isPartiallyMasked(MatchField<?> field) throws UnsupportedOperationException;
+
         /**
          * Sets a specific exact value for a field.
          *
