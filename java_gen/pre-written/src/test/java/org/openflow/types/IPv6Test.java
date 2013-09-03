@@ -11,7 +11,6 @@ import java.net.UnknownHostException;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.openflow.exceptions.OFParseError;
-import org.openflow.exceptions.OFShortRead;
 
 public class IPv6Test {
 
@@ -21,33 +20,33 @@ public class IPv6Test {
             "ffe0::",
             "1:2:3:4:5:6:7:8"
     };
-    
+
     String[] ipsWithMask = {
                             "1::1/80",
                             "1:2:3:4::/ffff:ffff:ffff:ff00::",
                             "ffff:ffee:1::/ff00:ff00:ff00:ff00::",
                             "8:8:8:8:8:8:8:8",
     };
-    
+
     byte[][] masks = {
-                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
-                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
-                                 (byte)0xff, (byte)0xff, (byte)0x00, (byte)0x00, 
+                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
+                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
+                                 (byte)0xff, (byte)0xff, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff, 
-                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
+                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
+                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0x00,
+                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00, 
-                                 (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
+                    new byte[] { (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00,
+                                 (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00,
+                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00, 
+                    new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                                  (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 }
     };
-    
+
     boolean[] hasMask = {
                          true,
                          true,
@@ -70,11 +69,11 @@ public class IPv6Test {
 
                 byte[] address = inetAddress.getAddress();
                 assertEquals(address.length, value.getValue().getBytes().length);
-                
+
                 for (int j = 0; j < address.length; j++) {
                     address[j] &= masks[i][j];
                 }
-                
+
                 assertArrayEquals(value.getValue().getBytes(), address);
                 assertArrayEquals(masks[i], value.getMask().getBytes());
             }
@@ -104,7 +103,7 @@ public class IPv6Test {
     }
 
     @Test
-    public void testReadFrom() throws OFParseError, OFShortRead, UnknownHostException {
+    public void testReadFrom() throws OFParseError, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
             IPv6 ip = IPv6.read16Bytes(ChannelBuffers.copiedBuffer(bytes));
@@ -126,7 +125,7 @@ public class IPv6Test {
     };
 
     @Test
-    public void testInvalidIPs() throws OFParseError, OFShortRead {
+    public void testInvalidIPs() throws OFParseError {
         for(String invalid : invalidIPs) {
             try {
                 IPv6.of(invalid);
@@ -138,7 +137,7 @@ public class IPv6Test {
     }
 
     @Test
-    public void testZeroCompression() throws OFParseError, OFShortRead {
+    public void testZeroCompression() throws OFParseError {
         assertEquals("::", IPv6.of("::").toString(true, false));
         assertEquals("0:0:0:0:0:0:0:0", IPv6.of("::").toString(false, false));
         assertEquals("0000:0000:0000:0000:0000:0000:0000:0000", IPv6.of("::").toString(false, true));
