@@ -268,11 +268,30 @@ class JavaOFInterface(object):
         self.constant_name = c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface, self.type_annotation = self.class_info()
+
         self.package = "org.openflow.protocol.%s" % pck_suffix if pck_suffix else "org.openflow.protocol"
         if self.name != parent_interface:
             self.parent_interface = parent_interface
         else:
             self.parent_interface = None
+
+    @property
+    @memoize
+    def all_parent_interfaces(self):
+        return [ "OFObject" ] + \
+               ([ self.parent_interface ] if self.parent_interface else [] )+ \
+               self.additional_parent_interfaces
+    @property
+    @memoize
+    def additional_parent_interfaces(self):
+        if loxi_utils.class_is_message(self.c_name):
+            m = re.match(r'(.*)Request$', self.name)
+            if m:
+                reply_name = m.group(1) + "Reply"
+                if model.interface_by_name(reply_name):
+                    return ["OFRequest<%s>" % reply_name ]
+        return []
+
 
     def is_instance_of(self, other_class):
         if self == other_class:
