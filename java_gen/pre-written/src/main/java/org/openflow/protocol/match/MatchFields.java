@@ -3,7 +3,7 @@ package org.openflow.protocol.match;
 // MUST BE ORDERED BY THE ORDER OF OF SPEC!!!
 public enum MatchFields {
     IN_PORT,
-    PHYSICAL_PORT,
+    IN_PHY_PORT,
     METADATA,
     ETH_DST,
     ETH_SRC,
@@ -30,5 +30,5 @@ public enum MatchFields {
     ARP_THA,
     IPV6_SRC,
     IPV6_DST,
-    IPV6_FLOWLABEL,
+    IPV6_FLABEL,
 }

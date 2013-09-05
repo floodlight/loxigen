@@ -443,7 +443,7 @@ struct of_experimenter : of_header {
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     uint32_t subtype;
     of_octets_t data;
 };
@@ -742,7 +742,7 @@ struct of_action_dec_nw_ttl : of_action {
 struct of_action_experimenter : of_action {
     uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
@@ -837,7 +837,7 @@ struct of_instruction_clear_actions : of_instruction {
 struct of_instruction_experimenter : of_instruction {
     uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
@@ -1327,7 +1327,7 @@ struct of_experimenter_stats_request : of_stats_request {
     uint16_t stats_type == 0xffff;
     uint16_t flags;
     pad(4);
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     pad(4);
     of_octets_t data;
 };
@@ -1340,7 +1340,7 @@ struct of_experimenter_stats_reply : of_stats_reply {
     uint16_t stats_type == 0xffff;
     uint16_t flags;
     pad(4);
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     pad(4);
     of_octets_t data;
 };
