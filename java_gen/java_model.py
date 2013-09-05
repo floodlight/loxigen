@@ -51,7 +51,8 @@ class JavaModel(object):
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
     # OFUint structs are there for god-knows what in loci. We certainly don't need them.
     interface_blacklist = set( ("OFUint8", "OFUint32",))
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
+    read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
     OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
@@ -395,6 +396,8 @@ class JavaOFInterface(object):
             return ("", "OFBsnHeader", None)
         elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name) and self.name != "OFNiciraHeader":
             return ("", "OFNiciraHeader", None)
+        elif self.name == "OFBsnHeader" or self.name =="OFNiciraHeader":
+            return ("", "OFExperimenter", None)
         elif re.match(r'OFMatch.*', self.name):
             return ("", "Match", None)
         elif loxi_utils.class_is_message(self.c_name):
@@ -404,6 +407,8 @@ class JavaOFInterface(object):
                 return ("action", "OFActionBsn", None)
             elif re.match(r'OFActionNicira.+', self.name):
                 return ("action", "OFActionNicira", None)
+            elif self.name == "OFActionBsn" or self.name == "OFActionNicira":
+                return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
         elif re.match(r'OFBsnVport.+$', self.name):
@@ -454,7 +459,7 @@ class JavaOFInterface(object):
                 if of_member.name not in member_map:
                     member_map[of_member.name] = JavaMember.for_of_member(self, of_member)
 
-        return tuple(member_map.values())
+        return tuple(m for m in member_map.values() if m.name not in model.read_blacklist[self.name])
 
     @property
     def virtual_members(self):
