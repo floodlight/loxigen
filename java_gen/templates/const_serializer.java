@@ -33,10 +33,10 @@
 
 package ${package};
 
-import org.openflow.types.*;
+import org.projectfloodlight.openflow.types.*;
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.openflow.exceptions.OFParseError;
-import org.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFVersion;
 import ${enum.package}.${enum.name};
 
 public class ${class_name} {

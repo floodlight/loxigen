@@ -31,7 +31,7 @@
 
 //:: include('_autogen.java')
 
-package org.openflow.protocol;
+package org.projectfloodlight.openflow.protocol;
 
 //:: include("_imports.java")
 
@@ -40,7 +40,7 @@ public final class OFFactories {
         switch(version) {
             //:: for v in versions:
             case ${v.constant_version}:
-                return org.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
+                return org.projectfloodlight.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
             //:: #endfor
             default:
                 throw new IllegalArgumentException("Unknown version: "+version);
