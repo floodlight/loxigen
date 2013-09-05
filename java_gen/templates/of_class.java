@@ -39,11 +39,11 @@ package ${msg.package};
 
 class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     // version: ${version}
-    private final static byte WIRE_VERSION = ${version.int_version};
+    final static byte WIRE_VERSION = ${version.int_version};
 //:: if msg.is_fixed_length:
-    private final static int LENGTH = ${msg.length};
+    final static int LENGTH = ${msg.length};
 //:: else:
-    private final static int MINIMUM_LENGTH = ${msg.min_length};
+    final static int MINIMUM_LENGTH = ${msg.min_length};
 //:: #endif
 
 //:: for prop in msg.data_members:
