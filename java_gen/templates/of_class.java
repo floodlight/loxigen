@@ -171,6 +171,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: else:
     // fixme: todo ${prop.name}
 //:: #endif
+//:: if prop.is_length_value or prop.is_field_length_value:
+            if(bb.readableBytes() + (bb.readerIndex() - start) < ${prop.name}) {
+                // Buffer does not have all data yet
+                bb.readerIndex(start);
+                return null;
+            }
+//:: #endif
 //:: #endfor
             //:: if msg.align:
             // align message to ${msg.align} bytes
