@@ -178,7 +178,7 @@ class JavaModel(object):
     @property
     @memoize
     def of_factories(self):
-        prefix = "org.openflow.protocol"
+        prefix = "org.projectfloodlight.openflow.protocol"
 
         factories = OrderedDict()
 
@@ -238,7 +238,7 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
-                    package="org.openflow.protocol.ver{}".format(version.of_version),
+                    package="org.projectfloodlight.openflow.protocol.ver{}".format(version.of_version),
                     name="{}Ver{}".format(self.name, version.of_version),
                     interface=self,
                     version=version
@@ -326,8 +326,7 @@ class JavaOFInterface(object):
         self.constant_name = c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface, self.type_annotation = self.class_info()
-
-        self.package = "org.openflow.protocol.%s" % pck_suffix if pck_suffix else "org.openflow.protocol"
+        self.package = "org.projectfloodlight.openflow.protocol.%s" % pck_suffix if pck_suffix else "org.projectfloodlight.openflow.protocol"
         if self.name != parent_interface:
             self.parent_interface = parent_interface
         else:
@@ -534,7 +533,7 @@ class JavaOFClass(object):
         self.c_name = self.ir_class.name
         self.version = version
         self.constant_name = self.c_name.upper().replace("OF_", "")
-        self.package = "org.openflow.protocol.ver%s" % version.of_version
+        self.package = "org.projectfloodlight.openflow.protocol.ver%s" % version.of_version
         self.generated = False
 
     @property
@@ -962,7 +961,7 @@ class JavaEnum(object):
                          for (name, version_value_map) in entry_name_version_value_map.items() ]
 
         self.entries = [ e for e in self.entries if e.name not in model.enum_entry_blacklist[self.name] ]
-        self.package = "org.openflow.protocol"
+        self.package = "org.projectfloodlight.openflow.protocol"
 
     def wire_type(self, version):
         ir_enum = self.version_enums[version]

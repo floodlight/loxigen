@@ -33,7 +33,7 @@
 
 package ${package};
 
-import org.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.protocol.OFVersion;
 
 public enum ${class_name} {
 //:: for i, entry in enumerate(enum.entries):
