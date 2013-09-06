@@ -85,7 +85,7 @@ builder.setXid(0x12345678)
     .setOutGroup(8)
     .setFlags(0)
     .setMatch(
-        factory.buildMatchV3()
+        factory.buildMatch()
             .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
             .setExact(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6)
             .setExact(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP)

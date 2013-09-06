@@ -27,6 +27,7 @@
 //::
 //:: import itertools
 //:: import of_g
+//:: import re
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -52,6 +53,9 @@ public interface ${factory.name} {
     ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)});
     //:: #endif
 //:: #endfor
+//:: if factory.name == 'OFFactory':
+    Match.Builder buildMatch();
+//:: #endif
 
     OFMessageReader<${factory.base_class}> getReader();
 

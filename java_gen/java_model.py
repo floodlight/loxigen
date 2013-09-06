@@ -112,7 +112,22 @@ class JavaModel(object):
                 "OFOxmIpv6Dst":             OxmMapEntry("IPv6", "IPV6_DST", False),
                 "OFOxmIpv6DstMasked":       OxmMapEntry("IPv6", "IPV6_DST", True),
                 "OFOxmIpv6Flabel":          OxmMapEntry("IPv6FlowLabel", "IPV6_FLABEL", False),
-                "OFOxmIpv6FlabelMasked":    OxmMapEntry("IPv6FlowLabel", "IPV6_FLABEL", True) }
+                "OFOxmIpv6FlabelMasked":    OxmMapEntry("IPv6FlowLabel", "IPV6_FLABEL", True),
+                "OFOxmIcmpv6Type":          OxmMapEntry("U8", "ICMPV6_TYPE", False),
+                "OFOxmIcmpv6TypeMasked":    OxmMapEntry("U8", "ICMPV6_TYPE", True),
+                "OFOxmIcmpv6Code":          OxmMapEntry("U8", "ICMPV6_CODE", False),
+                "OFOxmIcmpv6CodeMasked":    OxmMapEntry("U8", "ICMPV6_CODE", True),
+                "OFOxmIpv6NdTarget":        OxmMapEntry("IPv6", "IPV6_ND_TARGET", False),
+                "OFOxmIpv6NdTargetMasked":  OxmMapEntry("IPv6", "IPV6_ND_TARGET", True),
+                "OFOxmIpv6NdSll":           OxmMapEntry("MacAddress", "IPV6_ND_SLL", False),
+                "OFOxmIpv6NdSllMasked":     OxmMapEntry("MacAddress", "IPV6_ND_SLL", True),
+                "OFOxmIpv6NdTll":           OxmMapEntry("MacAddress", "IPV6_ND_TLL", False),
+                "OFOxmIpv6NdTllMasked":     OxmMapEntry("MacAddress", "IPV6_ND_TLL", True),
+                "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
+                "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
+                "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                }
 
     @property
     @memoize
