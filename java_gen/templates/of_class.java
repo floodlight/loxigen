@@ -145,7 +145,12 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     static class Reader implements OFMessageReader<${msg.interface.name}> {
         @Override
         public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
+//:: for prop in msg.members:
+//:: if not prop.is_virtual and (prop.is_length_value or prop.is_field_length_value):
             int start = bb.readerIndex();
+//::     break
+//:: #endif
+//:: #endfor
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.is_virtual:
@@ -203,7 +208,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     static class Writer implements OFMessageWriter<${impl_class}> {
         @Override
         public void write(ChannelBuffer bb, ${impl_class} message) {
+//:: if not msg.is_fixed_length:
             int startIndex = bb.writerIndex();
+//:: #endif
 //:: fields_with_length_member = {}
 //:: for prop in msg.members:
 //:: if prop.c_name in fields_with_length_member:
@@ -278,7 +285,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             return false;
         if (getClass() != obj.getClass())
             return false;
+        //:: if len(msg.data_members) > 0:
         ${msg.name} other = (${msg.name}) obj;
+        //:: #endif
 
         //:: for prop in msg.data_members:
         //:: if prop.java_type.is_primitive:
@@ -300,7 +309,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
     @Override
     public int hashCode() {
+        //:: if len(msg.data_members) > 0:
         final int prime = 31;
+        //:: #endif
         int result = 1;
 
         //:: for prop in msg.data_members:

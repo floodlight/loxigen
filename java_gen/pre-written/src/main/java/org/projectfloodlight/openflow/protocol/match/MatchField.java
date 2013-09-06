@@ -15,6 +15,8 @@ import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.TransportPort;
+import org.projectfloodlight.openflow.types.U32;
+import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VlanVid;
 
@@ -139,6 +141,34 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<IPv6FlowLabel> IPV6_FLABEL =
             new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLABEL,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
+
+    public final static MatchField<U8> ICMPV6_TYPE =
+            new MatchField<U8>("icmpv6_type", MatchFields.ICMPV6_TYPE,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+
+    public final static MatchField<U8> ICMPV6_CODE =
+            new MatchField<U8>("icmpv6_code", MatchFields.ICMPV6_CODE,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+
+    public final static MatchField<IPv6> IPV6_ND_TARGET =
+            new MatchField<IPv6>("ipv6_nd_target", MatchFields.IPV6_ND_TARGET,
+                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)135), U8.of((short)136)));
+
+    public final static MatchField<MacAddress> IPV6_ND_SLL =
+            new MatchField<MacAddress>("ipv6_nd_sll", MatchFields.IPV6_ND_SLL,
+                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)135)));
+
+    public final static MatchField<MacAddress> IPV6_ND_TLL =
+            new MatchField<MacAddress>("ipv6_nd_tll", MatchFields.IPV6_ND_TLL,
+                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)136)));
+
+    public final static MatchField<U32> MPLS_LABEL =
+            new MatchField<U32>("mpls_label", MatchFields.MPLS_LABEL,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_MPLS_UNICAST, EthType.ETH_TYPE_MPLS_MULTICAST));
+
+    public final static MatchField<U8> MPLS_TC =
+            new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_MPLS_UNICAST, EthType.ETH_TYPE_MPLS_MULTICAST));
 
     public String getName() {
         return name;

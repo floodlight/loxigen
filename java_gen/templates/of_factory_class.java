@@ -27,11 +27,14 @@
 //::
 //:: import itertools
 //:: import of_g
+//:: import re
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
 
 package ${factory.package};
+
+import org.projectfloodlight.openflow.protocol.OFOxmList;
 
 //:: include("_imports.java")
 
@@ -45,10 +48,13 @@ public class ${factory.name} implements ${factory.interface.name} {
     }
     //:: #endfor
 
+//:: general_get_match_func_written = False
 //:: for i in factory.interface.members:
     //:: if i.is_virtual:
     //::    continue
     //:: #endif
+    //:: is_match_object = re.match('OFMatch.*', i.name) # i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)) and i.versioned_class(factory.version).interface.parent_interface == 'Match'
+    //:: unsupported_match_object = is_match_object and not i.has_version(factory.version)
 
     //:: if len(i.writeable_members) > 0:
     public ${i.name}.Builder ${factory.interface.method_name(i, builder=True)}() {
@@ -58,6 +64,12 @@ public class ${factory.name} implements ${factory.interface.name} {
         throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
         //:: #endif
     }
+    //:: #endif
+    //:: if not general_get_match_func_written and is_match_object and not unsupported_match_object:
+    public Match.Builder buildMatch() {
+        return new ${i.versioned_class(factory.version).name}.Builder();
+    }
+    //::     general_get_match_func_written = True
     //:: #endif
     //:: if len(i.writeable_members) <= 2:
     public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)}) {
