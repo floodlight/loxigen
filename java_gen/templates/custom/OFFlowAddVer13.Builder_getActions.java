@@ -9,12 +9,11 @@
             return Collections.emptyList();
 //:: #endif
 //:: #endif
-        ImmutableList.Builder<OFAction> builder = ImmutableList.builder();
         for (OFInstruction inst : this.instructions) {
             if (inst instanceof OFInstructionApplyActions) {
                 OFInstructionApplyActions iap = (OFInstructionApplyActions)inst;
-                builder.addAll(iap.getActions());
+                return iap.getActions();
             }
         }
-        return builder.build();
+        return Collections.emptyList();
     }
