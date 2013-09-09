@@ -51,7 +51,7 @@ abstract class ${msg.name} {
 
     static class Reader implements OFMessageReader<${msg.interface.inherited_declaration()}> {
         @Override
-        public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
+        public ${msg.interface.inherited_declaration()} readFrom(ChannelBuffer bb) throws OFParseError {
 //:: if msg.is_fixed_length:
             if(bb.readableBytes() < LENGTH)
 //:: else:

@@ -31,4 +31,11 @@ public enum MatchFields {
     IPV6_SRC,
     IPV6_DST,
     IPV6_FLABEL,
+    ICMPV6_TYPE,
+    ICMPV6_CODE,
+    IPV6_ND_TARGET,
+    IPV6_ND_SLL,
+    IPV6_ND_TLL,
+    MPLS_LABEL,
+    MPLS_TC
 }
