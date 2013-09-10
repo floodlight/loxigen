@@ -71,7 +71,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     //:: #endif
 
     // Accessors for OF message fields
-    //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False)
+    //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False, has_parent=False)
 
     //:: if os.path.exists("%s/custom/%s.java" % (template_dir, msg.name)):
     //:: include("custom/%s.java" % msg.name, msg=msg)
@@ -95,7 +95,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             this.parentMessage = parentMessage;
         }
 
-//:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True)
+//:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True, has_parent=True)
 
         @Override
         public ${msg.interface.name} build() {
@@ -118,7 +118,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         private ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
 
-//:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True)
+//:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True, has_parent=False)
 //
         @Override
         public ${msg.interface.name} build() {
