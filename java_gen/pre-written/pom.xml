@@ -4,8 +4,8 @@
 
     <groupId>org.projectfloodlight</groupId>
     <artifactId>openflowj</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <version>0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <name>Loxi-Generated OpenFlow/J</name>
     <url>http://www.projectfloodlight.org/projects/</url>
