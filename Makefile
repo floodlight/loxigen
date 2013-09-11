@@ -43,6 +43,7 @@ LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
 INPUT_FILES = $(wildcard openflow_input/*)
 TEST_DATA = $(shell find test_data -name '*.data')
+OPENFLOWJ_WORKSPACE = openflowj-loxi
 
 all: c python
 
@@ -68,14 +69,19 @@ python-doc: python
 	@echo "HTML documentation output to ${LOXI_OUTPUT_DIR}/pyloxi-doc"
 
 java: .loxi_ts.java
+	mkdir -p ${OPENFLOWJ_WORKSPACE}
+	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_WORKSPACE}/pom.xml
+	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_WORKSPACE}/src
+	rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/src/ ${OPENFLOWJ_WORKSPACE}/gen-src
 
 .loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
 	touch $@
 
 java-eclipse: java
-	mkdir -p java-eclipse
-	rsync --checksum --delete -rv loxi_output/openflowj/ java_eclipse/
+	cd ${OPENFLOWJ_WORKSPACE} && mvn eclipse:eclipse
+	# Unfortunately, mvn eclipse:eclipse resolves the symlink, which doesn't work with eclipse
+	cd ${OPENFLOWJ_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
@@ -108,13 +114,17 @@ check-c: c
 	${LOXI_OUTPUT_DIR}/locitest/locitest
 
 check-java: java
-	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn compile test-compile test
+	cd ${OPENFLOWJ_WORKSPACE} && mvn compile test-compile test
 
 package-java: java
-	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn package
+	cd ${OPENFLOWJ_WORKSPACE} && mvn package
 
 deploy-java: java
-	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn deploy
+	cd ${OPENFLOWJ_WORKSPACE} && mvn deploy
+
+install-java: java
+	cd ${OPENFLOWJ_WORKSPACE} && mvn install
+
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
