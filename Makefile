@@ -113,6 +113,9 @@ check-java: java
 package-java: java
 	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn package
 
+deploy-java: java
+	cd ${LOXI_OUTPUT_DIR}/openflowj/ && mvn deploy
+
 pylint:
 	pylint -E ${LOXI_PY_FILES}
 
