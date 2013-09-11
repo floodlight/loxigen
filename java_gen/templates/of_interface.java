@@ -36,7 +36,7 @@ package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
 
-public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} extends OFObject${", %s" % msg.parent_interface if msg.parent_interface else ""}{
+public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} extends ${", ".join(msg.all_parent_interfaces)} {
 //:: for prop in msg.members:
     ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
