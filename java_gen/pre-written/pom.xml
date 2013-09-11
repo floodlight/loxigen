@@ -40,15 +40,64 @@
         <version>1.8</version>
         <executions>
             <execution>
+                <id>gen-src-add-source</id>
                 <phase>generate-sources</phase>
                 <goals><goal>add-source</goal></goals>
                 <configuration>
                     <sources>
-                        <source>../../java_gen/pre-written/src/main/java/</source>
+                        <source>gen-src/main/java</source>
+                    </sources>
+                </configuration>
+            </execution>
+            <execution>
+                <id>add-gen-src-test-source</id>
+                <!-- note: purposefully not using phase generate-test-sources,
+                     because that is not picked up by eclipse:eclipse -->
+                <phase>validate</phase>
+                <goals><goal>add-test-source</goal></goals>
+                <configuration>
+                    <sources>
+                        <source>gen-src/test/java</source>
                     </sources>
                 </configuration>
             </execution>
         </executions>
+    </plugin>
+    <!-- attach sources -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+            <execution>
+                <id>attach-sources</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <!-- attach javadoc -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <executions>
+            <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
     </plugin>
 </plugins>
 </build>
