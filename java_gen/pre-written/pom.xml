@@ -2,9 +2,9 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.openflow</groupId>
+    <groupId>org.projectfloodlight</groupId>
     <artifactId>openflowj</artifactId>
-    <version>2.0-SNAPSHOT</version>
+    <version>0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Loxi-Generated OpenFlow/J</name>
@@ -40,16 +40,77 @@
         <version>1.8</version>
         <executions>
             <execution>
+                <id>gen-src-add-source</id>
                 <phase>generate-sources</phase>
                 <goals><goal>add-source</goal></goals>
                 <configuration>
                     <sources>
-                        <source>../../java_gen/pre-written/src/main/java/</source>
+                        <source>gen-src/main/java</source>
+                    </sources>
+                </configuration>
+            </execution>
+            <execution>
+                <id>add-gen-src-test-source</id>
+                <!-- note: purposefully not using phase generate-test-sources,
+                     because that is not picked up by eclipse:eclipse -->
+                <phase>validate</phase>
+                <goals><goal>add-test-source</goal></goals>
+                <configuration>
+                    <sources>
+                        <source>gen-src/test/java</source>
                     </sources>
                 </configuration>
             </execution>
         </executions>
     </plugin>
+    <!-- attach sources -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>2.2.1</version>
+        <executions>
+            <execution>
+                <id>attach-sources</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <!-- attach javadoc -->
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.9.1</version>
+        <executions>
+            <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                    <goal>jar</goal>
+                </goals>
+            </execution>
+        </executions>
+    </plugin>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-eclipse-plugin</artifactId>
+        <configuration>
+            <downloadSources>true</downloadSources>
+            <downloadJavadocs>true</downloadJavadocs>
+        </configuration>
+    </plugin>
 </plugins>
 </build>
+<distributionManagement>
+  <repository>
+     <id>deployment</id>
+     <name>Internal Releases</name>
+     <url>http://10.197.128.18:8081/nexus/content/repositories/releases/</url>
+  </repository>
+  <snapshotRepository>
+     <id>deployment</id>
+     <name>Internal Releases</name>
+     <url>http://10.197.128.18:8081/nexus/content/repositories/snapshots/</url>
+  </snapshotRepository>
+</distributionManagement>
 </project>

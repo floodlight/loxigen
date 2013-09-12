@@ -70,7 +70,7 @@ abstract class ${msg.name} {
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
             ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-            if(${prop.name} != ${prop.value})
+            if(${prop.name} != ${prop.priv_value})
                 throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
 //:: elif prop.is_length_value:
             ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};

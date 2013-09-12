@@ -57,8 +57,6 @@ def gen_all_java(out, name):
     gen.create_of_const_enums()
     gen.create_of_factories()
 
-    with open('%s/README.java-lang' % os.path.dirname(__file__)) as readme_src:
-        out.writelines(readme_src.readlines())
     out.close()
 
 
@@ -157,6 +155,3 @@ def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
        into $basedir"""
     print "Copying pre-written files into %s" % basedir
-    #subprocess.call("cd java_gen/pre-written && tar cpf - pom.xml | ( cd ../../%s && tar xvpf - )" % basedir,
-    #        shell=True)
-    os.symlink(os.path.abspath("%s/pre-written/pom.xml" %  os.path.dirname(__file__)), "%s/pom.xml" % basedir)

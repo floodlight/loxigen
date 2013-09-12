@@ -51,7 +51,8 @@ class JavaModel(object):
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
     # OFUint structs are there for god-knows what in loci. We certainly don't need them.
     interface_blacklist = set( ("OFUint8", "OFUint32",))
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )))
+    read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
     OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
@@ -346,6 +347,24 @@ class JavaOFInterface(object):
         else:
             self.parent_interface = None
 
+    @property
+    @memoize
+    def all_parent_interfaces(self):
+        return [ "OFObject" ] + \
+               ([ self.parent_interface ] if self.parent_interface else [] )+ \
+               self.additional_parent_interfaces
+    @property
+    @memoize
+    def additional_parent_interfaces(self):
+        if loxi_utils.class_is_message(self.c_name) and not self.is_virtual:
+            m = re.match(r'(.*)Request$', self.name)
+            if m:
+                reply_name = m.group(1) + "Reply"
+                if model.interface_by_name(reply_name):
+                    return ["OFRequest<%s>" % reply_name ]
+        return []
+
+
     def is_instance_of(self, other_class):
         if self == other_class:
             return True
@@ -387,10 +406,12 @@ class JavaOFInterface(object):
             return ("", "OFStatsReply", None)
         elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod", None)
-        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name):
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name) and self.name != "OFBsnHeader":
             return ("", "OFBsnHeader", None)
-        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name):
+        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name) and self.name != "OFNiciraHeader":
             return ("", "OFNiciraHeader", None)
+        elif self.name == "OFBsnHeader" or self.name =="OFNiciraHeader":
+            return ("", "OFExperimenter", None)
         elif re.match(r'OFMatch.*', self.name):
             return ("", "Match", None)
         elif loxi_utils.class_is_message(self.c_name):
@@ -400,6 +421,8 @@ class JavaOFInterface(object):
                 return ("action", "OFActionBsn", None)
             elif re.match(r'OFActionNicira.+', self.name):
                 return ("action", "OFActionNicira", None)
+            elif self.name == "OFActionBsn" or self.name == "OFActionNicira":
+                return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
         elif re.match(r'OFBsnVport.+$', self.name):
@@ -450,7 +473,7 @@ class JavaOFInterface(object):
                 if of_member.name not in member_map:
                     member_map[of_member.name] = JavaMember.for_of_member(self, of_member)
 
-        return tuple(member_map.values())
+        return tuple(m for m in member_map.values() if m.name not in model.read_blacklist[self.name])
 
     @property
     def virtual_members(self):

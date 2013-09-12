@@ -608,7 +608,7 @@ struct of_experimenter : of_header {
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     uint32_t subtype;
     of_octets_t data;
 };
@@ -833,7 +833,7 @@ struct of_action_set_field : of_action {
 struct of_action_experimenter : of_action {
     uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
@@ -905,7 +905,7 @@ struct of_instruction_meter : of_instruction {
 struct of_instruction_experimenter : of_instruction {
     uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
@@ -1177,7 +1177,8 @@ struct of_flow_stats_entry {
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
-    pad(6);
+    uint16_t flags;
+    pad(4);
     uint64_t cookie;
     uint64_t packet_count;
     uint64_t byte_count;
@@ -1770,7 +1771,7 @@ struct of_meter_config {
 };
 
 struct of_experimenter_multipart_header {
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     uint32_t subtype;
 };
 
@@ -1802,7 +1803,7 @@ struct of_queue_prop_experimenter : of_queue_prop {
     uint16_t type == 65535;
     uint16_t len;
     pad(4);
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     pad(4);
     of_octets_t data;
 };
