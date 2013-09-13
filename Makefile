@@ -71,6 +71,7 @@ python-doc: python
 java: .loxi_ts.java
 	mkdir -p ${OPENFLOWJ_WORKSPACE}
 	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_WORKSPACE}/pom.xml
+	ln -sf ../java_gen/pre-written/LICENSE.txt ${OPENFLOWJ_WORKSPACE}/LICENSE.txt
 	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_WORKSPACE}/src
 	rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/src/ ${OPENFLOWJ_WORKSPACE}/gen-src
 
