@@ -90,8 +90,8 @@ builder.setXid(0x12345678)
             .setExact(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6)
             .setExact(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP)
             .setMasked(MatchField.IPV6_SRC, 
-                       IPv6.of(0x1CCAFE1CB1101C00l, 0x0028000000000000l),
-                       IPv6.of(0xFFFFFFFFFFF0FFFFl, 0x1C2C3C0000000000l))
+                       IPv6Address.of(0x1CCAFE1CB1101C00l, 0x0028000000000000l),
+                       IPv6Address.of(0xFFFFFFFFFFF0FFFFl, 0x1C2C3C0000000000l))
         	.build()
     )
     .setInstructions(

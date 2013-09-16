@@ -261,11 +261,11 @@ serial_num = JType('String') \
 table_name = JType('String') \
         .op(read='ChannelUtils.readFixedLengthString(bb, 32)', \
             write='ChannelUtils.writeFixedLengthString(bb, $name, 32)')
-ipv4 = JType("IPv4") \
-        .op(read="IPv4.read4Bytes(bb)", \
+ipv4 = JType("IPv4Address") \
+        .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)")
-ipv6 = JType("IPv6") \
-        .op(read="IPv6.read16Bytes(bb)", \
+ipv6 = JType("IPv6Address") \
+        .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)")
 packetin_reason = JType("OFPacketInReason")\
         .op(read="OFPacketInReasonSerializerVer$version.readFrom(bb)", write="OFPacketInReasonSerializerVer$version.writeTo(bb, $name)")
