@@ -580,7 +580,8 @@ class JavaOFClass(object):
     @property
     def is_fixed_length(self):
         """ true iff this class serializes to a fixed length on the wire """
-        return (self.ir_class.name, self.version.int_version) in of_g.is_fixed_length
+        return (self.ir_class.name, self.version.int_version) in of_g.is_fixed_length and \
+                not self.is_virtual
 
     def all_properties(self):
         return self.interface.members
