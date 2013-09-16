@@ -3,14 +3,14 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class IPv6WithMask extends Masked<IPv6Address> {
+public class IPv6AddressWithMask extends Masked<IPv6Address> {
 
-    private IPv6WithMask(IPv6Address value, IPv6Address mask) {
+    private IPv6AddressWithMask(IPv6Address value, IPv6Address mask) {
         super(value, mask);
     }
     
-    public static IPv6WithMask of(IPv6Address value, IPv6Address mask) {
-        return new IPv6WithMask(value, mask);
+    public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
+        return new IPv6AddressWithMask(value, mask);
     }
     
     @Override
@@ -31,7 +31,7 @@ public class IPv6WithMask extends Masked<IPv6Address> {
         return res.toString();
     }
     
-    public static IPv6WithMask of(final String string) {
+    public static IPv6AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
         int maskBits = 0;
@@ -64,10 +64,10 @@ public class IPv6WithMask extends Masked<IPv6Address> {
         
         if (maskAddress != null) {
             // Full address mask
-            return IPv6WithMask.of(ipv6, maskAddress);
+            return IPv6AddressWithMask.of(ipv6, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return IPv6WithMask.of(ipv6, IPv6Address.NO_MASK);
+            return IPv6AddressWithMask.of(ipv6, IPv6Address.NO_MASK);
         } else {
             // With mask
             BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);
@@ -83,7 +83,7 @@ public class IPv6WithMask extends Masked<IPv6Address> {
             } else {
                 maskBytes = maskBytesTemp;
             }
-            return IPv6WithMask.of(ipv6, IPv6Address.of(maskBytes));
+            return IPv6AddressWithMask.of(ipv6, IPv6Address.of(maskBytes));
         }
     }
 

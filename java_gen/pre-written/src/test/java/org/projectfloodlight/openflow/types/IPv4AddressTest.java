@@ -110,7 +110,7 @@ public class IPv4AddressTest {
     @Test
     public void testOfMasked() throws OFParseError {
         for (int i = 0; i < ipsWithMask.length; i++) {
-            IPv4WithMask value = IPv4WithMask.of(ipsWithMask[i]);
+            IPv4AddressWithMask value = IPv4AddressWithMask.of(ipsWithMask[i]);
             if (!hasMask[i]) {
                 IPv4Address ip = value.getValue();
                 assertArrayEquals(ipsWithMaskValues[i][0], ip.getBytes());

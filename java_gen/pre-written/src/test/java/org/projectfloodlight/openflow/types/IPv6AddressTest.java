@@ -57,14 +57,14 @@ public class IPv6AddressTest {
     @Test
     public void testMasked() throws UnknownHostException {
         for(int i=0; i < ipsWithMask.length; i++ ) {
-            IPv6WithMask value = IPv6WithMask.of(ipsWithMask[i]);
+            IPv6AddressWithMask value = IPv6AddressWithMask.of(ipsWithMask[i]);
             if (!hasMask[i]) {
                 IPv6Address ip = value.getValue();
                 InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i]);
 
                 assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
                 assertEquals(ipsWithMask[i], ip.toString());
-            } else if (value instanceof IPv6WithMask && hasMask[i]) {
+            } else if (value instanceof IPv6AddressWithMask && hasMask[i]) {
                 InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i].substring(0, ipsWithMask[i].indexOf('/')));
 
                 byte[] address = inetAddress.getAddress();
