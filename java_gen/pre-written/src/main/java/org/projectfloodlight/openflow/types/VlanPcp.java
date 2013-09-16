@@ -54,7 +54,7 @@ public class VlanPcp implements OFValueType<VlanPcp> {
     }
 
     public void writeByte(ChannelBuffer c) {
-        c.writeShort(this.pcp);
+        c.writeByte(this.pcp);
     }
 
     public static VlanPcp readByte(ChannelBuffer c) throws OFParseError {
