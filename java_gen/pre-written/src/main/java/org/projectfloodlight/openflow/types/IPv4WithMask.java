@@ -1,12 +1,12 @@
 package org.projectfloodlight.openflow.types;
 
-public class IPv4WithMask extends Masked<IPv4> {
+public class IPv4WithMask extends Masked<IPv4Address> {
 
     private IPv4WithMask(int rawValue, int rawMask) {
-        super(IPv4.of(rawValue), IPv4.of(rawMask));
+        super(IPv4Address.of(rawValue), IPv4Address.of(rawMask));
     }
     
-    private IPv4WithMask(IPv4 value, IPv4 mask) {
+    private IPv4WithMask(IPv4Address value, IPv4Address mask) {
         super(value, mask);
     }
     
@@ -14,23 +14,23 @@ public class IPv4WithMask extends Masked<IPv4> {
         return new IPv4WithMask(rawValue, rawMask);
     }
     
-    public static IPv4WithMask of(IPv4 value, IPv4 mask) {
+    public static IPv4WithMask of(IPv4Address value, IPv4Address mask) {
         return new IPv4WithMask(value, mask);
     }
     
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append(((IPv4)value).toString());
+        res.append(((IPv4Address)value).toString());
         
-        int maskint = ((IPv4)mask).getInt();
+        int maskint = ((IPv4Address)mask).getInt();
         res.append('/');
         if (Integer.bitCount((~maskint) + 1) == 1) {
             // CIDR notation
             res.append(Integer.bitCount(maskint));
         } else {
             // Full address mask
-            res.append(((IPv4)mask).toString());
+            res.append(((IPv4Address)mask).toString());
         }
         
         return res.toString();
@@ -40,7 +40,7 @@ public class IPv4WithMask extends Masked<IPv4> {
         int slashPos;
         String ip = string;
         int maskBits = 0;
-        IPv4 maskAddress = null;
+        IPv4Address maskAddress = null;
 
         // Read mask suffix
         if ((slashPos = string.indexOf('/')) != -1) {
@@ -51,7 +51,7 @@ public class IPv4WithMask extends Masked<IPv4> {
                     throw new IllegalArgumentException("IP Address not well formed: " + string);
                 if (suffix.indexOf('.') != -1) {
                     // Full mask
-                    maskAddress = IPv4.of(suffix);
+                    maskAddress = IPv4Address.of(suffix);
                 } else {
                     // CIDR Suffix
                     maskBits = Integer.parseInt(suffix);
@@ -65,18 +65,18 @@ public class IPv4WithMask extends Masked<IPv4> {
         }
         
         // Read IP
-        IPv4 ipv4 = IPv4.of(ip);
+        IPv4Address ipv4 = IPv4Address.of(ip);
         
         if (maskAddress != null) {
             // Full address mask
             return IPv4WithMask.of(ipv4, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return IPv4WithMask.of(ipv4, IPv4.NO_MASK);
+            return IPv4WithMask.of(ipv4, IPv4Address.NO_MASK);
         } else {
             // With mask
             int mask = (-1) << (32 - maskBits);
-            return IPv4WithMask.of(ipv4, IPv4.of(mask));
+            return IPv4WithMask.of(ipv4, IPv4Address.of(mask));
         }
     }
 

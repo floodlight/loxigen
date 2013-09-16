@@ -11,20 +11,20 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
  *
  * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
  */
-public class IPv6 implements OFValueType<IPv6> {
+public class IPv6Address implements OFValueType<IPv6Address> {
     static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;
 
-    public static final IPv6 NO_MASK = IPv6.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
-    public static final IPv6 FULL_MASK = IPv6.of(0x0, 0x0);
+    public static final IPv6Address NO_MASK = IPv6Address.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
+    public static final IPv6Address FULL_MASK = IPv6Address.of(0x0, 0x0);
 
-    private IPv6(final long raw1, final long raw2) {
+    private IPv6Address(final long raw1, final long raw2) {
         this.raw1 = raw1;
         this.raw2 = raw2;
     }
 
-    public static IPv6 of(final byte[] address) {
+    public static IPv6Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv6 address: " + address);
@@ -42,7 +42,7 @@ public class IPv6 implements OFValueType<IPv6> {
                         | (address[12] & 0xFFL) << 24 | (address[13] & 0xFFL) << 16
                         | (address[14] & 0xFFL) << 8 | (address[15]);
 
-        return IPv6.of(raw1, raw2);
+        return IPv6Address.of(raw1, raw2);
     }
 
     private static class IPv6Builder {
@@ -62,14 +62,14 @@ public class IPv6 implements OFValueType<IPv6> {
                 throw new IllegalArgumentException("16 bit word index must be in [0,7]");
         }
 
-        public IPv6 getIPv6() {
-            return IPv6.of(raw1, raw2);
+        public IPv6Address getIPv6() {
+            return IPv6Address.of(raw1, raw2);
         }
     }
 
     private final static Pattern colonPattern = Pattern.compile(":");
 
-    public static IPv6 of(final String string) {
+    public static IPv6Address of(final String string) {
         IPv6Builder builder = new IPv6Builder();
         String[] parts = colonPattern.split(string, -1);
 
@@ -122,8 +122,8 @@ public class IPv6 implements OFValueType<IPv6> {
         return builder.getIPv6();
     }
 
-    public static IPv6 of(final long raw1, final long raw2) {
-        return new IPv6(raw1, raw2);
+    public static IPv6Address of(final long raw1, final long raw2) {
+        return new IPv6Address(raw1, raw2);
     }
 
     volatile byte[] bytesCache = null;
@@ -265,7 +265,7 @@ public class IPv6 implements OFValueType<IPv6> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        IPv6 other = (IPv6) obj;
+        IPv6Address other = (IPv6Address) obj;
         if (raw1 != other.raw1)
             return false;
         if (raw2 != other.raw2)
@@ -278,12 +278,12 @@ public class IPv6 implements OFValueType<IPv6> {
         c.writeLong(this.raw2);
     }
 
-    public static IPv6 read16Bytes(ChannelBuffer c) throws OFParseError {
-        return IPv6.of(c.readLong(), c.readLong());
+    public static IPv6Address read16Bytes(ChannelBuffer c) throws OFParseError {
+        return IPv6Address.of(c.readLong(), c.readLong());
     }
 
     @Override
-    public IPv6 applyMask(IPv6 mask) {
-        return IPv6.of(this.raw1 & mask.raw1, this.raw2 & mask.raw2);
+    public IPv6Address applyMask(IPv6Address mask) {
+        return IPv6Address.of(this.raw1 & mask.raw1, this.raw2 & mask.raw2);
     }
 }

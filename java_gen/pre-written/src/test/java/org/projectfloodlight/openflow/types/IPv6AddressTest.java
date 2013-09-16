@@ -12,7 +12,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
-public class IPv6Test {
+public class IPv6AddressTest {
 
     String[] testStrings = {
             "::",
@@ -59,7 +59,7 @@ public class IPv6Test {
         for(int i=0; i < ipsWithMask.length; i++ ) {
             IPv6WithMask value = IPv6WithMask.of(ipsWithMask[i]);
             if (!hasMask[i]) {
-                IPv6 ip = value.getValue();
+                IPv6Address ip = value.getValue();
                 InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i]);
 
                 assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
@@ -84,7 +84,7 @@ public class IPv6Test {
     @Test
     public void testOfString() throws UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
-            IPv6 ip = IPv6.of(testStrings[i]);
+            IPv6Address ip = IPv6Address.of(testStrings[i]);
             InetAddress inetAddress = InetAddress.getByName(testStrings[i]);
 
             assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
@@ -96,7 +96,7 @@ public class IPv6Test {
     public void testOfByteArray() throws UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
-            IPv6 ip = IPv6.of(bytes);
+            IPv6Address ip = IPv6Address.of(bytes);
             assertEquals(testStrings[i], ip.toString());
             assertArrayEquals(bytes, ip.getBytes());
         }
@@ -106,7 +106,7 @@ public class IPv6Test {
     public void testReadFrom() throws OFParseError, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
-            IPv6 ip = IPv6.read16Bytes(ChannelBuffers.copiedBuffer(bytes));
+            IPv6Address ip = IPv6Address.read16Bytes(ChannelBuffers.copiedBuffer(bytes));
             assertEquals(testStrings[i], ip.toString());
             assertArrayEquals(bytes, ip.getBytes());
         }
@@ -128,7 +128,7 @@ public class IPv6Test {
     public void testInvalidIPs() throws OFParseError {
         for(String invalid : invalidIPs) {
             try {
-                IPv6.of(invalid);
+                IPv6Address.of(invalid);
                 fail("Invalid IP "+invalid+ " should have raised IllegalArgumentException");
             } catch(IllegalArgumentException e) {
                 // ok
@@ -138,10 +138,10 @@ public class IPv6Test {
 
     @Test
     public void testZeroCompression() throws OFParseError {
-        assertEquals("::", IPv6.of("::").toString(true, false));
-        assertEquals("0:0:0:0:0:0:0:0", IPv6.of("::").toString(false, false));
-        assertEquals("0000:0000:0000:0000:0000:0000:0000:0000", IPv6.of("::").toString(false, true));
-        assertEquals("1::4:5:6:0:8", IPv6.of("1:0:0:4:5:6:0:8").toString(true, false));
-        assertEquals("1:0:0:4::8", IPv6.of("1:0:0:4:0:0:0:8").toString(true, false));
+        assertEquals("::", IPv6Address.of("::").toString(true, false));
+        assertEquals("0:0:0:0:0:0:0:0", IPv6Address.of("::").toString(false, false));
+        assertEquals("0000:0000:0000:0000:0000:0000:0000:0000", IPv6Address.of("::").toString(false, true));
+        assertEquals("1::4:5:6:0:8", IPv6Address.of("1:0:0:4:5:6:0:8").toString(true, false));
+        assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8").toString(true, false));
     }
 }
