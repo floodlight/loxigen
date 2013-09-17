@@ -586,7 +586,7 @@ struct of_flow_mod : of_header {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -603,7 +603,7 @@ struct of_flow_add : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -620,7 +620,7 @@ struct of_flow_modify : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -637,7 +637,7 @@ struct of_flow_modify_strict : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -654,7 +654,7 @@ struct of_flow_delete : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -671,7 +671,7 @@ struct of_flow_delete_strict : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
