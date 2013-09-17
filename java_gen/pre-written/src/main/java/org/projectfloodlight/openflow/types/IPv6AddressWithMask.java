@@ -3,39 +3,39 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class IPv6WithMask extends Masked<IPv6> {
+public class IPv6AddressWithMask extends Masked<IPv6Address> {
 
-    private IPv6WithMask(IPv6 value, IPv6 mask) {
+    private IPv6AddressWithMask(IPv6Address value, IPv6Address mask) {
         super(value, mask);
     }
     
-    public static IPv6WithMask of(IPv6 value, IPv6 mask) {
-        return new IPv6WithMask(value, mask);
+    public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
+        return new IPv6AddressWithMask(value, mask);
     }
     
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append(((IPv6)value).toString());
+        res.append(((IPv6Address)value).toString());
         res.append('/');
         
-        BigInteger maskint = new BigInteger(((IPv6)mask).getBytes());
+        BigInteger maskint = new BigInteger(((IPv6Address)mask).getBytes());
         if (maskint.not().add(BigInteger.ONE).bitCount() == 1) {
             // CIDR notation
             res.append(maskint.bitCount());
         } else {
             // Full address mask
-            res.append(((IPv6)mask).toString());
+            res.append(((IPv6Address)mask).toString());
         }
         
         return res.toString();
     }
     
-    public static IPv6WithMask of(final String string) {
+    public static IPv6AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
         int maskBits = 0;
-        IPv6 maskAddress = null;
+        IPv6Address maskAddress = null;
 
         // Read mask suffix
         if ((slashPos = string.indexOf('/')) != -1) {
@@ -46,7 +46,7 @@ public class IPv6WithMask extends Masked<IPv6> {
                     throw new IllegalArgumentException("IPv6 Address not well formed: " + string);
                 if (suffix.indexOf(':') != -1) {
                     // Full mask
-                    maskAddress = IPv6.of(suffix);
+                    maskAddress = IPv6Address.of(suffix);
                 } else {
                     // CIDR Suffix
                     maskBits = Integer.parseInt(suffix);
@@ -60,14 +60,14 @@ public class IPv6WithMask extends Masked<IPv6> {
         }
         
         // Read IP
-        IPv6 ipv6 = IPv6.of(ip);
+        IPv6Address ipv6 = IPv6Address.of(ip);
         
         if (maskAddress != null) {
             // Full address mask
-            return IPv6WithMask.of(ipv6, maskAddress);
+            return IPv6AddressWithMask.of(ipv6, maskAddress);
         } else if (maskBits == 0) {
             // No mask
-            return IPv6WithMask.of(ipv6, IPv6.NO_MASK);
+            return IPv6AddressWithMask.of(ipv6, IPv6Address.NO_MASK);
         } else {
             // With mask
             BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);
@@ -83,7 +83,7 @@ public class IPv6WithMask extends Masked<IPv6> {
             } else {
                 maskBytes = maskBytesTemp;
             }
-            return IPv6WithMask.of(ipv6, IPv6.of(maskBytes));
+            return IPv6AddressWithMask.of(ipv6, IPv6Address.of(maskBytes));
         }
     }
 

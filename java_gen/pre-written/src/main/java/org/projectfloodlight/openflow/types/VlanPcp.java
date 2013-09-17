@@ -10,7 +10,7 @@ public class VlanPcp implements OFValueType<VlanPcp> {
 
     private final byte pcp;
 
-    public static final VlanPcp NO_MASK = VlanPcp.of((byte)0xFF);
+    public static final VlanPcp NO_MASK = new VlanPcp((byte)0xFF);
     public static final VlanPcp FULL_MASK = VlanPcp.of((byte)0x0);
 
     private VlanPcp(byte pcp) {
@@ -54,7 +54,7 @@ public class VlanPcp implements OFValueType<VlanPcp> {
     }
 
     public void writeByte(ChannelBuffer c) {
-        c.writeShort(this.pcp);
+        c.writeByte(this.pcp);
     }
 
     public static VlanPcp readByte(ChannelBuffer c) throws OFParseError {

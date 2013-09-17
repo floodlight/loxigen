@@ -5,38 +5,38 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 
 /**
- * Wrapper around an IPv4 address
+ * Wrapper around an IPv4Address address
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4 implements OFValueType<IPv4> {
+public class IPv4Address implements OFValueType<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
-    
-    public static final IPv4 NO_MASK = IPv4.of(0xFFFFFFFF);
-    public static final IPv4 FULL_MASK = IPv4.of(0x00000000);
 
-    private IPv4(final int rawValue) {
+    public static final IPv4Address NO_MASK = IPv4Address.of(0xFFFFFFFF);
+    public static final IPv4Address FULL_MASK = IPv4Address.of(0x00000000);
+
+    private IPv4Address(final int rawValue) {
         this.rawValue = rawValue;
     }
 
-    public static IPv4 of(final byte[] address) {
+    public static IPv4Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv4 address: " + address);
+                    "Invalid byte array length for IPv4Address address: " + address);
         }
 
         int raw =
                 (address[0] & 0xFF) << 24 | (address[1] & 0xFF) << 16
                         | (address[2] & 0xFF) << 8 | (address[3] & 0xFF) << 0;
-        return IPv4.of(raw);
+        return IPv4Address.of(raw);
     }
 
-    public static IPv4 of(final int raw) {
-        return new IPv4(raw);
+    public static IPv4Address of(final int raw) {
+        return new IPv4Address(raw);
     }
 
-    public static IPv4 of(final String string) {
+    public static IPv4Address of(final String string) {
         int start = 0;
         int shift = 24;
 
@@ -57,7 +57,7 @@ public class IPv4 implements OFValueType<IPv4> {
             shift -= 8;
             start = end + 1;
         }
-        return IPv4.of(raw);
+        return IPv4Address.of(raw);
     }
 
     public int getInt() {
@@ -112,24 +112,24 @@ public class IPv4 implements OFValueType<IPv4> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        IPv4 other = (IPv4) obj;
+        IPv4Address other = (IPv4Address) obj;
         if (rawValue != other.rawValue)
             return false;
         return true;
     }
-    
+
     public void write4Bytes(ChannelBuffer c) {
         c.writeInt(rawValue);
     }
-    
-    public static IPv4 read4Bytes(ChannelBuffer c) {
-        return IPv4.of(c.readInt());
+
+    public static IPv4Address read4Bytes(ChannelBuffer c) {
+        return IPv4Address.of(c.readInt());
     }
 
     @Override
-    public IPv4 applyMask(IPv4 mask) {
-        return IPv4.of(this.rawValue & mask.rawValue);
+    public IPv4Address applyMask(IPv4Address mask) {
+        return IPv4Address.of(this.rawValue & mask.rawValue);
     }
 
-    
+
 }
