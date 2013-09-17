@@ -8,7 +8,7 @@ import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
-public class IPv4Test {
+public class IPv4AddressTest {
     byte[][] testAddresses = new byte[][] {
             {0x01, 0x02, 0x03, 0x04 },
             {127, 0, 0, 1},
@@ -67,7 +67,7 @@ public class IPv4Test {
     @Test
     public void testOfString() {
         for(int i=0; i < testAddresses.length; i++ ) {
-            IPv4 ip = IPv4.of(testStrings[i]);
+            IPv4Address ip = IPv4Address.of(testStrings[i]);
             assertEquals(testInts[i], ip.getInt());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());
@@ -77,7 +77,7 @@ public class IPv4Test {
     @Test
     public void testOfByteArray() {
         for(int i=0; i < testAddresses.length; i++ ) {
-            IPv4 ip = IPv4.of(testAddresses[i]);
+            IPv4Address ip = IPv4Address.of(testAddresses[i]);
             assertEquals(testInts[i], ip.getInt());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());
@@ -87,7 +87,7 @@ public class IPv4Test {
     @Test
     public void testReadFrom() throws OFParseError {
         for(int i=0; i < testAddresses.length; i++ ) {
-            IPv4 ip = IPv4.read4Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
+            IPv4Address ip = IPv4Address.read4Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getInt());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());
@@ -99,7 +99,7 @@ public class IPv4Test {
     public void testInvalidIPs() throws OFParseError {
         for(String invalid : invalidIPs) {
             try {
-                IPv4.of(invalid);
+                IPv4Address.of(invalid);
                 fail("Invalid IP "+invalid+ " should have raised IllegalArgumentException");
             } catch(IllegalArgumentException e) {
                 // ok
@@ -110,9 +110,9 @@ public class IPv4Test {
     @Test
     public void testOfMasked() throws OFParseError {
         for (int i = 0; i < ipsWithMask.length; i++) {
-            IPv4WithMask value = IPv4WithMask.of(ipsWithMask[i]);
+            IPv4AddressWithMask value = IPv4AddressWithMask.of(ipsWithMask[i]);
             if (!hasMask[i]) {
-                IPv4 ip = value.getValue();
+                IPv4Address ip = value.getValue();
                 assertArrayEquals(ipsWithMaskValues[i][0], ip.getBytes());
             } else if (hasMask[i]) {
                 byte[] ipBytes = new byte[4];
