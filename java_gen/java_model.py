@@ -137,7 +137,8 @@ class JavaModel(object):
 
         @property
         def getter_name(self):
-            return "get"+self.name
+            prefix = "is" if self.type == java_type.boolean else "get"
+            return prefix+self.name
 
     def gen_port_speed(enum_entry):
         splits = enum_entry.name.split("_")
@@ -147,8 +148,16 @@ class JavaModel(object):
                 return "PortSpeed.SPEED_{}".format(splits[1])
         return "PortSpeed.SPEED_NONE";
 
+    def gen_stp_state(enum_entry):
+        splits = enum_entry.name.split("_")
+        if len(splits)>=1:
+            if splits[0] == "STP":
+                return "true"
+        return "false"
+
     enum_metadata_map = defaultdict(lambda: (),
-            OFPortFeatures = ( OFEnumMetadata("PortSpeed", java_type.port_speed, gen_port_speed), )
+            OFPortFeatures = ( OFEnumMetadata("PortSpeed", java_type.port_speed, gen_port_speed), ),
+            OFPortState = ( OFEnumMetadata("StpState", java_type.boolean, gen_stp_state), )
     )
 
     @property
