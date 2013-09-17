@@ -1,9 +1,12 @@
 import errno
-import loxi_utils.loxi_utils as loxi_utils
 import os
 import re
 import subprocess
 import time
+
+from generic_utils import memoize
+import loxi_utils.loxi_utils as loxi_utils
+import of_g
 
 def erase_type_annotation(class_name):
     m=re.match(r'(.*)<.*>', class_name)
@@ -23,7 +26,9 @@ def name_c_to_camel(name):
 def name_c_to_caps_camel(name):
     """ 'of_stats_reply' to 'OFStatsReply' """
     camel = name_c_to_camel(name.title())
-    if camel.startswith('Of'):
+    if camel.startswith('Ofp'):
+        return camel.replace('Ofp','OF',1)
+    elif camel.startswith('Of'):
         return camel.replace('Of','OF',1)
     else:
         return camel
@@ -394,6 +399,21 @@ exceptions = {
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
 }
 
+
+@memoize
+def enum_java_types():
+    enum_types = {}
+
+    for protocol in of_g.ir.values():
+        for enum in protocol.enums:
+            java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
+            java_type = java_name if not enum.is_bitmask else "Set<{}>".format(java_name)
+            enum_types[enum.name] = \
+                    JType(java_type)\
+                      .op(read = "{}SerializerVer$version.readFrom(bb)".format(java_name),
+                          write ="{}SerializerVer$version.writeTo(bb, $name)".format(java_name))
+    return enum_types
+
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
@@ -413,6 +433,7 @@ def make_standard_list_jtype(c_type):
         .op(
             read= 'ChannelUtils.readList(bb, $length, OF%sVer$version.READER)' % java_base_name, \
             write='ChannelUtils.writeList(bb, $name)')
+
 
 
 #### main entry point for conversion of LOXI types (c_types) Java types.
@@ -437,6 +458,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):
         return make_standard_list_jtype(c_type)
+    elif c_type in enum_java_types():
+        return enum_java_types()[c_type]
     else:
         print "WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name)
         jtype = name_c_to_caps_camel(re.sub(r'_t$', "", c_type))
