@@ -37,12 +37,12 @@
 ::     if type(m) == OFPadMember:
         reader.skip(${m.length})
 ::     elif type(m) == OFLengthMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader')}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
 ::     elif type(m) == OFFieldLengthMember:
 ::         field_length_members[m.field_name] = m
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader')}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
 ::     elif type(m) == OFTypeMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader')}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
         assert(_${m.name} == ${m.value})
 ::     elif type(m) == OFDataMember:
 ::         if m.name in field_length_members:
@@ -50,7 +50,7 @@
 ::         else:
 ::             reader_expr = 'reader'
 ::         #endif
-        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr)}
+        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
 ::     #endif
 :: #endfor
 :: if ofclass.has_external_alignment or ofclass.has_internal_alignment:

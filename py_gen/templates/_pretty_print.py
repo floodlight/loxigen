@@ -24,6 +24,7 @@
 :: # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
+:: import loxi_utils.loxi_utils as loxi_utils
 ::
         q.text("${ofclass.pyname} {")
         with q.group():
@@ -52,7 +53,7 @@
                 q.text(util.pretty_wildcards(self.${m.name}))
 :: elif m.oftype == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
-:: elif m.oftype.startswith("uint"):
+:: elif loxi_utils.lookup_ir_wiretype(m.oftype, version=version).startswith("uint"):
                 q.text("%#x" % self.${m.name})
 :: else:
                 q.pp(self.${m.name})
