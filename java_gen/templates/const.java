@@ -33,11 +33,35 @@
 
 package ${package};
 
-import org.projectfloodlight.openflow.protocol.OFVersion;
+//:: include("_imports.java", msg=enum)
 
 public enum ${class_name} {
 //:: for i, entry in enumerate(enum.entries):
-     ${entry.name}${ ", " if i < len(enum.entries)-1 else ";" }
+//::    if enum.metadata:
+//::        params = "({})".format(", ".join(entry.constructor_params))
+//::    else:
+//::        params = ""
+//::    #endif
+     ${entry.name}${params}${ ", " if i < len(enum.entries)-1 else ";" }
 //:: #endfor
 
+//:: if enum.metadata:
+//:: for metadata in enum.metadata:
+     private final ${metadata.type.public_type} ${metadata.variable_name};
+//:: #endfor
+
+     private ${class_name}(${", ".join("{} {}".format(m.type.public_type, m.variable_name) for m in enum.metadata)}) {
+     //:: for metadata in enum.metadata:
+        this.${metadata.variable_name} = ${metadata.variable_name};
+     //:: #endfor
+     }
+
+//:: for metadata in enum.metadata:
+     public ${metadata.type.public_type} ${metadata.getter_name}() {
+         return ${metadata.variable_name};
+     }
+//:: #endfor
+
+
+//:: #endif
 }

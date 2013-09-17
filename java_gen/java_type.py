@@ -305,6 +305,7 @@ oxm_list = JType("OFOxmList") \
 meter_features = JType("OFMeterFeatures")\
         .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
 
+port_speed = JType("PortSpeed")
 boolean = JType("boolean")
 
 generic_t = JType("T")
