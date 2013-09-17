@@ -130,6 +130,27 @@ class JavaModel(object):
                 "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
                 }
 
+    class OFEnumMetadata(namedtuple("OFEnumMetadata", ("name", "type", "value"))):
+        @property
+        def variable_name(self):
+            return self.name[0].lower() + self.name[1:]
+
+        @property
+        def getter_name(self):
+            return "get"+self.name
+
+    def gen_port_speed(enum_entry):
+        splits = enum_entry.name.split("_")
+        if len(splits)>=2:
+            m = re.match(r'\d+[MGTP]B', splits[1])
+            if m:
+                return "PortSpeed.SPEED_{}".format(splits[1])
+        return "PortSpeed.SPEED_NONE";
+
+    enum_metadata_map = defaultdict(lambda: (),
+            OFPortFeatures = ( OFEnumMetadata("PortSpeed", java_type.port_speed, gen_port_speed), )
+    )
+
     @property
     @memoize
     def versions(self):
@@ -979,6 +1000,8 @@ class JavaEnum(object):
         self.entries = [ e for e in self.entries if e.name not in model.enum_entry_blacklist[self.name] ]
         self.package = "org.projectfloodlight.openflow.protocol"
 
+        self.metadata = model.enum_metadata_map[self.name]
+
     def wire_type(self, version):
         ir_enum = self.version_enums[version]
         if "wire_type" in ir_enum.params:
@@ -1020,6 +1043,10 @@ class JavaEnumEntry(object):
         self.enum = enum
         self.name = enum.name_prefix + "_".join(name.split("_")[1:]).upper()
         self.values = values
+
+    @property
+    def constructor_params(self):
+        return [ m.value(self) for m in self.enum.metadata ]
 
     def has_value(self, version):
         return version in self.values
