@@ -157,4 +157,9 @@ class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
     def values(self):
         return [(e.name, e.value) for e in self.entries]
 
+    @property
+    def is_bitmask(self):
+        return "bitmask" in self.params and self.params['bitmask']
+
+
 OFEnumEntry = namedtuple('OFEnumEntry', ['name', 'value', 'params'])
