@@ -230,8 +230,8 @@ instructions_list = JType('List<OFInstruction>') \
             write='ChannelUtils.writeList(bb, $name)')
 buckets_list = JType('List<OFBucket>') \
         .op(read='ChannelUtils.readList(bb, $length, OFBucketVer$version.READER)', write='ChannelUtils.writeList(bb, $name)')
-port_desc_list = JType('List<OFPhysicalPort>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFPhysicalPort.READER)', write='ChannelUtils.writeList(bb, $name)')
+port_desc_list = JType('List<OFPortDesc>') \
+        .op(read='ChannelUtils.readList(bb, $length, OFPortDescVer$version.READER)', write='ChannelUtils.writeList(bb, $name)')
 port_desc = JType('OFPortDesc') \
         .op(read='OFPortDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
