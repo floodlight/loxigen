@@ -130,7 +130,7 @@ class JavaModel(object):
                 "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
                 }
 
-    class OFEnumMetadata(namedtuple("OFEnumMetadata", ("name", "type", "value"))):
+    class OFEnumPropertyMetadata(namedtuple("OFEnumPropertyMetadata", ("name", "type", "value"))):
         @property
         def variable_name(self):
             return self.name[0].lower() + self.name[1:]
@@ -140,6 +140,8 @@ class JavaModel(object):
             prefix = "is" if self.type == java_type.boolean else "get"
             return prefix+self.name
 
+    OFEnumMetadata = namedtuple("OFEnumMetadata", ("properties", "to_string"))
+
     def gen_port_speed(enum_entry):
         splits = enum_entry.name.split("_")
         if len(splits)>=2:
@@ -148,6 +150,26 @@ class JavaModel(object):
                 return "PortSpeed.SPEED_{}".format(splits[1])
         return "PortSpeed.SPEED_NONE";
 
+
+    port_features_to_string_map = {
+        "PF_10MB_HD":       "10mb-hd",
+        "PF_10MB_FD":       "10mb-fd",
+        "PF_100MB_HD":      "100mb-hd",
+        "PF_100MB_FD":      "100mb-fd",
+        "PF_1GB_HD":        "1gb-hd",
+        "PF_1GB_FD":        "1gb-fd",
+        "PF_10GB_FD":       "10gb-fd",
+        "PF_40GB_FD":       "40gb-fd",
+        "PF_100GB_FD":      "100gb-fd",
+        "PF_1TB_FD":        "1tb-fd",
+        "PF_COPPER":        "copper",
+        "PF_FIBER":         "fiber",
+        "PF_AUTONEG":       "autoneg",
+        "PF_PAUSE":         "pause",
+        "PF_PAUSE_ASYM":    "pause-asym",
+        "PF_OTHER":         "other",
+    }
+
     def gen_stp_state(enum_entry):
         splits = enum_entry.name.split("_")
         if len(splits)>=1:
@@ -155,9 +177,30 @@ class JavaModel(object):
                 return "true"
         return "false"
 
-    enum_metadata_map = defaultdict(lambda: (),
-            OFPortFeatures = ( OFEnumMetadata("PortSpeed", java_type.port_speed, gen_port_speed), ),
-            OFPortState = ( OFEnumMetadata("StpState", java_type.boolean, gen_stp_state), )
+    port_state_to_string_map = {
+        "STP_LISTEN":   "listen",
+        "LINK_DOWN":    "link-down",
+        "STP_LEARN":    "learn-no-relay",
+        "STP_FORWARD":  "forward",
+        "STP_BLOCK":    "block-broadcast",
+        "BLOCKED":      "blocked",
+        "LIVE":         "live"
+    }
+
+    port_config_to_string_map = {
+        "PORT_DOWN":        "port-down",
+        "NO_STP":           "no-stp",
+        "NO_RECV":          "no-recv",
+        "NO_RECV_STP":      "no-recv-stp",
+        "NO_FLOOD":         "no-flood",
+        "NO_FWD":           "no-fwd",
+        "NO_PACKET_IN":     "no-pkt-in",
+    }
+
+    enum_metadata_map = defaultdict(lambda: JavaModel.OFEnumMetadata((), None),
+            OFPortFeatures = OFEnumMetadata((OFEnumPropertyMetadata("PortSpeed", java_type.port_speed, gen_port_speed),), lambda e: JavaModel.port_features_to_string_map.get(e.name)),
+            OFPortState = OFEnumMetadata((OFEnumPropertyMetadata("StpState", java_type.boolean, gen_stp_state),), lambda e: JavaModel.port_state_to_string_map.get(e.name)),
+            OFPortConfig = OFEnumMetadata((), lambda e: JavaModel.port_config_to_string_map.get(e.name))
     )
 
     @property
@@ -1055,7 +1098,7 @@ class JavaEnumEntry(object):
 
     @property
     def constructor_params(self):
-        return [ m.value(self) for m in self.enum.metadata ]
+        return [ m.value(self) for m in self.enum.metadata.properties ]
 
     def has_value(self, version):
         return version in self.values
