@@ -91,21 +91,21 @@ struct of_packet_queue {
                 ['OFPPC_NO_PACKET_IN', [], 64]]],
             ['metadata', 'version', '2'],
             ['struct', 'of_echo_reply', [['align', '8']], None, [
-                ['data', 'uint8_t', 'version'],
-                ['type', 'uint8_t', 'type', 3],
-                ['data', 'uint16_t', 'length'],
-                ['data', 'uint32_t', 'xid'],
-                ['data', 'of_octets_t', 'data']]],
+                ['data', ['scalar', 'uint8_t'], 'version'],
+                ['type', ['scalar', 'uint8_t'], 'type', 3],
+                ['data', ['scalar', 'uint16_t'], 'length'],
+                ['data', ['scalar', 'uint32_t'], 'xid'],
+                ['data', ['scalar', 'of_octets_t'], 'data']]],
             ['enum', 'ofp_queue_op_failed_code',
                 [['wire_type', 'uint32'], ['bitmask','False'], ['complete', 'True']], [
                 ['OFPQOFC_BAD_PORT', [], 0],
                 ['OFPQOFC_BAD_QUEUE', [], 1],
                 ['OFPQOFC_EPERM', [], 2]]],
             ['struct', 'of_packet_queue', [], None, [
-                ['data', 'uint32_t', 'queue_id'],
-                ['data', 'uint16_t', 'len'],
+                ['data', ['scalar', 'uint32_t'], 'queue_id'],
+                ['data', ['scalar', 'uint16_t'], 'len'],
                 ['pad', 2],
-                ['data', 'list(of_queue_prop_t)', 'properties']]],
+                ['data', ['list', 'list(of_queue_prop_t)'], 'properties']]],
         ]
         self.assertEquals(expected_ast, ast)
 
@@ -167,15 +167,15 @@ struct of_queue_prop_min_rate : of_queue_prop {
             ['metadata', 'version', '1'],
 
             ['struct', 'of_queue_prop', [], None, [
-                ['discriminator', 'uint16_t', 'type'],
-                ['data', 'uint16_t', 'len'],
+                ['discriminator', ['scalar', 'uint16_t'], 'type'],
+                ['data', ['scalar', 'uint16_t'], 'len'],
                 ['pad', 4]]],
 
             ['struct', 'of_queue_prop_min_rate', [], 'of_queue_prop', [
-                ['type', 'uint16_t', 'type', 1],
-                ['data', 'uint16_t', 'len'],
+                ['type', ['scalar', 'uint16_t'], 'type', 1],
+                ['data', ['scalar', 'uint16_t'], 'len'],
                 ['pad', 4],
-                ['data', 'uint16_t', 'rate'],
+                ['data', ['scalar', 'uint16_t'], 'rate'],
                 ['pad', 6]]],
         ]
         self.assertEquals(expected_ast, ast)
