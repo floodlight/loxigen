@@ -130,14 +130,17 @@ class JavaModel(object):
                 "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
                 }
 
-    class OFEnumMetadata(namedtuple("OFEnumMetadata", ("name", "type", "value"))):
+    class OFEnumPropertyMetadata(namedtuple("OFEnumPropertyMetadata", ("name", "type", "value"))):
         @property
         def variable_name(self):
             return self.name[0].lower() + self.name[1:]
 
         @property
         def getter_name(self):
-            return "get"+self.name
+            prefix = "is" if self.type == java_type.boolean else "get"
+            return prefix+self.name
+
+    OFEnumMetadata = namedtuple("OFEnumMetadata", ("properties", "to_string"))
 
     def gen_port_speed(enum_entry):
         splits = enum_entry.name.split("_")
@@ -147,8 +150,16 @@ class JavaModel(object):
                 return "PortSpeed.SPEED_{}".format(splits[1])
         return "PortSpeed.SPEED_NONE";
 
-    enum_metadata_map = defaultdict(lambda: (),
-            OFPortFeatures = ( OFEnumMetadata("PortSpeed", java_type.port_speed, gen_port_speed), )
+    def gen_stp_state(enum_entry):
+        splits = enum_entry.name.split("_")
+        if len(splits)>=1:
+            if splits[0] == "STP":
+                return "true"
+        return "false"
+
+    enum_metadata_map = defaultdict(lambda: JavaModel.OFEnumMetadata((), None),
+            OFPortFeatures = OFEnumMetadata((OFEnumPropertyMetadata("PortSpeed", java_type.port_speed, gen_port_speed),), None),
+            OFPortState = OFEnumMetadata((OFEnumPropertyMetadata("StpState", java_type.boolean, gen_stp_state),), None),
     )
 
     @property
@@ -1046,7 +1057,7 @@ class JavaEnumEntry(object):
 
     @property
     def constructor_params(self):
-        return [ m.value(self) for m in self.enum.metadata ]
+        return [ m.value(self) for m in self.enum.metadata.properties ]
 
     def has_value(self, version):
         return version in self.values

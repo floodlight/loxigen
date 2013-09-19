@@ -36,32 +36,42 @@ package ${package};
 //:: include("_imports.java", msg=enum)
 
 public enum ${class_name} {
+
 //:: for i, entry in enumerate(enum.entries):
-//::    if enum.metadata:
+//::    if enum.metadata.properties:
 //::        params = "({})".format(", ".join(entry.constructor_params))
 //::    else:
 //::        params = ""
 //::    #endif
-     ${entry.name}${params}${ ", " if i < len(enum.entries)-1 else ";" }
+//::    delimiter = ", " if i < len(enum.entries)-1 else ";"
+//::    to_string_value = enum.metadata.to_string(entry) if enum.metadata.to_string else None
+//::    if to_string_value:
+     ${entry.name}${params} {
+         @Override
+         public String toString() {
+            return "${to_string_value}";
+         }
+     }${delimiter}
+//::    else:
+     ${entry.name}${params}${delimiter}
+//::    #endif
+//:: #endfor
+//:: if enum.metadata.properties:
+
+//:: for property_metadata in enum.metadata.properties:
+     private final ${property_metadata.type.public_type} ${property_metadata.variable_name};
 //:: #endfor
 
-//:: if enum.metadata:
-//:: for metadata in enum.metadata:
-     private final ${metadata.type.public_type} ${metadata.variable_name};
-//:: #endfor
-
-     private ${class_name}(${", ".join("{} {}".format(m.type.public_type, m.variable_name) for m in enum.metadata)}) {
-     //:: for metadata in enum.metadata:
-        this.${metadata.variable_name} = ${metadata.variable_name};
+     private ${class_name}(${", ".join("{} {}".format(m.type.public_type, m.variable_name) for m in enum.metadata.properties)}) {
+     //:: for property_metadata in enum.metadata.properties:
+        this.${property_metadata.variable_name} = ${property_metadata.variable_name};
      //:: #endfor
      }
+//:: for property_metadata in enum.metadata.properties:
 
-//:: for metadata in enum.metadata:
-     public ${metadata.type.public_type} ${metadata.getter_name}() {
-         return ${metadata.variable_name};
+     public ${property_metadata.type.public_type} ${property_metadata.getter_name}() {
+         return ${property_metadata.variable_name};
      }
 //:: #endfor
-
-
 //:: #endif
 }
