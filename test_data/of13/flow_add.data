@@ -83,7 +83,7 @@ builder.setXid(0x12345678)
     .setBufferId(50)
     .setOutPort(OFPort.of(6))
     .setOutGroup(8)
-    .setFlags(0)
+    .setFlags(ImmutableSet.<OFFlowModFlags>of())
     .setMatch(
         factory.buildMatch()
             .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))

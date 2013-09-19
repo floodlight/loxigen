@@ -36,6 +36,7 @@ These may need to be sorted out into language specific functions
 import sys
 import of_g
 import tenjin
+from generic_utils import find, memoize
 
 def class_signature(members):
     """
@@ -516,6 +517,17 @@ def render_static(out, name, path):
         raise ValueError("template %s not found" % name)
     with open(template_filename) as infile:
         out.write(infile.read())
+
+@memoize
+def lookup_ir_wiretype(oftype, version):
+    """ if of is a reference to an enum in ir, resolve it to the wiretype
+        declared in that enum. Else return oftype """
+    enums = of_g.ir[version].enums
+    enum = find(lambda e: e.name == oftype, enums)
+    if enum and 'wire_type' in enum.params:
+        return enum.params['wire_type']
+    else:
+        return oftype
 
 class TemplateEngine(tenjin.Engine):
     def include(self, template_name, **kwargs):

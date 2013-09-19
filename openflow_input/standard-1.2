@@ -772,7 +772,7 @@ struct of_flow_mod : of_header {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
@@ -793,7 +793,7 @@ struct of_flow_add : of_flow_mod {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
@@ -814,7 +814,7 @@ struct of_flow_modify : of_flow_mod {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
@@ -835,7 +835,7 @@ struct of_flow_modify_strict : of_flow_mod {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
@@ -856,7 +856,7 @@ struct of_flow_delete : of_flow_mod {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;
@@ -877,7 +877,7 @@ struct of_flow_delete_strict : of_flow_mod {
     uint32_t buffer_id;
     of_port_no_t out_port;
     uint32_t out_group;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     pad(2);
     of_match_t match;
     list(of_instruction_t) instructions;

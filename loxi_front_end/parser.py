@@ -44,10 +44,11 @@ integer = (
 identifier = word.copy().setName("identifier")
 
 # Type names
-scalar_type = word
-array_type = P.Combine(word + lit('[') - P.Word(P.alphanums + '_') - lit(']'))
-list_type = P.Combine(kw('list') - lit('(') - identifier - lit(')'))
-any_type = (array_type | list_type | scalar_type).setName("type name")
+enum_type = kw("enum") - word
+scalar_type = tag("scalar") + word
+array_type = tag("array") + P.Combine(word + lit('[') - P.Word(P.alphanums + '_') - lit(']'))
+list_type = tag("list") + P.Combine(kw('list') - lit('(') - identifier - lit(')'))
+any_type = P.Group(enum_type | array_type | list_type | scalar_type).setName("type name")
 
 # Structs
 pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
@@ -56,7 +57,7 @@ type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
 
 struct_param_name = kw("align")
-struct_param = P.Group(struct_param_name - s('=') - any_type)
+struct_param = P.Group(struct_param_name - s('=') - word)
 struct_param_list = P.Forward()
 struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))
 
@@ -68,12 +69,12 @@ struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_li
 
 # Enums
 enum_param_name = kw("wire_type") | kw("bitmask") | kw("complete")
-enum_param = P.Group(enum_param_name  - s('=') - any_type)
+enum_param = P.Group(enum_param_name  - s('=') - word)
 enum_param_list = P.Forward()
 enum_param_list << enum_param + P.Optional(s(',') + P.Optional(enum_param_list))
 
 enum_member_param_name = kw("virtual")
-enum_member_param = P.Group(enum_member_param_name  - s('=') - any_type)
+enum_member_param = P.Group(enum_member_param_name  - s('=') - word)
 enum_member_param_list = P.Forward()
 enum_member_param_list << enum_member_param + P.Optional(s(',') + P.Optional(enum_member_param_list))
 

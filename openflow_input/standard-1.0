@@ -159,7 +159,7 @@ enum ofp_flow_wildcards(wire_type=uint32_t, bitmask=True) {
     OFPFW_NW_DST_MASK = 0xfc000,
     OFPFW_DL_VLAN_PCP = 0x100000,
     OFPFW_NW_TOS = 0x200000,
-    OFPFW_ALL = 0x3fffff,
+    OFPFW_ALL(virtual=True) = 0x3fffff,
 };
 
 enum ofp_action_type(wire_type=uint16_t) {
@@ -586,7 +586,7 @@ struct of_flow_mod : of_header {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -603,7 +603,7 @@ struct of_flow_add : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -620,7 +620,7 @@ struct of_flow_modify : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -637,7 +637,7 @@ struct of_flow_modify_strict : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -654,7 +654,7 @@ struct of_flow_delete : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 
@@ -671,7 +671,7 @@ struct of_flow_delete_strict : of_flow_mod {
     uint16_t priority;
     uint32_t buffer_id;
     of_port_no_t out_port;
-    uint16_t flags;
+    enum ofp_flow_mod_flags flags;
     list(of_action_t) actions;
 };
 

@@ -67,19 +67,19 @@ class ${ofclass.pyname}(Message):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
-            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype)}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype, version=version)}
 :: #endfor
 
     def pack(self):
         packed = []
-:: include('_pack.py', ofclass=ofclass)
+:: include('_pack.py', ofclass=ofclass, version=version)
         return ''.join(packed)
 
     @staticmethod
     def unpack(buf):
         if len(buf) < 8: raise loxi.ProtocolError("buffer too short to contain an OpenFlow message")
         obj = ${ofclass.pyname}()
-:: include('_unpack.py', ofclass=ofclass)
+:: include('_unpack.py', ofclass=ofclass, version=version)
         return obj
 
     def __eq__(self, other):

@@ -27,6 +27,9 @@
 
 from collections import namedtuple
 
+import loxi_utils.loxi_utils as loxi_utils
+import of_g
+
 OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 
 # Map from LOXI type name to an object with templates for init, pack, and unpack
@@ -206,9 +209,12 @@ for (cls, element_deserializer) in fixed_elem_len_lists.items():
 
 ## Public interface
 
+def lookup_type_data(oftype, version):
+    return type_data_map.get(loxi_utils.lookup_ir_wiretype(oftype, version))
+
 # Return an initializer expression for the given oftype
-def gen_init_expr(oftype):
-    type_data = type_data_map.get(oftype)
+def gen_init_expr(oftype, version):
+    type_data = lookup_type_data(oftype, version)
     if type_data and type_data.init:
         return type_data.init
     else:
@@ -218,8 +224,8 @@ def gen_init_expr(oftype):
 #
 # 'value_expr' is a string of Python code which will evaluate to
 # the value to be packed.
-def gen_pack_expr(oftype, value_expr):
-    type_data = type_data_map.get(oftype)
+def gen_pack_expr(oftype, value_expr, version):
+    type_data = lookup_type_data(oftype, version)
     if type_data and type_data.pack:
         return type_data.pack % value_expr
     else:
@@ -229,8 +235,8 @@ def gen_pack_expr(oftype, value_expr):
 #
 # 'reader_expr' is a string of Python code which will evaluate to
 # the OFReader instance used for deserialization.
-def gen_unpack_expr(oftype, reader_expr):
-    type_data = type_data_map.get(oftype)
+def gen_unpack_expr(oftype, reader_expr, version):
+    type_data = lookup_type_data(oftype, version)
     if type_data and type_data.unpack:
         return type_data.unpack % reader_expr
     else:
