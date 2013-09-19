@@ -25,6 +25,8 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+from generic_utils import find
+from collections import namedtuple
 import copy
 import of_g
 import loxi_front_end.type_maps as type_maps
@@ -33,25 +35,35 @@ from loxi_ir import *
 class InputError(Exception):
     pass
 
-def create_member(m_ast):
+
+FrontendCtx = namedtuple("FrontendCtx", ("used_enums"))
+
+def get_type(t_ast, ctx):
+    if t_ast[0] == "enum":
+        ctx.used_enums.add(t_ast[1])
+
+    return t_ast[1]
+
+def create_member(m_ast, ctx):
     if m_ast[0] == 'pad':
         return OFPadMember(length=m_ast[1])
     elif m_ast[0] == 'type':
-        return OFTypeMember(name=m_ast[2], oftype=m_ast[1], value=m_ast[3])
+        return OFTypeMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), value=m_ast[3])
     elif m_ast[0] == 'data':
         if m_ast[2] == 'length' or m_ast[2] == 'len': # Should be moved to parser
-            return OFLengthMember(name=m_ast[2], oftype=m_ast[1])
+            return OFLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
         elif m_ast[2] == 'actions_len':
             # HACK only usage so far
-            return OFFieldLengthMember(name=m_ast[2], oftype=m_ast[1], field_name='actions')
+            return OFFieldLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), field_name='actions')
         else:
-            return OFDataMember(name=m_ast[2], oftype=m_ast[1])
+            return OFDataMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     elif m_ast[0] == 'discriminator':
-        return OFDiscriminatorMember(name=m_ast[2], oftype=m_ast[1])
+        return OFDiscriminatorMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     else:
         raise InputError("Dont know how to create member: %s" % m_ast[0])
 
 def create_ofinput(ast):
+
     """
     Create an OFInput from an AST
 
@@ -59,7 +71,7 @@ def create_ofinput(ast):
 
     @returns An OFInput object
     """
-
+    ctx = FrontendCtx(set())
     ofinput = OFInput(wire_versions=set(), classes=[], enums=[])
 
     for decl_ast in ast:
@@ -70,7 +82,7 @@ def create_ofinput(ast):
             # 3: super_class or None
             # 4: list of members
             superclass = decl_ast[3]
-            members = [create_member(m_ast) for m_ast in decl_ast[4]]
+            members = [create_member(m_ast, ctx) for m_ast in decl_ast[4]]
 
             discriminators = [ m for m in members if isinstance(m, OFDiscriminatorMember) ]
             if len(discriminators) > 1:
@@ -102,5 +114,9 @@ def create_ofinput(ast):
 
     if not ofinput.wire_versions:
         raise InputError("Missing #version metadata")
+
+    for used_enum in ctx.used_enums:
+        if not find(lambda e: e.name == used_enum, ofinput.enums):
+            raise Exception("Undeclared enum used in OFInput: {}".format(used_enum))
 
     return ofinput

@@ -45,7 +45,7 @@ INPUT_FILES = $(wildcard openflow_input/*)
 TEST_DATA = $(shell find test_data -name '*.data')
 OPENFLOWJ_WORKSPACE = openflowj-loxi
 
-all: c python
+all: c python java
 
 c: .loxi_ts.c
 
@@ -97,6 +97,8 @@ debug:
 	@echo "LOXI_TEMPLATE_FILES=\"${LOXI_TEMPLATE_FILES}\""
 	@echo
 	@echo "INPUT_FILES=\"${INPUT_FILES}\""
+
+check-all: check check-c check-py check-java
 
 check:
 	./utest/test_parser.py

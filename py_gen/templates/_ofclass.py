@@ -11,7 +11,7 @@ class ${ofclass.pyname}(${superclass}):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
-            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype)}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype, version=version)}
 :: #endfor
         return
 

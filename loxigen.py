@@ -442,7 +442,11 @@ def read_input():
                         if m.oftype == 'of_oxm_t':
                             m_type = 'of_octets_t'
                         else:
-                            m_type = m.oftype
+                            enum = find(lambda e: e.name == m.oftype, ofinput.enums)
+                            if enum and "wire_type" in enum.params:
+                                m_type = enum.params["wire_type"]
+                            else:
+                                m_type = m.oftype
                         legacy_members.append(dict(m_type=m_type, name=m.name))
                 versions[version_name]['classes'][ofclass.name] = legacy_members
 

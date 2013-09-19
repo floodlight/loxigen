@@ -747,6 +747,8 @@ class JavaMember(object):
             return self.enum_value
         elif java_type == "OFOxmList":
             return "OFOxmList.EMPTY"
+        elif re.match(r'Set.*', java_type):
+            return "Collections.emptySet()"
         elif re.match(r'List.*', java_type):
             return "Collections.emptyList()"
         elif java_type == "boolean":
@@ -1019,6 +1021,11 @@ class JavaEnum(object):
             return java_type.convert_enum_wire_type_to_jtype(ir_enum.params["wire_type"])
         else:
             return java_type.u8
+
+    @property
+    @memoize
+    def is_bitmask(self):
+        return any(ir_enum.is_bitmask for ir_enum in self.version_enums.values())
 
     @property
     def versions(self):

@@ -101,7 +101,11 @@ class JavaGenerator(object):
 
             for version in enum.versions:
                 clazz = java_model.OFGenericClass(package="org.projectfloodlight.openflow.protocol.ver{}".format(version.of_version), name="{}SerializerVer{}".format(enum.name, version.of_version))
-                self.render_class(clazz=clazz, template="const_serializer.java", enum=enum, version=version)
+
+                if enum.is_bitmask:
+                    self.render_class(clazz=clazz, template="const_set_serializer.java", enum=enum, version=version)
+                else:
+                    self.render_class(clazz=clazz, template="const_serializer.java", enum=enum, version=version)
 
     def create_of_interfaces(self):
         """ Create the base interfaces for of classes"""
