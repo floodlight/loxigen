@@ -46,6 +46,7 @@ enum ofp_bsn_vport_q_in_q_untagged(wire_type=uint16_t, complete=False) {
 // FIXME For now, inheritance is not exercised.  See below.
 struct of_bsn_vport {
     uint16_t type == ?;  /* Discriminate virtual port type */
+    of_port_name_t if_name;  /* Name to use in create operation */
     uint16_t length; /* Length in bytes of this structure with this header */
     /* Remainder of data is specific to the port type */
 };
@@ -55,7 +56,8 @@ struct of_bsn_vport {
 
 struct of_bsn_vport_q_in_q : of_bsn_vport {
     uint16_t type == 0;
-    uint16_t length;  /* 16 */
+    of_port_name_t if_name;
+    uint16_t length;  /* 32 */
     uint32_t port_no;     /* OF port number of parent; usually phys port */
     uint16_t ingress_tpid;
     uint16_t ingress_vlan_id;
