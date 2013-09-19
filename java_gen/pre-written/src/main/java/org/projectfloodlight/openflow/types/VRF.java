@@ -1,7 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 @Immutable
 public class VRF implements OFValueType<VRF> {

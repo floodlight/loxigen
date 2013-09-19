@@ -1,15 +1,12 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class LagId implements OFValueType<LagId> {
+public class LagId {
     static final int LENGTH = 4;
     private final int rawValue;
-
-    public static final LagId NO_ClassId = LagId.of(0xFFFFFFFF);
-    public static final LagId FULL_MASK = LagId.of(0x00000000);
 
     private LagId(final int rawValue) {
         this.rawValue = rawValue;
@@ -23,7 +20,6 @@ public class LagId implements OFValueType<LagId> {
         return rawValue;
     }
 
-    @Override
     public int getLength() {
         return LENGTH;
     }
@@ -53,11 +49,6 @@ public class LagId implements OFValueType<LagId> {
         if (rawValue != other.rawValue)
             return false;
         return true;
-    }
-
-    @Override
-    public LagId applyMask(LagId mask) {
-        return LagId.of(this.rawValue & mask.rawValue);
     }
 
     public void write4Bytes(ChannelBuffer c) {

@@ -1,14 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
-import org.projectfloodlight.openflow.annotations.Immutable;
+import javax.annotation.concurrent.Immutable;
 
 @Immutable
-public class L2MulticastId implements OFValueType<L2MulticastId> {
+public class L2MulticastId {
     static final int LENGTH = 4;
     private final int rawValue;
-
-    public static final L2MulticastId NO_ClassId = L2MulticastId.of(0xFFFFFFFF);
-    public static final L2MulticastId FULL_MASK = L2MulticastId.of(0x00000000);
 
     private L2MulticastId(final int rawValue) {
         this.rawValue = rawValue;
@@ -22,7 +19,6 @@ public class L2MulticastId implements OFValueType<L2MulticastId> {
         return rawValue;
     }
 
-    @Override
     public int getLength() {
         return LENGTH;
     }
@@ -52,10 +48,5 @@ public class L2MulticastId implements OFValueType<L2MulticastId> {
     @Override
     public String toString() {
         return Integer.toString(rawValue);
-    }
-
-    @Override
-    public L2MulticastId applyMask(L2MulticastId mask) {
-        return L2MulticastId.of(this.rawValue & mask.rawValue);
     }
 }
