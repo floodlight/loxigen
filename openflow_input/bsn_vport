@@ -55,12 +55,13 @@ struct of_bsn_vport {
 
 struct of_bsn_vport_q_in_q : of_bsn_vport {
     uint16_t type == 0;
-    uint16_t length;  /* 16 */
+    uint16_t length;  /* 32 */
     uint32_t port_no;     /* OF port number of parent; usually phys port */
     uint16_t ingress_tpid;
     uint16_t ingress_vlan_id;
     uint16_t egress_tpid;
     uint16_t egress_vlan_id;
+    of_port_name_t if_name;  /* Name to use in create operation */
 };
 
 // Request from controller to switch to create vport
