@@ -97,8 +97,8 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
 };
 
 enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
-    OFPPS_STP_LISTEN = 0,
     OFPPS_LINK_DOWN = 1,
+    OFPPS_STP_LISTEN = 0,
     OFPPS_STP_LEARN = 0x100,
     OFPPS_STP_FORWARD = 0x200,
     OFPPS_STP_BLOCK = 0x300,
