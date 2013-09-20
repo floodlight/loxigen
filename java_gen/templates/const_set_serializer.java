@@ -46,9 +46,9 @@ import ${enum.package}.${enum.name};
 public class ${class_name} {
     //:: wire_type = enum.wire_type(version)
     //:: int_wire_type = enum.wire_type(version).pub_type
-    //:: entries = sorted([ (entry, entry.value(version)) for entry in enum.entries if entry.has_value(version) ], lambda (_,va), (_2,vb): va.__cmp__(vb))
+    //:: entries = [entry for entry in enum.entries if entry.has_value(version) ]
 
-    //:: for entry, _ in entries:
+    //:: for entry in entries:
     public final static ${int_wire_type} ${entry.name}_VAL = ${entry.format_value(version)};
     //:: #endfor
 
@@ -67,9 +67,21 @@ public class ${class_name} {
     public static Set<${enum.name}> ofWireValue(${int_wire_type} val) {
         EnumSet<${enum.name}> set = EnumSet.noneOf(${enum.name}.class);
 
-        //:: for entry, _ in entries:
+        //:: last_group = None
+        //:: for entry in entries:
+        //::    if entry.is_mask:
+        //::        continue
+        //::    #endif
+        //::    group = entry.masked_enum_group
+        //::    if group:
+        ${"else " if group == last_group else "" }if((val & ${group.mask}_VAL) == ${entry.name}_VAL)
+            set.add(${enum.name}.${entry.name});
+        //::       last_group = group
+        //::    else:
         if((val & ${entry.name}_VAL) != 0)
             set.add(${enum.name}.${entry.name});
+        //::       last_group = None
+        //::    #endif
         //:: #endfor
         return Collections.unmodifiableSet(set);
     }
@@ -79,7 +91,10 @@ public class ${class_name} {
 
         for(${enum.name} e: set) {
             switch(e) {
-                //:: for entry, _ in entries:
+                //:: for entry in entries:
+                //::    if entry.is_mask:
+                //::        continue
+                //::    #endif
                 case ${entry.name}:
                     wireValue |= ${entry.name}_VAL;
                     break;
