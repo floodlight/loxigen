@@ -82,6 +82,7 @@ public class ${class_name} {
                 //:: for entry, _ in entries:
                 case ${entry.name}:
                     wireValue |= ${entry.name}_VAL;
+                    break;
                 //:: #endfor
                 default:
                     throw new IllegalArgumentException("Illegal enum value for type ${enum.name} in version ${version}: " + e);
