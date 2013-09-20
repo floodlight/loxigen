@@ -334,6 +334,8 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u16_l2_table_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_ipv4_value(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_ipv4_value_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_u8_hybrid_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_hybrid_version(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 
 
 #endif /* _LOCI_SHOW_H_ */
