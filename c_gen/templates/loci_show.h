@@ -154,6 +154,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_string(writer, cookie, val) writer(cookie, "%s", val)
 
 #define LOCI_SHOW_port_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
+#define LOCI_SHOW_port_name_if_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_tab_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_desc_str(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_ser_num(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
