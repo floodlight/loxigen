@@ -11,3 +11,4 @@ tags
 .*.swo
 *.cache
 openflowj-loxi
+/bin
