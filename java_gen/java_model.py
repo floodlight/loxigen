@@ -130,6 +130,12 @@ class JavaModel(object):
                 "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
                 }
 
+    MaskedEnumGroup = namedtuple("MaskedEnumGroup", ("name", "mask", "members"))
+
+    masked_enum_groups = defaultdict(lambda: (),
+            OFPortState= (MaskedEnumGroup("stp_flags", mask="STP_MASK", members=set(("STP_LISTEN", "STP_LEARN", "STP_FORWARD", "STP_BLOCK"))), )
+    )
+
     class OFEnumPropertyMetadata(namedtuple("OFEnumPropertyMetadata", ("name", "type", "value"))):
         @property
         def variable_name(self):
@@ -1003,8 +1009,6 @@ class JavaEnum(object):
         entry_name_version_value_map = OrderedDefaultDict(lambda: OrderedDict())
         for version, ir_enum in version_enum_map.items():
             for ir_entry in ir_enum.entries:
-                if "virtual" in ir_entry.params:
-                    continue
                 entry_name_version_value_map[ir_entry.name][version] = ir_entry.value
 
         self.entries = [ JavaEnumEntry(self, name, version_value_map)
@@ -1078,3 +1082,14 @@ class JavaEnumEntry(object):
 
     def all_values(self, versions, not_present=None):
         return [ self.values[version] if version in self.values else not_present for version in versions ]
+
+    @property
+    @memoize
+    def masked_enum_group(self):
+        group = find(lambda g: self.name in g.members, model.masked_enum_groups[self.enum.name])
+        return group
+
+    @property
+    @memoize
+    def is_mask(self):
+        return any(self.name == g.mask for g in model.masked_enum_groups[self.enum.name])
