@@ -47,12 +47,23 @@ import java_gen.java_type as java_type
 from java_gen.java_type import erase_type_annotation
 
 class JavaModel(object):
+    # registry for enums that should not be generated
+    # set(${java_enum_name})
     enum_blacklist = set(("OFDefinitions",))
+    # registry for enum *entry* that should not be generated
+    # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
+
+    # registry of interfaces that should not be generated
+    # set(java_names)
     # OFUint structs are there for god-knows what in loci. We certainly don't need them.
     interface_blacklist = set( ("OFUint8", "OFUint32",))
+    # registry of interface properties that should not be generated
+    # map: $java_type -> set(java_name_property)
     read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    # map: $java_type -> set(java_name_property)
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    # interfaces that are virtual
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
     OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
@@ -130,13 +141,33 @@ class JavaModel(object):
                 "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
                 }
 
+    # Registry of nullable properties:
+    # ${java_class_name} -> set(${java_property_name})
+    nullable_map = defaultdict(lambda: set(),
+    )
+
+    # represents a subgroup of a bitmask enum that is actualy a normal enumerable within a masked part of the enum
+    # e.g., the flags STP.* in OF1.0 port state are bit mask entries, but instead enumerables according to the mask "STP_MASK"
+    # name: a name for the group
+    # mask: java name of the enum entry that defines the mask
+    # members: set of names of the members of the group
     MaskedEnumGroup = namedtuple("MaskedEnumGroup", ("name", "mask", "members"))
 
+    # registry of MaskedEnumGroups (see above).
+    # map: ${java_enum_name}: tuple(MaskedEnumGroup)
     masked_enum_groups = defaultdict(lambda: (),
             OFPortState= (MaskedEnumGroup("stp_flags", mask="STP_MASK", members=set(("STP_LISTEN", "STP_LEARN", "STP_FORWARD", "STP_BLOCK"))), )
     )
 
+    # represents a metadata property associated with an EnumClass
+    # name:
     class OFEnumPropertyMetadata(namedtuple("OFEnumPropertyMetadata", ("name", "type", "value"))):
+        """
+        represents a metadata property associated with an Enum Class
+        @param name name of metadata property
+        @param type java_type instance describing the type
+        @value: Generator function f(entry) that generates the value
+        """
         @property
         def variable_name(self):
             return self.name[0].lower() + self.name[1:]
@@ -146,9 +177,11 @@ class JavaModel(object):
             prefix = "is" if self.type == java_type.boolean else "get"
             return prefix+self.name
 
+    """ Metadata container. """
     OFEnumMetadata = namedtuple("OFEnumMetadata", ("properties", "to_string"))
 
     def gen_port_speed(enum_entry):
+        """ Generator function for OFortFeatures.PortSpeed"""
         splits = enum_entry.name.split("_")
         if len(splits)>=2:
             m = re.match(r'\d+[MGTP]B', splits[1])
@@ -157,12 +190,15 @@ class JavaModel(object):
         return "PortSpeed.SPEED_NONE";
 
     def gen_stp_state(enum_entry):
+        """ Generator function for OFPortState.StpState"""
         splits = enum_entry.name.split("_")
         if len(splits)>=1:
             if splits[0] == "STP":
                 return "true"
         return "false"
 
+    # registry for metadata properties for enums
+    # map: ${java_enum_name}: OFEnumMetadata
     enum_metadata_map = defaultdict(lambda: JavaModel.OFEnumMetadata((), None),
             OFPortFeatures = OFEnumMetadata((OFEnumPropertyMetadata("PortSpeed", java_type.port_speed, gen_port_speed),), None),
             OFPortState = OFEnumMetadata((OFEnumPropertyMetadata("StpState", java_type.boolean, gen_stp_state),), None),
@@ -884,6 +920,11 @@ class JavaMember(object):
             return False
         return (self.name,) == (other.name,)
 
+    @property
+    def is_nullable(self):
+        return self.name in model.nullable_map[self.msg.name]
+
+
 class JavaVirtualMember(JavaMember):
     """ Models a virtual property (member) of an openflow class that is not backed by a loxi ir member """
     def __init__(self, msg, name, java_type, value=None):
@@ -930,7 +971,7 @@ class JavaUnitTestSet(object):
         while test_data.exists(data_file_template.format(i=i)):
             self.test_units.append(JavaUnitTest(java_class, data_file_template.format(i=i), test_class_name + str(i)))
             i = i + 1
-        
+
     @property
     def package(self):
         return self.java_class.package
@@ -942,7 +983,7 @@ class JavaUnitTestSet(object):
     @property
     def length(self):
         return len(self.test_units)
-    
+
     def get_test_unit(self, i):
         return self.test_units[i]
 
@@ -959,7 +1000,7 @@ class JavaUnitTest(object):
             self.test_class_name = self.java_class.name + "Test"
         else:
             self.test_class_name = test_class_name
-        
+
     @property
     def package(self):
         return self.java_class.package
