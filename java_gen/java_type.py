@@ -310,6 +310,7 @@ oxm_list = JType("OFOxmList") \
 meter_features = JType("OFMeterFeatures")\
         .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)", write="$name.writeTo(bb)")
 
+
 port_speed = JType("PortSpeed")
 boolean = JType("boolean")
 
@@ -454,6 +455,9 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif field_name == "version" and c_type == "uint8_t":
         return JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
+    elif field_name == "buffer_id" and c_type == "uint32_t":
+        return JType("OFBufferId") \
+            .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())")
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):
