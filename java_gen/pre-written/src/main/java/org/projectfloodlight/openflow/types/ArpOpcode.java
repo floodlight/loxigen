@@ -60,7 +60,10 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
 
     private static final int MIN_OPCODE = 0;
     private static final int MAX_OPCODE = 0xFFFF;
-    
+
+    private static final int NONE_VAL = 0;
+    public static final ArpOpcode NONE = new ArpOpcode(NONE_VAL);
+
     public static final ArpOpcode NO_MASK = new ArpOpcode(0xFFFFFFFF);
     public static final ArpOpcode FULL_MASK = new ArpOpcode(0x00000000);
 
@@ -83,6 +86,8 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
         if (opcode < MIN_OPCODE || opcode > MAX_OPCODE)
             throw new IllegalArgumentException("Invalid ARP opcode: " + opcode);
         switch (opcode) {
+            case NONE_VAL:
+                return NONE;
             case ARP_OPCODE_VAL_REQUEST:
                 return ARP_OPCODE_REQUEST;
             case ARP_OPCODE_VAL_REPLY:
@@ -137,11 +142,11 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
                 return new ArpOpcode(opcode);
         }
     }
-    
+
     public void write2Bytes(ChannelBuffer c) {
         c.writeShort(this.opcode);
     }
-    
+
     public static ArpOpcode read2Bytes(ChannelBuffer c) {
         return ArpOpcode.of(c.readUnsignedShort());
     }
@@ -150,9 +155,9 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
     public ArpOpcode applyMask(ArpOpcode mask) {
         return ArpOpcode.of(this.opcode & mask.opcode);
     }
-    
+
     public int getOpCode() {
         return opcode;
     }
-    
+
 }

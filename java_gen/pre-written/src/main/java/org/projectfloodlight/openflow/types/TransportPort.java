@@ -14,6 +14,9 @@ public class TransportPort implements OFValueType<TransportPort> {
     static final int MAX_PORT = 0xFFFF;
     static final int MIN_PORT = 0;
 
+    private final static int NONE_VAL = 0;
+    public final static TransportPort NONE = new TransportPort(NONE_VAL);
+
     public static final TransportPort NO_MASK = new TransportPort(0xFFFFFFFF);
     public static final TransportPort FULL_MASK = TransportPort.of(0x0);
 
@@ -24,7 +27,9 @@ public class TransportPort implements OFValueType<TransportPort> {
     }
 
     public static TransportPort of(int port) {
-        if (port < MIN_PORT || port > MAX_PORT) {
+        if(port == NONE_VAL)
+            return NONE;
+        else if (port < MIN_PORT || port > MAX_PORT) {
             throw new IllegalArgumentException("Illegal transport layer port number: " + port);
         }
         return new TransportPort(port);

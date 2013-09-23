@@ -8,6 +8,8 @@ public class OFMetadata implements OFValueType<OFMetadata> {
 
     private final U64 u64;
 
+    public static final OFMetadata NONE = OFMetadata.of(U64.ZERO);
+
     public static final OFMetadata NO_MASK = OFMetadata.of(U64.ofRaw(0xFFFFFFFFFFFFFFFFl));
     public static final OFMetadata FULL_MASK = OFMetadata.of(U64.ofRaw(0x0));
 

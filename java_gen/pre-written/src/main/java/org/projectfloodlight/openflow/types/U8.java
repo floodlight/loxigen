@@ -23,6 +23,9 @@ import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 public class U8 implements Writeable, OFValueType<U8> {
+    private final static byte ZERO_VAL = 0;
+    public final static U8 ZERO = new U8(ZERO_VAL);
+
     private final byte raw;
 
     private U8(byte raw) {
@@ -30,6 +33,9 @@ public class U8 implements Writeable, OFValueType<U8> {
     }
 
     public static final U8 of(short value) {
+        if(value == ZERO_VAL)
+            return ZERO;
+
         return new U8(t(value));
     }
 

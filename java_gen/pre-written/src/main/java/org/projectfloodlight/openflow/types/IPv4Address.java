@@ -13,6 +13,9 @@ public class IPv4Address implements OFValueType<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 
+    private final static int NONE_VAL = 0x0;
+    public final static IPv4Address NONE = new IPv4Address(NONE_VAL);
+
     public static final IPv4Address NO_MASK = IPv4Address.of(0xFFFFFFFF);
     public static final IPv4Address FULL_MASK = IPv4Address.of(0x00000000);
 
@@ -33,6 +36,8 @@ public class IPv4Address implements OFValueType<IPv4Address> {
     }
 
     public static IPv4Address of(final int raw) {
+        if(raw == NONE_VAL)
+            return NONE;
         return new IPv4Address(raw);
     }
 

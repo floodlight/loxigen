@@ -9,6 +9,9 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
 
     private final int label;
 
+    private final static int NONE_VAL = 0x0;
+    public static final IPv6FlowLabel NONE = new IPv6FlowLabel(NONE_VAL);
+
     public static final IPv6FlowLabel NO_MASK = IPv6FlowLabel.of(0xFFFFFFFF);
     public static final IPv6FlowLabel FULL_MASK = IPv6FlowLabel.of(0x0);
 
@@ -17,6 +20,8 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
     }
 
     public static IPv6FlowLabel of(int label) {
+        if(label == NONE_VAL)
+            return NONE;
         return new IPv6FlowLabel(label);
     }
 

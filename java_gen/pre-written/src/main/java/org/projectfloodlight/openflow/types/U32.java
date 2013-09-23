@@ -23,6 +23,9 @@ import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 public class U32 implements Writeable, OFValueType<U32> {
+    private final static int ZERO_VAL = 0;
+    public final static U32 ZERO = new U32(ZERO_VAL);
+
     private final int raw;
 
     private U32(int raw) {
@@ -30,11 +33,13 @@ public class U32 implements Writeable, OFValueType<U32> {
     }
 
     public static U32 of(long value) {
-        return new U32(U32.t(value));
+        return ofRaw(U32.t(value));
     }
 
-    public static U32 ofRaw(int value) {
-        return new U32(value);
+    public static U32 ofRaw(int raw) {
+        if(raw == ZERO_VAL)
+            return ZERO;
+        return new U32(raw);
     }
 
     public long getValue() {

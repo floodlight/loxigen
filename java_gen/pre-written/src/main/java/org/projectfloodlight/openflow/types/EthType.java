@@ -5,7 +5,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * EtherType field representation.
- * 
+ *
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
 public class EthType implements OFValueType<EthType> {

@@ -6,8 +6,10 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 public class VlanVid implements OFValueType<VlanVid> {
 
     private static final short VALIDATION_MASK = 0x0FFF;
+    private static final short NONE_VAL = 0x0000;
     final static int LENGTH = 2;
 
+    public static final VlanVid NONE = new VlanVid(NONE_VAL);
     public static final VlanVid NO_MASK = new VlanVid((short)0xFFFF);
     public static final VlanVid FULL_MASK = VlanVid.of((short)0x0);
 
@@ -18,7 +20,9 @@ public class VlanVid implements OFValueType<VlanVid> {
     }
 
     public static VlanVid of(short vid) {
-        if ((vid & VALIDATION_MASK) != vid)
+        if(vid == NONE_VAL)
+            return NONE;
+        else if ((vid & VALIDATION_MASK) != vid)
             throw new IllegalArgumentException("Illegal VLAN VID value: " + vid);
         return new VlanVid(vid);
     }

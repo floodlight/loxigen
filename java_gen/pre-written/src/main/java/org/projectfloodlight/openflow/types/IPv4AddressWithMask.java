@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 public class IPv4AddressWithMask extends Masked<IPv4Address> {
+    public final static IPv4AddressWithMask NONE = of(IPv4Address.NONE, IPv4Address.NONE);
 
     private IPv4AddressWithMask(int rawValue, int rawMask) {
         super(IPv4Address.of(rawValue), IPv4Address.of(rawMask));

@@ -4,33 +4,34 @@ import java.math.BigInteger;
 import java.util.Arrays;
 
 public class IPv6AddressWithMask extends Masked<IPv6Address> {
+    public final static IPv6AddressWithMask NONE = of(IPv6Address.NONE, IPv6Address.NONE);
 
     private IPv6AddressWithMask(IPv6Address value, IPv6Address mask) {
         super(value, mask);
     }
-    
+
     public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
         return new IPv6AddressWithMask(value, mask);
     }
-    
+
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
-        res.append(((IPv6Address)value).toString());
+        res.append(value.toString());
         res.append('/');
-        
-        BigInteger maskint = new BigInteger(((IPv6Address)mask).getBytes());
+
+        BigInteger maskint = new BigInteger(mask.getBytes());
         if (maskint.not().add(BigInteger.ONE).bitCount() == 1) {
             // CIDR notation
             res.append(maskint.bitCount());
         } else {
             // Full address mask
-            res.append(((IPv6Address)mask).toString());
+            res.append(mask.toString());
         }
-        
+
         return res.toString();
     }
-    
+
     public static IPv6AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
@@ -58,10 +59,10 @@ public class IPv6AddressWithMask extends Masked<IPv6Address> {
                 throw new IllegalArgumentException("IPv6 Address not well formed: " + string);
             }
         }
-        
+
         // Read IP
         IPv6Address ipv6 = IPv6Address.of(ip);
-        
+
         if (maskAddress != null) {
             // Full address mask
             return IPv6AddressWithMask.of(ipv6, maskAddress);
