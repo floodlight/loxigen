@@ -24,6 +24,8 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 
 public class U64 implements Writeable, OFValueType<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
+    private final static long ZERO_VAL = 0;
+    public final static U64 ZERO = new U64(ZERO_VAL);
 
     private final long raw;
 
@@ -36,6 +38,8 @@ public class U64 implements Writeable, OFValueType<U64> {
     }
 
     public static U64 ofRaw(final long raw) {
+        if(raw == ZERO_VAL)
+            return ZERO;
         return new U64(raw);
     }
 

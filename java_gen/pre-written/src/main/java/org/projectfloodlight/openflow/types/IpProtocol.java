@@ -4,7 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
  * IP-Protocol field representation
- * 
+ *
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  */
 public class IpProtocol implements OFValueType<IpProtocol> {
@@ -297,6 +297,8 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     public static final IpProtocol IP_PROTO_MANET = new IpProtocol(IP_PROTO_NUM_MANET);
     public static final IpProtocol IP_PROTO_HIP = new IpProtocol(IP_PROTO_NUM_HIP);
     public static final IpProtocol IP_PROTO_SHIM6 = new IpProtocol(IP_PROTO_NUM_SHIM6);
+
+    public static final IpProtocol NONE = IP_PROTO_HOPOPT;
 
     public static final IpProtocol NO_MASK = IP_PROTO_HOPOPT;
     public static final IpProtocol FULL_MASK = new IpProtocol((short)0x0000);
@@ -627,7 +629,7 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     public String toString() {
         return Integer.toHexString(proto);
     }
-    
+
     public void writeByte(ChannelBuffer c) {
         c.writeByte(this.proto);
     }
@@ -644,5 +646,5 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     public short getIpProtocolNumber() {
         return proto;
     }
-    
+
 }

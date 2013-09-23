@@ -72,6 +72,8 @@ public enum IpDscp implements OFValueType<IpDscp> {
 
     static final int LENGTH = 1;
 
+    public static final IpDscp NONE = DSCP_0;
+
     public static final IpDscp NO_MASK = DSCP_NO_MASK;
     public static final IpDscp FULL_MASK = DSCP_0;
 

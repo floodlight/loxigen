@@ -47,7 +47,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 
 //:: for prop in msg.data_members:
-    private final static ${prop.java_type.public_type} ${prop.default_name} = ${prop.default_value};
+    //:: if prop.default_value:
+        private final static ${prop.java_type.public_type} ${prop.default_name} = ${prop.default_value};
+    //:: #endif
 //:: #end
 
     // OF message fields
@@ -97,13 +99,27 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
 //:: include("_field_accessors.java", msg=msg, generate_setters=True, builder=True, has_parent=True)
 
+
         @Override
         public ${msg.interface.name} build() {
+                //:: for prop in msg.data_members:
+                ${prop.java_type.public_type} ${prop.name} = this.${prop.name}Set ? this.${prop.name} : parentMessage.${prop.name};
+                //::    if not prop.is_nullable and not prop.java_type.is_primitive:
+                if(${prop.name} == null)
+                    throw new NullPointerException("Property ${prop.name} must not be null");
+                //::    #endif
+                //:: #endfor
+
+                //
+                //:: if os.path.exists("%s/custom/%s.Builder_normalize_stanza.java" % (template_dir, msg.name)):
+                //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+                //:: #endif
                 return new ${impl_class}(
-                    ${",\n                      ".join(
-                         [ "this.{0}Set ? this.{0} : parentMessage.{0}".format(prop.name)
-                             for prop in msg.data_members])}
-                    );
+                //:: for i, prop in enumerate(msg.data_members):
+                //::    comma = "," if i < len(msg.data_members)-1 else ""
+                    ${prop.name}${comma}
+                //:: #endfor
+                );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
         //:: include("custom/%s.Builder.java" % msg.name, msg=msg, has_parent=True)
@@ -122,10 +138,28 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //
         @Override
         public ${msg.interface.name} build() {
+            //:: for prop in msg.data_members:
+            //::    if prop.default_value:
+            ${prop.java_type.public_type} ${prop.name} = this.${prop.name}Set ? this.${prop.name} : ${prop.default_name};
+            //:: else:
+            if(!this.${prop.name}Set)
+                throw new IllegalStateException("Property ${prop.name} doesn't have default value -- must be set");
+            //::    #endif
+            //::    if not prop.is_nullable and not prop.java_type.is_primitive:
+            if(${prop.name} == null)
+                throw new NullPointerException("Property ${prop.name} must not be null");
+            //::    #endif
+            //:: #endfor
+
+            //:: if os.path.exists("%s/custom/%s.Builder_normalize_stanza.java" % (template_dir, msg.name)):
+            //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+            //:: #endif
+
             return new ${impl_class}(
-                ${",\n                      ".join(
-                     [ "this.{0}Set ? this.{0} : {1}.{2}".format(prop.name, impl_class, prop.default_name)
-                         for prop in msg.data_members])}
+                //:: for i, prop in enumerate(msg.data_members):
+                //::    comma = "," if i < len(msg.data_members)-1 else ""
+                    ${prop.name}${comma}
+                //:: #endfor
                 );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
@@ -190,7 +224,10 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: #endif
 
             //:: if msg.data_members:
-            return new ${impl_class}(
+            //:: if os.path.exists("%s/custom/%s.Reader_normalize_stanza.java" % (template_dir, msg.name)):
+            //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+            //:: #endif
+             return new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
                     );
