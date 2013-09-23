@@ -747,24 +747,14 @@ class JavaMember(object):
 
     @property
     def default_value(self):
-        java_type = self.java_type.public_type;
-
         if self.is_fixed_value:
             return self.enum_value
-        elif java_type == "OFOxmList":
-            return "OFOxmList.EMPTY"
-        elif re.match(r'Set.*', java_type):
-            return "Collections.emptySet()"
-        elif re.match(r'List.*', java_type):
-            return "Collections.emptyList()"
-        elif java_type == "boolean":
-            return "false";
-        elif self.java_type.is_array:
-            return "new %s[0]" % java_type[:-2]
-        elif java_type in ("byte", "char", "short", "int", "long"):
-            return "({0}) 0".format(java_type);
         else:
-            return "null";
+            default = self.java_type.default_op(self.msg.version)
+            if default == "null" and not self.is_nullable:
+                return None
+            else:
+                return default
 
     @property
     def enum_value(self):
