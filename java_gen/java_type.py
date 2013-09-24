@@ -312,6 +312,8 @@ meter_features = JType("OFMeterFeatures")\
 
 
 port_speed = JType("PortSpeed")
+error_type = JType("OFErrorType")
+
 boolean = JType("boolean")
 
 generic_t = JType("T")

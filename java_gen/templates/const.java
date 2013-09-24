@@ -36,7 +36,6 @@ package ${package};
 //:: include("_imports.java", msg=enum)
 
 public enum ${class_name} {
-
 //:: for i, entry in enumerate(enum.entries):
 //::    if enum.metadata.properties:
 //::        params = "({})".format(", ".join(entry.constructor_params))
