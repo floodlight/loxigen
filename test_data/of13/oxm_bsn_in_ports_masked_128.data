@@ -1,0 +1,20 @@
+-- binary
+00 03 # class
+01 # type/masked
+20 # length
+00 00 00 00 00 00 00 00 # value
+00 00 00 00 00 00 00 00 # ...
+80 00 00 01 00 00 00 00 # mask
+00 00 00 00 00 02 00 01 # ...
+-- python
+ofp.oxm.bsn_in_ports_128_masked(set(), set([0, 17, 96, 127]))
+-- c
+obj = of_oxm_bsn_in_ports_128_masked_new(OF_VERSION_1_3);
+{
+    of_bitmap_128_t bmap = { 0, 0 };
+    of_oxm_bsn_in_ports_128_masked_value_set(obj, bmap);
+}
+{
+    of_bitmap_128_t bmap = { 0x8000000100000000, 0x00000000020001 };
+    of_oxm_bsn_in_ports_128_masked_value_mask_set(obj, bmap);
+}
