@@ -64,13 +64,16 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     public static final ICMPv4Type ICMPV4_TYPE_PHOTURIS = new ICMPv4Type(ICMPV4_TYPE_VAL_PHOTURIS);
     public static final ICMPv4Type ICMPV4_TYPE_EXPERIMENTAL_MOBILITY    = new ICMPv4Type(ICMPV4_TYPE_VAL_EXPERIMENTAL_MOBILITY);
 
+    // HACK alert - we're disapproriating ICMPV4_TYPE_ECHO_REPLY (value 0) as 'none' as well
+    public static final ICMPv4Type NONE   = ICMPV4_TYPE_ECHO_REPLY;
+
     public static final ICMPv4Type NO_MASK = new ICMPv4Type((short)0xFFFF);
     public static final ICMPv4Type FULL_MASK = new ICMPv4Type((short)0x0000);
 
     private final short type;
-    
+
     private static final int MIN_TYPE = 0;
-    private static final int MAX_TYPE = 0xFF;    
+    private static final int MAX_TYPE = 0xFF;
 
     private ICMPv4Type(short type) {
         this.type = type;
@@ -145,15 +148,15 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     public int getLength() {
         return LENGTH;
     }
-    
+
     public short getType() {
         return type;
     }
-    
+
     public void writeByte(ChannelBuffer c) {
         c.writeByte(this.type);
     }
-    
+
     public static ICMPv4Type readByte(ChannelBuffer c) {
         return ICMPv4Type.of(c.readUnsignedByte());
     }
@@ -163,5 +166,5 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
         return ICMPv4Type.of((short)(this.type & mask.type));
     }
 
-    
+
 }

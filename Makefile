@@ -49,7 +49,7 @@ all: c python java
 
 c: .loxi_ts.c
 
-.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES ${TEST_DATA}
+.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c
 	touch $@
 
@@ -86,7 +86,6 @@ java-eclipse: java
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
-	rm -rf openflowj-loxi
 	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python .loxi_ts.java
 
 debug:

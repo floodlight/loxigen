@@ -5,6 +5,10 @@ import javax.annotation.concurrent.Immutable;
 @Immutable
 public class Metadata {
     static final int LENGTH = 4;
+
+    private final static int NONE_VAL = 0;
+    public final static Metadata NONE = new Metadata(NONE_VAL);
+
     private final int rawValue;
 
     private Metadata(final int rawValue) {
@@ -12,6 +16,9 @@ public class Metadata {
     }
 
     public static Metadata of(final int raw) {
+        if(raw == NONE_VAL)
+            return NONE;
+
         return new Metadata(raw);
     }
 
