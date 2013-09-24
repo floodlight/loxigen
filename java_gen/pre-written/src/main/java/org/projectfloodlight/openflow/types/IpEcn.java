@@ -10,6 +10,7 @@ public enum IpEcn implements OFValueType<IpEcn> {
     ECN_11((byte)3),
     ECN_NO_MASK((byte)0xFF);
 
+    public static final IpEcn NONE = ECN_00;
     public static final IpEcn NO_MASK = ECN_NO_MASK;
     public static final IpEcn FULL_MASK = ECN_00;
 

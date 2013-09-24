@@ -3,7 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 
 /**
- * 
+ *
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
  *
  */
@@ -13,7 +13,10 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     final static short MAX_CODE = 0xFF;
 
     private final short code;
-    
+
+    private static final short NONE_VAL = 0;
+    public static final ICMPv4Code NONE = new ICMPv4Code(NONE_VAL);
+
     public static final ICMPv4Code NO_MASK = new ICMPv4Code((short)0xFFFF);
     public static final ICMPv4Code FULL_MASK = new ICMPv4Code((short)0x0000);
 
@@ -22,6 +25,9 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     }
 
     public static ICMPv4Code of(short code) {
+        if(code == NONE_VAL)
+            return NONE;
+
         if (code > MAX_CODE || code < 0)
             throw new IllegalArgumentException("Illegal ICMPv4 code: " + code);
         return new ICMPv4Code(code);
@@ -31,15 +37,15 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     public int getLength() {
         return LENGTH;
     }
-    
+
     public short getCode() {
         return code;
     }
-    
+
     public void writeByte(ChannelBuffer c) {
         c.writeByte(this.code);
     }
-    
+
     public static ICMPv4Code readByte(ChannelBuffer c) {
         return ICMPv4Code.of(c.readUnsignedByte());
     }
@@ -49,5 +55,5 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
         return ICMPv4Code.of((short)(this.code & mask.code));
     }
 
-    
+
 }

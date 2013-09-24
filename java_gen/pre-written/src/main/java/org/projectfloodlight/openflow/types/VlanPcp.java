@@ -6,10 +6,12 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 public class VlanPcp implements OFValueType<VlanPcp> {
 
     private static final byte VALIDATION_MASK = 0x07;
+    private static final byte NONE_VAL = 0x00;
     static final int LENGTH = 1;
 
     private final byte pcp;
 
+    public static final VlanPcp NONE = new VlanPcp(NONE_VAL);
     public static final VlanPcp NO_MASK = new VlanPcp((byte)0xFF);
     public static final VlanPcp FULL_MASK = VlanPcp.of((byte)0x0);
 

@@ -14,6 +14,9 @@ public class MacAddress implements OFValueType<MacAddress> {
     static final int MacAddrLen = 6;
     private final long rawValue;
 
+    private final static long NONE_VAL = 0x0L;
+    public static final MacAddress NONE = new MacAddress(NONE_VAL);
+
     public static final MacAddress NO_MASK = MacAddress.of(0xFFFFFFFFFFFFFFFFl);
     public static final MacAddress FULL_MASK = MacAddress.of(0x0);
 
@@ -30,6 +33,9 @@ public class MacAddress implements OFValueType<MacAddress> {
     }
 
     public static MacAddress of(final long raw) {
+        if(raw == NONE_VAL)
+            return NONE;
+
         return new MacAddress(raw);
     }
 

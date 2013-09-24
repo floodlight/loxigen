@@ -60,23 +60,23 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<IpDscp> IP_DSCP =
             new MatchField<IpDscp>("ip_dscp", MatchFields.IP_DSCP,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv4, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpEcn> IP_ECN =
             new MatchField<IpEcn>("ip_dscp", MatchFields.IP_ECN,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv4, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpProtocol> IP_PROTO =
             new MatchField<IpProtocol>("ip_proto", MatchFields.IP_PROTO,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv4, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IPv4Address> IPV4_SRC =
             new MatchField<IPv4Address>("ipv4_src", MatchFields.IPV4_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv4));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<IPv4Address> IPV4_DST =
             new MatchField<IPv4Address>("ipv4_dst", MatchFields.IPV4_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv4));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
             "tcp_src", MatchFields.TCP_SRC,
@@ -112,35 +112,35 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
             "arp_op", MatchFields.ARP_OP,
-            new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_ARP));
+            new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv4Address> ARP_SPA =
             new MatchField<IPv4Address>("arp_spa", MatchFields.ARP_SPA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_ARP));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv4Address> ARP_TPA =
             new MatchField<IPv4Address>("arp_tpa", MatchFields.ARP_TPA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_ARP));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<MacAddress> ARP_SHA =
             new MatchField<MacAddress>("arp_sha", MatchFields.ARP_SHA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_ARP));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<MacAddress> ARP_THA =
             new MatchField<MacAddress>("arp_tha", MatchFields.ARP_THA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_ARP));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv6Address> IPV6_SRC =
             new MatchField<IPv6Address>("ipv6_src", MatchFields.IPV6_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<IPv6Address> IPV6_DST =
             new MatchField<IPv6Address>("ipv6_dst", MatchFields.IPV6_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<IPv6FlowLabel> IPV6_FLABEL =
             new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLABEL,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_IPv6));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<U8> ICMPV6_TYPE =
             new MatchField<U8>("icmpv6_type", MatchFields.ICMPV6_TYPE,
@@ -164,11 +164,11 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<U32> MPLS_LABEL =
             new MatchField<U32>("mpls_label", MatchFields.MPLS_LABEL,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_MPLS_UNICAST, EthType.ETH_TYPE_MPLS_MULTICAST));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<U8> MPLS_TC =
             new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ETH_TYPE_MPLS_UNICAST, EthType.ETH_TYPE_MPLS_MULTICAST));
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public String getName() {
         return name;
