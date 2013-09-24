@@ -40,7 +40,7 @@ public class OFBufferId {
     }
 
     public static OFBufferId read4Bytes(ChannelBuffer c) throws OFParseError {
-        return OFBufferId.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
+        return OFBufferId.of(c.readInt());
     }
 
     @Override
