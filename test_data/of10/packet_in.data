@@ -30,7 +30,7 @@ of_packet_in_xid_set(obj, 305419896);
 -- java
 builder
    .setXid(0x12345678)
-   .setBufferId(0xabcdef01L)
+   .setBufferId(OFBufferId.of(0xabcdef01))
    .setTotalLen(9)
    .setInPort(OFPort.LOCAL)
    .setReason(OFPacketInReason.ACTION)
