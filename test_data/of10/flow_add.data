@@ -147,6 +147,7 @@ builder.setXid(0x12345678)
     )
     .setIdleTimeout(5)
     .setFlags(Sets.immutableEnumSet(OFFlowModFlags.CHECK_OVERLAP))
+    .setBufferId(OFBufferId.of(0))
     .setActions(
         ImmutableList.of(
             factory.actions().output(OFPort.FLOOD, 0),

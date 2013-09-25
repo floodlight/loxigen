@@ -33,7 +33,7 @@ ofp.message.packet_in(
 -- java
 builder
    .setXid(0x12345678)
-   .setBufferId(100)
+   .setBufferId(OFBufferId.of(100))
    .setTotalLen(17000)
    .setReason(OFPacketInReason.ACTION)
    .setTableId((byte) 20)
