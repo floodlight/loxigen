@@ -26,7 +26,7 @@ public class IPv4Address implements OFValueType<IPv4Address> {
     public static IPv4Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv4Address address: " + address);
+                    "Invalid byte array length for IPv4Address address: " + address.length);
         }
 
         int raw =
