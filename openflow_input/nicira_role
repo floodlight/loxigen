@@ -27,7 +27,7 @@
 
 #version 1
 
-enum ofp_nicira_controller_role {
+enum ofp_nicira_controller_role(wire_type=uint32_t) {
    NX_ROLE_OTHER = 0,
    NX_ROLE_MASTER = 1,
    NX_ROLE_SLAVE = 2,
@@ -40,7 +40,7 @@ struct of_nicira_controller_role_request : of_nicira_header {
     uint32_t xid;
     uint32_t experimenter == 0x2320;
     uint32_t subtype == 10;
-    uint32_t role;         // 0 other, 1 master, 2 slave
+    enum ofp_nicira_controller_role role;         // 0 other, 1 master, 2 slave
 };
 
 struct of_nicira_controller_role_reply : of_nicira_header {
@@ -50,5 +50,5 @@ struct of_nicira_controller_role_reply : of_nicira_header {
     uint32_t xid;
     uint32_t experimenter == 0x2320;
     uint32_t subtype == 11;
-    uint32_t role;         // 0 other, 1 master, 2 slave
+    enum ofp_nicira_controller_role role;         // 0 other, 1 master, 2 slave
 };

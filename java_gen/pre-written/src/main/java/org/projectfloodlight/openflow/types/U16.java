@@ -23,6 +23,9 @@ import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 public class U16 implements Writeable, OFValueType<U16> {
+    private final static short ZERO_VAL = 0;
+    public final static U16 ZERO = new U16(ZERO_VAL);
+
     public static int f(final short i) {
         return i & 0xffff;
     }
@@ -38,11 +41,13 @@ public class U16 implements Writeable, OFValueType<U16> {
     }
 
     public static final U16 of(int value) {
-        return new U16(t(value));
+        return ofRaw(t(value));
     }
 
-    public static final U16 ofRaw(short value) {
-        return new U16(value);
+    public static final U16 ofRaw(short raw) {
+        if(raw == ZERO_VAL)
+            return ZERO;
+        return new U16(raw);
     }
 
     public int getValue() {

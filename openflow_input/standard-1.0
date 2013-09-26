@@ -383,12 +383,12 @@ struct of_port_desc {
     of_port_no_t port_no;
     of_mac_addr_t hw_addr;
     of_port_name_t name;
-    uint32_t config;
-    uint32_t state;
-    uint32_t curr;
-    uint32_t advertised;
-    uint32_t supported;
-    uint32_t peer;
+    enum ofp_port_config config;
+    enum ofp_port_state state;
+    enum ofp_port_features curr;
+    enum ofp_port_features advertised;
+    enum ofp_port_features supported;
+    enum ofp_port_features peer;
 };
 
 struct of_features_request : of_header {
@@ -417,7 +417,7 @@ struct of_port_status : of_header {
     uint8_t type == 12;
     uint16_t length;
     uint32_t xid;
-    uint8_t reason;
+    enum ofp_port_reason reason;
     pad(7);
     of_port_desc_t desc;
 };

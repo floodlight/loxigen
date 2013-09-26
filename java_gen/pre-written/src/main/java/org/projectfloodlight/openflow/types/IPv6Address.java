@@ -16,6 +16,10 @@ public class IPv6Address implements OFValueType<IPv6Address> {
     private final long raw1;
     private final long raw2;
 
+    private final static long NONE_VAL1 = 0x0L;
+    private final static long NONE_VAL2 = 0x0L;
+    public static final IPv6Address NONE = new IPv6Address(NONE_VAL1, NONE_VAL2);
+
     public static final IPv6Address NO_MASK = IPv6Address.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
     public static final IPv6Address FULL_MASK = IPv6Address.of(0x0, 0x0);
 
@@ -27,7 +31,7 @@ public class IPv6Address implements OFValueType<IPv6Address> {
     public static IPv6Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv6 address: " + address);
+                    "Invalid byte array length for IPv6 address: " + address.length);
         }
 
         long raw1 =
@@ -123,6 +127,8 @@ public class IPv6Address implements OFValueType<IPv6Address> {
     }
 
     public static IPv6Address of(final long raw1, final long raw2) {
+        if(raw1==NONE_VAL1 && raw2 == NONE_VAL2)
+            return NONE;
         return new IPv6Address(raw1, raw2);
     }
 
