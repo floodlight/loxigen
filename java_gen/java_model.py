@@ -229,7 +229,8 @@ class JavaModel(object):
                 "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
                 "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
                 "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
+                "OFOxmBsnInPortsMasked128": OxmMapEntry("OFPortMap", "BSN_IN_PORTS_MASKED_128", True)
                 }
 
     # Registry of nullable properties:
