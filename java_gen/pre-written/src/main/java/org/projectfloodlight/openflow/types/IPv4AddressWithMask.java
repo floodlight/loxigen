@@ -1,6 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import org.projectfloodlight.openflow.types.IPAddress.IpVersion;
 
 public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     public final static IPv4AddressWithMask NONE = of(IPv4Address.NONE, IPv4Address.NONE);
@@ -14,8 +13,8 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     }
 
     @Override
-    public IpVersion getIpVersion() {
-        return IpVersion.IPv4;
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv4;
     }
 
     public static IPv4AddressWithMask of(int rawValue, int rawMask) {

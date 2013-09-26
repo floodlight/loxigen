@@ -29,8 +29,8 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
     @Override
-    public IpVersion getIpVersion() {
-        return IpVersion.IPv6;
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv6;
     }
 
     public static IPv6Address of(final byte[] address) {

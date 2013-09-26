@@ -24,8 +24,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     @Override
-    public IpVersion getIpVersion() {
-        return IpVersion.IPv4;
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv4;
     }
 
     public static IPv4Address of(final byte[] address) {

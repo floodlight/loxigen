@@ -2,12 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F> {
 
-    public enum IpVersion {
-        IPv4,
-        IPv6
-    }
-
-    public abstract IpVersion getIpVersion();
+    public abstract IPVersion getIpVersion();
 
     public static IPAddress<?> of(String ip) {
         if (ip.indexOf('.') != -1)

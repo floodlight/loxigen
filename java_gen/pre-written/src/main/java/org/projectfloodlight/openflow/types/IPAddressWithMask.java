@@ -1,6 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import org.projectfloodlight.openflow.types.IPAddress.IpVersion;
 
 public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F> {
 
@@ -8,7 +7,7 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
         super(value, mask);
     }
 
-    public abstract IpVersion getIpVersion();
+    public abstract IPVersion getIpVersion();
 
     public static IPAddressWithMask<?> of(String ip) {
         if (ip.indexOf('.') != -1)
