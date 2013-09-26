@@ -3,11 +3,18 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 import java.util.Arrays;
 
-public class IPv6AddressWithMask extends Masked<IPv6Address> {
+import org.projectfloodlight.openflow.types.IPAddress.IpVersion;
+
+public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
     public final static IPv6AddressWithMask NONE = of(IPv6Address.NONE, IPv6Address.NONE);
 
     private IPv6AddressWithMask(IPv6Address value, IPv6Address mask) {
         super(value, mask);
+    }
+
+    @Override
+    public IpVersion getIpVersion() {
+        return IpVersion.IPv6;
     }
 
     public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
