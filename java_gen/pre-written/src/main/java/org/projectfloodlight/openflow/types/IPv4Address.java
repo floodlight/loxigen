@@ -9,7 +9,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4Address implements OFValueType<IPv4Address> {
+public class IPv4Address extends IPAddress<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -21,6 +21,11 @@ public class IPv4Address implements OFValueType<IPv4Address> {
 
     private IPv4Address(final int rawValue) {
         this.rawValue = rawValue;
+    }
+
+    @Override
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv4;
     }
 
     public static IPv4Address of(final byte[] address) {

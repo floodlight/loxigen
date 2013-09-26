@@ -10,7 +10,8 @@ public class Prerequisite<T extends OFValueType<T>> {
     private final Set<OFValueType<T>> values;
     private boolean any;
 
-    public Prerequisite(MatchField<T> field, @SuppressWarnings("unchecked") OFValueType<T>... values) {
+    @SafeVarargs
+    public Prerequisite(MatchField<T> field, OFValueType<T>... values) {
         this.values = new HashSet<OFValueType<T>>();
         this.field = field;
         if (values == null || values.length == 0) {
