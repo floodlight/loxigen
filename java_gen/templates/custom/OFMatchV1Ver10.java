@@ -119,7 +119,6 @@
                 result = IPv4AddressWithMask.of(ipv4Src, IPv4Address.of(srcBitMask));
                 break;
             case IPV4_DST:
-                int dstMaskedBits = Math.min(32, (wildcards & OFPFW_NW_DST_MASK) >> OFPFW_NW_DST_SHIFT);
                 int dstBitMask = (-1) << (32 - getIpv4DstCidrMaskLen());
 
                 result = IPv4AddressWithMask.of(ipv4Dst, IPv4Address.of(dstBitMask));

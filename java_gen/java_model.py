@@ -247,7 +247,13 @@ class JavaModel(object):
     # registry of MaskedEnumGroups (see above).
     # map: ${java_enum_name}: tuple(MaskedEnumGroup)
     masked_enum_groups = defaultdict(lambda: (),
-            OFPortState= (MaskedEnumGroup("stp_flags", mask="STP_MASK", members=set(("STP_LISTEN", "STP_LEARN", "STP_FORWARD", "STP_BLOCK"))), )
+            OFPortState = (MaskedEnumGroup("stp_flags", mask="STP_MASK", members=set(("STP_LISTEN", "STP_LEARN", "STP_FORWARD", "STP_BLOCK"))), ),
+            OFConfigFlags = (
+                MaskedEnumGroup("frag_flags", mask="FRAG_MASK", members=set(("FRAG_NORMAL", "FRAG_DROP", "FRAG_REASM"))),
+            ),
+            OFTableConfig = (
+                MaskedEnumGroup("table_miss_flags", mask="TABLE_MISS_MASK", members=set(("TABLE_MISS_CONTROLLER", "TABLE_MISS_CONTINUE", "TABLE_MISS_DROP"))),
+            ),
     )
 
     # represents a metadata property associated with an EnumClass

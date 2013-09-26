@@ -36,7 +36,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     public static IPv6Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv6 address: " + address);
+                    "Invalid byte array length for IPv6 address: " + address.length);
         }
 
         long raw1 =
