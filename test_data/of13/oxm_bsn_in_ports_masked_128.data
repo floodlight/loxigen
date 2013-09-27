@@ -18,3 +18,7 @@ obj = of_oxm_bsn_in_ports_128_masked_new(OF_VERSION_1_3);
     of_bitmap_128_t bmap = { 0x8000000100000000, 0x00000000020001 };
     of_oxm_bsn_in_ports_128_masked_value_mask_set(obj, bmap);
 }
+-- java
+OFPortMap portmap = OFPortMap.ofPorts(OFPort.of(0), OFPort.of(17), OFPort.of(96), OFPort.of(127));
+builder.setValue(portmap.getValue());
+builder.setMask(portmap.getMask());
