@@ -46,7 +46,7 @@ public class ${test.name} {
     //:: var_name = msg.interface.variable_name
     //:: builder_method = factory.method_name(msg.interface)
     //:: factory_impl = java_model.model.factory_of(test.interface).of_version(test.java_class.version).name
-    ${factory.name if factory.name is not None else OFFactory} factory;
+    ${factory.name if factory.name is not None else "OFFactory"} factory;
 
     final static byte[] ${msg.constant_name}_SERIALIZED =
         new byte[] { ${", ".join("%s0x%x" % (("" if ord(c)<128 else "(byte) "),  ord(c)) for c in test_data["binary"] ) } };
