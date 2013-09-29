@@ -248,8 +248,8 @@ u32obj = JType('U32', 'U32') \
 u64 = JType('U64', 'U64') \
         .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO")
 of_port = JType("OFPort") \
-         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.NONE") \
-         .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.NONE")
+         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
+         .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
 actions_list = JType('List<OFAction>') \
         .op(read='ChannelUtils.readList(bb, $length, OFActionVer$version.READER)',
             write='ChannelUtils.writeList(bb, $name);',

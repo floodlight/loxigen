@@ -20,7 +20,6 @@ public class OFPort implements OFValueType<OFPort> {
 
     // private int constants (OF1.1+) to avoid duplication in the code
     // should not have to use these outside this class
-    private static final int OFPP_NONE_INT = 0x0;
     private static final int OFPP_ANY_INT = 0xFFffFFff;
     private static final int OFPP_LOCAL_INT = 0xFFffFFfe;
     private static final int OFPP_CONTROLLER_INT = 0xFFffFFfd;
@@ -86,9 +85,6 @@ public class OFPort implements OFValueType<OFPort> {
      * output port). NOTE: OpenFlow 1.0 calls this 'NONE'
      */
     public final static OFPort ANY = new NamedPort(OFPP_ANY_INT, "any");
-
-    /** port number 0, read of the wire, e.g, if not set */
-    public final static OFPort NONE = new NamedPort(OFPP_NONE_INT, "none");
 
     public static final OFPort NO_MASK = OFPort.of(0xFFFFFFFF);
     public static final OFPort FULL_MASK = OFPort.of(0x0);
@@ -162,8 +158,6 @@ public class OFPort implements OFValueType<OFPort> {
      */
     public static OFPort ofInt(final int portNumber) {
         switch (portNumber) {
-            case 0:
-                return NONE;
             case 1:
                 return PrecachedPort.p1;
             case 2:
@@ -306,8 +300,6 @@ public class OFPort implements OFValueType<OFPort> {
      */
     public static OFPort ofShort(final short portNumber) {
         switch (portNumber) {
-            case 0:
-                return NONE;
             case 1:
                 return PrecachedPort.p1;
             case 2:
