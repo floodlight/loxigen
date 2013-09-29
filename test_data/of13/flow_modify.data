@@ -76,7 +76,7 @@ ofp.message.flow_modify(
 builder.setXid(0x12345678)
     .setCookie(U64.parseHex("FEDCBA9876543210"))
     .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
-    .setTableId((byte) 3)
+    .setTableId(TableId.of(3))
     .setIdleTimeout(5)
     .setHardTimeout(10)
     .setPriority(6000)
@@ -96,7 +96,7 @@ builder.setXid(0x12345678)
     )
     .setInstructions(
         ImmutableList.<OFInstruction>of(
-        	factory.instructions().gotoTable((short)4),
-        	factory.instructions().gotoTable((short)7)
+                factory.instructions().gotoTable(TableId.of(4)),
+                factory.instructions().gotoTable(TableId.of(7))
         )
     );

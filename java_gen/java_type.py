@@ -380,7 +380,10 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
-
+table_id = JType("TableId") \
+        .op(read='TableId.readByte(bb)',
+            write='$name.writeByte(bb)',
+            default='TableId.ALL')
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
@@ -538,6 +541,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "table_id" and c_type == "uint8_t":
+        return table_id
     elif field_name == "version" and c_type == "uint8_t":
         return JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
