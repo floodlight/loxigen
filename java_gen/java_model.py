@@ -572,8 +572,10 @@ class JavaOFInterface(object):
         # FIXME: This duplicates inheritance information that is now available in the loxi_ir
         # model (note, that the loxi model is on versioned classes). Should check/infer the
         # inheritance information from the versioned lox_ir classes.
-        if re.match(r'OF.+StatsRequest$', self.name):
-            return ("", "OFStatsRequest", None)
+        if re.match(r'OFStatsRequest$', self.name):
+            return ("", "OFMessage", "T extends OFStatsReply")
+        elif re.match(r'OF.+StatsRequest$', self.name):
+            return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif re.match(r'OF.+StatsReply$', self.name):
             return ("", "OFStatsReply", None)
         elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
