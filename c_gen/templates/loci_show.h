@@ -341,5 +341,6 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_pdu_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_octets_pdu_payload(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
 #define LOCI_SHOW_u32_pdu_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u16_is_pdu_expected(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */

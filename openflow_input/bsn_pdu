@@ -59,8 +59,9 @@ struct of_bsn_set_port_pdu_expected_rx_info_request : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 33;
-    uint32_t pdu_timeout_ms;
     of_port_no_t port_no;
+    uint16_t is_pdu_expected; // following fields are valid only if this is 1
+    uint32_t pdu_timeout_ms;
     of_octets_t pdu_payload;
 };
 
