@@ -22,6 +22,8 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.primitives.UnsignedInts;
+
 public class U32 implements Writeable, OFValueType<U32> {
     private final static int ZERO_VAL = 0;
     public final static U32 ZERO = new U32(ZERO_VAL);
@@ -108,6 +110,11 @@ public class U32 implements Writeable, OFValueType<U32> {
     @Override
     public U32 applyMask(U32 mask) {
         return ofRaw(raw & mask.raw);
+    }
+
+    @Override
+    public int compareTo(U32 o) {
+        return UnsignedInts.compare(raw, o.raw);
     }
 
 }

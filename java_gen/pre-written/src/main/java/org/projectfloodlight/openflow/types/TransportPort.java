@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.Ints;
+
 /**
  * Represents L4 (Transport Layer) port (TCP, UDP, etc.)
  *
@@ -78,6 +80,11 @@ public class TransportPort implements OFValueType<TransportPort> {
     @Override
     public TransportPort applyMask(TransportPort mask) {
         return TransportPort.of(this.port & mask.port);
+    }
+
+    @Override
+    public int compareTo(TransportPort o) {
+        return Ints.compare(port,  o.port);
     }
 
 }
