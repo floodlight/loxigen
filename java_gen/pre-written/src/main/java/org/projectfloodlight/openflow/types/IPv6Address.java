@@ -11,7 +11,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
  *
  * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
  */
-public class IPv6Address implements OFValueType<IPv6Address> {
+public class IPv6Address extends IPAddress<IPv6Address> {
     static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;
@@ -28,10 +28,15 @@ public class IPv6Address implements OFValueType<IPv6Address> {
         this.raw2 = raw2;
     }
 
+    @Override
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv6;
+    }
+
     public static IPv6Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv6 address: " + address);
+                    "Invalid byte array length for IPv6 address: " + address.length);
         }
 
         long raw1 =
