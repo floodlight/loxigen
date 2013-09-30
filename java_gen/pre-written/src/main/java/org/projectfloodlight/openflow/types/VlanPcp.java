@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.UnsignedBytes;
+
 public class VlanPcp implements OFValueType<VlanPcp> {
 
     private static final byte VALIDATION_MASK = 0x07;
@@ -66,6 +68,11 @@ public class VlanPcp implements OFValueType<VlanPcp> {
     @Override
     public VlanPcp applyMask(VlanPcp mask) {
         return VlanPcp.of((byte)(this.pcp & mask.pcp));
+    }
+
+    @Override
+    public int compareTo(VlanPcp o) {
+        return UnsignedBytes.compare(pcp, o.pcp);
     }
 
 }

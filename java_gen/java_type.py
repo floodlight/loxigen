@@ -248,8 +248,8 @@ u32obj = JType('U32', 'U32') \
 u64 = JType('U64', 'U64') \
         .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO")
 of_port = JType("OFPort") \
-         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.NONE") \
-         .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.NONE")
+         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
+         .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
 actions_list = JType('List<OFAction>') \
         .op(read='ChannelUtils.readList(bb, $length, OFActionVer$version.READER)',
             write='ChannelUtils.writeList(bb, $name);',
@@ -380,7 +380,10 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
-
+table_id = JType("TableId") \
+        .op(read='TableId.readByte(bb)',
+            write='$name.writeByte(bb)',
+            default='TableId.ALL')
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
@@ -538,6 +541,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "table_id" and c_type == "uint8_t":
+        return table_id
     elif field_name == "version" and c_type == "uint8_t":
         return JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')

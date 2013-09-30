@@ -36,7 +36,7 @@ package ${factory.package};
 
 //:: include("_imports.java")
 
-public interface ${factory.name} {
+public interface ${factory.name}${" extends XidGenerator" if factory.xid_generator else ""} {
     // Subfactories
 //:: for name, clazz in factory.sub_factories.items():
     ${clazz} ${name}();
@@ -50,7 +50,7 @@ public interface ${factory.name} {
     ${i.name}.Builder ${factory.method_name(i, builder=True)}()${ "" if i.is_universal else " throws UnsupportedOperationException"};
     //:: #endif
     //:: if len(i.writeable_members) <= 2:
-    ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)});
+    ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xid" )});
     //:: #endif
 //:: #endfor
 //:: if factory.name == 'OFFactory':

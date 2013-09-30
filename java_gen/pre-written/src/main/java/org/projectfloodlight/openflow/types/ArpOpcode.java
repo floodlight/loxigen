@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.primitives.UnsignedInts;
+
 public class ArpOpcode implements OFValueType<ArpOpcode> {
 
     final static int LENGTH = 2;
@@ -158,6 +160,33 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
 
     public int getOpCode() {
         return opcode;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + opcode;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ArpOpcode other = (ArpOpcode) obj;
+        if (opcode != other.opcode)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int compareTo(ArpOpcode o) {
+        return UnsignedInts.compare(opcode, o.opcode);
     }
 
 }

@@ -4,6 +4,8 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.primitives.Longs;
+
 /**
  * Wrapper around a 6 byte mac address.
  *
@@ -129,6 +131,11 @@ public class MacAddress implements OFValueType<MacAddress> {
     @Override
     public MacAddress applyMask(MacAddress mask) {
         return MacAddress.of(this.rawValue & mask.rawValue);
+    }
+
+    @Override
+    public int compareTo(MacAddress o) {
+        return Longs.compare(rawValue, o.rawValue);
     }
 
 
