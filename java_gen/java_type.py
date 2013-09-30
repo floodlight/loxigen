@@ -227,7 +227,8 @@ class JType(object):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='bb.readByte()', write='bb.writeByte($name)')
+        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
+        .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)', write='ChannelUtils.writeList(bb, $name)')
 u16 = JType('int', 'short') \
