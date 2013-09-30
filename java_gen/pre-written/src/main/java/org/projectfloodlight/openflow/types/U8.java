@@ -22,6 +22,8 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.primitives.UnsignedBytes;
+
 public class U8 implements Writeable, OFValueType<U8> {
     private final static byte ZERO_VAL = 0;
     public final static U8 ZERO = new U8(ZERO_VAL);
@@ -110,6 +112,11 @@ public class U8 implements Writeable, OFValueType<U8> {
     @Override
     public U8 applyMask(U8 mask) {
         return ofRaw( (byte) (raw & mask.raw));
+    }
+
+    @Override
+    public int compareTo(U8 o) {
+        return UnsignedBytes.compare(raw, o.raw);
     }
 
 }

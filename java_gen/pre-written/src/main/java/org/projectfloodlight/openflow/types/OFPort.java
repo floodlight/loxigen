@@ -4,6 +4,8 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.UnsignedInts;
+
 /**
  * Abstraction of an logical / OpenFlow switch port (ofp_port_no) in OpenFlow.
  * Immutable. Note: Switch port numbers were changed in OpenFlow 1.1 from uint16
@@ -537,5 +539,10 @@ public class OFPort implements OFValueType<OFPort> {
     @Override
     public OFPort applyMask(OFPort mask) {
         return OFPort.of(this.portNumber & mask.portNumber);
+    }
+
+    @Override
+    public int compareTo(OFPort o) {
+        return UnsignedInts.compare(this.portNumber, o.portNumber);
     }
 }

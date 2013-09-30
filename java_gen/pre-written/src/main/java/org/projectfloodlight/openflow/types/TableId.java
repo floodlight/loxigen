@@ -3,7 +3,9 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
-public class TableId implements OFValueType<TableId> {
+import com.google.common.primitives.Shorts;
+
+public class TableId implements OFValueType<TableId>, Comparable<TableId> {
 
     final static int LENGTH = 1;
 
@@ -40,22 +42,6 @@ public class TableId implements OFValueType<TableId> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof TableId))
-            return false;
-        TableId other = (TableId)obj;
-        if (other.id != this.id)
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int prime = 13873;
-        return this.id * prime;
-    }
-
-    @Override
     public String toString() {
         return "0x" + Integer.toHexString(id);
     }
@@ -82,5 +68,25 @@ public class TableId implements OFValueType<TableId> {
         return TableId.of((short)(this.id & mask.id));
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof TableId))
+            return false;
+        TableId other = (TableId)obj;
+        if (other.id != this.id)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int prime = 13873;
+        return this.id * prime;
+    }
+
+    @Override
+    public int compareTo(TableId other) {
+        return Shorts.compare(this.id, other.id);
+    }
 
 }

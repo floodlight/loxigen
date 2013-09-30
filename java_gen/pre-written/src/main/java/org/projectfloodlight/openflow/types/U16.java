@@ -60,7 +60,7 @@ public class U16 implements Writeable, OFValueType<U16> {
 
     @Override
     public String toString() {
-        return "" + f(raw);
+        return Integer.toString(f(raw));
     }
 
     @Override
@@ -109,5 +109,10 @@ public class U16 implements Writeable, OFValueType<U16> {
     @Override
     public U16 applyMask(U16 mask) {
         return ofRaw( (short) (raw & mask.raw));
+    }
+
+    @Override
+    public int compareTo(U16 o) {
+        return Integer.compare(f(raw), f(o.raw));
     }
 }
