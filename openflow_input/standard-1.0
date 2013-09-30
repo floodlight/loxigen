@@ -35,8 +35,8 @@ enum macro_definitions {
     OFP_MAX_TABLE_NAME_LEN = 32,
     OFP_MAX_PORT_NAME_LEN = 16,
 
-    OFP_TCP_PORT = 6633,
-    OFP_SSL_PORT = 6633,
+    OFP_TCP_PORT = 6653,
+    OFP_SSL_PORT = 6653,
 
     OFP_ETH_ALEN = 6,
 
