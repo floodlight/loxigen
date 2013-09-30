@@ -66,7 +66,7 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_ERROR = 1,
     OFPT_ECHO_REQUEST = 2,
     OFPT_ECHO_REPLY = 3,
-    OFPT_VENDOR = 4,
+    OFPT_EXPERIMENTER = 4,
     OFPT_FEATURES_REQUEST = 5,
     OFPT_FEATURES_REPLY = 6,
     OFPT_GET_CONFIG_REQUEST = 7,
@@ -214,7 +214,7 @@ enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
     OFPSF_REPLY_MORE = 0x1,
 };
 
-enum ofp_stats_types(wire_type=uint16_t) {
+enum ofp_stats_type(wire_type=uint16_t) {
     OFPST_DESC = 0,
     OFPST_FLOW = 1,
     OFPST_AGGREGATE = 2,
@@ -407,7 +407,7 @@ struct of_features_reply : of_header {
     uint32_t n_buffers;
     uint8_t n_tables;
     pad(3);
-    uint32_t capabilities;
+    enum ofp_capabilities capabilities;
     uint32_t actions;
     list(of_port_desc_t) ports;
 };
@@ -698,8 +698,66 @@ struct of_error_msg : of_header {
     uint8_t type == 1;
     uint16_t length;
     uint32_t xid;
-    uint16_t err_type;
-    uint16_t code;
+    uint16_t err_type == ?;
+};
+
+struct of_hello_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0;
+    enum ofp_hello_failed_code code;
+    of_octets_t data;
+};
+
+struct of_bad_request_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 1;
+    enum ofp_bad_request_code code;
+    of_octets_t data;
+};
+
+struct of_bad_action_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 2;
+    enum ofp_bad_action_code code;
+    of_octets_t data;
+};
+
+struct of_flow_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 3;
+    enum ofp_flow_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_port_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 4;
+    enum ofp_port_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_queue_op_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 5;
+    enum ofp_queue_op_failed_code code;
     of_octets_t data;
 };
 

@@ -33,11 +33,12 @@ def name_c_to_caps_camel(name):
     else:
         return camel
 
-java_primitive_types = set("byte char short int long".split(" "))
+java_primitive_types = set("boolean byte char short int long".split(" "))
 
 ### info table about java primitive types, for casting literals in the source code
 # { name : (signed?, length_in_bits) }
 java_primitives_info = {
+        'boolean' : (False, 8),
         'byte' : (True, 8),
         'char' : (False, 16),
         'short' : (True, 16),
@@ -48,7 +49,7 @@ java_primitives_info = {
 def format_primitive_literal(t, value):
     """ Format a primitive numeric literal for inclusion in the
         java source code. Takes care of casting the literal
-        apropriately for correct representation despite Java's
+        appropriately for correct representation despite Java's
         signed-craziness
     """
     signed, bits = java_primitives_info[t]
@@ -384,7 +385,14 @@ table_stats_wildcards = JType("int") \
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
-boolean = JType("boolean").op(default="false")
+boolean = JType("boolean", "byte") \
+        .op(read='(bb.readByte() != 0)',
+            write='bb.writeByte($name ? 1 : 0)',
+            default="false")
+datapath_id = JType("DatapathId") \
+        .op(read='DatapathId.of(bb.readLong())',
+            write='bb.writeLong($name.getLong())',
+            default='DatapathId.NONE')
 
 generic_t = JType("T")
 
@@ -475,7 +483,9 @@ exceptions = {
         'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
                 'tcp_src': transport_port, 'tcp_dst': transport_port
-                }
+                },
+        'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
+        'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
 }
 
 
@@ -538,12 +548,25 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "err_type":
+        return JType("OFErrorType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)')
+    elif field_name == "stats_type":
+        return JType("OFStatsType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)')
     elif field_name == "version" and c_type == "uint8_t":
         return JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
-    elif field_name == "buffer_id" and c_type == "uint32_t":
+    elif field_name == "buffer_id":
         return JType("OFBufferId") \
             .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+    elif field_name == 'datapath_id':
+        return datapath_id
+    elif field_name == 'actions' and obj_name == 'of_features_reply':
+        return JType("Set<OFActionType>") \
+            .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
+                write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
+                default='ImmutableSet.<OFActionType>of()')
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

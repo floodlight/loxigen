@@ -92,8 +92,8 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_GROUP_MOD = 15,
     OFPT_PORT_MOD = 16,
     OFPT_TABLE_MOD = 17,
-    OFPT_MULTIPART_REQUEST = 18,
-    OFPT_MULTIPART_REPLY = 19,
+    OFPT_STATS_REQUEST = 18,
+    OFPT_STATS_REPLY = 19,
     OFPT_BARRIER_REQUEST = 20,
     OFPT_BARRIER_REPLY = 21,
     OFPT_QUEUE_GET_CONFIG_REQUEST = 22,
@@ -336,7 +336,7 @@ enum ofp_hello_failed_code(wire_type=uint16_t) {
 enum ofp_bad_request_code(wire_type=uint16_t) {
     OFPBRC_BAD_VERSION = 0,
     OFPBRC_BAD_TYPE = 1,
-    OFPBRC_BAD_MULTIPART = 2,
+    OFPBRC_BAD_STAT = 2,
     OFPBRC_BAD_EXPERIMENTER = 3,
     OFPBRC_BAD_EXP_TYPE = 4,
     OFPBRC_EPERM = 5,
@@ -481,30 +481,30 @@ enum ofp_table_features_failed_code(wire_type=uint16_t) {
     OFPTFFC_EPERM = 5,
 };
 
-enum ofp_multipart_types(wire_type=uint16_t) {
-    OFPMP_DESC = 0,
-    OFPMP_FLOW = 1,
-    OFPMP_AGGREGATE = 2,
-    OFPMP_TABLE = 3,
-    OFPMP_PORT_STATS = 4,
-    OFPMP_QUEUE = 5,
-    OFPMP_GROUP = 6,
-    OFPMP_GROUP_DESC = 7,
-    OFPMP_GROUP_FEATURES = 8,
-    OFPMP_METER = 9,
-    OFPMP_METER_CONFIG = 10,
-    OFPMP_METER_FEATURES = 11,
-    OFPMP_TABLE_FEATURES = 12,
-    OFPMP_PORT_DESC = 13,
-    OFPMP_EXPERIMENTER = 0xffff,
+enum ofp_stats_type(wire_type=uint16_t) {
+    OFPST_DESC = 0,
+    OFPST_FLOW = 1,
+    OFPST_AGGREGATE = 2,
+    OFPST_TABLE = 3,
+    OFPST_PORT = 4,
+    OFPST_QUEUE = 5,
+    OFPST_GROUP = 6,
+    OFPST_GROUP_DESC = 7,
+    OFPST_GROUP_FEATURES = 8,
+    OFPST_METER = 9,
+    OFPST_METER_CONFIG = 10,
+    OFPST_METER_FEATURES = 11,
+    OFPST_TABLE_FEATURES = 12,
+    OFPST_PORT_DESC = 13,
+    OFPST_EXPERIMENTER = 0xffff,
 };
 
-enum ofp_multipart_request_flags(wire_type=uint16_t, bitmask=True) {
-    OFPMPF_REQ_MORE = 0x1,
+enum ofp_stats_request_flags(wire_type=uint16_t, bitmask=True) {
+    OFPSF_REQ_MORE = 0x1,
 };
 
-enum ofp_multipart_reply_flags(wire_type=uint16_t, bitmask=True) {
-    OFPMPF_REPLY_MORE = 0x1,
+enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
+    OFPSF_REPLY_MORE = 0x1,
 };
 
 enum ofp_table_feature_prop_type(wire_type=uint16_t) {
@@ -695,7 +695,7 @@ struct of_features_reply : of_header {
     uint8_t n_tables;
     uint8_t auxiliary_id;
     pad(2);
-    uint32_t capabilities;
+    enum ofp_capabilities capabilities;
     uint32_t reserved;
 };
 
@@ -1150,21 +1150,159 @@ struct of_error_msg : of_header {
     uint8_t type == 1;
     uint16_t length;
     uint32_t xid;
-    uint16_t err_type;
-    uint16_t code;
+    uint16_t err_type == ?;
+};
+
+struct of_hello_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0;
+    enum ofp_hello_failed_code code;
     of_octets_t data;
 };
 
-//struct of_error_experimenter_msg {
-//    uint8_t version;
-//    uint8_t type;
-//    uint16_t length;
-//    uint32_t xid;
-//    uint16_t err_type;
-//    uint16_t subtype;
-//    uint32_t experimenter;
-//    of_octets_t data;
-//};
+struct of_bad_request_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 1;
+    enum ofp_bad_request_code code;
+    of_octets_t data;
+};
+
+struct of_bad_action_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 2;
+    enum ofp_bad_action_code code;
+    of_octets_t data;
+};
+
+struct of_bad_instruction_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 3;
+    enum ofp_bad_instruction_code code;
+    of_octets_t data;
+};
+
+struct of_bad_match_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 4;
+    enum ofp_bad_match_code code;
+    of_octets_t data;
+};
+
+struct of_flow_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 5;
+    enum ofp_flow_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_group_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 6;
+    enum ofp_group_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_port_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 7;
+    enum ofp_port_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_table_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 8;
+    enum ofp_table_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_queue_op_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 9;
+    enum ofp_queue_op_failed_code code;
+    of_octets_t data;
+};
+
+struct of_switch_config_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 10;
+    enum ofp_switch_config_failed_code code;
+    of_octets_t data;
+};
+
+struct of_role_request_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 11;
+    enum ofp_role_request_failed_code code;
+    of_octets_t data;
+};
+
+struct of_meter_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 12;
+    enum ofp_meter_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_table_features_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 13;
+    enum ofp_table_features_failed_code code;
+    of_octets_t data;
+};
+
+struct of_experimenter_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype;
+    uint32_t experimenter;
+    of_octets_t data;
+};
 
 // STATS ENTRIES: flow, table, port, queue, group stats, group desc stats
 
@@ -1770,7 +1908,7 @@ struct of_meter_config {
     list(of_meter_band_t) entries;
 };
 
-struct of_experimenter_multipart_header {
+struct of_experimenter_stats_header {
     uint32_t experimenter == ?;
     uint32_t subtype;
 };

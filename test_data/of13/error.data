@@ -6,8 +6,7 @@
 00 08 # code
 61 62 63 # data
 -- python
-ofp.message.error_msg(
+ofp.message.bad_match_error_msg(
     xid=0x12345678,
-    err_type=ofp.OFPET_BAD_MATCH,
     code=ofp.OFPBMC_BAD_MASK,
     data="abc")

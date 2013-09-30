@@ -42,6 +42,10 @@ public class ${factory.name} implements ${factory.interface.name} {
     public final static ${factory.name} INSTANCE = new ${factory.name}();
     private ${factory.name}() {}
 
+    public OFVersion getOFVersion() {
+        return OFVersion.OF_${factory.version.of_version};
+    }
+
     //:: for name, clazz in factory.interface.sub_factories.items():
     public ${clazz} ${name}() {
         return ${clazz}Ver${factory.version.of_version}.INSTANCE;
