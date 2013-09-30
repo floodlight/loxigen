@@ -2,8 +2,9 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class ICMPv4Type implements OFValueType<ICMPv4Type> {
+import com.google.common.primitives.Shorts;
 
+public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     final static int LENGTH = 1;
 
     private static final short ICMPV4_TYPE_VAL_ECHO_REPLY    = 0;
@@ -166,5 +167,30 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
         return ICMPv4Type.of((short)(this.type & mask.type));
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + type;
+        return result;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ICMPv4Type other = (ICMPv4Type) obj;
+        if (type != other.type)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int compareTo(ICMPv4Type o) {
+        return Shorts.compare(type, o.type);
+    }
 }

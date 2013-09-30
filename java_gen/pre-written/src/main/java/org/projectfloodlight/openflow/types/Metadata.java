@@ -2,8 +2,10 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.primitives.UnsignedInts;
+
 @Immutable
-public class Metadata {
+public class Metadata implements OFValueType<Metadata> {
     static final int LENGTH = 4;
 
     private final static int NONE_VAL = 0;
@@ -26,9 +28,19 @@ public class Metadata {
         return rawValue;
     }
 
+    @Override
     public int getLength() {
         return LENGTH;
     }
+
+    @Override
+    public String toString() {
+        return Integer.toString(rawValue);
+    }
+
+    @Override
+    public Metadata applyMask(Metadata mask) {
+        return Metadata.of(rawValue & mask.rawValue);    }
 
     @Override
     public int hashCode() {
@@ -53,7 +65,7 @@ public class Metadata {
     }
 
     @Override
-    public String toString() {
-        return Integer.toString(rawValue);
+    public int compareTo(Metadata o) {
+        return UnsignedInts.compare(rawValue, rawValue);
     }
 }

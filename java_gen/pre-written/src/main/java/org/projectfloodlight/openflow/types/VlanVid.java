@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.Shorts;
+
 public class VlanVid implements OFValueType<VlanVid> {
 
     private static final short VALIDATION_MASK = 0x0FFF;
@@ -84,6 +86,11 @@ public class VlanVid implements OFValueType<VlanVid> {
     @Override
     public VlanVid applyMask(VlanVid mask) {
         return VlanVid.of((short)(this.vid & mask.vid));
+    }
+
+    @Override
+    public int compareTo(VlanVid o) {
+        return Shorts.compare(vid, o.vid);
     }
 
 }

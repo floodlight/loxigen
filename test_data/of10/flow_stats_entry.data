@@ -110,7 +110,7 @@ of_flow_stats_entry_priority_set(obj, 100);
 of_flow_stats_entry_table_id_set(obj, 3);
 -- java
     builder
-      .setTableId((short) 3)
+      .setTableId(TableId.of(3))
       .setMatch(
         factory.buildMatch()
             .setExact(MatchField.IN_PORT, OFPort.of(3))
