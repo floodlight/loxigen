@@ -30,19 +30,19 @@
 
 #version any
 
-struct of_bsn_set_port_pdu_tx_info_request : of_bsn_header {
+struct of_bsn_pdu_tx_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 31;
-    uint32_t pdu_tx_interval_ms;
+    uint32_t tx_interval_ms;
     of_port_no_t port_no;
-    of_octets_t pdu_payload;
+    of_octets_t data;
 };
 
-struct of_bsn_set_port_pdu_tx_info_reply : of_bsn_header {
+struct of_bsn_pdu_tx_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -52,20 +52,19 @@ struct of_bsn_set_port_pdu_tx_info_reply : of_bsn_header {
     uint32_t status; // 0 means success
 };
 
-struct of_bsn_set_port_pdu_expected_rx_info_request : of_bsn_header {
+struct of_bsn_pdu_rx_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 33;
+    uint32_t timeout_ms;
     of_port_no_t port_no;
-    uint16_t is_pdu_expected; // following fields are valid only if this is 1
-    uint32_t pdu_timeout_ms;
-    of_octets_t pdu_payload;
+    of_octets_t data;
 };
 
-struct of_bsn_set_port_pdu_expected_rx_info_reply : of_bsn_header {
+struct of_bsn_pdu_rx_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -75,7 +74,7 @@ struct of_bsn_set_port_pdu_expected_rx_info_reply : of_bsn_header {
     uint32_t status; // 0 means success
 };
 
-struct of_bsn_pdu_timedout_notif : of_bsn_header {
+struct of_bsn_pdu_rx_timeout : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -83,5 +82,4 @@ struct of_bsn_pdu_timedout_notif : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 35;
     of_port_no_t port_no;
-    of_octets_t expected_pdu_payload;
 };

@@ -337,10 +337,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_ipv4_value_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u8_hybrid_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u16_hybrid_version(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
-#define LOCI_SHOW_octets_expected_pdu_payload(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
-#define LOCI_SHOW_u32_pdu_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_octets_pdu_payload(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
-#define LOCI_SHOW_u32_pdu_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_u16_is_pdu_expected(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u32_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */
