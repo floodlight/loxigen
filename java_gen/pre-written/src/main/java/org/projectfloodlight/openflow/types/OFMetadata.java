@@ -63,6 +63,8 @@ public class OFMetadata implements OFValueType<OFMetadata> {
         return "Metadata: " + u64.toString();
     }
 
-
-
+    @Override
+    public int compareTo(OFMetadata o) {
+        return u64.compareTo(o.u64);
+    }
 }

@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.primitives.UnsignedInts;
+
 
 /**
  * EtherType field representation.
@@ -214,24 +216,6 @@ public class EthType implements OFValueType<EthType> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof EthType))
-            return false;
-        EthType o = (EthType)obj;
-        if (o.rawValue != this.rawValue)
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = 1;
-        result = prime * result + rawValue;
-        return result;
-    }
-
-    @Override
     public String toString() {
         return Integer.toHexString(rawValue);
     }
@@ -251,6 +235,29 @@ public class EthType implements OFValueType<EthType> {
 
     public int getValue() {
         return rawValue;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof EthType))
+            return false;
+        EthType o = (EthType)obj;
+        if (o.rawValue != this.rawValue)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = 1;
+        result = prime * result + rawValue;
+        return result;
+    }
+
+    @Override
+    public int compareTo(EthType o) {
+        return UnsignedInts.compare(rawValue, o.rawValue);
     }
 
 

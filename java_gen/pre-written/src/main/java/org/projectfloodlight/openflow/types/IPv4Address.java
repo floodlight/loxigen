@@ -1,6 +1,10 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
+
 import org.jboss.netty.buffer.ChannelBuffer;
+
+import com.google.common.primitives.UnsignedInts;
 
 
 
@@ -9,7 +13,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4Address implements OFValueType<IPv4Address> {
+public class IPv4Address extends IPAddress<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -21,6 +25,11 @@ public class IPv4Address implements OFValueType<IPv4Address> {
 
     private IPv4Address(final int rawValue) {
         this.rawValue = rawValue;
+    }
+
+    @Override
+    public IPVersion getIpVersion() {
+        return IPVersion.IPv4;
     }
 
     public static IPv4Address of(final byte[] address) {
@@ -101,28 +110,6 @@ public class IPv4Address implements OFValueType<IPv4Address> {
         return res.toString();
     }
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + rawValue;
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        IPv4Address other = (IPv4Address) obj;
-        if (rawValue != other.rawValue)
-            return false;
-        return true;
-    }
-
     public void write4Bytes(ChannelBuffer c) {
         c.writeInt(rawValue);
     }
@@ -136,5 +123,33 @@ public class IPv4Address implements OFValueType<IPv4Address> {
         return IPv4Address.of(this.rawValue & mask.rawValue);
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + Arrays.hashCode(bytesCache);
+        result = prime * result + rawValue;
+        return result;
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        IPv4Address other = (IPv4Address) obj;
+        if (!Arrays.equals(bytesCache, other.bytesCache))
+            return false;
+        if (rawValue != other.rawValue)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int compareTo(IPv4Address o) {
+        return UnsignedInts.compare(rawValue, o.rawValue);
+    }
 }

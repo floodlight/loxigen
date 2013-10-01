@@ -380,14 +380,15 @@ class JavaModel(object):
             annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
 
             factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
-                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={})
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator=False)
 
         factories[""] = OFFactory(
                     package=prefix,
                     name="OFFactory",
                     remove_prefix="",
                     members=[], base_class="OFMessage", sub_factories=OrderedDict(
-                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ))
+                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ),
+                    xid_generator=True)
 
         for i in self.interfaces:
             for n, factory in factories.items():
@@ -430,7 +431,7 @@ class JavaModel(object):
             return True
 
 
-class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories"))):
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories", "xid_generator"))):
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
@@ -587,8 +588,10 @@ class JavaOFInterface(object):
         # FIXME: This duplicates inheritance information that is now available in the loxi_ir
         # model (note, that the loxi model is on versioned classes). Should check/infer the
         # inheritance information from the versioned lox_ir classes.
-        if re.match(r'OF.+StatsRequest$', self.name):
-            return ("", "OFStatsRequest", None)
+        if re.match(r'OFStatsRequest$', self.name):
+            return ("", "OFMessage", "T extends OFStatsReply")
+        elif re.match(r'OF.+StatsRequest$', self.name):
+            return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif re.match(r'OF.+StatsReply$', self.name):
             return ("", "OFStatsReply", None)
         elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
@@ -636,6 +639,10 @@ class JavaOFInterface(object):
     @memoize
     def writeable_members(self):
         return [ m for m in self.members if m.is_writeable ]
+
+    @memoize
+    def member_by_name(self, name):
+        return find(lambda m: m.name == name, self.members)
 
     @property
     @memoize

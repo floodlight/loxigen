@@ -425,7 +425,7 @@
                     wildcards |= OFPFW_TP_SRC;
                     break;
                 case IN_PORT:
-                    setInPort(OFPort.NONE);
+                    setInPort(OFPort.of(0)); // NOTE: not 'NONE' -- that is 0xFF for ports
                     wildcards |= OFPFW_IN_PORT;
                     break;
                 case IPV4_DST:

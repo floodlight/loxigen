@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.primitives.Shorts;
+
 /**
  * IP-Protocol field representation
  *
@@ -608,24 +610,6 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof IpProtocol))
-            return false;
-        IpProtocol o = (IpProtocol)obj;
-        if (o.proto != this.proto)
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 37;
-        int result = 1;
-        result = prime * result + proto;
-        return result;
-    }
-
-    @Override
     public String toString() {
         return Integer.toHexString(proto);
     }
@@ -645,6 +629,30 @@ public class IpProtocol implements OFValueType<IpProtocol> {
 
     public short getIpProtocolNumber() {
         return proto;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof IpProtocol))
+            return false;
+        IpProtocol o = (IpProtocol)obj;
+        if (o.proto != this.proto)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 37;
+        int result = 1;
+        result = prime * result + proto;
+        return result;
+    }
+
+
+    @Override
+    public int compareTo(IpProtocol o) {
+        return Shorts.compare(proto, o.proto);
     }
 
 }
