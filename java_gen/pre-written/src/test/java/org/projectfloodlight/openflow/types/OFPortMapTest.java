@@ -24,7 +24,7 @@ public class OFPortMapTest extends TestCase {
 
         // Test that all ports that were added are actually on, and all other ports are off
         OFPortMap portmap = builder.build();
-        System.out.println(portmap);
+        //System.out.println(portmap);
         Boolean[] actual = new Boolean[128];
         for (int i = 0; i < 128; i++) {
             actual[i] = false;
