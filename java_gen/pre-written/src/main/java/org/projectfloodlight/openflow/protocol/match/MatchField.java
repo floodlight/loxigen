@@ -13,7 +13,7 @@ import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
-import org.projectfloodlight.openflow.types.OFPortBitmap;
+import org.projectfloodlight.openflow.types.OFBitMask128;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U32;
@@ -171,8 +171,8 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
-    public final static MatchField<OFPortBitmap> BSN_IN_PORTS_128 =
-            new MatchField<OFPortBitmap>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
+    public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
+            new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
 
     public String getName() {
         return name;
