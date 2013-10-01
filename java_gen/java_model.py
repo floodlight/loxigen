@@ -229,7 +229,9 @@ class JavaModel(object):
                 "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
                 "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
                 "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
+                "OFOxmBsnInPorts128":       OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", False),
+                "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True)
                 }
 
     # Registry of nullable properties:
@@ -399,6 +401,13 @@ class JavaModel(object):
                         factory.members.append(i)
                         break
         return factories.values()
+    
+    @memoize
+    def factory_of(self, interface):
+        for factory in self.of_factories:
+            if interface in factory.members:
+                return factory
+        return None
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -441,6 +450,12 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
+    
+    def of_version(self, version):
+        for fc in self.factory_classes:
+            if fc.version == version:
+                return fc
+        return None
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
 class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
@@ -1113,7 +1128,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-
+    
+    @property
+    def interface(self):
+        return self.java_class.interface
+    
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)

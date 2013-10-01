@@ -1,0 +1,24 @@
+-- binary
+00 03 # class
+01 # type/masked
+20 # length
+00 00 00 00 00 00 00 00 # value
+00 00 00 00 00 00 00 00 # ...
+ff ff ff fe ff ff ff ff # mask - Only ports 0, 17, 96 are selected (and thus are zero)
+ff ff ff ff ff fd ff fe # ...
+-- python
+ofp.oxm.bsn_in_ports_128_masked(set(), set(range(0,128)) - set((0, 17,96)))
+-- c
+obj = of_oxm_bsn_in_ports_128_masked_new(OF_VERSION_1_3);
+{
+    of_bitmap_128_t bmap = { 0, 0 };
+    of_oxm_bsn_in_ports_128_masked_value_set(obj, bmap);
+}
+{
+    of_bitmap_128_t bmap = { 0xfffffffeffffffff , 0xfffffffffffdfffe };
+    of_oxm_bsn_in_ports_128_masked_value_mask_set(obj, bmap);
+}
+-- java
+OFPortMap portmap = OFPortMap.ofPorts(OFPort.of(0), OFPort.of(17), OFPort.of(96));
+builder.setValue(portmap.getValue());
+builder.setMask(portmap.getMask());

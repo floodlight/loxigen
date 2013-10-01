@@ -380,6 +380,10 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
+port_bitmap = JType('OFBitMask128') \
+            .op(read='OFBitMask128.read16Bytes(bb)',
+                write='$name.write16Bytes(bb)',
+                default='OFBitMask128.NONE')
 table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
@@ -420,6 +424,7 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
+        'of_bitmap_128_t': port_bitmap
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -473,6 +478,9 @@ exceptions = {
         'of_oxm_mpls_label_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         'of_oxm_mpls_tc' : { 'value' : u8obj },
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        
+        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
+        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,
