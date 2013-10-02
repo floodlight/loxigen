@@ -227,7 +227,8 @@ class JType(object):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='bb.readByte()', write='bb.writeByte($name)')
+        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
+        .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)', write='ChannelUtils.writeList(bb, $name)')
 u16 = JType('int', 'short') \
@@ -323,9 +324,9 @@ eth_type = JType("EthType")\
             write="$name.write2Bytes(bb)",
             default="EthType.NONE")
 vlan_vid = JType("VlanVid")\
-        .op(read="VlanVid.read2Bytes(bb)",
-            write="$name.write2Bytes(bb)",
-            default="VlanVid.NONE")
+        .op(version=1, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=2, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=ANY, read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="VlanVid.NONE")
 vlan_pcp = JType("VlanPcp")\
         .op(read="VlanPcp.readByte(bb)",
             write="$name.writeByte(bb)",
@@ -549,6 +550,10 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
+        return JType("OFInstructionType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
+            .op(read="OFInstructionTypeSerializerVer$version.readFrom(bb)", write="OFInstructionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
