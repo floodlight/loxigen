@@ -1,6 +1,6 @@
 :: import of_g
 :: ir = of_g.ir
--- TODO copyright (GPL)
+:: include('_copyright.lua')
 
 :: include('_ofreader.lua')
 
