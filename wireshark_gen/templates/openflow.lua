@@ -78,7 +78,8 @@ ${ofclass.name}_v${version}_dissectors = {}
 :: name = 'dissect_%s_v%d' % (ofclass.name, version)
 :: include('_ofclass_dissector.lua', name=name, ofclass=ofclass)
 :: if ofclass.superclass:
-:: discriminator_value = 0
+:: discriminator = ofproto.class_by_name(ofclass.superclass).discriminator
+:: discriminator_value = ofclass.member_by_name(discriminator.name).value
 ${ofclass.superclass}_v${version}_dissectors[${discriminator_value}] = ${name}
 
 :: #endif
