@@ -1,0 +1,22 @@
+-- binary
+04 01 # version / type
+00 0f # length
+12 34 56 78 # xid
+00 01 # err_type
+00 08 # code
+61 62 63 # data
+-- python
+ofp.message.bad_request_error_msg(
+    xid=0x12345678,
+    code=ofp.OFPBRC_BUFFER_UNKNOWN,
+    data="abc")
+-- c
+obj = of_bad_request_error_msg_new(OF_VERSION_1_3);
+of_flow_add_xid_set(obj, 0x12345678);
+of_bad_request_error_msg_code_set(obj, OF_REQUEST_FAILED_BUFFER_UNKNOWN_BY_VERSION(OF_VERSION_1_3));
+of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
+of_bad_request_error_msg_data_set(obj, &data);
+-- java
+builder.setXid(0x12345678)
+    .setCode(OFBadRequestCode.BUFFER_UNKNOWN)
+    .setData(new byte[] { 0x61, 0x62, 0x63 });
