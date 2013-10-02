@@ -41,7 +41,7 @@
 function ${name}(reader, subtree)
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
-    reader.skip(m.length)
+    reader.skip(${m.length})
 :: continue
 :: #endif
 :: field_name = make_field_name(version, ofclass.name, m.name)
