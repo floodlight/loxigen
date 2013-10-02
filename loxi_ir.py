@@ -66,6 +66,9 @@ class OFProtocol(namedtuple('OFProtocol', ['wire_version', 'classes', 'enums']))
     def class_by_name(self, name):
         return find(lambda ofclass: ofclass.name == name, self.classes)
 
+    def enum_by_name(self, name):
+        return find(lambda enum: enum.name == name, self.enums)
+
 """
 An OpenFlow class
 
