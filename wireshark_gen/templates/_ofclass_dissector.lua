@@ -48,4 +48,5 @@ function ${name}(reader, subtree)
 :: reader_name = "read_" + m.oftype.replace(')', '').replace('(', '_')
     ${reader_name}(reader, ${version}, subtree, '${field_name}')
 :: #endfor
+    return '${ofclass.name}'
 end

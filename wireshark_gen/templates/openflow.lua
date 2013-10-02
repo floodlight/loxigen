@@ -99,15 +99,22 @@ function dissect_of_message(buf, root)
     local subtree = root:add(p_of, buf(0))
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
-    if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
-        of_message_dissectors[version_val][type_val](reader, subtree)
+
+    local protocol = "OF ?"
+    if openflow_versions[version_val] then
+        protocol = "OF " .. openflow_versions[version_val]
     end
+
+    local info = "unknown"
+    if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
+        info = of_message_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return protocol, info
 end
 
 -- of dissector function
 function p_of.dissector (buf, pkt, root)
-    pkt.cols.protocol = p_of.name
-
     local offset = 0
     repeat
         if buf:len() - offset >= 4 then
@@ -118,7 +125,17 @@ function p_of.dissector (buf, pkt, root)
                 return
             end
 
-            dissect_of_message(buf(offset, msg_len), root)
+            protocol, info = dissect_of_message(buf(offset, msg_len), root)
+
+            if offset == 0 then
+                pkt.cols.protocol:clear()
+                pkt.cols.info:clear()
+            else
+                pkt.cols.protocol:prepend(" + ")
+                pkt.cols.info:prepend(" + ")
+            end
+            pkt.cols.protocol:append(protocol)
+            pkt.cols.info:append(info)
             offset = offset + msg_len
         else
             -- we don't have all of length field yet
