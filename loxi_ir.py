@@ -62,7 +62,9 @@ Combination of multiple OFInput objects.
 @param classes List of OFClass objects
 @param enums List of Enum objects
 """
-OFProtocol = namedtuple('OFProtocol', ['wire_version', 'classes', 'enums'])
+class OFProtocol(namedtuple('OFProtocol', ['wire_version', 'classes', 'enums'])):
+    def class_by_name(self, name):
+        return find(lambda ofclass: ofclass.name == name, self.classes)
 
 """
 An OpenFlow class
