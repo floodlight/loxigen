@@ -37,8 +37,8 @@ OFReader.new = function(buf, offset)
     end
 
     self.read_all = function()
-        local r = buf(offset, buf.len() - offset)
-        offset = buf.len()
+        local r = buf(offset, buf:len() - offset)
+        offset = buf:len()
         return r
     end
 
