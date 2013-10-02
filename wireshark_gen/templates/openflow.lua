@@ -92,16 +92,17 @@ local of_message_dissectors = {
 }
 
 function dissect_of_message(buf, root)
+    local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
-    subtree:add(fields['of10.header.version'], buf(0,1))
-    subtree:add(fields['of10.header.type'], buf(1,1))
-    subtree:add(fields['of10.header.length'], buf(2,2))
-    subtree:add(fields['of10.header.xid'], buf(4,4))
+    subtree:add(fields['of10.header.version'], reader.read(1))
+    subtree:add(fields['of10.header.type'], reader.read(1))
+    subtree:add(fields['of10.header.length'], reader.read(2))
+    subtree:add(fields['of10.header.xid'], reader.read(4))
 
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
     if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
-        of_message_dissectors[version_val][type_val](buf, subtree)
+        of_message_dissectors[version_val][type_val](reader, subtree)
     end
 end
 

@@ -37,7 +37,7 @@
 :: if ofclass.virtual:
 -- Discriminator is ${ofclass.discriminator.name}
 :: #endif
-function ${name}(buf, subtree)
+function ${name}(reader, subtree)
 :: for m in ofclass.members:
 :: if isinstance(m, OFTypeMember):
     -- type ${m.name}
