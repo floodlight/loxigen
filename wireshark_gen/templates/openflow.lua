@@ -131,8 +131,8 @@ function p_of.dissector (buf, pkt, root)
                 pkt.cols.protocol:clear()
                 pkt.cols.info:clear()
             else
-                pkt.cols.protocol:prepend(" + ")
-                pkt.cols.info:prepend(" + ")
+                pkt.cols.protocol:append(" + ")
+                pkt.cols.info:append(" + ")
             end
             pkt.cols.protocol:append(protocol)
             pkt.cols.info:append(info)
