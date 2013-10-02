@@ -30,10 +30,11 @@ from collections import namedtuple
 import loxi_utils.loxi_utils as utils
 import loxi_front_end
 import of_g
+from loxi_ir import *
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
-DissectorField = namedtuple("DissectorField", ["name", "type", "base"])
+DissectorField = namedtuple("DissectorField", ["fullname", "name", "type", "base"])
 
 # TODO move into IR
 def create_superclass_map():
@@ -68,12 +69,20 @@ def create_superclass_map():
     return superclasses
 
 def create_fields():
-    return [
-        DissectorField("version", "UINT8", "DEC"),
-        DissectorField("type", "UINT8", "DEC"),
-        DissectorField("length", "UINT16", "DEC"),
-        DissectorField("xid", "UINT32", "HEX"),
-    ]
+    r = []
+    proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13' }
+    for wire_version, ofproto in of_g.ir.items():
+        for ofclass in ofproto.classes:
+            for m in ofclass.members:
+                if isinstance(m, OFPadMember):
+                    continue
+                fullname = "%s.%s.%s" % (
+                    proto_names[wire_version],
+                    ofclass.name[3:],
+                    m.name)
+                r.append(DissectorField(fullname, m.name, "UINT8", "DEC"))
+
+    return r
 
 def generate(out, name):
     superclasses = create_superclass_map()

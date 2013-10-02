@@ -24,13 +24,14 @@ local enum_v${version}_${enum.name} = {
 
 :: #endfor
 
+fields = {}
 :: for field in fields:
-f_${field.name} = ProtoField.new("${field.name}", "of.${field.name}", "FT_${field.type}", nil, "BASE_${field.base}")
+fields[${repr(field.fullname)}] = ProtoField.new("${field.name}", "${field.fullname}", "FT_${field.type}", nil, "BASE_${field.base}")
 :: #endfor
 
 p_of.fields = {
 :: for field in fields:
-    f_${field.name},
+    fields[${repr(field.fullname)}],
 :: #endfor
 }
 
@@ -55,13 +56,11 @@ ${superclasses[ofclass.name]}_dissectors[${version}][${typeval}] = ${name}
 :: #endfor
 
 function dissect_of_message(buf, root)
-    -- create subtree for of
     local subtree = root:add(p_of, buf(0))
-    -- add protocol fields to subtree
-    subtree:add(f_version, buf(0,1))
-    subtree:add(f_type, buf(1,1))
-    subtree:add(f_length, buf(2,2))
-    subtree:add(f_xid, buf(4,4))
+    subtree:add(fields['of10.header.version'], buf(0,1))
+    subtree:add(fields['of10.header.type'], buf(1,1))
+    subtree:add(fields['of10.header.length'], buf(2,2))
+    subtree:add(fields['of10.header.xid'], buf(4,4))
 
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
