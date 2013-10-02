@@ -97,6 +97,7 @@ end
 function p_of.init()
 end
 
--- register a chained dissector for port 8002
+-- register a chained dissector for OpenFlow port numbers
 local tcp_dissector_table = DissectorTable.get("tcp.port")
 tcp_dissector_table:add(6633, p_of)
+tcp_dissector_table:add(6653, p_of)
