@@ -79,7 +79,11 @@ The members are in the same order as on the wire.
 """
 class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params'])):
     def member_by_name(self, name):
-        return find(self.members, lambda m: hasattr(m, "name") and m.name == name)
+        return find(lambda m: hasattr(m, "name") and m.name == name, self.members)
+
+    @property
+    def discriminator(self):
+        return find(lambda m: type(m) == OFDiscriminatorMember, self.members)
 
 """
 Normal field
