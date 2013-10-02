@@ -66,7 +66,7 @@ function dissect_of_message(buf, root)
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
     if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
-        of_message_dissectors[version_val][type_val](buf, root)
+        of_message_dissectors[version_val][type_val](buf, subtree)
     end
 end
 

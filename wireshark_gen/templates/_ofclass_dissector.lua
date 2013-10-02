@@ -1,5 +1,5 @@
 :: from loxi_ir import *
-function ${name}(buf, root)
+function ${name}(buf, subtree)
 :: for m in ofclass.members:
 :: if isinstance(m, OFTypeMember):
     -- type ${m.name}
