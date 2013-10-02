@@ -40,7 +40,10 @@ import org.projectfloodlight.openflow.protocol.OFOxmList;
 
 public class ${factory.name} implements ${factory.interface.name} {
     public final static ${factory.name} INSTANCE = new ${factory.name}();
-    private ${factory.name}() {}
+
+    //:: if factory.interface.xid_generator:
+    private final XidGenerator xidGenerator = XidGenerators.global();
+    //:: #endif
 
     public OFVersion getOFVersion() {
         return OFVersion.OF_${factory.version.of_version};
@@ -63,7 +66,7 @@ public class ${factory.name} implements ${factory.interface.name} {
     //:: if len(i.writeable_members) > 0:
     public ${i.name}.Builder ${factory.interface.method_name(i, builder=True)}() {
         //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
-        return new ${i.versioned_class(factory.version).name}.Builder();
+        return new ${i.versioned_class(factory.version).name}.Builder()${".setXid(nextXid())" if i.member_by_name("xid") else ""};
         //:: else:
         throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
         //:: #endif
@@ -76,12 +79,12 @@ public class ${factory.name} implements ${factory.interface.name} {
     //::     general_get_match_func_written = True
     //:: #endif
     //:: if len(i.writeable_members) <= 2:
-    public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members)}) {
+    public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xid" )}) {
         //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
         //:: if len(i.writeable_members) > 0:
         return new ${i.versioned_class(factory.version).name}(
                 ${",\n                      ".join(
-                         [ prop.name for prop in i.versioned_class(factory.version).data_members])}
+                         [ prop.name if prop.name != "xid" else "nextXid()" for prop in i.versioned_class(factory.version).data_members])}
                     );
         //:: else:
         return ${i.versioned_class(factory.version).name}.INSTANCE;
@@ -157,6 +160,11 @@ public class ${factory.name} implements ${factory.interface.name} {
             default:
                 return null;
         }
+    }
+//:: #endif
+//:: if factory.interface.xid_generator:
+    public long nextXid() {
+        return xidGenerator.nextXid();
     }
 //:: #endif
 

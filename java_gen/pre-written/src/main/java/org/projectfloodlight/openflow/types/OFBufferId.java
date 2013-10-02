@@ -4,14 +4,15 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.UnsignedInts;
+
 /**
  * Abstraction of a buffer id in OpenFlow. Immutable.
  *
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
 @Immutable
-public class OFBufferId {
-
+public class OFBufferId implements Comparable<OFBufferId> {
     public static final OFBufferId NO_BUFFER = new OFBufferId(0xFFFFFFFF);
 
     private final int rawValue;
@@ -55,5 +56,10 @@ public class OFBufferId {
         if (rawValue != other.rawValue)
             return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(OFBufferId o) {
+        return UnsignedInts.compare(rawValue, o.rawValue);
     }
 }

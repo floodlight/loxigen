@@ -49,7 +49,7 @@ from java_gen.java_type import erase_type_annotation
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
-    enum_blacklist = set(("OFDefinitions", "OFPortNo",))
+    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId"))
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
@@ -138,7 +138,9 @@ class JavaModel(object):
                 "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
                 "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
                 "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
+                "OFOxmBsnInPorts128":       OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", False),
+                "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True)
                 }
 
     # Registry of nullable properties:
@@ -286,14 +288,15 @@ class JavaModel(object):
             annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
 
             factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
-                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={})
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator=False)
 
         factories[""] = OFFactory(
                     package=prefix,
                     name="OFFactory",
                     remove_prefix="",
                     members=[], base_class="OFMessage", sub_factories=OrderedDict(
-                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ))
+                        ("{}{}s".format(n[2].lower(), n[3:]), "{}s".format(n)) for n in sub_factory_classes ),
+                    xid_generator=True)
 
         for i in self.interfaces:
             for n, factory in factories.items():
@@ -306,6 +309,13 @@ class JavaModel(object):
                         factory.members.append(i)
                         break
         return factories.values()
+    
+    @memoize
+    def factory_of(self, interface):
+        for factory in self.of_factories:
+            if interface in factory.members:
+                return factory
+        return None
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -329,7 +339,7 @@ class JavaModel(object):
             return True
 
 
-class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories"))):
+class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories", "xid_generator"))):
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
@@ -348,6 +358,12 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
+    
+    def of_version(self, version):
+        for fc in self.factory_classes:
+            if fc.version == version:
+                return fc
+        return None
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
 class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
@@ -480,8 +496,10 @@ class JavaOFInterface(object):
         # FIXME: This duplicates inheritance information that is now available in the loxi_ir
         # model (note, that the loxi model is on versioned classes). Should check/infer the
         # inheritance information from the versioned lox_ir classes.
-        if re.match(r'OF.+StatsRequest$', self.name):
-            return ("", "OFStatsRequest", None)
+        if re.match(r'OFStatsRequest$', self.name):
+            return ("", "OFMessage", "T extends OFStatsReply")
+        elif re.match(r'OF.+StatsRequest$', self.name):
+            return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif re.match(r'OF.+StatsReply$', self.name):
             return ("", "OFStatsReply", None)
         elif re.match(r'OF.+ErrorMsg$', self.name):
@@ -531,6 +549,10 @@ class JavaOFInterface(object):
     @memoize
     def writeable_members(self):
         return [ m for m in self.members if m.is_writeable ]
+
+    @memoize
+    def member_by_name(self, name):
+        return find(lambda m: m.name == name, self.members)
 
     @property
     @memoize
@@ -1016,7 +1038,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-
+    
+    @property
+    def interface(self):
+        return self.java_class.interface
+    
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)

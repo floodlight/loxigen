@@ -22,6 +22,8 @@ import java.math.BigInteger;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.primitives.UnsignedLongs;
+
 public class U64 implements Writeable, OFValueType<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
     private final static long ZERO_VAL = 0;
@@ -111,6 +113,11 @@ public class U64 implements Writeable, OFValueType<U64> {
     @Override
     public void writeTo(ChannelBuffer bb) {
         bb.writeLong(raw);
+    }
+
+    @Override
+    public int compareTo(U64 o) {
+        return UnsignedLongs.compare(raw, o.raw);
     }
 
 }

@@ -286,6 +286,8 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
     OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
+
+    OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
@@ -1066,6 +1068,15 @@ of_overlap_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
 #define OF_OVERLAP_MAC_ADDR(v1, v2, m1, m2) \\
     of_overlap_mac_addr((v1), (v2), (m1), (m2))
 
+#define OF_MORE_SPECIFIC_BITMAP_128(v1, v2) \\
+    (OF_MORE_SPECIFIC_INT((v1)->lo, (v2)->lo) && OF_MORE_SPECIFIC_INT((v1)->hi, (v2)->hi))
+
+#define OF_RESTRICTED_MATCH_BITMAP_128(v1, v2, mask) \\
+    (OF_RESTRICTED_MATCH_INT((v1)->lo, (v2)->lo, (mask)->lo) && OF_RESTRICTED_MATCH_INT((v1)->hi, (v2)->hi, (mask)->hi))
+
+#define OF_OVERLAP_BITMAP_128(v1, v2, m1, m2) \\
+    (OF_OVERLAP_INT((v1)->lo, (v2)->lo, (m1)->lo, (m2)->lo) && OF_OVERLAP_INT((v1)->hi, (v2)->hi, (m1)->hi, (m2)->hi))
+
 /**
  * More-specific-than macro for integer types; see above
  * @return true if v1 is equal to or more specific than v2
@@ -1136,6 +1147,9 @@ of_match_more_specific(of_match_t *entry, of_match_t *query)
         elif entry["m_type"] == "of_mac_addr_t":
             comp = "OF_MORE_SPECIFIC_MAC_ADDR"
             match_type = "OF_RESTRICTED_MATCH_MAC_ADDR"
+        elif entry["m_type"] == "of_bitmap_128_t":
+            comp = "OF_MORE_SPECIFIC_BITMAP_128"
+            match_type = "OF_RESTRICTED_MATCH_BITMAP_128"
         else: # Integer
             comp = "OF_MORE_SPECIFIC_INT"
             match_type = "OF_RESTRICTED_MATCH_INT"
@@ -1190,6 +1204,8 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
             check = "OF_OVERLAP_IPV6"
         elif entry["m_type"] == "of_mac_addr_t":
             check = "OF_OVERLAP_MAC_ADDR"
+        elif entry["m_type"] == "of_bitmap_128_t":
+            check = "OF_OVERLAP_BITMAP_128"
         else: # Integer
             check = "OF_OVERLAP_INT"
             m1 = "m1->%s" % key

@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.primitives.Shorts;
+
 /**
  *
  * @author Yotam Harchol (yotam.harchol@bigswitch.com)
@@ -56,4 +58,30 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     }
 
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + code;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        ICMPv4Code other = (ICMPv4Code) obj;
+        if (code != other.code)
+            return false;
+        return true;
+    }
+
+    @Override
+    public int compareTo(ICMPv4Code o) {
+        return Shorts.compare(code, o.code);
+    }
 }

@@ -559,6 +559,52 @@ of_message_to_object_id(of_message_t msg, int length) {
 }
 """
 
+    oxm_template = """
+/**
+ * oxm wire type to object ID array.
+ * Treat as private; use function accessor below
+ */
+
+extern const of_object_id_t *const of_oxm_type_to_id[OF_VERSION_ARRAY_MAX];
+
+#define OF_OXM_ITEM_COUNT %(ar_len)d\n
+
+/**
+ * Map an oxm wire value to an OF object
+ * @param oxm The oxm type wire value
+ * @param version The version associated with the check
+ * @return The oxm OF object type
+ * @return OF_OBJECT_INVALID if type does not map to an object
+ *
+ */
+static inline of_object_id_t
+of_oxm_to_object_id(uint32_t type_len, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return OF_OBJECT_INVALID;
+    }
+
+    uint16_t class = (type_len >> 16) & 0xffff;
+    uint8_t masked_type = (type_len >> 8) & 0xff;
+
+    if (class == 0x8000) {
+        if (masked_type < 0 || masked_type >= OF_OXM_ITEM_COUNT) {
+            return OF_OBJECT_INVALID;
+        }
+
+        return of_oxm_type_to_id[version][masked_type];
+    } else if (class == 0x0003) {
+        switch (masked_type) {
+        case 0x00: return OF_OXM_BSN_IN_PORTS_128;
+        case 0x01: return OF_OXM_BSN_IN_PORTS_128_MASKED;
+        default: return OF_OBJECT_INVALID;
+        }
+    } else {
+        return OF_OBJECT_INVALID;
+    }
+}
+"""
+
     # Action types array gen
     ar_len = type_maps.type_array_len(type_maps.action_types, max_type_value)
     out.write(map_with_experimenter_template %
@@ -619,13 +665,14 @@ of_message_to_object_id(of_message_t msg, int length) {
     out.write(map_template %
               dict(name="flow_mod", u_name="FLOW_MOD", ar_len=ar_len))
 
+    # OXM
     ar_len = type_maps.type_array_len(type_maps.oxm_types, max_type_value)
     out.write("""
 /* NOTE: We could optimize the OXM and only generate OF 1.2 versions. */
 """)
-    out.write(map_template %
-              dict(name="oxm", u_name="OXM", ar_len=ar_len))
+    out.write(oxm_template % dict(ar_len=ar_len))
 
+    # Messages
     out.write(experimenter_function)
     # Must follow stats reply/request
     ar_len = type_maps.type_array_len(type_maps.message_types, max_type_value)
@@ -1104,11 +1151,6 @@ extern void of_meter_band_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-
-/* XXX Hardcoded to the OpenFlow Basic OXM class */
-#define OF_OXM_MASKED_TYPE_GET(hdr) (((hdr) >> 8) & 0xff)
-#define OF_OXM_MASKED_TYPE_SET(hdr, val)                    \\
-    (hdr) = ((hdr) & 0x000000ff) + 0x80000000 + (((val) & 0xff) << 8)
 
 #define OF_OXM_LENGTH_GET(hdr) (((hdr) & 0xff) + 4)
 #define OF_OXM_LENGTH_SET(hdr, val)                         \\

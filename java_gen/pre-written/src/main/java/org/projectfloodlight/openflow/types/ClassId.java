@@ -2,33 +2,45 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.primitives.UnsignedInts;
+
 @Immutable
-public class Metadata {
+public class ClassId implements OFValueType<ClassId> {
     static final int LENGTH = 4;
 
     private final static int NONE_VAL = 0;
-    public final static Metadata NONE = new Metadata(NONE_VAL);
+    public final static ClassId NONE = new ClassId(NONE_VAL);
 
     private final int rawValue;
 
-    private Metadata(final int rawValue) {
+    private ClassId(final int rawValue) {
         this.rawValue = rawValue;
     }
 
-    public static Metadata of(final int raw) {
+    public static ClassId of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
 
-        return new Metadata(raw);
+        return new ClassId(raw);
     }
 
     public int getInt() {
         return rawValue;
     }
 
+    @Override
     public int getLength() {
         return LENGTH;
     }
+
+    @Override
+    public String toString() {
+        return Integer.toString(rawValue);
+    }
+
+    @Override
+    public ClassId applyMask(ClassId mask) {
+        return ClassId.of(rawValue & mask.rawValue);    }
 
     @Override
     public int hashCode() {
@@ -46,14 +58,14 @@ public class Metadata {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Metadata other = (Metadata) obj;
+        ClassId other = (ClassId) obj;
         if (rawValue != other.rawValue)
             return false;
         return true;
     }
 
     @Override
-    public String toString() {
-        return Integer.toString(rawValue);
+    public int compareTo(ClassId o) {
+        return UnsignedInts.compare(rawValue, rawValue);
     }
 }

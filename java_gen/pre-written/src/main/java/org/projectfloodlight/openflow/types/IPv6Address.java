@@ -5,6 +5,8 @@ import java.util.regex.Pattern;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.primitives.Longs;
+
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
  * two 64 bit longs (not that you'd have to know).
@@ -296,5 +298,14 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     @Override
     public IPv6Address applyMask(IPv6Address mask) {
         return IPv6Address.of(this.raw1 & mask.raw1, this.raw2 & mask.raw2);
+    }
+
+    @Override
+    public int compareTo(IPv6Address o) {
+        int res = Longs.compare(raw1, o.raw1);
+        if(res != 0)
+            return res;
+        else
+            return Longs.compare(raw2, o.raw2);
     }
 }
