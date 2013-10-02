@@ -36,38 +36,6 @@ templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templ
 
 DissectorField = namedtuple("DissectorField", ["fullname", "name", "type", "base"])
 
-# TODO move into IR
-def create_superclass_map():
-    superclasses = {}
-    for supercls, subcls_set in loxi_front_end.type_maps.inheritance_map.items():
-        for subcls in subcls_set:
-            superclasses[supercls + '_' + subcls] = supercls
-
-    for version, versioned in loxi_front_end.type_maps.message_types.items():
-        for subcls in versioned:
-            superclasses['of_' + subcls] = 'of_message'
-
-    for version, versioned in loxi_front_end.type_maps.extension_message_subtype.items():
-        for experimenter, classes in versioned.items():
-            for cls in classes:
-                superclasses[cls] = 'of_experimenter_' + experimenter
-
-    for version, versioned in loxi_front_end.type_maps.extension_action_subtype.items():
-        for experimenter, classes in versioned.items():
-            for cls in classes:
-                superclasses[cls] = 'of_action_' + experimenter
-
-    for version, versioned in loxi_front_end.type_maps.stats_types.items():
-        for subcls in versioned:
-            superclasses['of_' + subcls + '_stats_request'] = 'of_stats_request'
-            superclasses['of_' + subcls + '_stats_reply'] = 'of_stats_reply'
-
-    for version, versioned in loxi_front_end.type_maps.flow_mod_types.items():
-        for subcls in versioned:
-            superclasses['of_flow_' + subcls] = 'of_flow_mod'
-
-    return superclasses
-
 def create_fields():
     r = []
     proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13' }
@@ -85,15 +53,7 @@ def create_fields():
     return r
 
 def generate(out, name):
-    superclasses = create_superclass_map()
-    all_classes = sorted(of_g.unified.keys())
-
-    for cls in all_classes:
-        if cls not in superclasses:
-            print cls + ": " + superclasses.get(cls, "NONE")
-
     context = {
-        'superclasses': superclasses,
         'fields': create_fields(),
     }
     utils.render_template(out, "openflow.lua", [templates_dir], context)

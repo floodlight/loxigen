@@ -62,25 +62,34 @@ p_of.fields = {
 :: #endfor
 }
 
-:: for supercls in set(sorted(superclasses.values())):
-local ${supercls}_dissectors = {
+-- Subclass maps for virtual classes
 :: for version, ofproto in ir.items():
-    [${version}] = {},
+:: for ofclass in ofproto.classes:
+:: if ofclass.virtual:
+${ofclass.name}_v${version}_dissectors = {}
+:: #endif
 :: #endfor
-}
 :: #endfor
+
+--- Dissectors for each class
 
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: name = 'dissect_%s_v%d' % (ofclass.name, version)
-:: typeval = 0
 :: include('_ofclass_dissector.lua', name=name, ofclass=ofclass)
-:: if ofclass.name in superclasses:
-${superclasses[ofclass.name]}_dissectors[${version}][${typeval}] = ${name}
+:: if ofclass.superclass:
+:: discriminator_value = 0
+${ofclass.superclass}_v${version}_dissectors[${discriminator_value}] = ${name}
 
 :: #endif
 :: #endfor
 :: #endfor
+
+local of_message_dissectors = {
+:: for version in ir:
+    [${version}] = of_header_v${version}_dissectors,
+:: #endfor
+}
 
 function dissect_of_message(buf, root)
     local subtree = root:add(p_of, buf(0))

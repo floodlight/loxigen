@@ -26,10 +26,23 @@
 :: # under the EPL.
 ::
 :: from loxi_ir import *
+:: attrs = []
+:: if ofclass.virtual: attrs.append("virtual")
+:: if ofclass.superclass: attrs.append("child")
+:: if not ofclass.superclass: attrs.append("top-level")
+-- ${' '.join(attrs)} class ${ofclass.name}
+:: if ofclass.superclass:
+-- Child of ${ofclass.superclass}
+:: #endif
+:: if ofclass.virtual:
+-- Discriminator is ${ofclass.discriminator.name}
+:: #endif
 function ${name}(buf, subtree)
 :: for m in ofclass.members:
 :: if isinstance(m, OFTypeMember):
     -- type ${m.name}
+:: elif isinstance(m, OFDiscriminatorMember):
+    -- discriminator ${m.name}
 :: elif isinstance(m, OFDataMember):
     -- data ${m.name}
 :: elif isinstance(m, OFLengthMember):
