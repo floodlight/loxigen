@@ -54,3 +54,61 @@ end
 function read_list_of_hello_elem_t(reader, version, subtree, field_name)
     -- TODO
 end
+
+function read_of_match_t(reader, version, subtree, field_name)
+    if version == 1 then
+        dissect_of_match_v1_v1(reader, subtree:add(fields[field_name]))
+    elseif version == 2 then
+        dissect_of_match_v2_v2(reader, subtree:add(fields[field_name]))
+    elseif version >= 3 then
+        dissect_of_match_v3_v3(reader, subtree:add(fields[field_name]))
+    end
+end
+
+function read_of_wc_bmap_t(reader, version, subtree, field_name)
+    if version <= 2 then
+        read_scalar(reader, subtree, field_name, 4)
+    else
+        read_scalar(reader, subtree, field_name, 8)
+    end
+end
+
+function read_of_port_no_t(reader, version, subtree, field_name)
+    if version == 1 then
+        read_scalar(reader, subtree, field_name, 2)
+    else
+        read_scalar(reader, subtree, field_name, 4)
+    end
+end
+
+function read_of_mac_addr_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 6)
+end
+
+function read_of_ipv4_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 4)
+end
+
+function read_of_fm_cmd_t(reader, version, subtree, field_name)
+    if version == 1 then
+        read_scalar(reader, subtree, field_name, 2)
+    else
+        read_scalar(reader, subtree, field_name, 1)
+    end
+end
+
+function read_ofp_flow_mod_flags(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 2)
+end
+
+function read_list_of_action_t(reader, version, subtree, field_name)
+    -- TODO
+end
+
+function read_list_of_port_desc_t(reader, version, subtree, field_name)
+    -- TODO
+end
+
+function read_list_of_packet_queue_t(reader, version, subtree, field_name)
+    -- TODO
+end
