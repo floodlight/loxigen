@@ -36,18 +36,20 @@ templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templ
 
 DissectorField = namedtuple("DissectorField", ["fullname", "name", "type", "base"])
 
+proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13' }
+def make_field_name(wire_version, ofclass_name, member_name):
+    return "%s.%s.%s" % (proto_names[wire_version],
+                         ofclass_name[3:],
+                         member_name)
+
 def create_fields():
     r = []
-    proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13' }
     for wire_version, ofproto in of_g.ir.items():
         for ofclass in ofproto.classes:
             for m in ofclass.members:
                 if isinstance(m, OFPadMember):
                     continue
-                fullname = "%s.%s.%s" % (
-                    proto_names[wire_version],
-                    ofclass.name[3:],
-                    m.name)
+                fullname = make_field_name(wire_version, ofclass.name, m.name)
                 r.append(DissectorField(fullname, m.name, "UINT8", "DEC"))
 
     return r

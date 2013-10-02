@@ -24,28 +24,31 @@
 :: # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
-::
-:: from loxi_ir import *
-:: from wireshark_gen import make_field_name
-:: attrs = []
-:: if ofclass.virtual: attrs.append("virtual")
-:: if ofclass.superclass: attrs.append("child")
-:: if not ofclass.superclass: attrs.append("top-level")
--- ${' '.join(attrs)} class ${ofclass.name}
-:: if ofclass.superclass:
--- Child of ${ofclass.superclass}
-:: #endif
-:: if ofclass.virtual:
--- Discriminator is ${ofclass.discriminator.name}
-:: #endif
-function ${name}(reader, subtree)
-:: for m in ofclass.members:
-:: if isinstance(m, OFPadMember):
-    reader.skip(m.length)
-:: continue
-:: #endif
-:: field_name = make_field_name(version, ofclass.name, m.name)
-:: reader_name = "read_" + m.oftype.replace(')', '').replace('(', '_')
-    ${reader_name}(reader, ${version}, subtree, '${field_name}')
-:: #endfor
+
+function read_scalar(reader, subtree, field_name, length)
+    subtree:add(fields[field_name], reader.read(length))
+end
+
+function read_uint8_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 1)
+end
+
+function read_uint16_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 2)
+end
+
+function read_uint32_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 4)
+end
+
+function read_uint64_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 8)
+end
+
+function read_of_octets_t(reader, version, subtree, field_name)
+    subtree:add(fields[field_name], reader.read_all())
+end
+
+function read_list_of_hello_elem_t(reader, version, subtree, field_name)
+    -- TODO
 end

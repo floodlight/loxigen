@@ -31,6 +31,8 @@
 
 :: include('_ofreader.lua')
 
+:: include('_oftype_readers.lua')
+
 p_of = Proto ("of", "OpenFlow")
 
 local openflow_versions = {
@@ -76,7 +78,7 @@ ${ofclass.name}_v${version}_dissectors = {}
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: name = 'dissect_%s_v%d' % (ofclass.name, version)
-:: include('_ofclass_dissector.lua', name=name, ofclass=ofclass)
+:: include('_ofclass_dissector.lua', name=name, ofclass=ofclass, version=version)
 :: if ofclass.superclass:
 :: discriminator = ofproto.class_by_name(ofclass.superclass).discriminator
 :: discriminator_value = ofclass.member_by_name(discriminator.name).value
@@ -95,11 +97,6 @@ local of_message_dissectors = {
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
-    subtree:add(fields['of10.header.version'], reader.read(1))
-    subtree:add(fields['of10.header.type'], reader.read(1))
-    subtree:add(fields['of10.header.length'], reader.read(2))
-    subtree:add(fields['of10.header.xid'], reader.read(4))
-
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
     if of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
