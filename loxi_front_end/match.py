@@ -394,6 +394,16 @@ of_match_members = dict(
         takes_mask_in_spec=False,
         order=501,
         ),
+
+    bsn_in_ports_128 = dict(
+        name="bsn_in_ports_128",
+        m_type="of_bitmap_128_t",
+        v2_wc_shift=9,
+        print_type="p",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1000,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()
