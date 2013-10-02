@@ -31,6 +31,7 @@ import loxi_utils.loxi_utils as utils
 import loxi_front_end
 import of_g
 from loxi_ir import *
+import field_info
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
@@ -42,6 +43,41 @@ def make_field_name(wire_version, ofclass_name, member_name):
                          ofclass_name[3:],
                          member_name)
 
+def get_field_info(version, cls, name, oftype):
+    """
+    Decide on a Wireshark type and base for a given field.
+
+    Returns (type, base)
+    """
+    if oftype.startswith("list"):
+        return "BYTES", "NONE"
+
+    ofproto = of_g.ir[version]
+    enum = ofproto.enum_by_name(oftype)
+
+    if enum:
+        field_type = "UINT32"
+    elif oftype in field_info.oftype_to_wireshark_type:
+        field_type = field_info.oftype_to_wireshark_type[oftype]
+    else:
+        print "WARN missing oftype_to_wireshark_type for", oftype
+        field_type = "BYTES"
+
+    if enum:
+        if enum.is_bitmask:
+            field_base = "HEX"
+        else:
+            field_base = "DEC"
+    elif oftype in field_info.field_to_base:
+        field_base = field_info.field_to_base[name]
+    elif oftype in field_info.oftype_to_base:
+        field_base = field_info.oftype_to_base[oftype]
+    else:
+        print "WARN missing oftype_to_base for", oftype
+        field_base = "NONE"
+
+    return field_type, field_base
+
 def create_fields():
     r = []
     for wire_version, ofproto in of_g.ir.items():
@@ -50,7 +86,8 @@ def create_fields():
                 if isinstance(m, OFPadMember):
                     continue
                 fullname = make_field_name(wire_version, ofclass.name, m.name)
-                r.append(DissectorField(fullname, m.name, "UINT8", "DEC"))
+                field_type, field_base = get_field_info(wire_version, ofclass.name, m.name, m.oftype)
+                r.append(DissectorField(fullname, m.name, field_type, field_base))
 
     return r
 
