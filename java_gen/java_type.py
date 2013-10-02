@@ -542,6 +542,10 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
+        return JType("OFInstructionType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
+            .op(read="OFInstructionTypeSerializerVer$version.readFrom(bb)", write="OFInstructionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
