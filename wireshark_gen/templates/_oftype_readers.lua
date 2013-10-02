@@ -46,7 +46,9 @@ function read_uint64_t(reader, version, subtree, field_name)
 end
 
 function read_of_octets_t(reader, version, subtree, field_name)
-    subtree:add(fields[field_name], reader.read_all())
+    if not reader.is_empty() then
+        subtree:add(fields[field_name], reader.read_all())
+    end
 end
 
 function read_list_of_hello_elem_t(reader, version, subtree, field_name)
