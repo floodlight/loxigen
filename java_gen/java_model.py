@@ -140,7 +140,7 @@ def gen_error_type(enum_entry):
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
-    enum_blacklist = set(("OFDefinitions", "OFPortNo",))
+    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId"))
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))

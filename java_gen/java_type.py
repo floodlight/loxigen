@@ -324,9 +324,9 @@ eth_type = JType("EthType")\
             write="$name.write2Bytes(bb)",
             default="EthType.NONE")
 vlan_vid = JType("VlanVid")\
-        .op(read="VlanVid.read2Bytes(bb)",
-            write="$name.write2Bytes(bb)",
-            default="VlanVid.NONE")
+        .op(version=1, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=2, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=ANY, read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="VlanVid.NONE")
 vlan_pcp = JType("VlanPcp")\
         .op(read="VlanPcp.readByte(bb)",
             write="$name.writeByte(bb)",
