@@ -56,6 +56,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: for prop in msg.data_members:
     private final ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
+//
+//:: if all(prop.default_value for prop in msg.data_members):
+    // Immutable default instance
+    final static ${impl_class} DEFAULT = new ${impl_class}(
+        ${", ".join(prop.default_name for prop in msg.data_members)}
+    );
+//:: #endif
 
     //:: if msg.data_members:
     // package private constructor - used by readers, builders, and factory
