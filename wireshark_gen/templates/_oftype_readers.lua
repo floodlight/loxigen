@@ -102,7 +102,18 @@ function read_ofp_flow_mod_flags(reader, version, subtree, field_name)
 end
 
 function read_list_of_action_t(reader, version, subtree, field_name)
-    -- TODO
+    if reader.is_empty() then
+        return
+    end
+
+    local list = subtree:add(fields[field_name], reader.peek_all(0))
+    while not reader.is_empty() do
+        local action_type = reader.peek(0, 2):uint()
+        local action_len = reader.peek(2, 2):uint()
+        local child_reader = reader.slice(action_len)
+        local child_subtree = list:add(fields[field_name], child_reader.peek_all(0))
+        local info = dissect_of_action_v1(child_reader, child_subtree)
+    end
 end
 
 function read_list_of_port_desc_t(reader, version, subtree, field_name)

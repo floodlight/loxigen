@@ -46,6 +46,10 @@ OFReader.new = function(buf, offset)
         return buf(offset + off, len)
     end
 
+    self.peek_all = function(off)
+        return buf(offset + off, buf:len() - offset - off)
+    end
+
     self.skip = function(len)
         offset = offset + len
     end
