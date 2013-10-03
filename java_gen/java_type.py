@@ -385,6 +385,8 @@ table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
             default='TableId.ALL')
+of_version = JType("OFVersion", 'byte') \
+            .op(read='bb.readByte()', write='bb.writeByte($name)')
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
@@ -549,8 +551,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
-        return JType("OFVersion", 'byte') \
-            .op(read='bb.readByte()', write='bb.writeByte($name)')
+        return of_version
     elif field_name == "buffer_id" and c_type == "uint32_t":
         return JType("OFBufferId") \
             .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")

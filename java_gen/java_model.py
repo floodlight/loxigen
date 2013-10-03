@@ -656,29 +656,30 @@ class JavaOFInterface(object):
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.name == "OFOxm":
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "value", java_type.generic_t),
                     JavaVirtualMember(self, "mask", java_type.generic_t),
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype("T")),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   )
+                   ]
         elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
             field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
                 if self.name in model.oxm_map \
                 else java_type.make_match_field_jtype()
 
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "matchField", field_type),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   ) \
-                   + \
-                   (
-                           ( JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type), ) if not find(lambda x: x.name == "mask", self.ir_model_members) else
-                    ()
-                   )
-        else:
-            return ()
+                   ]
+            if not find(lambda x: x.name == "mask", self.ir_model_members):
+                virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
+
+        return tuple(virtual_members)
 
     @property
     @memoize
@@ -791,26 +792,31 @@ class JavaOFClass(object):
         return self.ir_model_members + self.virtual_members
 
     @property
+    @memoize
     def ir_model_members(self):
         members = [ JavaMember.for_of_member(self, of_member) for of_member in self.ir_class.members ]
         return tuple(members)
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.interface.parent_interface and self.interface.parent_interface.startswith("OFOxm"):
             if self.interface.name in model.oxm_map:
                 oxm_entry = model.oxm_map[self.interface.name]
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
                     JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
-                   )
+                   ]
             else:
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
-                   )
-        else:
-            return ()
+                   ]
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
+
+        return tuple(virtual_members)
 
     def all_versions(self):
         return [ JavaOFVersion(int_version)
