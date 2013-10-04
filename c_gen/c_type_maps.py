@@ -1036,7 +1036,7 @@ of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
         of_message_stats_type_set(msg, type);
     }
     if ((type = of_object_to_error_type(id, ver)) >= 0) {
-        /* It's a stats obj */
+        /* It's an error obj */
         of_message_error_type_set(msg, type);
     }
     if ((type = of_object_to_flow_mod_command(id, ver)) >= 0) {

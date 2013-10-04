@@ -129,7 +129,7 @@ def parse_error(buf):
     if err_type in error_msg_parsers:
         return error_msg_parsers[err_type](buf)
     else:
-        raise loxi.ProtocolError("unexpected error type %u" % stats_type)
+        raise loxi.ProtocolError("unexpected error type %u" % err_type)
 
 def parse_flow_mod(buf):
 :: if version == 1:
