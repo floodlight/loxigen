@@ -76,6 +76,12 @@ public class ${factory.name} implements ${factory.interface.name} {
     public Match.Builder buildMatch() {
         return new ${i.versioned_class(factory.version).name}.Builder();
     }
+
+    final static Match MATCH_WILDCARD_ALL = ${i.versioned_class(factory.version).name}.DEFAULT;
+
+    public Match matchWildcardAll() {
+        return MATCH_WILDCARD_ALL;
+    }
     //::     general_get_match_func_written = True
     //:: #endif
     //:: if len(i.writeable_members) <= 2:

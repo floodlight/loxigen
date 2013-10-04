@@ -55,6 +55,7 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
 //:: #endfor
 //:: if factory.name == 'OFFactory':
     Match.Builder buildMatch();
+    Match matchWildcardAll();
 //:: #endif
 
     OFVersion getOFVersion();
