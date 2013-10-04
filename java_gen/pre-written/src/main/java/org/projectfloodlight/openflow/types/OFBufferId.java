@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 /**
@@ -12,7 +13,7 @@ import com.google.common.primitives.UnsignedInts;
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
 @Immutable
-public class OFBufferId implements Comparable<OFBufferId> {
+public class OFBufferId implements Comparable<OFBufferId>, PrimitiveSinkable {
     public static final OFBufferId NO_BUFFER = new OFBufferId(0xFFFFFFFF);
 
     private final int rawValue;
@@ -69,5 +70,10 @@ public class OFBufferId implements Comparable<OFBufferId> {
     @Override
     public int compareTo(OFBufferId o) {
         return UnsignedInts.compare(rawValue, o.rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

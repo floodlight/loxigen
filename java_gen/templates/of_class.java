@@ -247,6 +247,33 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         }
     }
 
+    public void putTo(PrimitiveSink sink) {
+        FUNNEL.funnel(this, sink);
+    }
+
+    final static ${impl_class}Funnel FUNNEL = new ${impl_class}Funnel();
+    static class ${impl_class}Funnel implements Funnel<${impl_class}> {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public void funnel(${impl_class} message, PrimitiveSink sink) {
+//:: for prop in msg.members:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
+            ${prop.java_type.funnel_op(version, "message." + prop.name, pub_type=True)};
+//:: elif prop.is_pad:
+            // skip pad (${prop.length} bytes)
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} = ${prop.value}
+            ${prop.java_type.funnel_op(version, prop.priv_value, pub_type=False)};
+//:: else:
+            // FIXME: skip funnel of ${prop.name}
+//:: #endif
+//:: #endfor
+        }
+    }
+
+
     public void writeTo(ChannelBuffer bb) {
         WRITER.write(bb, this);
     }

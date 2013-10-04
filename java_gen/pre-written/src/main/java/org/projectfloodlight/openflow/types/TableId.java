@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
 
 public class TableId implements OFValueType<TableId>, Comparable<TableId> {
@@ -87,6 +88,11 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
     @Override
     public int compareTo(TableId other) {
         return Shorts.compare(this.id, other.id);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte((byte) id);
     }
 
 }

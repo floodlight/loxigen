@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
 
 public class ICMPv4Type implements OFValueType<ICMPv4Type> {
@@ -193,4 +194,10 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     public int compareTo(ICMPv4Type o) {
         return Shorts.compare(type, o.type);
     }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putShort(type);
+    }
+
 }
