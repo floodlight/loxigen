@@ -170,4 +170,7 @@ public class ${factory.name} implements ${factory.interface.name} {
     }
 //:: #endif
 
+    public OFVersion getVersion() {
+            return OFVersion.${factory.version.constant_version};
+    }
 }
