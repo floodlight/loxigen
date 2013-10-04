@@ -140,7 +140,7 @@ def gen_error_type(enum_entry):
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
-    enum_blacklist = set(("OFDefinitions", "OFPortNo",))
+    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId"))
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
@@ -229,7 +229,9 @@ class JavaModel(object):
                 "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
                 "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
                 "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
+                "OFOxmBsnInPorts128":       OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", False),
+                "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True)
                 }
 
     # Registry of nullable properties:
@@ -399,6 +401,13 @@ class JavaModel(object):
                         factory.members.append(i)
                         break
         return factories.values()
+    
+    @memoize
+    def factory_of(self, interface):
+        for factory in self.of_factories:
+            if interface in factory.members:
+                return factory
+        return None
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -441,6 +450,12 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
+    
+    def of_version(self, version):
+        for fc in self.factory_classes:
+            if fc.version == version:
+                return fc
+        return None
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
 class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
@@ -656,29 +671,30 @@ class JavaOFInterface(object):
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.name == "OFOxm":
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "value", java_type.generic_t),
                     JavaVirtualMember(self, "mask", java_type.generic_t),
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype("T")),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   )
+                   ]
         elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
             field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
                 if self.name in model.oxm_map \
                 else java_type.make_match_field_jtype()
 
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "matchField", field_type),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   ) \
-                   + \
-                   (
-                           ( JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type), ) if not find(lambda x: x.name == "mask", self.ir_model_members) else
-                    ()
-                   )
-        else:
-            return ()
+                   ]
+            if not find(lambda x: x.name == "mask", self.ir_model_members):
+                virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
+
+        return tuple(virtual_members)
 
     @property
     @memoize
@@ -791,26 +807,31 @@ class JavaOFClass(object):
         return self.ir_model_members + self.virtual_members
 
     @property
+    @memoize
     def ir_model_members(self):
         members = [ JavaMember.for_of_member(self, of_member) for of_member in self.ir_class.members ]
         return tuple(members)
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.interface.parent_interface and self.interface.parent_interface.startswith("OFOxm"):
             if self.interface.name in model.oxm_map:
                 oxm_entry = model.oxm_map[self.interface.name]
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
                     JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
-                   )
+                   ]
             else:
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
-                   )
-        else:
-            return ()
+                   ]
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
+
+        return tuple(virtual_members)
 
     def all_versions(self):
         return [ JavaOFVersion(int_version)
@@ -1113,7 +1134,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-
+    
+    @property
+    def interface(self):
+        return self.java_class.interface
+    
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)

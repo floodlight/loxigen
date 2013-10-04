@@ -1007,6 +1007,11 @@ typedef char of_table_name_t[OF_MAX_TABLE_NAME_LEN];
 typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
 
+typedef struct of_bitmap_128_s {
+    uint64_t hi;
+    uint64_t lo;
+} of_bitmap_128_t;
+
 /* These are types which change across versions.  */
 typedef uint32_t of_port_no_t;
 typedef uint16_t of_fm_cmd_t;
