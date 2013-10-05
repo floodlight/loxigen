@@ -57,12 +57,7 @@ class Action(object):
 
 :: #endfor
 
-:: if version == of_g.VERSION_1_0:
-def parse_vendor(reader):
-:: else:
 def parse_experimenter(reader):
-:: #endif
-
     experimenter, = reader.peek("!4xL")
     if experimenter == 0x005c16c7: # Big Switch Networks
         subtype, = reader.peek("!8xL")

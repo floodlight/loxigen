@@ -58,9 +58,10 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
     Match matchWildcardAll();
 //:: #endif
 
+    OFVersion getOFVersion();
     OFMessageReader<${factory.base_class}> getReader();
-
 //:: if factory.name == 'OFOxms':
+
     public <F extends OFValueType<F>> OFOxm<F> fromValue(F value, MatchField<F> field);
     public <F extends OFValueType<F>> OFOxm<F> fromValueAndMask(F value, F mask, MatchField<F> field);
     public <F extends OFValueType<F>> OFOxm<F> fromMasked(Masked<F> masked, MatchField<F> field);

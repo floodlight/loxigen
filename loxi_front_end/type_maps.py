@@ -155,7 +155,7 @@ def class_is_virtual(cls):
     if loxi_utils.class_is_list(cls):
         return True
     # TODO get this from the input file when we have virtual class syntax
-    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira"]:
+    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira"]:
         return True
     return False
 
@@ -169,6 +169,7 @@ def class_is_virtual(cls):
 message_types = {
     # version 1.0
     of_g.VERSION_1_0:dict(
+        error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 16,
@@ -177,6 +178,7 @@ message_types = {
 
     # version 1.1
     of_g.VERSION_1_1:dict(
+        error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,
@@ -185,6 +187,7 @@ message_types = {
 
     # version 1.2
     of_g.VERSION_1_2:dict(
+        error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,
@@ -193,6 +196,7 @@ message_types = {
 
     # version 1.3
     of_g.VERSION_1_3:dict(
+        error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
         stats_request           = 18,  # FIXME Multipart
@@ -474,6 +478,24 @@ flow_mod_list = [
     "of_flow_modify_strict",
     "of_flow_delete",
     "of_flow_delete_strict"
+]
+
+error_msg_list = [
+    "of_hello_failed_error_msg",
+    "of_bad_request_error_msg",
+    "of_bad_action_error_msg",
+    "of_bad_instruction_error_msg",
+    "of_bad_match_error_msg",
+    "of_flow_mod_failed_error_msg",
+    "of_group_mod_failed_error_msg",
+    "of_port_mod_failed_error_msg",
+    "of_table_mod_failed_error_msg",
+    "of_queue_op_failed_error_msg",
+    "of_switch_config_failed_error_msg",
+    "of_role_request_failed_error_msg",
+    "of_meter_mod_failed_error_msg",
+    "of_table_features_failed_error_msg",
+    "of_experimenter_error_msg"
 ]
 
 def sub_class_map(base_type, version):
