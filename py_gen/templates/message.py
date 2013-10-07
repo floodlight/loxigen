@@ -122,6 +122,15 @@ def parse_message(buf):
     else:
         raise loxi.ProtocolError("unexpected message type")
 
+def parse_error(buf):
+    if len(buf) < 8 + 2:
+        raise loxi.ProtocolError("message too short")
+    err_type, = struct.unpack_from("!H", buf, 8)
+    if err_type in error_msg_parsers:
+        return error_msg_parsers[err_type](buf)
+    else:
+        raise loxi.ProtocolError("unexpected error type %u" % err_type)
+
 def parse_flow_mod(buf):
 :: if version == 1:
 :: offset = 57
@@ -137,7 +146,6 @@ def parse_flow_mod(buf):
     else:
         raise loxi.ProtocolError("unexpected flow mod cmd %u" % cmd)
 
-:: if version < of_g.VERSION_1_3:
 def parse_stats_reply(buf):
     if len(buf) < 8 + 2:
         raise loxi.ProtocolError("message too short")
@@ -155,31 +163,8 @@ def parse_stats_request(buf):
         return stats_request_parsers[stats_type](buf)
     else:
         raise loxi.ProtocolError("unexpected stats type %u" % stats_type)
-:: else:
-def parse_multipart_reply(buf):
-    if len(buf) < 8 + 2:
-        raise loxi.ProtocolError("message too short")
-    multipart_type, = struct.unpack_from("!H", buf, 8)
-    if multipart_type in multipart_reply_parsers:
-        return multipart_reply_parsers[multipart_type](buf)
-    else:
-        raise loxi.ProtocolError("unexpected multipart type %u" % multipart_type)
 
-def parse_multipart_request(buf):
-    if len(buf) < 8 + 2:
-        raise loxi.ProtocolError("message too short")
-    multipart_type, = struct.unpack_from("!H", buf, 8)
-    if multipart_type in multipart_request_parsers:
-        return multipart_request_parsers[multipart_type](buf)
-    else:
-        raise loxi.ProtocolError("unexpected multipart type %u" % multipart_type)
-:: #endif
-
-:: if version == of_g.VERSION_1_0:
-def parse_vendor(buf):
-:: else:
 def parse_experimenter(buf):
-:: #endif
     if len(buf) < 16:
         raise loxi.ProtocolError("experimenter message too short")
 
@@ -210,6 +195,30 @@ parsers = {
 :: #endfor
 }
 
+error_msg_parsers = {
+    const.OFPET_HELLO_FAILED : hello_failed_error_msg.unpack,
+    const.OFPET_BAD_REQUEST : bad_request_error_msg.unpack,
+    const.OFPET_BAD_ACTION : bad_action_error_msg.unpack,
+    const.OFPET_FLOW_MOD_FAILED : flow_mod_failed_error_msg.unpack,
+    const.OFPET_PORT_MOD_FAILED : port_mod_failed_error_msg.unpack,
+    const.OFPET_QUEUE_OP_FAILED : queue_op_failed_error_msg.unpack,
+:: if version >= of_g.VERSION_1_1:
+    const.OFPET_BAD_INSTRUCTION : bad_instruction_error_msg.unpack,
+    const.OFPET_BAD_MATCH : bad_match_error_msg.unpack,
+    const.OFPET_GROUP_MOD_FAILED : group_mod_failed_error_msg.unpack,
+    const.OFPET_TABLE_MOD_FAILED : table_mod_failed_error_msg.unpack,
+    const.OFPET_SWITCH_CONFIG_FAILED : switch_config_failed_error_msg.unpack,
+:: #endif
+:: if version >= of_g.VERSION_1_2:
+    const.OFPET_ROLE_REQUEST_FAILED : role_request_failed_error_msg.unpack,
+    const.OFPET_EXPERIMENTER : experimenter_error_msg.unpack,
+:: #endif
+:: if version >= of_g.VERSION_1_3:
+    const.OFPET_METER_MOD_FAILED : meter_mod_failed_error_msg.unpack,
+    const.OFPET_TABLE_FEATURES_FAILED : table_features_failed_error_msg.unpack,
+:: #endif
+}
+
 flow_mod_parsers = {
     const.OFPFC_ADD : flow_add.unpack,
     const.OFPFC_MODIFY : flow_modify.unpack,
@@ -218,7 +227,6 @@ flow_mod_parsers = {
     const.OFPFC_DELETE_STRICT : flow_delete_strict.unpack,
 }
 
-:: if version < of_g.VERSION_1_3:
 stats_reply_parsers = {
     const.OFPST_DESC : desc_stats_reply.unpack,
     const.OFPST_FLOW : flow_stats_reply.unpack,
@@ -232,6 +240,13 @@ stats_reply_parsers = {
 :: #endif
 :: if version >= of_g.VERSION_1_2:
     const.OFPST_GROUP_FEATURES : group_features_stats_reply.unpack,
+:: #endif
+:: if version >= of_g.VERSION_1_3:
+    const.OFPST_METER : meter_stats_reply.unpack,
+    const.OFPST_METER_CONFIG : meter_config_stats_reply.unpack,
+    const.OFPST_METER_FEATURES : meter_features_stats_reply.unpack,
+    const.OFPST_TABLE_FEATURES : table_features_stats_reply.unpack,
+    const.OFPST_PORT_DESC : port_desc_stats_reply.unpack,
 :: #endif
 }
 
@@ -249,42 +264,14 @@ stats_request_parsers = {
 :: if version >= of_g.VERSION_1_2:
     const.OFPST_GROUP_FEATURES : group_features_stats_request.unpack,
 :: #endif
-}
-:: else:
-multipart_reply_parsers = {
-    const.OFPMP_DESC : desc_stats_reply.unpack,
-    const.OFPMP_FLOW : flow_stats_reply.unpack,
-    const.OFPMP_AGGREGATE : aggregate_stats_reply.unpack,
-    const.OFPMP_TABLE : table_stats_reply.unpack,
-    const.OFPMP_PORT_STATS : port_stats_reply.unpack,
-    const.OFPMP_QUEUE : queue_stats_reply.unpack,
-    const.OFPMP_GROUP : group_stats_reply.unpack,
-    const.OFPMP_GROUP_DESC : group_desc_stats_reply.unpack,
-    const.OFPMP_GROUP_FEATURES : group_features_stats_reply.unpack,
-    const.OFPMP_METER : meter_stats_reply.unpack,
-    const.OFPMP_METER_CONFIG : meter_config_stats_reply.unpack,
-    const.OFPMP_METER_FEATURES : meter_features_stats_reply.unpack,
-    const.OFPMP_TABLE_FEATURES : table_features_stats_reply.unpack,
-    const.OFPMP_PORT_DESC : port_desc_stats_reply.unpack,
-}
-
-multipart_request_parsers = {
-    const.OFPMP_DESC : desc_stats_request.unpack,
-    const.OFPMP_FLOW : flow_stats_request.unpack,
-    const.OFPMP_AGGREGATE : aggregate_stats_request.unpack,
-    const.OFPMP_TABLE : table_stats_request.unpack,
-    const.OFPMP_PORT_STATS : port_stats_request.unpack,
-    const.OFPMP_QUEUE : queue_stats_request.unpack,
-    const.OFPMP_GROUP : group_stats_request.unpack,
-    const.OFPMP_GROUP_DESC : group_desc_stats_request.unpack,
-    const.OFPMP_GROUP_FEATURES : group_features_stats_request.unpack,
-    const.OFPMP_METER : meter_stats_request.unpack,
-    const.OFPMP_METER_CONFIG : meter_config_stats_request.unpack,
-    const.OFPMP_METER_FEATURES : meter_features_stats_request.unpack,
-    const.OFPMP_TABLE_FEATURES : table_features_stats_request.unpack,
-    const.OFPMP_PORT_DESC : port_desc_stats_request.unpack,
-}
+:: if version >= of_g.VERSION_1_3:
+    const.OFPST_METER : meter_stats_request.unpack,
+    const.OFPST_METER_CONFIG : meter_config_stats_request.unpack,
+    const.OFPST_METER_FEATURES : meter_features_stats_request.unpack,
+    const.OFPST_TABLE_FEATURES : table_features_stats_request.unpack,
+    const.OFPST_PORT_DESC : port_desc_stats_request.unpack,
 :: #endif
+}
 
 :: experimenter_ofclasses = [x for x in ofclasses if x.type_members[1].value == 4]
 :: sort_key = lambda x: x.type_members[2].value

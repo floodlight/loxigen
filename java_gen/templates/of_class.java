@@ -391,6 +391,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: for prop in msg.data_members:
         //:: if prop.java_type.pub_type == 'long':
         result = prime *  (int) (${prop.name} ^ (${prop.name} >>> 32));
+        //:: elif prop.java_type.pub_type == 'boolean':
+        result = prime * result + (${prop.name} ? 1231 : 1237);
         //:: elif prop.java_type.is_primitive:
         result = prime * result + ${prop.name};
         //:: elif prop.java_type.is_array:

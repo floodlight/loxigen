@@ -37,14 +37,6 @@ public class OFBufferId implements Comparable<OFBufferId>, PrimitiveSinkable {
         return Long.toString(U32.f(rawValue));
     }
 
-    public void write4Bytes(ChannelBuffer c) {
-        c.writeInt(this.rawValue);
-    }
-
-    public static OFBufferId read4Bytes(ChannelBuffer c) throws OFParseError {
-        return OFBufferId.of(c.readInt());
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
