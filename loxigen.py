@@ -423,6 +423,8 @@ def read_input():
 
         # Populate global state
         for wire_version in ofinput.wire_versions:
+            if wire_version not in of_g.target_version_list:
+                    continue
             ofinputs_by_version[wire_version].append(ofinput)
             version_name = of_g.of_version_wire2name[wire_version]
 

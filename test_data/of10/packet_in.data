@@ -29,7 +29,7 @@ of_packet_in_total_len_set(obj, 9);
 of_packet_in_xid_set(obj, 305419896);
 -- java
 builder
-   .setXid(0x12345678)
+   .setXidLoxi(0x12345678)
    .setBufferId(OFBufferId.of(0xabcdef01))
    .setTotalLen(9)
    .setInPort(OFPort.LOCAL)

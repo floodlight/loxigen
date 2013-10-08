@@ -59,7 +59,7 @@ args = []
 # The default configuration dictionary for LOXI code generation
 options_default = {
     "lang"               : "c",
-    "version-list"       : "1.0 1.1 1.2 1.3",
+    "version-list"       : "1.0 1.3",
     "install-dir"        : "loxi_output",
 }
 

@@ -66,7 +66,7 @@ public class ${factory.name} implements ${factory.interface.name} {
     //:: if len(i.writeable_members) > 0:
     public ${i.name}.Builder ${factory.interface.method_name(i, builder=True)}() {
         //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
-        return new ${i.versioned_class(factory.version).name}.Builder()${".setXid(nextXid())" if i.member_by_name("xid") else ""};
+        return new ${i.versioned_class(factory.version).name}.Builder()${".setXidLoxi(nextXid())" if i.member_by_name("xidLoxi") else ""};
         //:: else:
         throw new UnsupportedOperationException("${i.name} not supported in version ${factory.version}");
         //:: #endif
@@ -85,12 +85,12 @@ public class ${factory.name} implements ${factory.interface.name} {
     //::     general_get_match_func_written = True
     //:: #endif
     //:: if len(i.writeable_members) <= 2:
-    public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xid" )}) {
+    public ${i.name} ${factory.interface.method_name(i, builder=False)}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xidLoxi" )}) {
         //::   if i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)):
         //:: if len(i.writeable_members) > 0:
         return new ${i.versioned_class(factory.version).name}(
                 ${",\n                      ".join(
-                         [ prop.name if prop.name != "xid" else "nextXid()" for prop in i.versioned_class(factory.version).data_members])}
+                         [ prop.name if prop.name != "xidLoxi" else "nextXid()" for prop in i.versioned_class(factory.version).data_members])}
                     );
         //:: else:
         return ${i.versioned_class(factory.version).name}.INSTANCE;
@@ -177,4 +177,5 @@ public class ${factory.name} implements ${factory.interface.name} {
     public OFVersion getVersion() {
             return OFVersion.${factory.version.constant_version};
     }
+
 }

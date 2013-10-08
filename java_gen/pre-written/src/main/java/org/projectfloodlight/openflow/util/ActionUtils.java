@@ -16,7 +16,7 @@ public class ActionUtils {
     private ActionUtils() {}
 
     public static List<OFAction> getActions(OFFlowStatsEntry e) {
-        if(e.getVersion() == OFVersion.OF_10) {
+        if(e.getVersionLoxi() == OFVersion.OF_10) {
             return e.getActions();
         } else {
             for(OFInstruction i: e.getInstructions()) {
@@ -29,7 +29,7 @@ public class ActionUtils {
     }
 
     public static List<OFAction> getActions(OFFlowMod e) {
-        if(e.getVersion() == OFVersion.OF_10) {
+        if(e.getVersionLoxi() == OFVersion.OF_10) {
             return e.getActions();
         } else {
             for(OFInstruction i: e.getInstructions()) {

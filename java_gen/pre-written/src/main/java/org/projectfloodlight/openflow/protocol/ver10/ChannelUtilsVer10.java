@@ -5,10 +5,10 @@ import java.util.Set;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.match.Match;
-import org.projectfloodlight.openflow.protocol.ver10.OFMatchV1Ver10;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
+import org.projectfloodlight.openflow.protocol.match.Match;
+
 
 /**
  * Collection of helper functions for reading and writing into ChannelBuffers

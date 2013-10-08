@@ -32,7 +32,7 @@ ofp.message.packet_in(
     data="abc")
 -- java
 builder
-   .setXid(0x12345678)
+   .setXidLoxi(0x12345678)
    .setBufferId(OFBufferId.of(100))
    .setTotalLen(17000)
    .setReason(OFPacketInReason.ACTION)

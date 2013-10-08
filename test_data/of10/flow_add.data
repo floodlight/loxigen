@@ -134,7 +134,7 @@ of_flow_add_flags_set(obj, 2);
     }
 }
 -- java
-builder.setXid(0x12345678)
+builder.setXidLoxi(0x12345678)
     .setMatch(
         factory.buildMatch()
             .setExact(MatchField.IN_PORT, OFPort.of(3))

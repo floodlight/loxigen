@@ -2,10 +2,9 @@ package org.projectfloodlight.openflow.protocol.ver13;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
 import org.projectfloodlight.openflow.protocol.OFMatchBmap;
 import org.projectfloodlight.openflow.protocol.match.Match;
-import org.projectfloodlight.openflow.protocol.ver13.OFMatchV3Ver13;
-import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
 
 /**
  * Collection of helper functions for reading and writing into ChannelBuffers
