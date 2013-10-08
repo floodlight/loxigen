@@ -174,7 +174,7 @@ code_gen_config = dict(
 
 ## These members do not get normal accessors
 
-skip_members = ["version", "type", "length", "stats_type", "len",
+skip_members = ["version", "type", "length", "err_type", "stats_type", "len",
                 "type_len", "actions_len", "_command"]
 
 ## Some OpenFlow string length constants
