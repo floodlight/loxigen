@@ -250,6 +250,10 @@ enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_RESET_COUNTS = 0x4,
     OFPFF_NO_PKT_COUNTS = 0x8,
     OFPFF_NO_BYT_COUNTS = 0x10,
+
+    /* Non-standard, enabled by an experimenter message */
+    /* See the bsn_flow_idle input file */
+    OFPFF_BSN_SEND_IDLE = 0x80,
 };
 
 enum ofp_group(wire_type=uint32_t, complete=False) {
