@@ -55,7 +55,13 @@ local enum_v${version}_${enum.name} = {
 
 fields = {}
 :: for field in fields:
-fields[${repr(field.fullname)}] = ProtoField.new("${field.name}", "${field.fullname}", "FT_${field.type}", nil, "BASE_${field.base}")
+:: if field.type in ["uint8", "uint16", "uint32", "uint64"]:
+fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base})
+:: elif field.type in ["ipv4", "ipv6", "ether", "bytes", "stringz"]:
+fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}")
+:: else:
+:: raise NotImplementedError("unknown Wireshark type " + field.type)
+:: #endif
 :: #endfor
 
 p_of.fields = {
