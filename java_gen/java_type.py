@@ -394,6 +394,10 @@ table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
             default='TableId.ALL')
+table_id_default_zero = JType("TableId") \
+        .op(read='TableId.readByte(bb)',
+            write='$name.writeByte(bb)',
+            default='TableId.ZERO')
 of_version = JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 
@@ -577,6 +581,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFInstructionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFInstructionTypeSerializerVer$version.readFrom(bb)", write="OFInstructionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif obj_name in ("of_flow_add", "of_flow_modify", "of_flow_modify_strict", "of_delete_strict") and  field_name == "table_id" and c_type == "uint8_t":
+        return table_id_default_zero
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
