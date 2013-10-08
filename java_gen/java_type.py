@@ -423,6 +423,10 @@ table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
             default='TableId.ALL')
+table_id_default_zero = JType("TableId") \
+        .op(read='TableId.readByte(bb)',
+            write='$name.writeByte(bb)',
+            default='TableId.ZERO')
 of_version = JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 
@@ -595,6 +599,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
             .op(read='bb.readShort()', write='bb.writeShort($name)')
     elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
         return instruction_type
+    elif obj_name in ("of_flow_add", "of_flow_modify", "of_flow_modify_strict", "of_delete_strict") and  field_name == "table_id" and c_type == "uint8_t":
+        return table_id_default_zero
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":

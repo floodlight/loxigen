@@ -15,7 +15,9 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
     private static final short ALL_VAL = 0x00FF;
     private static final short NONE_VAL = 0x0000;
     public static final TableId NONE = new TableId(NONE_VAL);
+
     public static final TableId ALL = new TableId(ALL_VAL);
+    public static final TableId ZERO = NONE;
 
     private final short id;
 
