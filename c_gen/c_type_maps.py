@@ -67,6 +67,10 @@ def gen_object_id_to_type(out):
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_stats_request", version)],
                            comma, cls))
+            elif cls in type_maps.error_msg_list:
+                out.write("    %d%s /* %s */\n" %
+                          (type_maps.type_val[("of_error_msg", version)],
+                           comma, cls))
             elif cls in type_maps.flow_mod_list:
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_flow_mod", version)],
@@ -230,6 +234,9 @@ def gen_type_maps(out):
     out.write("#include <loci/loci.h>\n\n")
 
     # Generate maps from wire type values to object IDs
+    gen_type_to_object_id(out, "error_msg_type_to_id", "OF_ERROR_MSG",
+                          "OF_%s_ERROR_MSG", type_maps.error_types,
+                          max_type_value)
     gen_type_to_object_id(out, "action_type_to_id", "OF_ACTION",
                           "OF_ACTION_%s", type_maps.action_types,
                           max_type_value)
@@ -384,6 +391,42 @@ of_%(name)s_to_object_id(int %(name)s, of_version_t version)
     return of_%(name)s_type_to_id[version][%(name)s];
 }
 """
+
+    error_msg_template = """
+/**
+ * %(name)s wire type to object ID array.
+ * Treat as private; use function accessor below
+ */
+
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+
+#define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
+
+/**
+ * Map an %(name)s wire value to an OF object
+ * @param %(name)s The %(name)s type wire value
+ * @param version The version associated with the check
+ * @return The %(name)s OF object type
+ * @return OF_OBJECT_INVALID if type does not map to an object
+ *
+ */
+static inline of_object_id_t
+of_error_msg_to_object_id(uint16_t %(name)s, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return OF_OBJECT_INVALID;
+    }
+    if (%(name)s == OF_EXPERIMENTER_TYPE) {
+        return OF_EXPERIMENTER_ERROR_MSG;
+    }
+    if (%(name)s < 0 || %(name)s >= OF_%(u_name)s_ITEM_COUNT) {
+        return OF_OBJECT_INVALID;
+    }
+
+    return of_%(name)s_type_to_id[version][%(name)s];
+}
+"""
+
     # Experimenter mapping functions
     # Currently we support very few candidates, so we just do a
     # list of if/elses
@@ -457,6 +500,7 @@ of_message_to_object_id(of_message_t msg, int length) {
     of_version_t ver;
     of_object_id_t obj_id;
     uint16_t stats_type;
+    uint16_t err_type;
     uint8_t flow_mod_cmd;
 
     if (length < OF_MESSAGE_MIN_LENGTH) {
@@ -503,7 +547,61 @@ of_message_to_object_id(of_message_t msg, int length) {
         }
     }
 
+    if (obj_id == OF_ERROR_MSG) {
+        if (length < OF_MESSAGE_MIN_ERROR_LENGTH) {
+            return OF_OBJECT_INVALID;
+        }
+        err_type = of_message_error_type_get(msg);
+        obj_id = of_error_msg_to_object_id(err_type, ver);
+    }
+
     return obj_id;
+}
+"""
+
+    oxm_template = """
+/**
+ * oxm wire type to object ID array.
+ * Treat as private; use function accessor below
+ */
+
+extern const of_object_id_t *const of_oxm_type_to_id[OF_VERSION_ARRAY_MAX];
+
+#define OF_OXM_ITEM_COUNT %(ar_len)d\n
+
+/**
+ * Map an oxm wire value to an OF object
+ * @param oxm The oxm type wire value
+ * @param version The version associated with the check
+ * @return The oxm OF object type
+ * @return OF_OBJECT_INVALID if type does not map to an object
+ *
+ */
+static inline of_object_id_t
+of_oxm_to_object_id(uint32_t type_len, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return OF_OBJECT_INVALID;
+    }
+
+    uint16_t class = (type_len >> 16) & 0xffff;
+    uint8_t masked_type = (type_len >> 8) & 0xff;
+
+    if (class == 0x8000) {
+        if (masked_type < 0 || masked_type >= OF_OXM_ITEM_COUNT) {
+            return OF_OBJECT_INVALID;
+        }
+
+        return of_oxm_type_to_id[version][masked_type];
+    } else if (class == 0x0003) {
+        switch (masked_type) {
+        case 0x00: return OF_OXM_BSN_IN_PORTS_128;
+        case 0x01: return OF_OXM_BSN_IN_PORTS_128_MASKED;
+        default: return OF_OBJECT_INVALID;
+        }
+    } else {
+        return OF_OBJECT_INVALID;
+    }
 }
 """
 
@@ -557,17 +655,24 @@ of_message_to_object_id(of_message_t msg, int length) {
               dict(name="stats_request", u_name="STATS_REQUEST",
                    ar_len=ar_len))
 
+    ar_len = type_maps.type_array_len(type_maps.error_types,
+                                      max_type_value)
+    out.write(error_msg_template %
+              dict(name="error_msg", u_name="ERROR_MSG", ar_len=ar_len))
+#     out.write(error_msg_function)
+
     ar_len = type_maps.type_array_len(type_maps.flow_mod_types, max_type_value)
     out.write(map_template %
               dict(name="flow_mod", u_name="FLOW_MOD", ar_len=ar_len))
 
+    # OXM
     ar_len = type_maps.type_array_len(type_maps.oxm_types, max_type_value)
     out.write("""
 /* NOTE: We could optimize the OXM and only generate OF 1.2 versions. */
 """)
-    out.write(map_template %
-              dict(name="oxm", u_name="OXM", ar_len=ar_len))
+    out.write(oxm_template % dict(ar_len=ar_len))
 
+    # Messages
     out.write(experimenter_function)
     # Must follow stats reply/request
     ar_len = type_maps.type_array_len(type_maps.message_types, max_type_value)
@@ -721,6 +826,46 @@ of_object_to_stats_type(of_object_id_t id, of_version_t version)
         break;
     }
     return -1; /* Not recognized as stats type object for this version */
+}
+""")
+
+    ################################################################
+    # Generate object ID to the error sub-type map
+    ################################################################
+    out.write("""
+/**
+ * Map an object ID to an error type
+ * @param id An object ID
+ * @return The wire value for the error type
+ * @return -1 if not supported for this version
+ * @return -1 if id is not a specific error type ID
+ *
+ * Note that the value is returned as a signed integer.  So -1 is
+ * an error code, while 0xffff is the usual "experimenter" code.
+ */
+
+static inline int
+of_object_to_error_type(of_object_id_t id, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return -1;
+    }
+    switch (id) {""")
+    error_names = set()
+    for ver in of_g.of_version_range:
+        for name in type_maps.error_types[ver]:
+            error_names.add(name)
+    for name in error_names:
+        out.write("""
+    case OF_%(name)s_ERROR_MSG:
+        if (OF_ERROR_TYPE_%(name)s_SUPPORTED(version))
+            return OF_ERROR_TYPE_%(name)s_BY_VERSION(version);
+        break;""" % {"name": name.upper()})
+    out.write("""
+    default:
+        break;
+    }
+    return -1; /* Not recognized as error type object for this version */
 }
 """)
 
@@ -890,6 +1035,10 @@ of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
         /* It's a stats obj */
         of_message_stats_type_set(msg, type);
     }
+    if ((type = of_object_to_error_type(id, ver)) >= 0) {
+        /* It's an error obj */
+        of_message_error_type_set(msg, type);
+    }
     if ((type = of_object_to_flow_mod_command(id, ver)) >= 0) {
         /* It's a flow mod obj */
         of_message_flow_mod_command_set(msg, ver, type);
@@ -1002,11 +1151,6 @@ extern void of_meter_band_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
-
-/* XXX Hardcoded to the OpenFlow Basic OXM class */
-#define OF_OXM_MASKED_TYPE_GET(hdr) (((hdr) >> 8) & 0xff)
-#define OF_OXM_MASKED_TYPE_SET(hdr, val)                    \\
-    (hdr) = ((hdr) & 0x000000ff) + 0x80000000 + (((val) & 0xff) << 8)
 
 #define OF_OXM_LENGTH_GET(hdr) (((hdr) & 0xff) + 4)
 #define OF_OXM_LENGTH_SET(hdr, val)                         \\

@@ -50,7 +50,6 @@ def gen_all_java(out, name):
         shutil.rmtree(basedir)
     os.makedirs(basedir)
     copy_prewrite_tree(basedir)
-    java_model.adjust_ir()
     gen = JavaGenerator(basedir)
     gen.create_of_interfaces()
     gen.create_of_classes()

@@ -45,6 +45,10 @@ public class ${factory.name} implements ${factory.interface.name} {
     private final XidGenerator xidGenerator = XidGenerators.global();
     //:: #endif
 
+    public OFVersion getOFVersion() {
+        return OFVersion.OF_${factory.version.of_version};
+    }
+
     //:: for name, clazz in factory.interface.sub_factories.items():
     public ${clazz} ${name}() {
         return ${clazz}Ver${factory.version.of_version}.INSTANCE;
@@ -71,6 +75,12 @@ public class ${factory.name} implements ${factory.interface.name} {
     //:: if not general_get_match_func_written and is_match_object and not unsupported_match_object:
     public Match.Builder buildMatch() {
         return new ${i.versioned_class(factory.version).name}.Builder();
+    }
+
+    final static Match MATCH_WILDCARD_ALL = ${i.versioned_class(factory.version).name}.DEFAULT;
+
+    public Match matchWildcardAll() {
+        return MATCH_WILDCARD_ALL;
     }
     //::     general_get_match_func_written = True
     //:: #endif

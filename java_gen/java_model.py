@@ -46,101 +46,10 @@ import test_data
 import java_gen.java_type as java_type
 from java_gen.java_type import erase_type_annotation
 
-# Key is modified name of error code; value is OFErrorType value string
-error_type_map = {}
-
-def adjust_ir():
-    """
-    For Java we change of_error_message to combine the 16-bit type and code
-    fields into a single 32-bit code field and we combine the per-error-type
-    code enums into a single ofp_error_code enum. This enables the generated
-    OFErrorMsg class to have a getCode method that can return all supported
-    error codes. Otherwise we'd need to do something like having per-error-type
-    subclasses of OFErrorMsg that had a getCode that returned the different
-    error codes for each error type, which would be less convenient for clients
-    and would also entail changing the LOXI OF input files and impacting other
-    language backends.
-    """
-    for version in of_g.target_version_list:
-        of_protocol = of_g.ir[version]
-        error_type = find(lambda e: e.name == "ofp_error_type", of_protocol.enums)
-        if error_type == None:
-            raise Exception("ofp_error_type enum not found; OF version: " + str(version))
-        error_code_entries = []
-        # For each error type value look up the corresponding error code enum.
-        # Add those values to the combined entries for the new ofp_error_code
-        # enum. The name of the new value is formed by concatenating the name
-        # of the error type value with the name of the old error code value.
-        for error_type_entry in error_type.entries:
-            # Strip off the OFPxx prefix
-            prefix_length = error_type_entry.name.find('_')
-            if prefix_length < 0:
-                raise Exception("OFPET prefix not found for ofp_error_type value " + error_type_entry.name + "; OF version: " + str(version))
-            error_type_entry_name = error_type_entry.name[prefix_length+1:]
-            if error_type_entry_name == "EXPERIMENTER":
-                # There isn't an error code enum defined for the experimenter error type
-                # FIXME: Need to add support for the message ofp_error_experimenter_msg format
-                continue
-            # The per-error-type code enums follow a naming conventions where
-            # the middle part of the enum name is the same as the name of the
-            # error type value (except lower-case).
-            error_code_enum_name = "ofp_" + error_type_entry_name.lower() + "_code"
-            # Look up the error code enum from the IR
-            error_code_enum = None
-            for i, enum in enumerate(of_protocol.enums):
-                if enum.name == error_code_enum_name:
-                    error_code_enum = enum
-                    # We don't want to generate code for the per-error-type
-                    # enum so remove it from the IR
-                    del of_protocol.enums[i]
-                    break
-            if error_code_enum == None:
-                raise Exception("Error code enum not found: " + error_code_enum_name + "; OF version: " + str(version))
-            for error_code_entry in error_code_enum.entries:
-                # Strip off the prefix from the entry name
-                prefix_length = error_code_entry.name.find('_')
-                if prefix_length < 0:
-                    raise Exception("Prefix not found for error code value " + error_code_entry.name + "; OF version: " + str(version))
-                error_code_entry_name = error_code_entry.name[prefix_length+1:]
-                # Combine the entry type name and the error code name
-                error_code_entry_name = error_type_entry_name + "_" + error_code_entry_name
-                # Combine the entry type value and the error code value
-                error_code_entry_value = (error_type_entry.value << 16) + error_code_entry.value
-                # Add the enum entry to the combined ofp_error_code
-                # Note that the "OFPEC" prefix is arbitrary. It will be stripped
-                # off again during Java code generation, but there needs to be
-                # some/any prefix
-                error_code_entries.append(OFEnumEntry("OFPEC_" + error_code_entry_name, error_code_entry_value, {}))
-                error_type_map[error_code_entry_name] = error_type_entry_name
-        # We've collected all of the entries. Now we can add the enum to the IR
-        of_protocol.enums.append(OFEnum("ofp_error_code", error_code_entries, {'wire_type': 'uint32_t'}))
-
-        # We also need to patch the of_error_msg class to combine the 16-bit error
-        # type and code fields into a single 32-bit error code field
-        error_msg = find(lambda c: c.name == "of_error_msg", of_protocol.classes)
-        if error_msg == None:
-            raise Exception("of_error_msg class not found; OF version: " + str(version))
-        err_type_index = None
-        for i, member in enumerate(error_msg.members):
-            if member.name == "err_type":
-                # Keep track of the error type index so we can remove it once
-                # we've finished iterating
-                err_type_index = i
-            elif member.name == 'code':
-                # Change the code to be a 32-bit ofp_error_code enum value
-                error_msg.members[i] = OFDataMember("code", "ofp_error_code")
-        if err_type_index == None:
-            raise Exception("err_type member of of_error_msg not found; OF version: " + str(version))
-        del error_msg.members[err_type_index]
-
-
-def gen_error_type(enum_entry):
-    return "OFErrorType." + error_type_map[enum_entry.name]
-
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
-    enum_blacklist = set(("OFDefinitions", "OFPortNo",))
+    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId"))
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
@@ -229,7 +138,9 @@ class JavaModel(object):
                 "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
                 "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
                 "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True)
+                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
+                "OFOxmBsnInPorts128":       OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", False),
+                "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True)
                 }
 
     # Registry of nullable properties:
@@ -299,7 +210,6 @@ class JavaModel(object):
     enum_metadata_map = defaultdict(lambda: JavaModel.OFEnumMetadata((), None),
             OFPortFeatures = OFEnumMetadata((OFEnumPropertyMetadata("PortSpeed", java_type.port_speed, gen_port_speed),), None),
             OFPortState = OFEnumMetadata((OFEnumPropertyMetadata("StpState", java_type.boolean, gen_stp_state),), None),
-            OFErrorCode = OFEnumMetadata((OFEnumPropertyMetadata("ErrorType", java_type.error_type, gen_error_type),), None),
     )
 
     @property
@@ -399,6 +309,13 @@ class JavaModel(object):
                         factory.members.append(i)
                         break
         return factories.values()
+    
+    @memoize
+    def factory_of(self, interface):
+        for factory in self.of_factories:
+            if interface in factory.members:
+                return factory
+        return None
 
     def generate_class(self, clazz):
         """ return wether or not to generate implementation class clazz.
@@ -441,6 +358,12 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
+    
+    def of_version(self, version):
+        for fc in self.factory_classes:
+            if fc.version == version:
+                return fc
+        return None
 
 OFGenericClass = namedtuple("OFGenericClass", ("package", "name"))
 class OFFactoryClass(namedtuple("OFFactoryClass", ("package", "name", "interface", "version"))):
@@ -579,6 +502,8 @@ class JavaOFInterface(object):
             return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif re.match(r'OF.+StatsReply$', self.name):
             return ("", "OFStatsReply", None)
+        elif re.match(r'OF.+ErrorMsg$', self.name):
+            return ("", "OFErrorMsg", None)
         elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
             return ("", "OFFlowMod", None)
         elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name) and self.name != "OFBsnHeader":
@@ -656,29 +581,30 @@ class JavaOFInterface(object):
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.name == "OFOxm":
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "value", java_type.generic_t),
                     JavaVirtualMember(self, "mask", java_type.generic_t),
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype("T")),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   )
+                   ]
         elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
             field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
                 if self.name in model.oxm_map \
                 else java_type.make_match_field_jtype()
 
-            return (
+            virtual_members += [
                     JavaVirtualMember(self, "matchField", field_type),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                   ) \
-                   + \
-                   (
-                           ( JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type), ) if not find(lambda x: x.name == "mask", self.ir_model_members) else
-                    ()
-                   )
-        else:
-            return ()
+                   ]
+            if not find(lambda x: x.name == "mask", self.ir_model_members):
+                virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
+
+        return tuple(virtual_members)
 
     @property
     @memoize
@@ -791,26 +717,31 @@ class JavaOFClass(object):
         return self.ir_model_members + self.virtual_members
 
     @property
+    @memoize
     def ir_model_members(self):
         members = [ JavaMember.for_of_member(self, of_member) for of_member in self.ir_class.members ]
         return tuple(members)
 
     @property
     def virtual_members(self):
+        virtual_members = []
         if self.interface.parent_interface and self.interface.parent_interface.startswith("OFOxm"):
             if self.interface.name in model.oxm_map:
                 oxm_entry = model.oxm_map[self.interface.name]
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
                     JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
-                   )
+                   ]
             else:
-                return (
+                virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
-                   )
-        else:
-            return ()
+                   ]
+
+        if not find(lambda m: m.name == "version", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
+
+        return tuple(virtual_members)
 
     def all_versions(self):
         return [ JavaOFVersion(int_version)
@@ -1113,7 +1044,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-
+    
+    @property
+    def interface(self):
+        return self.java_class.interface
+    
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)
@@ -1132,10 +1067,7 @@ class JavaEnum(object):
     def __init__(self, c_name, version_enum_map):
         self.c_name = c_name
 
-        if c_name == "of_stats_types":
-            self.name = "OFStatsType"
-        else:
-            self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
+        self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
 
         # Port_features has constants that start with digits
         self.name_prefix = "PF_" if self.name == "OFPortFeatures" else ""

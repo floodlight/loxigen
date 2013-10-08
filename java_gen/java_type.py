@@ -33,11 +33,12 @@ def name_c_to_caps_camel(name):
     else:
         return camel
 
-java_primitive_types = set("byte char short int long".split(" "))
+java_primitive_types = set("boolean byte char short int long".split(" "))
 
 ### info table about java primitive types, for casting literals in the source code
 # { name : (signed?, length_in_bits) }
 java_primitives_info = {
+        'boolean' : (False, 8),
         'byte' : (True, 8),
         'char' : (False, 16),
         'short' : (True, 16),
@@ -48,7 +49,7 @@ java_primitives_info = {
 def format_primitive_literal(t, value):
     """ Format a primitive numeric literal for inclusion in the
         java source code. Takes care of casting the literal
-        apropriately for correct representation despite Java's
+        appropriately for correct representation despite Java's
         signed-craziness
     """
     signed, bits = java_primitives_info[t]
@@ -227,7 +228,8 @@ class JType(object):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='bb.readByte()', write='bb.writeByte($name)')
+        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
+        .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)', write='ChannelUtils.writeList(bb, $name)')
 u16 = JType('int', 'short') \
@@ -250,6 +252,9 @@ u64 = JType('U64', 'U64') \
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
+# the same OFPort, but with a default value of ZERO, only for OF10 match
+of_port_match_v1 = JType("OFPort") \
+         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ZERO")
 actions_list = JType('List<OFAction>') \
         .op(read='ChannelUtils.readList(bb, $length, OFActionVer$version.READER)',
             write='ChannelUtils.writeList(bb, $name);',
@@ -279,7 +284,8 @@ octets = JType('byte[]') \
             default="new byte[0]");
 of_match = JType('Match') \
         .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
-            write='$name.writeTo(bb)');
+            write='$name.writeTo(bb)',
+            default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
         .op(version=1, read="bb.readShort()", write="bb.writeShort($name)") \
         .op(version=ANY, read="bb.readByte()", write="bb.writeByte($name)")
@@ -323,9 +329,9 @@ eth_type = JType("EthType")\
             write="$name.write2Bytes(bb)",
             default="EthType.NONE")
 vlan_vid = JType("VlanVid")\
-        .op(read="VlanVid.read2Bytes(bb)",
-            write="$name.write2Bytes(bb)",
-            default="VlanVid.NONE")
+        .op(version=1, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=2, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
+        .op(version=ANY, read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="VlanVid.NONE")
 vlan_pcp = JType("VlanPcp")\
         .op(read="VlanPcp.readByte(bb)",
             write="$name.writeByte(bb)",
@@ -380,14 +386,27 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
+port_bitmap = JType('OFBitMask128') \
+            .op(read='OFBitMask128.read16Bytes(bb)',
+                write='$name.write16Bytes(bb)',
+                default='OFBitMask128.NONE')
 table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
             default='TableId.ALL')
+of_version = JType("OFVersion", 'byte') \
+            .op(read='bb.readByte()', write='bb.writeByte($name)')
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
-boolean = JType("boolean").op(default="false")
+boolean = JType("boolean", "byte") \
+        .op(read='(bb.readByte() != 0)',
+            write='bb.writeByte($name ? 1 : 0)',
+            default="false")
+datapath_id = JType("DatapathId") \
+        .op(read='DatapathId.of(bb.readLong())',
+            write='bb.writeLong($name.getLong())',
+            default='DatapathId.NONE')
 
 generic_t = JType("T")
 
@@ -420,6 +439,7 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
+        'of_bitmap_128_t': port_bitmap
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -473,12 +493,18 @@ exceptions = {
         'of_oxm_mpls_label_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         'of_oxm_mpls_tc' : { 'value' : u8obj },
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        
+        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
+        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
-                'tcp_src': transport_port, 'tcp_dst': transport_port
-                }
+                'tcp_src': transport_port, 'tcp_dst': transport_port,
+                'in_port': of_port_match_v1
+                },
+        'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
+        'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
 }
 
 
@@ -541,14 +567,30 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFActionType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
             .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+    elif field_name == "err_type":
+        return JType("OFErrorType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)')
+    elif field_name == "stats_type":
+        return JType("OFStatsType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)')
+    elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
+        return JType("OFInstructionType", 'short') \
+            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
+            .op(read="OFInstructionTypeSerializerVer$version.readFrom(bb)", write="OFInstructionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
-        return JType("OFVersion", 'byte') \
-            .op(read='bb.readByte()', write='bb.writeByte($name)')
+        return of_version
     elif field_name == "buffer_id" and c_type == "uint32_t":
         return JType("OFBufferId") \
             .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+    elif field_name == 'datapath_id':
+        return datapath_id
+    elif field_name == 'actions' and obj_name == 'of_features_reply':
+        return JType("Set<OFActionType>") \
+            .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
+                write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
+                default='ImmutableSet.<OFActionType>of()')
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

@@ -876,6 +876,30 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
 #define of_wire_buffer_ipv6_set(buf, offset, addr) \
     _wbuf_octets_set(buf, offset, (uint8_t *)&addr, sizeof(of_ipv6_t))
 
+/**
+ * Get an bitmap_128 address from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param addr Pointer to where to store the bitmap_128 address
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_bitmap_128_get(buf, offset, addr) \
+    (of_wire_buffer_u64_get(buf, offset, &addr->hi), of_wire_buffer_u64_get(buf, offset+8, &addr->lo))
+
+/**
+ * Set an bitmap_128 address in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param addr The variable holding bitmap_128 address to store
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_bitmap_128_set(buf, offset, addr) \
+    (of_wire_buffer_u64_set(buf, offset, addr.hi), of_wire_buffer_u64_set(buf, offset+8, addr.lo))
+
 /* Relocate data from start offset to the end of the buffer to a new position */
 static inline void
 of_wire_buffer_move_end(of_wire_buffer_t *wbuf, int start_offset, int new_offset)

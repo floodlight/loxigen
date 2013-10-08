@@ -142,3 +142,23 @@ def unpack_match_bmap(reader):
 
 def pack_list(values):
     return "".join([x.pack() for x in values])
+
+MASK64 = (1 << 64) - 1
+
+def pack_bitmap_128(value):
+    x = 0l
+    for y in value:
+        x |= 1 << y
+    return struct.pack("!QQ", (x >> 64) & MASK64, x & MASK64)
+
+def unpack_bitmap_128(reader):
+    hi, lo = reader.read("!QQ")
+    x = (hi << 64) | lo
+    i = 0
+    value = set()
+    while x != 0:
+        if x & 1 == 1:
+            value.add(i)
+        i += 1
+        x >>= 1
+    return value
