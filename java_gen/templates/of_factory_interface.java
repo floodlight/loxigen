@@ -58,7 +58,6 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
     Match matchWildcardAll();
 //:: #endif
 
-    OFVersion getOFVersion();
     OFMessageReader<${factory.base_class}> getReader();
     OFVersion getVersion();
 //:: if factory.name == 'OFOxms':
