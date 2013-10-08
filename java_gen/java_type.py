@@ -446,6 +446,11 @@ datapath_id = JType("DatapathId") \
         .op(read='DatapathId.of(bb.readLong())',
             write='bb.writeLong($name.getLong())',
             default='DatapathId.NONE')
+action_type_set = JType("Set<OFActionType>") \
+        .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
+            write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
+            default='ImmutableSet.<OFActionType>of()',
+            funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
 
 generic_t = JType("T")
 
@@ -599,10 +604,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif field_name == 'datapath_id':
         return datapath_id
     elif field_name == 'actions' and obj_name == 'of_features_reply':
-        return JType("Set<OFActionType>") \
-            .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
-                write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
-                default='ImmutableSet.<OFActionType>of()')
+        return action_type_set
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):
