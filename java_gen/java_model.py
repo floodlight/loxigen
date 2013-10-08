@@ -57,7 +57,7 @@ class JavaModel(object):
     # registry of interfaces that should not be generated
     # set(java_names)
     # OFUint structs are there for god-knows what in loci. We certainly don't need them.
-    interface_blacklist = set( ("OFUint8", "OFUint32",))
+    interface_blacklist = set( ("OFUint8", "OFUint32","OFMeterConfig"))
     # registry of interface properties that should not be generated
     # map: $java_type -> set(java_name_property)
     read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
@@ -226,6 +226,28 @@ class JavaModel(object):
             jversion = JavaOFVersion(of_protocol.wire_version)
 
             for of_class in of_protocol.classes:
+                if loxi_utils.class_is_meter_band(of_class.name) or \
+                   loxi_utils.class_is_queue_prop(of_class.name) or \
+                   loxi_utils.class_is_table_feature_prop(of_class.name) or \
+                   loxi_utils.class_is_hello_elem(of_class.name):
+                    continue
+                if (loxi_utils.class_is_message(of_class.name) and \
+                   of_class.name not in \
+                    ("of_header", "of_flow_mod", "of_flow_add",
+                       "of_flow_modify", "of_flow_modify_strict",
+                       "of_flow_delete", "of_flow_delete_strict",
+                       "of_stats_request", "of_flow_stats_request",
+                       "of_stats_reply", "of_flow_stats_reply")):
+                   continue
+                if of_class.name.startswith("of_meter") or of_class.name.startswith("of_bucket")\
+                        or of_class.name in \
+                        ( "of_table_features", "of_group_desc_stats_entry",
+                          "of_group_stats_entry", "of_packet_queue",
+                          "of_queue_stats_entry", "of_queue_properties",
+                          "of_port_desc"
+                          ):
+                    continue
+
                 if not of_class.name in version_map_per_class:
                     version_map_per_class[of_class.name] = collections.OrderedDict()
 
@@ -279,7 +301,7 @@ class JavaModel(object):
 
         factories = OrderedDict()
 
-        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp")
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFOxm", )
         for base_class in sub_factory_classes:
             package = base_class[2:].lower()
             remove_prefix = base_class[2].lower() + base_class[3:]
@@ -601,8 +623,8 @@ class JavaOFInterface(object):
             if not find(lambda x: x.name == "mask", self.ir_model_members):
                 virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
 
-        if not find(lambda m: m.name == "version", self.ir_model_members):
-            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
+        if not find(lambda m: m.name == "versionLoxi", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "versionLoxi", java_type.of_version))
 
         return tuple(virtual_members)
 
@@ -830,7 +852,7 @@ class JavaMember(object):
 
     @property
     def enum_value(self):
-        if self.name == "version":
+        if self.name == "versionLoxi":
             return "OFVersion.%s" % self.msg.version.constant_version
 
         java_type = self.java_type.public_type;
@@ -873,17 +895,17 @@ class JavaMember(object):
 
     @property
     def is_data(self):
-        return isinstance(self.member, OFDataMember) and self.name != "version"
+        return isinstance(self.member, OFDataMember) and self.name != "versionLoxi"
 
     @property
     def is_fixed_value(self):
-        return hasattr(self.member, "value") or self.name == "version" \
+        return hasattr(self.member, "value") or self.name == "versionLoxi" \
                 or ( self.name == "length" and self.msg.is_fixed_length) \
                 or ( self.name == "len" and self.msg.is_fixed_length)
 
     @property
     def value(self):
-        if self.name == "version":
+        if self.name == "versionLoxi":
             return self.msg.version.int_version
         elif self.name == "length" or self.name == "len":
             return self.msg.length
@@ -892,7 +914,7 @@ class JavaMember(object):
 
     @property
     def priv_value(self):
-        if self.name == "version":
+        if self.name == "versionLoxi":
             return self.msg.version.int_version
         elif self.name == "length" or self.name == "len":
             return self.msg.length
@@ -924,6 +946,8 @@ class JavaMember(object):
                 name = 'length'
             elif member.name == 'value_mask':
                 name = 'mask'
+            elif (re.match(r'OFMessage.*', java_class.name) or loxi_utils.class_is_message(java_class.c_name)) and member.name in ("version", "type", "xid"):
+                name = member.name + "Loxi"
             else:
                 name = java_type.name_c_to_camel(member.name)
             j_type = java_type.convert_to_jtype(java_class.c_name, member.name, member.oftype)

@@ -17,6 +17,6 @@ of_bad_request_error_msg_code_set(obj, OF_REQUEST_FAILED_BUFFER_UNKNOWN_BY_VERSI
 of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
 of_bad_request_error_msg_data_set(obj, &data);
 -- java
-builder.setXid(0x12345678)
+builder.setXidLoxi(0x12345678)
     .setCode(OFBadRequestCode.BUFFER_UNKNOWN)
     .setData(new byte[] { 0x61, 0x62, 0x63 });
