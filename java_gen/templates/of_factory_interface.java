@@ -50,7 +50,7 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
     ${i.name}.Builder ${factory.method_name(i, builder=True)}()${ "" if i.is_universal else " throws UnsupportedOperationException"};
     //:: #endif
     //:: if len(i.writeable_members) <= 2:
-    ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xid" )});
+    ${i.name} ${factory.method_name(i, builder=False )}(${", ".join("%s %s" % (p.java_type.public_type, p.name) for p in i.writeable_members if p.name != "xidLoxi" )});
     //:: #endif
 //:: #endfor
 //:: if factory.name == 'OFFactory':
@@ -58,8 +58,8 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
     Match matchWildcardAll();
 //:: #endif
 
-    OFVersion getOFVersion();
     OFMessageReader<${factory.base_class}> getReader();
+    OFVersion getVersion();
 //:: if factory.name == 'OFOxms':
 
     public <F extends OFValueType<F>> OFOxm<F> fromValue(F value, MatchField<F> field);

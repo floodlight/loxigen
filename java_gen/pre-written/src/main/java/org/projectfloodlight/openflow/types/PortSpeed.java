@@ -8,11 +8,11 @@ public enum PortSpeed {
     SPEED_NONE(0),
     SPEED_10MB(10),
     SPEED_100MB(100),
-    SPEED_1GB(1_000),
-    SPEED_10GB(10_000),
-    SPEED_40GB(40_000),
-    SPEED_100GB(100_000),
-    SPEED_1TB(1_000_000);
+    SPEED_1GB(1000),
+    SPEED_10GB(10000),
+    SPEED_40GB(40000),
+    SPEED_100GB(100000),
+    SPEED_1TB(1000000);
 
     private long speedInBps;
     private PortSpeed(int speedInMbps) {
