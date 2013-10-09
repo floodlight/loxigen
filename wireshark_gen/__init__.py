@@ -50,18 +50,18 @@ def get_field_info(version, cls, name, oftype):
     Returns (type, base)
     """
     if oftype.startswith("list"):
-        return "BYTES", "NONE"
+        return "bytes", "NONE"
 
     ofproto = of_g.ir[version]
     enum = ofproto.enum_by_name(oftype)
 
     if enum:
-        field_type = "UINT32"
+        field_type = "uint32"
     elif oftype in field_info.oftype_to_wireshark_type:
         field_type = field_info.oftype_to_wireshark_type[oftype]
     else:
         print "WARN missing oftype_to_wireshark_type for", oftype
-        field_type = "BYTES"
+        field_type = "bytes"
 
     if enum:
         if enum.is_bitmask:
