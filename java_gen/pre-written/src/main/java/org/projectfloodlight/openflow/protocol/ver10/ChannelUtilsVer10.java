@@ -4,10 +4,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
-import org.projectfloodlight.openflow.protocol.match.Match;
 
 
 /**
@@ -17,10 +15,6 @@ import org.projectfloodlight.openflow.protocol.match.Match;
  */
 
 public class ChannelUtilsVer10 {
-    public static Match readOFMatch(final ChannelBuffer bb) throws OFParseError {
-        return OFMatchV1Ver10.READER.readFrom(bb);
-    }
-
     // TODO these need to be figured out / removed
     public static OFBsnVportQInQ readOFBsnVportQInQ(ChannelBuffer bb) {
         throw new UnsupportedOperationException("not implemented");

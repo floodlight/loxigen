@@ -344,7 +344,10 @@ class JavaModel(object):
             Now true for everything except OFTableModVer10.
             @param clazz JavaOFClass instance
         """
-        if clazz.interface.name.startswith("OFMatchV"):
+        # for blackbird, don't generate class OFMatchV1Ver10 or OFFactoryVer10
+        if clazz.interface.name.startswith("OFMatchV1Ver10"):
+            return False
+        elif clazz.interface.name.startswith("OFMatchV"):
             return True
         elif clazz.name == "OFTableModVer10":
             # tablemod ver 10 is a hack and has no oftype defined
@@ -369,7 +372,7 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
                     name="{}Ver{}".format(self.name, version.of_version),
                     interface=self,
                     version=version
-                    ) for version in model.versions ]
+                    ) for version in model.versions if version.int_version > 1 ] # for blackbird, don't generate factories for 1.0
 
     def method_name(self, member, builder=True):
         n = member.variable_name
@@ -380,7 +383,11 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
-    
+
+    @property
+    def versions(self):
+        return [ fc.version for fc in self.factory_classes ]
+
     def of_version(self, version):
         for fc in self.factory_classes:
             if fc.version == version:

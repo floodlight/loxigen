@@ -118,6 +118,9 @@ class JavaGenerator(object):
         """ Create the OF classes with implementations for each of the interfaces and versions """
         for interface in self.java_model.interfaces:
             for java_class in interface.versioned_classes:
+                if java_class.version.int_version == 1:
+                    # don't generate OF10 classes in blackbird (just interfaces)
+                    continue
                 if self.java_model.generate_class(java_class):
                     if not java_class.is_virtual:
                         self.render_class(clazz=java_class,
@@ -152,7 +155,7 @@ class JavaGenerator(object):
             self.render_class(clazz=factory, template="of_factory_interface.java", factory=factory)
             for factory_class in factory.factory_classes:
                 self.render_class(clazz=factory_class, template="of_factory_class.java", factory=factory_class, model=self.java_model)
-            self.render_class(clazz=java_model.OFGenericClass(package="org.projectfloodlight.openflow.protocol", name="OFFactories"), template="of_factories.java", versions=self.java_model.versions)
+            self.render_class(clazz=java_model.OFGenericClass(package="org.projectfloodlight.openflow.protocol", name="OFFactories"), template="of_factories.java", versions=factory.versions)
 
 def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
