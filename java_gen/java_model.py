@@ -564,6 +564,8 @@ class JavaOFInterface(object):
             return ("queueprop", "OFQueueProp", None)
         elif loxi_utils.class_is_hello_elem(self.c_name):
             return ("", "OFHelloElem", None)
+        elif loxi_utils.class_is_table_feature_prop(self.c_name):
+            return ("", "OFTableFeatureProp", None)
         else:
             return ("", None, None)
 

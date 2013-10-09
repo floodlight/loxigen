@@ -81,35 +81,35 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
             "tcp_src", MatchFields.TCP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<TransportPort> TCP_DST = new MatchField<TransportPort>(
             "tcp_dst", MatchFields.TCP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<TransportPort> UDP_SRC = new MatchField<TransportPort>(
             "udp_src", MatchFields.UDP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_UDP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
 
     public final static MatchField<TransportPort> UDP_DST = new MatchField<TransportPort>(
             "udp_dst", MatchFields.UDP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_UDP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
 
     public final static MatchField<TransportPort> SCTP_SRC = new MatchField<TransportPort>(
             "sctp_src", MatchFields.SCTP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_SCTP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<TransportPort> SCTP_DST = new MatchField<TransportPort>(
             "sctp_dst", MatchFields.SCTP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_SCTP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
             "icmpv4_src", MatchFields.ICMPV4_TYPE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_ICMP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
             "icmpv4_dst", MatchFields.ICMPV4_CODE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_ICMP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
             "arp_op", MatchFields.ARP_OP,
@@ -145,11 +145,11 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<U8> ICMPV6_TYPE =
             new MatchField<U8>("icmpv6_type", MatchFields.ICMPV6_TYPE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<U8> ICMPV6_CODE =
             new MatchField<U8>("icmpv6_code", MatchFields.ICMPV6_CODE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<IPv6Address> IPV6_ND_TARGET =
             new MatchField<IPv6Address>("ipv6_nd_target", MatchFields.IPV6_ND_TARGET,
