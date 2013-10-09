@@ -9,9 +9,9 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.match.MatchFields;
+import org.projectfloodlight.openflow.protocol.oxm.OFOxm;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.util.ChannelUtils;
-import org.projectfloodlight.openflow.protocol.oxm.OFOxm;
 
 import com.google.common.collect.ImmutableMap;
 
