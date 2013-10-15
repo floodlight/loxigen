@@ -37,7 +37,7 @@ package org.projectfloodlight.openflow.protocol;
 
 public final class OFFactories {
 
-    private final static GenericReader GENERIC_READER = new GenericReader();
+    private static final GenericReader GENERIC_READER = new GenericReader();
 
     public static OFFactory getFactory(OFVersion version) {
         switch(version) {
