@@ -1,0 +1,54 @@
+-- binary
+04 04 # version, type
+00 38 # length
+12 34 56 78 # xid
+00 5c 16 c7 # experimenter
+00 00 00 28 # subtype
+fe dc ba 98 76 54 32 10 # cookie
+42 68 # priority
+14 # table_id
+00 # pad
+00 00 00 00 # pad
+00 01 # match.type
+00 16 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+80 00 2A 02 # match.oxm_list[1].type_len - ARP_OP
+00 01 # match.oxm_list[1].value
+00 00 # match.pad
+-- python
+ofp.message.bsn_flow_idle(
+    xid=0x12345678,
+    cookie=0xFEDCBA9876543210,
+    priority=17000,
+    table_id=20,
+    match=ofp.match([
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
+        ofp.oxm.arp_op(value=1),
+    ]))
+-- c
+obj = of_bsn_flow_idle_new(OF_VERSION_1_3);
+of_bsn_flow_idle_xid_set(obj, 0x12345678);
+of_bsn_flow_idle_cookie_set(obj, 0xFEDCBA9876543210);
+of_bsn_flow_idle_priority_set(obj, 17000);
+of_bsn_flow_idle_table_id_set(obj, 20);
+{
+    of_match_t match = { OF_VERSION_1_3 };
+    match.fields.in_port = 4;
+    match.masks.in_port = 5;
+    match.fields.arp_op = 1;
+    OF_MATCH_MASK_ARP_OP_EXACT_SET(&match);
+    of_bsn_flow_idle_match_set(obj, &match);
+}
+-- java
+builder.setXid(0x12345678)
+    .setCookie(U64.parseHex("FEDCBA9876543210"))
+    .setPriority(17000)
+    .setTableId(TableId.of(20))
+    .setMatch(
+        factory.buildMatch()
+            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+            .setExact(MatchField.ARP_OP, ArpOpcode.of(1))
+                .build()
+    );
