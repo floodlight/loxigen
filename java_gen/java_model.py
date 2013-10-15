@@ -237,7 +237,8 @@ class JavaModel(object):
                        "of_flow_modify", "of_flow_modify_strict",
                        "of_flow_delete", "of_flow_delete_strict",
                        "of_stats_request", "of_flow_stats_request",
-                       "of_stats_reply", "of_flow_stats_reply")):
+                       "of_stats_reply", "of_flow_stats_reply") and not
+                    re.match(r'of_.*error_msg', of_class.name)):
                    continue
                 if of_class.name.startswith("of_meter") or of_class.name.startswith("of_bucket")\
                         or of_class.name in \
@@ -769,8 +770,8 @@ class JavaOFClass(object):
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
                    ]
 
-        if not find(lambda m: m.name == "version", self.ir_model_members):
-            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
+        if not find(lambda m: m.name == "versionLoxi", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "versionLoxi", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
 
         return tuple(virtual_members)
 
