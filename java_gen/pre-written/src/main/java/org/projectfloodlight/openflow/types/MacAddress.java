@@ -19,6 +19,9 @@ public class MacAddress implements OFValueType<MacAddress> {
     private final static long NONE_VAL = 0x0L;
     public static final MacAddress NONE = new MacAddress(NONE_VAL);
 
+    private final static long BROADCAST_VAL = 0x0000FFFFFFFFFFFFL;
+    public static final MacAddress BROADCAST = new MacAddress(BROADCAST_VAL);
+
     public static final MacAddress NO_MASK = MacAddress.of(0xFFFFFFFFFFFFFFFFl);
     public static final MacAddress FULL_MASK = MacAddress.of(0x0);
 
@@ -27,6 +30,9 @@ public class MacAddress implements OFValueType<MacAddress> {
     }
 
     public static MacAddress of(final byte[] address) {
+        if (address.length != MacAddrLen)
+            throw new IllegalArgumentException(
+                    "Mac address byte array must be exactly 6 bytes long; length = " + address.length);
         long raw =
                 (address[0] & 0xFFL) << 40 | (address[1] & 0xFFL) << 32
                         | (address[2] & 0xFFL) << 24 | (address[3] & 0xFFL) << 16
@@ -34,30 +40,36 @@ public class MacAddress implements OFValueType<MacAddress> {
         return MacAddress.of(raw);
     }
 
-    public static MacAddress of(final long raw) {
+    public static MacAddress of(long raw) {
+        raw &= BROADCAST_VAL;
         if(raw == NONE_VAL)
             return NONE;
-
+        if (raw == BROADCAST_VAL)
+            return BROADCAST;
         return new MacAddress(raw);
     }
 
     public static MacAddress of(final String string) {
         int index = 0;
         int shift = 40;
+        final String FORMAT_ERROR = "Mac address is not well-formed. " +
+                "It must consist of 6 hex digit pairs separated by colons: ";
 
         long raw = 0;
         if (string.length() != 6 * 2 + 5)
-            throw new IllegalArgumentException("Mac address not well formed: " + string);
+            throw new IllegalArgumentException(FORMAT_ERROR + string);
 
         while (shift >= 0) {
-            raw |=
-                    ((long) (Character.digit(string.charAt(index++), 16) << 4 | Character
-                            .digit(string.charAt(index++), 16))) << shift;
+            int digit1 = Character.digit(string.charAt(index++), 16);
+            int digit2 = Character.digit(string.charAt(index++), 16);
+            if ((digit1 < 0) || (digit2 < 0))
+                throw new IllegalArgumentException(FORMAT_ERROR + string);
+            raw |= ((long) (digit1 << 4 | digit2)) << shift;
 
             if (shift == 0)
                 break;
             if (string.charAt(index++) != ':')
-                throw new IllegalArgumentException("Mac address not well formed: " + string);
+                throw new IllegalArgumentException(FORMAT_ERROR + string);
             shift -= 8;
         }
         return MacAddress.of(raw);
@@ -80,6 +92,25 @@ public class MacAddress implements OFValueType<MacAddress> {
             }
         }
         return bytesCache;
+    }
+
+    /**
+     * Returns {@code true} if the MAC address is the broadcast address.
+     * @return {@code true} if the MAC address is the broadcast address.
+     */
+    public boolean isBroadcast() {
+        return this == BROADCAST;
+    }
+
+    /**
+     * Returns {@code true} if the MAC address is a multicast address.
+     * @return {@code true} if the MAC address is a multicast address.
+     */
+    public boolean isMulticast() {
+        if (isBroadcast()) {
+            return false;
+        }
+        return (rawValue & (0x01L << 40)) != 0;
     }
 
     @Override

@@ -36,6 +36,9 @@ package org.projectfloodlight.openflow.protocol;
 //:: include("_imports.java")
 
 public final class OFFactories {
+
+    private final static GenericReader GENERIC_READER = new GenericReader();
+
     public static OFFactory getFactory(OFVersion version) {
         switch(version) {
             //:: for v in versions:
@@ -45,5 +48,26 @@ public final class OFFactories {
             default:
                 throw new IllegalArgumentException("Unknown version: "+version);
             }
+    }
+    
+    private static class GenericReader implements OFMessageReader<OFMessage> {
+        public OFMessage readFrom(ChannelBuffer bb) throws OFParseError {
+            short wireVersion = U8.f(bb.getByte(0));
+            OFFactory factory;
+            switch (wireVersion) {
+            //:: for v in versions:
+            case ${v.int_version}:
+                factory = org.projectfloodlight.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
+                break;
+            //:: #endfor
+            default:
+                throw new IllegalArgumentException("Unknown wire version: " + wireVersion);
+            }
+            return factory.getReader().readFrom(bb);
+        }
+    }
+
+    public static OFMessageReader<OFMessage> getGenericReader() {
+        return GENERIC_READER;
     }
 }
