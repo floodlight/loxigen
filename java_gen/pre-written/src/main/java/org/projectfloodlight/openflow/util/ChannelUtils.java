@@ -21,7 +21,12 @@ public class ChannelUtils {
     public static String readFixedLengthString(ChannelBuffer bb, int length) {
         byte[] dst = new byte[length];
         bb.readBytes(dst, 0, length);
-        return new String(dst, Charsets.US_ASCII);
+        int validLength = 0;
+        for (validLength = 0; validLength < length; validLength++) {
+            if (dst[validLength] == 0)
+                break;
+        }
+        return new String(dst, 0, validLength, Charsets.US_ASCII);
     }
 
     public static void writeFixedLengthString(ChannelBuffer bb, String string,
