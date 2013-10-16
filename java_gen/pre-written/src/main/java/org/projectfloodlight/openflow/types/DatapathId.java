@@ -2,13 +2,15 @@ package org.projectfloodlight.openflow.types;
 
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.primitives.UnsignedLongs;
+
 /**
  * Abstraction of a datapath ID that can be set and/or accessed as either a
  * long value or a colon-separated string.
- * 
+ *
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
-public class DatapathId {
+public class DatapathId implements Comparable<DatapathId> {
 
     public static final DatapathId NONE = new DatapathId(0);
 
@@ -59,5 +61,10 @@ public class DatapathId {
         if (rawValue != other.rawValue)
             return false;
         return true;
+    }
+
+    @Override
+    public int compareTo(DatapathId o) {
+        return UnsignedLongs.compare(rawValue, o.rawValue);
     }
 }
