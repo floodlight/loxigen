@@ -44,20 +44,20 @@ import loxi_utils.loxi_utils as loxi_utils
 import java_gen.java_model as java_model
 
 def gen_all_java(out, name):
+    # close the virtual file - we don't need it
+    out.close()
     basedir= '%s/openflowj' % of_g.options.install_dir
     print "Outputting to %s" % basedir
     if os.path.exists(basedir):
         shutil.rmtree(basedir)
     os.makedirs(basedir)
     copy_prewrite_tree(basedir)
-    java_model.adjust_ir()
     gen = JavaGenerator(basedir)
     gen.create_of_interfaces()
     gen.create_of_classes()
     gen.create_of_const_enums()
     gen.create_of_factories()
 
-    out.close()
 
 
 class JavaGenerator(object):

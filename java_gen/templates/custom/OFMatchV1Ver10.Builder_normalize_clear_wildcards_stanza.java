@@ -3,7 +3,7 @@
             // ip_src, tcp_dst) to 0, AND ALSO SET THE WILDCARD to 0. It doesn't do that any more as of 1.1.2 and 1.4
             if(ethType.equals(EthType.IPv4)) {
                 // IP
-                if(ipProto.equals(IpProtocol.IP_PROTO_TCP) || ipProto.equals(IpProtocol.IP_PROTO_UDP) || ipProto.equals(IpProtocol.IP_PROTO_ICMP)) {
+                if(ipProto.equals(IpProtocol.TCP) || ipProto.equals(IpProtocol.UDP) || ipProto.equals(IpProtocol.ICMP)) {
                     // fully speced, wildcards and all values are fine
                     // normalize 32-63 ipv4 src 'mask' to a full bitmask
                     if((wildcards & OFPFW_NW_SRC_ALL) != 0)

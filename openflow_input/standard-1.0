@@ -66,7 +66,7 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_ERROR = 1,
     OFPT_ECHO_REQUEST = 2,
     OFPT_ECHO_REPLY = 3,
-    OFPT_VENDOR = 4,
+    OFPT_EXPERIMENTER = 4,
     OFPT_FEATURES_REQUEST = 5,
     OFPT_FEATURES_REPLY = 6,
     OFPT_GET_CONFIG_REQUEST = 7,
@@ -94,6 +94,7 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_NO_FLOOD = 0x10,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
+    OFPPC_BSN_MIRROR_DEST = 0x80000000,
 };
 
 enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
@@ -175,7 +176,7 @@ enum ofp_action_type(wire_type=uint16_t) {
     OFPAT_SET_TP_SRC = 9,
     OFPAT_SET_TP_DST = 10,
     OFPAT_ENQUEUE = 11,
-    OFPAT_VENDOR = 0xffff,
+    OFPAT_EXPERIMENTER = 0xffff,
 };
 
 enum ofp_capabilities(wire_type=uint32_t, bitmask=True) {
@@ -214,14 +215,14 @@ enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
     OFPSF_REPLY_MORE = 0x1,
 };
 
-enum ofp_stats_types(wire_type=uint16_t) {
+enum ofp_stats_type(wire_type=uint16_t) {
     OFPST_DESC = 0,
     OFPST_FLOW = 1,
     OFPST_AGGREGATE = 2,
     OFPST_TABLE = 3,
     OFPST_PORT = 4,
     OFPST_QUEUE = 5,
-    OFPST_VENDOR = 0xffff,
+    OFPST_EXPERIMENTER = 0xffff,
 };
 
 enum ofp_packet_in_reason(wire_type=uint8_t) {
@@ -259,7 +260,7 @@ enum ofp_bad_request_code(wire_type=uint16_t) {
     OFPBRC_BAD_VERSION = 0,
     OFPBRC_BAD_TYPE = 1,
     OFPBRC_BAD_STAT = 2,
-    OFPBRC_BAD_VENDOR = 3,
+    OFPBRC_BAD_EXPERIMENTER = 3,
     OFPBRC_BAD_SUBTYPE = 4,
     OFPBRC_EPERM = 5,
     OFPBRC_BAD_LEN = 6,
@@ -270,8 +271,8 @@ enum ofp_bad_request_code(wire_type=uint16_t) {
 enum ofp_bad_action_code(wire_type=uint16_t) {
     OFPBAC_BAD_TYPE = 0,
     OFPBAC_BAD_LEN = 1,
-    OFPBAC_BAD_VENDOR = 2,
-    OFPBAC_BAD_VENDOR_TYPE = 3,
+    OFPBAC_BAD_EXPERIMENTER = 2,
+    OFPBAC_BAD_EXPERIMENTER_TYPE = 3,
     OFPBAC_BAD_OUT_PORT = 4,
     OFPBAC_BAD_ARGUMENT = 5,
     OFPBAC_EPERM = 6,
@@ -407,7 +408,7 @@ struct of_features_reply : of_header {
     uint32_t n_buffers;
     uint8_t n_tables;
     pad(3);
-    uint32_t capabilities;
+    enum ofp_capabilities capabilities;
     uint32_t actions;
     list(of_port_desc_t) ports;
 };
@@ -698,8 +699,66 @@ struct of_error_msg : of_header {
     uint8_t type == 1;
     uint16_t length;
     uint32_t xid;
-    uint16_t err_type;
-    uint16_t code;
+    uint16_t err_type == ?;
+};
+
+struct of_hello_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0;
+    enum ofp_hello_failed_code code;
+    of_octets_t data;
+};
+
+struct of_bad_request_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 1;
+    enum ofp_bad_request_code code;
+    of_octets_t data;
+};
+
+struct of_bad_action_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 2;
+    enum ofp_bad_action_code code;
+    of_octets_t data;
+};
+
+struct of_flow_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 3;
+    enum ofp_flow_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_port_mod_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 4;
+    enum ofp_port_mod_failed_code code;
+    of_octets_t data;
+};
+
+struct of_queue_op_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 5;
+    enum ofp_queue_op_failed_code code;
     of_octets_t data;
 };
 

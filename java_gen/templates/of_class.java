@@ -56,6 +56,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: for prop in msg.data_members:
     private final ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
+//
+//:: if all(prop.default_value for prop in msg.data_members):
+    // Immutable default instance
+    final static ${impl_class} DEFAULT = new ${impl_class}(
+        ${", ".join(prop.default_name for prop in msg.data_members)}
+    );
+//:: #endif
 
     //:: if msg.data_members:
     // package private constructor - used by readers, builders, and factory
@@ -195,27 +202,30 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.skipBytes(${prop.length});
-//:: elif prop.is_fixed_value:
-            // fixed value property ${prop.name} == ${prop.value}
-            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-            if(${prop.name} != ${prop.priv_value})
-                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
 //:: elif prop.is_length_value:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};
+            //:: if prop.is_fixed_value:
+            if(${prop.name} != ${prop.value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+            //:: else:
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
-//:: elif prop.is_field_length_value:
-//::        fields_with_length_member[prop.member.field_name] = prop.name
-            int ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-//:: else:
-    // fixme: todo ${prop.name}
-//:: #endif
-//:: if prop.is_length_value or prop.is_field_length_value:
+            //:: #endif
             if(bb.readableBytes() + (bb.readerIndex() - start) < ${prop.name}) {
                 // Buffer does not have all data yet
                 bb.readerIndex(start);
                 return null;
             }
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} == ${prop.value}
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            if(${prop.name} != ${prop.priv_value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+//:: elif prop.is_field_length_value:
+//::        fields_with_length_member[prop.member.field_name] = prop.name
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};
+//:: else:
+    // fixme: todo ${prop.name}
 //:: #endif
 //:: #endfor
             //:: if msg.align:
@@ -354,6 +364,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: for prop in msg.data_members:
         //:: if prop.java_type.pub_type == 'long':
         result = prime *  (int) (${prop.name} ^ (${prop.name} >>> 32));
+        //:: elif prop.java_type.pub_type == 'boolean':
+        result = prime * result + (${prop.name} ? 1231 : 1237);
         //:: elif prop.java_type.is_primitive:
         result = prime * result + ${prop.name};
         //:: elif prop.java_type.is_array:

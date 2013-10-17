@@ -45,11 +45,13 @@ typedef uint8_t *of_message_t;
 #define OF_MESSAGE_LENGTH_OFFSET 2
 #define OF_MESSAGE_XID_OFFSET 4
 #define OF_MESSAGE_HEADER_LENGTH 8
+#define OF_MESSAGE_ERROR_TYPE_OFFSET 8
 #define OF_MESSAGE_STATS_TYPE_OFFSET 8
 #define OF_MESSAGE_FLOW_MOD_COMMAND_OFFSET(version) ((version) == 1 ? 56 : 25)
 
 #define OF_MESSAGE_MIN_LENGTH 8
 #define OF_MESSAGE_MIN_STATS_LENGTH (OF_MESSAGE_STATS_TYPE_OFFSET + 2)
+#define OF_MESSAGE_MIN_ERROR_LENGTH (OF_MESSAGE_ERROR_TYPE_OFFSET + 4)
 #define OF_MESSAGE_MIN_FLOW_MOD_LENGTH(version)  ((version) == 1 ? 57 : 26)
 
 #define OF_MESSAGE_EXPERIMENTER_ID_OFFSET 8
@@ -175,6 +177,25 @@ of_message_stats_type_get(of_message_t msg) {
 static inline void
 of_message_stats_type_set(of_message_t msg, uint16_t type) {
     buf_u16_set(msg + OF_MESSAGE_STATS_TYPE_OFFSET, type);
+}
+
+/**
+ * @brief Get/set error type of a message
+ * @param msg Pointer to the message buffer of sufficient length
+ * @param type Data for set operation
+ * @returns get returns error type in host order
+ */
+
+static inline uint16_t
+of_message_error_type_get(of_message_t msg) {
+    uint16_t val;
+    buf_u16_get(msg + OF_MESSAGE_ERROR_TYPE_OFFSET, &val);
+    return val;
+}
+
+static inline void
+of_message_error_type_set(of_message_t msg, uint16_t type) {
+    buf_u16_set(msg + OF_MESSAGE_ERROR_TYPE_OFFSET, type);
 }
 
 

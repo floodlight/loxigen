@@ -559,12 +559,10 @@ void
 of_oxm_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
     uint32_t type_len;
-    int wire_type;
     of_wire_buffer_t *wbuf;
 
     _GET_OXM_TYPE_LEN(obj, &type_len, wbuf);
-    wire_type = OF_OXM_MASKED_TYPE_GET(type_len);
-    *id = of_oxm_to_object_id(wire_type, obj->version);
+    *id = of_oxm_to_object_id(type_len, obj->version);
 }
 
 /**
@@ -584,9 +582,21 @@ of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id)
 
     /* Read-modify-write */
     _GET_OXM_TYPE_LEN(obj, &type_len, wbuf);
-    wire_type = of_object_to_wire_type(id, obj->version);
-    ASSERT(wire_type >= 0);
-    OF_OXM_MASKED_TYPE_SET(type_len, wire_type);
+
+    switch (id) {
+    case OF_OXM_BSN_IN_PORTS_128:
+        type_len = 0x00030000 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_IN_PORTS_128_MASKED:
+        type_len = 0x00030100 | (type_len & 0xff);
+        break;
+    default:
+        wire_type = of_object_to_wire_type(id, obj->version);
+        ASSERT(wire_type >= 0);
+        type_len = 0x80000000 | (wire_type << 8) | (type_len & 0xff);
+        break;
+    }
+
     of_wire_buffer_u32_set(wbuf, 
            OF_OBJECT_ABSOLUTE_OFFSET(obj, OXM_HDR_OFFSET), type_len);
 }

@@ -162,6 +162,8 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 int loci_show_match(loci_writer_f writer, void *cookie, of_match_t *match);
 #define LOCI_SHOW_match(writer, cookie, val) loci_show_match(writer, cookie, &val)
 
+#define LOCI_SHOW_bitmap_128(writer, cookie, val) writer(cookie, "%" PRIx64 "%" PRIx64, (val).hi, (val).lo)
+
 /**
  * Generic version for any object
  */
@@ -337,6 +339,11 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_ipv4_value_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u8_hybrid_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u16_hybrid_version(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
-
+#define LOCI_SHOW_bitmap_128_value(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_bitmap_128_value_mask(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_bitmap_128_bsn_in_ports_128(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_u32_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_slot_num(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */

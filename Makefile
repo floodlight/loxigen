@@ -84,6 +84,12 @@ java-eclipse: java
 	# Unfortunately, mvn eclipse:eclipse resolves the symlink, which doesn't work with eclipse
 	cd ${OPENFLOWJ_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
 
+wireshark: .loxi_ts.wireshark
+
+.loxi_ts.wireshark: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=wireshark
+	touch $@
+
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
 	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python .loxi_ts.java
