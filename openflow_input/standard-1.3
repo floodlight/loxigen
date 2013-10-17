@@ -137,6 +137,7 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_NO_RECV = 0x4,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
+    OFPPC_BSN_MIRROR_DEST = 0x80000000,
 };
 
 enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
@@ -250,6 +251,10 @@ enum ofp_flow_mod_flags(wire_type=uint16_t, bitmask=True) {
     OFPFF_RESET_COUNTS = 0x4,
     OFPFF_NO_PKT_COUNTS = 0x8,
     OFPFF_NO_BYT_COUNTS = 0x10,
+
+    /* Non-standard, enabled by an experimenter message */
+    /* See the bsn_flow_idle input file */
+    OFPFF_BSN_SEND_IDLE = 0x80,
 };
 
 enum ofp_group(wire_type=uint32_t, complete=False) {
@@ -1382,7 +1387,7 @@ struct of_group_stats_entry {
 
 struct of_group_desc_stats_entry {
     uint16_t length;
-    uint8_t type;
+    uint8_t group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;

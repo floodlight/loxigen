@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.projectfloodlight.openflow.util.HexString;
 
 import com.google.common.hash.PrimitiveSink;
+import com.google.common.primitives.UnsignedLongs;
 
 /**
  * Abstraction of a datapath ID that can be set and/or accessed as either a
@@ -10,7 +11,7 @@ import com.google.common.hash.PrimitiveSink;
  *
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
-public class DatapathId implements PrimitiveSinkable {
+public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
 
     public static final DatapathId NONE = new DatapathId(0);
 
@@ -66,5 +67,9 @@ public class DatapathId implements PrimitiveSinkable {
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(rawValue);
+    }
+
+    public int compareTo(DatapathId o) {
+        return UnsignedLongs.compare(rawValue, o.rawValue);
     }
 }
