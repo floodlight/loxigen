@@ -1172,7 +1172,7 @@ struct of_group_stats_entry {
 
 struct of_group_desc_stats_entry {
     uint16_t length;
-    uint8_t type;
+    uint8_t group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
