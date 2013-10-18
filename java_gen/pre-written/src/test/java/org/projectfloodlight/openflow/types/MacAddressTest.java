@@ -84,7 +84,7 @@ public class MacAddressTest {
         for(String invalid : invalidMacStrings) {
             try {
                 MacAddress.of(invalid);
-                fail("Invalid IP "+invalid+ " should have raised IllegalArgumentException");
+                fail("Invalid MAC address "+invalid+ " should have raised IllegalArgumentException");
             } catch(IllegalArgumentException e) {
                 // ok
             }
@@ -96,7 +96,7 @@ public class MacAddressTest {
         for(byte[] invalid : invalidMacBytes) {
             try {
                 MacAddress.of(invalid);
-                fail("Invalid IP "+invalid+ " should have raised IllegalArgumentException");
+                fail("Invalid MAC address bytes "+ Arrays.toString(invalid) + " should have raised IllegalArgumentException");
             } catch(IllegalArgumentException e) {
                 // ok
             }

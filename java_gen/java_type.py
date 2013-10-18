@@ -509,6 +509,7 @@ exceptions = {
                 },
         'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
+        'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
 }
 
 
