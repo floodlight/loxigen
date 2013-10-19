@@ -455,6 +455,13 @@ action_type_set = JType("Set<OFActionType>") \
             write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
             default='ImmutableSet.<OFActionType>of()',
             funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
+of_group = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
+# the outgroup field of of_flow_stats_request has a special default value
+of_group_default_any = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
+buffer_id = JType("OFBufferId") \
+         .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
 
 generic_t = JType("T")
 
@@ -553,6 +560,8 @@ exceptions = {
                 },
         'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
+        'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
+        'of_flow_stats_request': { 'out_group': of_group_default_any },
 }
 
 
@@ -607,6 +616,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return of_version
     elif field_name == "buffer_id" and c_type == "uint32_t":
         return buffer_id
+    elif field_name == "group_id" and c_type == "uint32_t":
+        return of_group
     elif field_name == 'datapath_id':
         return datapath_id
     elif field_name == 'actions' and obj_name == 'of_features_reply':

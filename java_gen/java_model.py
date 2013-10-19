@@ -49,7 +49,7 @@ from java_gen.java_type import erase_type_annotation
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
-    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId"))
+    enum_blacklist = set(("OFDefinitions", "OFPortNo", "OFVlanId", "OFGroup"))
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
@@ -926,6 +926,8 @@ class JavaMember(object):
                 name = 'length'
             elif member.name == 'value_mask':
                 name = 'mask'
+            elif member.name == 'group_id':
+                name = 'group'
             else:
                 name = java_type.name_c_to_camel(member.name)
             j_type = java_type.convert_to_jtype(java_class.c_name, member.name, member.oftype)

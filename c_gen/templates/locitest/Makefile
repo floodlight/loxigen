@@ -10,3 +10,6 @@ all: locitest
 
 locitest: $(OBJS)
 	$(CC) $^ -o $@
+
+# BSN build system magic
+MODULE := locitest

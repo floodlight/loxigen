@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.projectfloodlight.openflow.util.HexString;
 
 import com.google.common.hash.PrimitiveSink;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedLongs;
 
 /**
@@ -29,12 +30,20 @@ public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
         return new DatapathId(HexString.toLong(s));
     }
 
+    public static DatapathId of(byte[] bytes) {
+        return new DatapathId(Longs.fromByteArray(bytes));
+    }
+
     public long getLong() {
         return rawValue;
     }
 
     public U64 getUnsignedLong() {
         return U64.of(rawValue);
+    }
+
+    public byte[] getBytes() {
+        return Longs.toByteArray(rawValue);
     }
 
     @Override
@@ -69,6 +78,7 @@ public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
         sink.putLong(rawValue);
     }
 
+    @Override
     public int compareTo(DatapathId o) {
         return UnsignedLongs.compare(rawValue, o.rawValue);
     }
