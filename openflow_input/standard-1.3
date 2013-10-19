@@ -1983,7 +1983,7 @@ struct of_role_request : of_header {
     uint8_t type == 24;
     uint16_t length;
     uint32_t xid;
-    uint32_t role;
+    enum ofp_controller_role role;
     pad(4);
     uint64_t generation_id;
 };
@@ -1993,7 +1993,9 @@ struct of_role_reply : of_header {
     uint8_t type == 25;
     uint16_t length;
     uint32_t xid;
-    of_octets_t data;
+    enum ofp_controller_role role;
+    pad(4);
+    uint64_t generation_id;
 };
 
 ////////////////////////////////////////////////////////////////
