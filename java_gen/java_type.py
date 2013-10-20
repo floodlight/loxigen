@@ -411,6 +411,18 @@ datapath_id = JType("DatapathId") \
         .op(read='DatapathId.of(bb.readLong())',
             write='bb.writeLong($name.getLong())',
             default='DatapathId.NONE')
+action_type_set = JType("Set<OFActionType>") \
+        .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
+            write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
+            default='ImmutableSet.<OFActionType>of()')
+of_group = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
+# the outgroup field of of_flow_stats_request has a special default value
+of_group_default_any = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
+buffer_id = JType("OFBufferId") \
+         .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+
 
 generic_t = JType("T")
 
@@ -510,6 +522,7 @@ exceptions = {
         'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
         'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
+        'of_flow_stats_request': { 'out_group': of_group_default_any },
 }
 
 
@@ -589,15 +602,13 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif field_name == "version" and c_type == "uint8_t":
         return of_version
     elif field_name == "buffer_id" and c_type == "uint32_t":
-        return JType("OFBufferId") \
-            .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+        return buffer_id
+    elif field_name == "group_id" and c_type == "uint32_t":
+        return of_group
     elif field_name == 'datapath_id':
         return datapath_id
     elif field_name == 'actions' and obj_name == 'of_features_reply':
-        return JType("Set<OFActionType>") \
-            .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
-                write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
-                default='ImmutableSet.<OFActionType>of()')
+        return action_type_set
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):
