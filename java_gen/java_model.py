@@ -237,7 +237,8 @@ class JavaModel(object):
                        "of_flow_modify", "of_flow_modify_strict",
                        "of_flow_delete", "of_flow_delete_strict",
                        "of_stats_request", "of_flow_stats_request",
-                       "of_stats_reply", "of_flow_stats_reply")):
+                       "of_stats_reply", "of_flow_stats_reply") and not
+                    re.match(r'of_.*error_msg', of_class.name)):
                    continue
                 if of_class.name.startswith("of_meter") or of_class.name.startswith("of_bucket")\
                         or of_class.name in \
@@ -344,7 +345,10 @@ class JavaModel(object):
             Now true for everything except OFTableModVer10.
             @param clazz JavaOFClass instance
         """
-        if clazz.interface.name.startswith("OFMatchV"):
+        # for blackbird, don't generate class OFMatchV1Ver10 or OFFactoryVer10
+        if clazz.interface.name.startswith("OFMatchV1Ver10"):
+            return False
+        elif clazz.interface.name.startswith("OFMatchV"):
             return True
         elif clazz.name == "OFTableModVer10":
             # tablemod ver 10 is a hack and has no oftype defined
@@ -369,7 +373,7 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
                     name="{}Ver{}".format(self.name, version.of_version),
                     interface=self,
                     version=version
-                    ) for version in model.versions ]
+                    ) for version in model.versions if version.int_version > 1 ] # for blackbird, don't generate factories for 1.0
 
     def method_name(self, member, builder=True):
         n = member.variable_name
@@ -380,7 +384,11 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
-    
+
+    @property
+    def versions(self):
+        return [ fc.version for fc in self.factory_classes ]
+
     def of_version(self, version):
         for fc in self.factory_classes:
             if fc.version == version:
@@ -762,8 +770,8 @@ class JavaOFClass(object):
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
                    ]
 
-        if not find(lambda m: m.name == "version", self.ir_model_members):
-            virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
+        if not find(lambda m: m.name == "versionLoxi", self.ir_model_members):
+            virtual_members.append(JavaVirtualMember(self, "versionLoxi", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
 
         return tuple(virtual_members)
 
