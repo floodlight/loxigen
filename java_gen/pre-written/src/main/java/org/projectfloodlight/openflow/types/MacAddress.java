@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
 /**
@@ -167,6 +168,12 @@ public class MacAddress implements OFValueType<MacAddress> {
     @Override
     public int compareTo(MacAddress o) {
         return Longs.compare(rawValue, o.rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt((int) (this.rawValue >> 16));
+        sink.putShort((short) (this.rawValue & 0xFFFF));
     }
 
 
