@@ -1,9 +1,9 @@
 package org.projectfloodlight.openflow.types;
 
 
-public class OFPortMap extends Masked<OFBitMask128> {
+public class OFPortBitMap extends Masked<OFBitMask128> {
 
-    private OFPortMap(OFBitMask128 mask) {
+    private OFPortBitMap(OFBitMask128 mask) {
         super(OFBitMask128.NONE, mask);
     }
 
@@ -11,7 +11,7 @@ public class OFPortMap extends Masked<OFBitMask128> {
         return !(this.mask.isOn(port.getPortNumber()));
     }
 
-    public static OFPortMap ofPorts(OFPort... ports) {
+    public static OFPortBitMap ofPorts(OFPort... ports) {
         Builder builder = new Builder();
         for (OFPort port: ports) {
             builder.set(port);
@@ -21,9 +21,9 @@ public class OFPortMap extends Masked<OFBitMask128> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof OFPortMap))
+        if (!(obj instanceof OFPortBitMap))
             return false;
-        OFPortMap other = (OFPortMap)obj;
+        OFPortBitMap other = (OFPortBitMap)obj;
         return (other.value.equals(this.value) && other.mask.equals(this.mask));
     }
 
@@ -67,8 +67,8 @@ public class OFPortMap extends Masked<OFBitMask128> {
             return this;
         }
 
-        public OFPortMap build() {
-            return new OFPortMap(OFBitMask128.of(raw1, raw2));
+        public OFPortBitMap build() {
+            return new OFPortBitMap(OFBitMask128.of(raw1, raw2));
         }
     }
 

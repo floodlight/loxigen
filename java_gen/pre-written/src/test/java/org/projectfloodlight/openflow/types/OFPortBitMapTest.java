@@ -5,16 +5,16 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class OFPortMapTest extends TestCase {
+public class OFPortBitMapTest extends TestCase {
 
     @Test
-    public void testOFPortMap() {
+    public void testOFPortBitMap() {
         Boolean[] on = new Boolean[128];
         for (int i = 0; i < 128; i++) {
             on[i] = false;
         }
 
-        OFPortMap.Builder builder = new OFPortMap.Builder();
+        OFPortBitMap.Builder builder = new OFPortBitMap.Builder();
 
         for (int i = 0; i < 128; i += 3) {
             OFPort p = OFPort.of(i);
@@ -23,7 +23,7 @@ public class OFPortMapTest extends TestCase {
         }
 
         // Test that all ports that were added are actually on, and all other ports are off
-        OFPortMap portmap = builder.build();
+        OFPortBitMap portmap = builder.build();
         //System.out.println(portmap);
         Boolean[] actual = new Boolean[128];
         for (int i = 0; i < 128; i++) {
