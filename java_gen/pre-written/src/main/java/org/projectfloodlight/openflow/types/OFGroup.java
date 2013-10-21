@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 /**
@@ -155,4 +156,8 @@ public class OFGroup implements OFValueType<OFGroup> {
         return UnsignedInts.compare(this.groupNumber, o.groupNumber);
     }
 
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(groupNumber);
+    }
 }

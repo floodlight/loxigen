@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 
@@ -152,4 +153,10 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     public int compareTo(IPv4Address o) {
         return UnsignedInts.compare(rawValue, o.rawValue);
     }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
+    }
+
 }

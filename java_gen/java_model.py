@@ -895,9 +895,9 @@ class JavaMember(object):
     @property
     def priv_value(self):
         if self.name == "version":
-            return self.msg.version.int_version
+            return self.java_type.format_value(self.msg.version.int_version, pub_type=False)
         elif self.name == "length" or self.name == "len":
-            return self.msg.length
+            return self.java_type.format_value(self.msg.length, pub_type=False)
         else:
             return self.java_type.format_value(self.member.value, pub_type=False)
 

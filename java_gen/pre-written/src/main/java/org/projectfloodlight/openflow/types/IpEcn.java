@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
+
 public enum IpEcn implements OFValueType<IpEcn> {
     ECN_00((byte)0),
     ECN_01((byte)1),
@@ -62,5 +64,10 @@ public enum IpEcn implements OFValueType<IpEcn> {
 
     public byte getEcnValue() {
         return ecn;
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte(ecn);
     }
 }

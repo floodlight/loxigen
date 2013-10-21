@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
 
 /**
@@ -653,6 +654,12 @@ public class IpProtocol implements OFValueType<IpProtocol> {
     @Override
     public int compareTo(IpProtocol o) {
         return Shorts.compare(proto, o.proto);
+    }
+
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putShort(proto);
     }
 
 }

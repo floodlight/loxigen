@@ -38,12 +38,12 @@ java_primitive_types = set("boolean byte char short int long".split(" "))
 ### info table about java primitive types, for casting literals in the source code
 # { name : (signed?, length_in_bits) }
 java_primitives_info = {
-        'boolean' : (False, 8),
-        'byte' : (True, 8),
-        'char' : (False, 16),
-        'short' : (True, 16),
-        'int' : (True, 32),
-        'long' : (True, 64),
+        'boolean' : (False, 8, False),
+        'byte' : (True, 8, True),
+        'char' : (False, 16, True),
+        'short' : (True, 16, True),
+        'int' : (True, 32, False),
+        'long' : (True, 64, False),
 }
 
 def format_primitive_literal(t, value):
@@ -52,7 +52,7 @@ def format_primitive_literal(t, value):
         appropriately for correct representation despite Java's
         signed-craziness
     """
-    signed, bits = java_primitives_info[t]
+    signed, bits, cast_needed = java_primitives_info[t]
     max = (1 << bits)-1
     if value > max:
         raise Exception("Value %d to large for type %s" % (value, t))
@@ -65,20 +65,21 @@ def format_primitive_literal(t, value):
                 return str((1 << bits) - value)
             else:
                 return "(%s) 0x%x" % (t, value)
-        else:
-            return "0x%x%s" % (value, "L" if t=="long" else "")
+    return "%s0x%x%s" % ("(%s) " % t if cast_needed else "", value, "L" if t=="long" else "")
+
 
 ANY = 0xFFFFFFFFFFFFFFFF
 
 class VersionOp:
-    def __init__(self, version=ANY, read=None, write=None, default=None):
+    def __init__(self, version=ANY, read=None, write=None, default=None, funnel=None):
         self.version = version
         self.read = read
         self.write = write
         self.default = default
+        self.funnel = funnel
 
     def __str__(self):
-        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s' ]" % (self.version, self.read, self.write, self.default )
+        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s', Funnel: '%s' ]" % (self.version, self.read, self.write, self.default, self.funnel )
 
 ### FIXME: This class should really be cleaned up
 class JType(object):
@@ -94,7 +95,11 @@ class JType(object):
         self.priv_type = priv_type  # the internal storage type
         self.ops = {}
 
-    def op(self, version=ANY, read=None, write=None, default=None, pub_type=ANY):
+    def set_priv_type(self, priv_type):
+        self.priv_type = priv_type
+        return self
+
+    def op(self, version=ANY, read=None, write=None, default=None, funnel=None, pub_type=ANY):
         """
         define operations to be performed for reading and writing this type
         (when read_op, write_op is called). The operations 'read' and 'write'
@@ -110,7 +115,7 @@ class JType(object):
 
         pub_types = [ pub_type ] if pub_type is not ANY else [ False, True ]
         for pub_type in pub_types:
-            self.ops[(version, pub_type)] = VersionOp(version, read, write, default)
+            self.ops[(version, pub_type)] = VersionOp(version, read, write, default, funnel)
         return self
 
     def format_value(self, value, pub_type=True):
@@ -136,6 +141,24 @@ class JType(object):
         """ Is the private type different from the public one?"""
         return self.pub_type != self.priv_type
 
+    def get_op(self, op_type, version, pub_type, default_value, arguments):
+        ver = ANY if version is None else version.int_version
+
+        if not "version" in arguments:
+            arguments["version"] = version.of_version
+
+        def lookup(ver, pub_type):
+            if (ver, pub_type) in self.ops:
+                return getattr(self.ops[(ver, pub_type)], op_type)
+            else:
+                return None
+
+        _op = lookup(ver, pub_type) or lookup(ANY, pub_type) or default_value
+        if callable(_op):
+            return _op(**arguments)
+        else:
+            return reduce(lambda a,repl: a.replace("$%s" % repl[0], str(repl[1])),  arguments.items(), _op)
+
     def read_op(self, version=None, length=None, pub_type=True):
         """ return a Java stanza that reads a value of this JType from ChannelBuffer bb.
         @param version int - OF wire version to generate expression for
@@ -149,20 +172,12 @@ class JType(object):
              # assumes that
              # (1) length of the message has been read to 'length'
              # (2) readerIndex at the start of the message has been stored in 'start'
-            length = "length - (bb.readerIndex() - start)";
+            length = "length - (bb.readerIndex() - start)"
 
-        ver = ANY if version is None else version.int_version
-        _read_op = None
-        if (ver, pub_type) in self.ops:
-            _read_op = self.ops[(ver, pub_type)].read or self.ops[(ANY, pub_type)].read
-        elif (ANY, pub_type) in self.ops:
-            _read_op = self.ops[(ANY, pub_type)].read
-        if _read_op is None:
-            _read_op = 'ChannelUtilsVer$version.read%s(bb)' % self.pub_type
-        if callable(_read_op):
-            return _read_op(version)
-        else:
-            return _read_op.replace("$length", str(length)).replace("$version", version.of_version)
+        return self.get_op("read", version, pub_type,
+            default_value='ChannelUtilsVer$version.read%s(bb)' % self.pub_type,
+            arguments=dict(length=length)
+            )
 
     def write_op(self, version=None, name=None, pub_type=True):
         """ return a Java stanza that writes a value of this JType contained in Java expression
@@ -172,37 +187,22 @@ class JType(object):
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
         @return string containing generated Java expression.
         """
-        ver = ANY if version is None else version.int_version
-        _write_op = None
-        if (ver, pub_type) in self.ops:
-            _write_op = self.ops[(ver, pub_type)].write or self.ops[(ANY, pub_type)].write
-        elif (ANY, pub_type) in self.ops:
-            _write_op = self.ops[(ANY, pub_type)].write
-        if _write_op is None:
 
-            _write_op = 'ChannelUtilsVer$version.write%s(bb, $name)' % self.pub_type
-        if callable(_write_op):
-            return _write_op(version, name)
-        else:
-            return _write_op.replace("$name", str(name)).replace("$version", version.of_version)
+        return self.get_op("write", version, pub_type,
+            default_value='ChannelUtilsVer$version.write%s(bb, $name)' % self.pub_type,
+            arguments=dict(name=name)
+            )
+
 
     def default_op(self, version=None, pub_type=True):
         """ return a Java stanza that returns a default value of this JType.
         @param version JavaOFVersion
         @return string containing generated Java expression.
         """
-        ver = ANY if version is None else version.int_version
-        _default_op = None
-        if (ver, pub_type) in self.ops:
-            _default_op = self.ops[(ver, pub_type)].default or self.ops[(ANY, pub_type)].default
-        elif (ANY, pub_type) in self.ops:
-            _default_op = self.ops[(ANY, pub_type)].default
-        if _default_op is None:
-            _default_op = self.format_value(0) if self.is_primitive else "null"
-        if callable(_default_op):
-            return _default_op(version, name)
-        else:
-            return _default_op.replace("$version", version.of_version)
+        return self.get_op("default", version, pub_type,
+            arguments = dict(),
+            default_value = self.format_value(0) if self.is_primitive else "null"
+        )
 
     def skip_op(self, version=None, length=None):
         """ return a java stanza that skips an instance of JType in the input ChannelBuffer 'bb'.
@@ -211,18 +211,68 @@ class JType(object):
             Currently just delegates to read_op + throws away the result."""
         return self.read_op(version, length)
 
+    def funnel_op(self, version=None, name=None, pub_type=True):
+        t = self.pub_type if pub_type else self.priv_type
+        return self.get_op("funnel", version, pub_type,
+            arguments = dict(name=name),
+            default_value =  '$name.putTo(sink)' if not self._is_primitive(pub_type) else "sink.put{}($name)".format(t[0].upper() + t[1:])
+        )
+
     @property
     def is_primitive(self):
+        return self._is_primitive()
+
+    def _is_primitive(self, pub_type=True):
         """ return true if the pub_type is a java primitive type (and thus needs
         special treatment, because it doesn't have methods)"""
-        return self.pub_type in java_primitive_types
+        t = self.pub_type if pub_type else self.priv_type
+        return t in java_primitive_types
 
     @property
     def is_array(self):
-        """ return true iff the pub_type is a Java array (and thus requires special
-        treatment for equals / toString etc.) """
-        return self.pub_type.endswith("[]")
+        return self._is_array()
 
+    def _is_array(self, pub_type=True):
+        t = self.pub_type if pub_type else self.priv_type
+        return t.endswith("[]")
+
+# Create a default mapping for a list type. Type defauls to List<${java_mapping_of_name}>
+def gen_enum_jtype(java_name, is_bitmask=False):
+    if is_bitmask:
+        java_type = "Set<{}>".format(java_name)
+        default_value = "ImmutableSet.<{}>of()".format(java_name)
+    else:
+        java_type = java_name
+        default_value = "null"
+
+    serializer = "{}SerializerVer$version".format(java_name)
+
+    return JType(java_type)\
+            .op(read="{}.readFrom(bb)".format(serializer),
+                write="{}.writeTo(bb, $name)".format(serializer),
+                default=default_value,
+                funnel="{}.putTo($name, sink)".format(serializer)
+               )
+
+def gen_list_jtype(java_base_name):
+    # read op assumes the class has a public final static field READER that implements
+    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
+    # write op assumes class implements Writeable
+    return JType("List<{}>".format(java_base_name)) \
+        .op(
+            read= 'ChannelUtils.readList(bb, $length, {}Ver$version.READER)'.format(java_base_name), \
+            write='ChannelUtils.writeList(bb, $name)',
+            default="ImmutableList.<{}>of()".format(java_base_name),
+            funnel='FunnelUtils.putList($name, sink)'
+            )
+
+def gen_fixed_length_string_jtype(length):
+    return JType('String').op(
+              read='ChannelUtils.readFixedLengthString(bb, {})'.format(length),
+              write='ChannelUtils.writeFixedLengthString(bb, $name, {})'.format(length),
+              default='""',
+              funnel='sink.putUnencodedChars($name)'
+            )
 
 ##### Predefined JType mappings
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
@@ -231,7 +281,11 @@ u8 =  JType('short', 'byte') \
         .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
         .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
-        .op(read='ChannelUtils.readList(bb, $length, U8.READER)', write='ChannelUtils.writeList(bb, $name)')
+        .op(read='ChannelUtils.readList(bb, $length, U8.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<U8>of()',
+            funnel='FunnelUtils.putList($name, sink)'
+           )
 u16 = JType('int', 'short') \
         .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
         .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
@@ -242,7 +296,8 @@ u32_list = JType('List<U32>', 'int[]') \
         .op(
                 read='ChannelUtils.readList(bb, $length, U32.READER)',
                 write='ChannelUtils.writeList(bb, $name)',
-                default="ImmutableList.<U32>of()");
+                default="ImmutableList.<U32>of()",
+                funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
 u32obj = JType('U32', 'U32') \
@@ -255,33 +310,20 @@ of_port = JType("OFPort") \
 # the same OFPort, but with a default value of ZERO, only for OF10 match
 of_port_match_v1 = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ZERO")
-actions_list = JType('List<OFAction>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFActionVer$version.READER)',
-            write='ChannelUtils.writeList(bb, $name);',
-            default='ImmutableList.<OFAction>of()')
-instructions_list = JType('List<OFInstruction>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFInstructionVer$version.READER)', \
-            write='ChannelUtils.writeList(bb, $name)',
-            default='ImmutableList.<OFInstruction>of()')
-buckets_list = JType('List<OFBucket>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFBucketVer$version.READER)',
-            write='ChannelUtils.writeList(bb, $name)',
-            default='ImmutableList.<OFBucket>of()')
-port_desc_list = JType('List<OFPortDesc>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFPortDescVer$version.READER)',
-            write='ChannelUtils.writeList(bb, $name)',
-            default='ImmutableList.<OFPortDesc>of()')
+actions_list = gen_list_jtype("OFAction")
+instructions_list = gen_list_jtype("OFInstruction")
+buckets_list = gen_list_jtype("OFBucket")
+port_desc_list = gen_list_jtype("OFPortDesc")
+packet_queue_list = gen_list_jtype("OFPacketQueue")
 port_desc = JType('OFPortDesc') \
         .op(read='OFPortDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
-packet_queue_list = JType('List<OFPacketQueue>') \
-        .op(read='ChannelUtils.readList(bb, $length, OFPacketQueueVer$version.READER)',
-            write='ChannelUtils.writeList(bb, $name);',
-            default='ImmutableList.<OFPacketQueue>of()')
-octets = JType('byte[]') \
+octets = JType('byte[]')\
         .op(read='ChannelUtils.readBytes(bb, $length)', \
             write='bb.writeBytes($name)', \
-            default="new byte[0]");
+            default="new byte[0]",
+            funnel="sink.putBytes($name)"
+            );
 of_match = JType('Match') \
         .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
             write='$name.writeTo(bb)',
@@ -293,22 +335,11 @@ mac_addr = JType('MacAddress') \
         .op(read="MacAddress.read6Bytes(bb)", \
             write="$name.write6Bytes(bb)",
             default="MacAddress.NONE")
-port_name = JType('String') \
-        .op(read='ChannelUtils.readFixedLengthString(bb, 16)', \
-            write='ChannelUtils.writeFixedLengthString(bb, $name, 16)',
-            default='""')
-desc_str = JType('String') \
-        .op(read='ChannelUtils.readFixedLengthString(bb, 256)', \
-            write='ChannelUtils.writeFixedLengthString(bb, $name, 256)',
-            default='""')
-serial_num = JType('String') \
-        .op(read='ChannelUtils.readFixedLengthString(bb, 32)', \
-            write='ChannelUtils.writeFixedLengthString(bb, $name, 32)',
-            default='""')
-table_name = JType('String') \
-        .op(read='ChannelUtils.readFixedLengthString(bb, 32)', \
-            write='ChannelUtils.writeFixedLengthString(bb, $name, 32)',
-            default='""')
+
+port_name = gen_fixed_length_string_jtype(16)
+desc_str = gen_fixed_length_string_jtype(256)
+serial_num = gen_fixed_length_string_jtype(32)
+table_name = gen_fixed_length_string_jtype(32)
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -317,9 +348,7 @@ ipv6 = JType("IPv6Address") \
         .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
-packetin_reason = JType("OFPacketInReason")\
-        .op(read="OFPacketInReasonSerializerVer$version.readFrom(bb)",
-            write="OFPacketInReasonSerializerVer$version.writeTo(bb, $name)")
+packetin_reason = gen_enum_jtype("OFPacketInReason")
 transport_port = JType("TransportPort")\
         .op(read="TransportPort.read2Bytes(bb)",
             write="$name.write2Bytes(bb)",
@@ -403,6 +432,16 @@ of_version = JType("OFVersion", 'byte') \
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
+of_type = JType("OFType", 'byte') \
+            .op(read='bb.readByte()', write='bb.writeByte($name)')
+action_type= gen_enum_jtype("OFActionType")\
+               .set_priv_type("short")\
+               .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+instruction_type = gen_enum_jtype("OFInstructionType")\
+               .set_priv_type('short') \
+               .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+buffer_id = JType("OFBufferId") \
+            .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
 boolean = JType("boolean", "byte") \
         .op(read='(bb.readByte() != 0)',
             write='bb.writeByte($name ? 1 : 0)',
@@ -414,7 +453,8 @@ datapath_id = JType("DatapathId") \
 action_type_set = JType("Set<OFActionType>") \
         .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
             write='ChannelUtilsVer10.writeSupportedActions(bb, $name)',
-            default='ImmutableSet.<OFActionType>of()')
+            default='ImmutableSet.<OFActionType>of()',
+            funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
 of_group = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
 # the outgroup field of of_flow_stats_request has a special default value
@@ -422,7 +462,6 @@ of_group_default_any = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
 buffer_id = JType("OFBufferId") \
          .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
-
 
 generic_t = JType("T")
 
@@ -509,7 +548,7 @@ exceptions = {
         'of_oxm_mpls_label_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         'of_oxm_mpls_tc' : { 'value' : u8obj },
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
-        
+
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
 
@@ -533,41 +572,20 @@ def enum_java_types():
     for protocol in of_g.ir.values():
         for enum in protocol.enums:
             java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
-            if enum.is_bitmask:
-                java_type = "Set<{}>".format(java_name)
-                default_value = "ImmutableSet.<{}>of()".format(java_name)
-            else:
-                java_type = java_name
-                default_value = "null"
-            enum_types[enum.name] = \
-                    JType(java_type)\
-                      .op(read="{}SerializerVer$version.readFrom(bb)".format(java_name),
-                          write="{}SerializerVer$version.writeTo(bb, $name)".format(java_name),
-                          default=default_value)
+
+            enum_types[enum.name] = gen_enum_jtype(java_name, enum.is_bitmask)
     return enum_types
 
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
 
-# Create a default mapping for a list type. Type defauls to List<${java_mapping_of_name}>
-def make_standard_list_jtype(c_type):
+def list_cname_to_java_name(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
     if not m:
         raise Exception("Not a recgonized standard list type declaration: %s" % c_type)
     base_name = m.group(1)
-    java_base_name = name_c_to_caps_camel(base_name)
-
-    # read op assumes the class has a public final static field READER that implements
-    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
-    # write op assumes class implements Writeable
-    return JType("List<OF{}>".format(java_base_name)) \
-        .op(
-            read= 'ChannelUtils.readList(bb, $length, OF{}Ver$version.READER)'.format(java_base_name), \
-            write='ChannelUtils.writeList(bb, $name)',
-            default="ImmutableList.<OF{}>of()".format(java_base_name)
-            )
-
+    return "OF" + name_c_to_caps_camel(base_name)
 
 
 #### main entry point for conversion of LOXI types (c_types) Java types.
@@ -579,12 +597,9 @@ def convert_to_jtype(obj_name, field_name, c_type):
     if obj_name in exceptions and field_name in exceptions[obj_name]:
         return exceptions[obj_name][field_name]
     elif ( obj_name == "of_header" or loxi_utils.class_is_message(obj_name)) and field_name == "type" and c_type == "uint8_t":
-        return JType("OFType", 'byte') \
-            .op(read='bb.readByte()', write='bb.writeByte($name)')
+        return of_type
     elif field_name == "type" and re.match(r'of_action.*', obj_name):
-        return JType("OFActionType", 'short') \
-            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
-            .op(read="OFActionTypeSerializerVer$version.readFrom(bb)", write="OFActionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+        return action_type
     elif field_name == "err_type":
         return JType("OFErrorType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)')
@@ -592,9 +607,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return JType("OFStatsType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)')
     elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
-        return JType("OFInstructionType", 'short') \
-            .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)\
-            .op(read="OFInstructionTypeSerializerVer$version.readFrom(bb)", write="OFInstructionTypeSerializerVer$version.writeTo(bb, $name)", pub_type=True)
+        return instruction_type
     elif obj_name in ("of_flow_add", "of_flow_modify", "of_flow_modify_strict", "of_delete_strict") and  field_name == "table_id" and c_type == "uint8_t":
         return table_id_default_zero
     elif field_name == "table_id" and c_type == "uint8_t":
@@ -612,7 +625,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):
-        return make_standard_list_jtype(c_type)
+        return gen_list_jtype(list_cname_to_java_name(c_type))
     elif c_type in enum_java_types():
         return enum_java_types()[c_type]
     else:

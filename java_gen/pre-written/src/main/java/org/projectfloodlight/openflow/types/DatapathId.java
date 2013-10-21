@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedLongs;
 
@@ -13,7 +14,7 @@ import com.google.common.primitives.UnsignedLongs;
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
 @Immutable
-public class DatapathId implements Comparable<DatapathId> {
+public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
 
     public static final DatapathId NONE = new DatapathId(0);
 
@@ -72,6 +73,11 @@ public class DatapathId implements Comparable<DatapathId> {
         if (rawValue != other.rawValue)
             return false;
         return true;
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putLong(rawValue);
     }
 
     @Override
