@@ -1,13 +1,39 @@
 package org.projectfloodlight.openflow.types;
 
 
+/** User-facing object representing a bitmap of ports that can be matched on.
+ *  This is implemented by the custom BSN OXM type of_oxm_bsn_in_ports_182.
+ *
+ *  You can call set() on the builder for all the Ports you want to match on
+ *  and unset to exclude the port.
+ *
+ *  <b>Implementation note:</b> to comply with the matching semantics of OXM (which is a logical "AND" not "OR")
+ *  the underlying match uses a data format which is very unintuitive. The value is always
+ *  0, and the mask has the bits set for the ports that should <b>NOT</b> be included in the
+ *  range.
+ *
+ *  For the curious: We transformed the bitmap (a logical OR) problem into a logical
+ *  AND NOT problem.
+ *
+ *  We logically mean:   Inport is 1 OR 3
+ *  We technically say:  Inport IS NOT 2 AND IS NOT 4 AND IS NOT 5 AND IS NOT ....
+ *  The second term cannot be represented in OXM, the second can.
+ *
+ *  That said, all that craziness is hidden from the user of this object.
+ * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ */
 public class OFPortBitMap extends Masked<OFBitMask128> {
 
     private OFPortBitMap(OFBitMask128 mask) {
         super(OFBitMask128.NONE, mask);
     }
 
+    /** @return whether or not the given port is logically included in the
+     *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+     *  this OXM.
+     */
     public boolean isOn(OFPort port) {
+        // see the implementation note above about the logical inversion of the mask
         return !(this.mask.isOn(port.getPortNumber()));
     }
 
@@ -39,15 +65,30 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
 
         }
 
+        /** @return whether or not the given port is logically included in the
+         *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+         *  this OXM.
+         */
         public boolean isOn(OFPort port) {
+            // see the implementation note above about the logical inversion of the mask
             return !(OFBitMask128.isBitOn(raw1, raw2, port.getPortNumber()));
         }
 
+        /** remove this port from the match, i.e., packets from this in-port
+         *  will NOT be matched.
+         */
         public Builder unset(OFPort port) {
+            // see the implementation note above about the logical inversion of the mask
             int bit = port.getPortNumber();
-            if (bit < 0 || bit >= 127) // MAX PORT IS 127
+            if (bit < 0 || bit > 127)
                 throw new IndexOutOfBoundsException("Port number is out of bounds");
-            if (bit < 64) {
+            else if (bit == 127)
+                // the highest order bit in the bitmask is reserved. The switch will
+                // set that bit for all ports >= 127. The reason is that we don't want
+                // the OFPortMap to match all ports out of its range (i.e., a packet
+                // coming in on port 181 would match *any* OFPortMap).
+                throw new IndexOutOfBoundsException("The highest order bit in the bitmask is reserved.");
+            else if (bit < 64) {
                 raw2 |= ((long)1 << bit);
             } else {
                 raw1 |= ((long)1 << (bit - 64));
@@ -55,11 +96,21 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
             return this;
         }
 
+        /** add this port from the match, i.e., packets from this in-port
+         *  will NOT be matched.
+         */
         public Builder set(OFPort port) {
+            // see the implementation note above about the logical inversion of the mask
             int bit = port.getPortNumber();
-            if (bit < 0 || bit >= 127)
+            if (bit < 0 || bit > 127)
                 throw new IndexOutOfBoundsException("Port number is out of bounds");
-            if (bit < 64) {
+            else if (bit == 127)
+                // the highest order bit in the bitmask is reserved. The switch will
+                // set that bit for all ports >= 127. The reason is that we don't want
+                // the OFPortMap to match all ports out of its range (i.e., a packet
+                // coming in on port 181 would match *any* OFPortMap).
+                throw new IndexOutOfBoundsException("The highest order bit in the bitmask is reserved.");
+            else if (bit < 64) {
                 raw2 &= ~((long)1 << bit);
             } else {
                 raw1 &= ~((long)1 << (bit - 64));
