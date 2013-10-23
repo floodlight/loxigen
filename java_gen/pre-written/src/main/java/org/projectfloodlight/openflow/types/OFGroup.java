@@ -25,32 +25,25 @@ public class OFGroup implements OFValueType<OFGroup> {
     private static final int ANY_VAL = 0xffffffff;
 
 
-    // ////////////// public constants - use to access well known OpenFlow ports
+    // ////////////// public constants - use to access well known OpenFlow group constants
 
-    /** Maximum number of physical and logical switch ports. */
+    /** Maximum number of physical and logical switch groups. */
     public final static OFGroup MAX = new NamedGroup(MAX_VAL, "max");
 
-    /**
-     * Send the packet out the input port. This reserved port must be explicitly
-     * used in order to send back out of the input port.
-     */
+    /** All groups */
     public final static OFGroup ALL = new NamedGroup(ALL_VAL, "all");
 
     /**
-     * Wildcard group used only for flow mod (delete) and flow stats requests.
-     * Selects all flows regardless of output port (including flows with no
-     * output port). NOTE: OpenFlow 1.0 calls this 'NONE'
-     */
+     * Wildcard group used only for flow mod (delete) and flow stats requests. */
     public final static OFGroup ANY = new NamedGroup(ANY_VAL, "any");
 
-    /** group 0 in case we need it
-     */
+    /** group 0 in case we need it */
     public static final OFGroup ZERO = OFGroup.of(ZERO_VAL);
 
     public static final OFGroup NO_MASK = ANY;
     public static final OFGroup FULL_MASK = ZERO;
 
-    /** raw openflow port number as a signed 32 bit integer */
+    /** raw openflow group number as a signed 32 bit integer */
     private final int groupNumber;
 
     /** private constructor. use of*-Factory methods instead */
@@ -59,11 +52,11 @@ public class OFGroup implements OFValueType<OFGroup> {
     }
 
     /**
-     * get an OFPort object corresponding to a raw 32-bit integer port number.
-     * NOTE: The port object may either be newly allocated or cached. Do not
+     * get an OFGroup object corresponding to a raw 32-bit integer group number.
+     * NOTE: The group object may either be newly allocated or cached. Do not
      * rely on either behavior.
      *
-     * @param portNumber
+     * @param groupNumber the raw 32-bit group number
      * @return a corresponding OFPort
      */
     public static OFGroup of(final int groupNumber) {
@@ -86,7 +79,7 @@ public class OFGroup implements OFValueType<OFGroup> {
         }
     }
 
-    /** return the port number as a int32 */
+    /** return the group number as a int32 */
     public int getGroupNumber() {
         return groupNumber;
     }
@@ -96,7 +89,7 @@ public class OFGroup implements OFValueType<OFGroup> {
         return UnsignedInts.toString(groupNumber);
     }
 
-    /** Extension of OFPort for named groups */
+    /** Extension of OFGroup for named groups */
     static class NamedGroup extends OFGroup {
         private final String name;
 
