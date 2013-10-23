@@ -5,48 +5,48 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 
-public class OFPortMapTest extends TestCase {
+public class OFPortBitMapTest extends TestCase {
 
     @Test
-    public void testOFPortMap() {
-        Boolean[] on = new Boolean[128];
-        for (int i = 0; i < 128; i++) {
+    public void testOFPortBitMap() {
+        Boolean[] on = new Boolean[127];
+        for (int i = 0; i < 127; i++) {
             on[i] = false;
         }
 
-        OFPortMap.Builder builder = new OFPortMap.Builder();
+        OFPortBitMap.Builder builder = new OFPortBitMap.Builder();
 
-        for (int i = 0; i < 128; i += 3) {
+        for (int i = 0; i < 127; i += 3) {
             OFPort p = OFPort.of(i);
             builder.set(p);
             on[p.getPortNumber()] = true;
         }
 
         // Test that all ports that were added are actually on, and all other ports are off
-        OFPortMap portmap = builder.build();
+        OFPortBitMap portmap = builder.build();
         //System.out.println(portmap);
-        Boolean[] actual = new Boolean[128];
-        for (int i = 0; i < 128; i++) {
+        Boolean[] actual = new Boolean[127];
+        for (int i = 0; i < 127; i++) {
             actual[i] = false;
         }
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 127; i++) {
             actual[i] = portmap.isOn(OFPort.of(i));
         }
         assertArrayEquals(on, actual);
 
         // Turn some ports off
-        for (int i = 0; i < 128; i += 7) {
+        for (int i = 0; i < 127; i += 7) {
             on[i] = false;
             builder.unset(OFPort.of(i));
         }
 
         // Test again
         portmap = builder.build();
-        actual = new Boolean[128];
-        for (int i = 0; i < 128; i++) {
+        actual = new Boolean[127];
+        for (int i = 0; i < 127; i++) {
             actual[i] = false;
         }
-        for (int i = 0; i < 128; i++) {
+        for (int i = 0; i < 127; i++) {
             actual[i] = portmap.isOn(OFPort.of(i));
         }
         assertArrayEquals(on, actual);
