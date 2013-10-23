@@ -773,6 +773,10 @@ class JavaOFClass(object):
         return int(self.ir_class.params['align']) if 'align' in self.ir_class.params else 0
 
     @property
+    def length_includes_align(self):
+        return self.ir_class.params['length_includes_align'] == "True" if 'length_includes_align' in self.ir_class.params else False
+
+    @property
     @memoize
     def superclass(self):
         return find(lambda c: c.version == self.version and c.c_name == self.ir_class.superclass, model.all_classes)
