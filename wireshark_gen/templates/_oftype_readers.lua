@@ -140,3 +140,12 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
     end
     reader.skip_align()
 end
+
+function read_list_of_instruction_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    if not reader.is_empty() then
+        subtree:add(fields[field_name], reader.read_all())
+    end
+end
