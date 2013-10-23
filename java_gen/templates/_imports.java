@@ -14,6 +14,8 @@ import org.projectfloodlight.openflow.protocol.queueprop.*;
 import org.projectfloodlight.openflow.types.*;
 import org.projectfloodlight.openflow.util.*;
 import org.projectfloodlight.openflow.exceptions.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import com.google.common.collect.ImmutableList;
