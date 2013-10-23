@@ -229,8 +229,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 //:: #endfor
             //:: if msg.align:
-            // align message to ${msg.align} bytes
+            //:: if msg.length_includes_align:
+            // align message to ${msg.align} bytes (length contains aligned value)
+            bb.skipBytes(length - (bb.readerIndex() - start));
+            //:: else:
+            // align message to ${msg.align} bytes (length does not contain alignment)
             bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
             //:: #endif
 
             //:: if msg.data_members:
@@ -327,10 +332,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
-            bb.setShort(lengthIndex, length);
+            //:: if msg.align:
+            int alignedLength = ((length + ${msg.align-1})/${msg.align} * ${msg.align});
+            //:: #endif
+            bb.setShort(lengthIndex, ${"alignedLength" if msg.length_includes_align else "length"});
             //:: if msg.align:
             // align message to ${msg.align} bytes
-            bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);
+            bb.writeZero(alignedLength - length);
             //:: #endif
 //:: #end
 
