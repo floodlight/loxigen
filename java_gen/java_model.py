@@ -773,6 +773,10 @@ class JavaOFClass(object):
         return int(self.ir_class.params['align']) if 'align' in self.ir_class.params else 0
 
     @property
+    def length_includes_align(self):
+        return self.ir_class.params['length_includes_align'] == "True" if 'length_includes_align' in self.ir_class.params else False
+
+    @property
     @memoize
     def superclass(self):
         return find(lambda c: c.version == self.version and c.c_name == self.ir_class.superclass, model.all_classes)
@@ -1001,16 +1005,23 @@ class JavaUnitTestSet(object):
         self.java_class = java_class
         first_data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
                                                      name=java_class.c_name[3:])
-        data_file_template = "of{version}/{name}.".format(version=java_class.version.of_version,
-                                                     name=java_class.c_name[3:]) + "{i}.data"
+        glob_file_name = "of{version}/{name}__*.data".format(version=java_class.version.of_version,
+                                                     name=java_class.c_name[3:])
         test_class_name = self.java_class.name + "Test"
         self.test_units = []
         if test_data.exists(first_data_file_name):
             self.test_units.append(JavaUnitTest(java_class, first_data_file_name, test_class_name))
+
         i = 1
-        while test_data.exists(data_file_template.format(i=i)):
-            self.test_units.append(JavaUnitTest(java_class, data_file_template.format(i=i), test_class_name + str(i)))
-            i = i + 1
+        for f in test_data.glob(glob_file_name):
+            m = re.match(".*__(.*).data", f)
+            if m:
+                suffix = java_type.name_c_to_caps_camel(m.group(1))
+            else:
+                suffix = str(i)
+                i += 1
+            test_class_name = self.java_class.name + suffix + "Test"
+            self.test_units.append(JavaUnitTest(java_class, f, test_class_name))
 
     @property
     def package(self):

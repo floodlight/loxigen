@@ -26,6 +26,7 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+import fnmatch
 import os
 
 _test_data_dir = os.path.dirname(os.path.realpath(__file__))
@@ -44,6 +45,11 @@ def list_files():
             if filename.endswith('.data') and not filename.startswith('.'):
                 result.append(dirname + '/' + filename)
     return sorted(result)
+
+def glob(pattern):
+    for f in list_files():
+        if fnmatch.fnmatch(f, pattern):
+            yield f
 
 def exists(name):
     return os.path.exists(os.path.join(_test_data_dir, name))

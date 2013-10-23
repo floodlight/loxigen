@@ -730,7 +730,7 @@ struct of_port_mod : of_header {
 };
 
 // FIXME Does this need to be v4?
-struct of_match_v3(align=8) {
+struct of_match_v3(align=8, length_includes_align=False) {
     uint16_t type == 1;
     uint16_t length;
     list(of_oxm_t) oxm_list;
@@ -829,13 +829,13 @@ struct of_action_dec_nw_ttl : of_action {
     pad(4);
 };
 
-struct of_action_set_field : of_action {
+struct of_action_set_field(align=8, length_includes_align=True) : of_action {
     uint16_t type == 25;
     uint16_t len;
     of_oxm_t field;
 };
 
-struct of_action_experimenter : of_action {
+struct of_action_experimenter(align=8, length_includes_align=True): of_action {
     uint16_t type == 65535;
     uint16_t len;
     uint32_t experimenter == ?;
