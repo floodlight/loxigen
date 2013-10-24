@@ -75,7 +75,8 @@ def gen_object_id_to_type(out):
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_flow_mod", version)],
                            comma, cls))
-            elif (cls, version) in type_maps.type_val:
+            elif (cls, version) in type_maps.type_val and \
+                    type_maps.type_val[(cls, version)] != type_maps.invalid_type:
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[(cls, version)], comma, cls))
             elif type_maps.message_is_extension(cls, version):
