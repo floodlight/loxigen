@@ -123,3 +123,29 @@ end
 function read_list_of_packet_queue_t(reader, version, subtree, field_name)
     -- TODO
 end
+
+function read_list_of_oxm_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local list_len = reader.peek(-2,2):uint()
+    local reader2 = reader.slice(list_len - 4)
+    local list = subtree:add(fields[field_name], reader2.peek_all(0))
+    while not reader2.is_empty() do
+        local match_len = 4 + reader2.peek(3,1):uint()
+        local child_reader = reader2.slice(match_len)
+        local child_subtree = list:add(fields[field_name], child_reader.peek_all(0))
+        local info = dissect_of_oxm_v3(child_reader, child_subtree)
+        child_subtree:set_text(info)
+    end
+    reader.skip_align()
+end
+
+function read_list_of_instruction_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    if not reader.is_empty() then
+        subtree:add(fields[field_name], reader.read_all())
+    end
+end
