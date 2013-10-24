@@ -405,6 +405,15 @@ of_match_members = dict(
         takes_mask_in_spec=True,
         order=1000,
         ),
+
+    bsn_lag_id = dict(
+        name="bsn_lag_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1001,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()

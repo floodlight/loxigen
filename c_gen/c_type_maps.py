@@ -598,6 +598,8 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
         switch (masked_type) {
         case 0x00: return OF_OXM_BSN_IN_PORTS_128;
         case 0x01: return OF_OXM_BSN_IN_PORTS_128_MASKED;
+        case 0x02: return OF_OXM_BSN_LAG_ID;
+        case 0x03: return OF_OXM_BSN_LAG_ID_MASKED;
         default: return OF_OBJECT_INVALID;
         }
     } else {
