@@ -58,10 +58,6 @@ enum macro_definitions {
     OFPQ_MIN_RATE_UNCFG = 0xffff,
 };
 
-enum ofp_port_no(wire_type=uint32_t, complete=False) {
-    OFPP_ANY = 0xffffffff,
-};
-
 enum ofp_port(wire_type=uint32_t) {
     OFPP_MAX = 0xffffff00,
     OFPP_IN_PORT = 0xfffffff8,
@@ -71,6 +67,7 @@ enum ofp_port(wire_type=uint32_t) {
     OFPP_ALL = 0xfffffffc,
     OFPP_CONTROLLER = 0xfffffffd,
     OFPP_LOCAL = 0xfffffffe,
+    OFPP_ANY = 0xffffffff,
 };
 
 enum ofp_type(wire_type=uint8_t) {
