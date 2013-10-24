@@ -280,6 +280,13 @@ enum ofp_packet_in_reason(wire_type=uint8_t) {
     OFPR_NO_MATCH = 0,
     OFPR_ACTION = 1,
     OFPR_INVALID_TTL = 2,
+
+    // non-standard BSN extensions. OF does not have a standard-conformant
+    // way to extend the set of packet_in reasons
+    OFPR_BSN_NEW_HOST = 128,
+    OFPR_BSN_STATION_MOVE = 129,
+    OFPR_BSN_BAD_VLAN = 130,
+    OFPR_BSN_DESTINATION_LOOKUP_FAILURE = 131,
 };
 
 enum ofp_flow_removed_reason(wire_type=uint8_t) {
