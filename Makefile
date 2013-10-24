@@ -92,7 +92,7 @@ wireshark: .loxi_ts.wireshark
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
-	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python .loxi_ts.java
+	rm -f loxigen.log loxigen-test.log .loxi_ts.*
 
 debug:
 	@echo "LOXI_OUTPUT_DIR=\"${LOXI_OUTPUT_DIR}\""

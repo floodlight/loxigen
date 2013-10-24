@@ -37,6 +37,7 @@ import of_g
 from loxi_ir import *
 import lang_java
 import test_data
+from collections import namedtuple
 from import_cleaner import ImportCleaner
 
 import loxi_utils.loxi_utils as loxi_utils
@@ -52,20 +53,21 @@ def gen_all_java(out, name):
         shutil.rmtree(basedir)
     os.makedirs(basedir)
     copy_prewrite_tree(basedir)
-    gen = JavaGenerator(basedir)
+    gen = JavaGenerator(basedir, JavaGeneratorOptions(instrument=True))
     gen.create_of_interfaces()
     gen.create_of_classes()
     gen.create_of_const_enums()
     gen.create_of_factories()
 
-
+JavaGeneratorOptions = namedtuple("JavaGeneratorOptions", ("instrument",))
 
 class JavaGenerator(object):
     templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
-    def __init__(self, basedir):
+    def __init__(self, basedir, gen_opts):
         self.basedir = basedir
         self.java_model = java_model.model
+        self.gen_opts = gen_opts
 
     def render_class(self, clazz, template, src_dir=None, **context):
         if not src_dir:
@@ -74,6 +76,7 @@ class JavaGenerator(object):
         context['class_name'] = clazz.name
         context['package'] = clazz.package
         context['template_dir'] = self.templates_dir
+        context['genopts']= self.gen_opts
 
         filename = os.path.join(self.basedir, src_dir, "%s/%s.java" % (clazz.package.replace(".", "/"), clazz.name))
         dirname = os.path.dirname(filename)
@@ -83,14 +86,13 @@ class JavaGenerator(object):
         print "filename: %s" % filename
         with open(filename, "w") as f:
             loxi_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
-        
+
         try:
             cleaner = ImportCleaner(filename)
             cleaner.find_used_imports()
             cleaner.rewrite_file(filename)
         except:
             print 'Cannot clean imports from file %s' % filename
-        
 
     def create_of_const_enums(self):
         for enum in self.java_model.enums:
