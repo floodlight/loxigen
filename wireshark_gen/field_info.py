@@ -81,6 +81,32 @@ oftype_to_base = {
     "of_bitmap_128_t": "NONE",
 }
 
+# Use enums for certain fields where it isn't specified in the LOXI input
+class_field_to_enum = {
+    ('of_flow_mod', 'type'): 'ofp_type',
+    ('of_error_msg', 'type'): 'ofp_type',
+    ('of_stats_request', 'type'): 'ofp_type',
+    ('of_stats_request', 'stats_type'): 'ofp_stats_type',
+    ('of_stats_request', 'flags'): 'ofp_stats_request_flags',
+    ('of_stats_reply', 'type'): 'ofp_type',
+    ('of_stats_reply', 'stats_type'): 'ofp_stats_type',
+    ('of_stats_reply', 'flags'): 'ofp_stats_reply_flags',
+    ('of_flow_mod', 'table_id'): 'ofp_table',
+    ('of_flow_mod', '_command'): 'ofp_flow_mod_command',
+    ('of_flow_mod', 'out_port'): 'ofp_port',
+    ('of_flow_mod', 'out_group'): 'ofp_group',
+    ('of_error_msg', 'err_type'): 'ofp_error_type',
+    ('of_port_mod', 'type'): 'ofp_type',
+    ('of_hello', 'type'): 'ofp_type',
+    ('of_features_request', 'type'): 'ofp_type',
+    ('of_features_reply', 'type'): 'ofp_type',
+    ('of_barrier_request', 'type'): 'ofp_type',
+    ('of_barrier_reply', 'type'): 'ofp_type',
+    ('of_echo_request', 'type'): 'ofp_type',
+    ('of_echo_reply', 'type'): 'ofp_type',
+    ('of_match_v3', 'type'): 'ofp_match_type'
+}
+
 # Override oftype_to_base for certain field names
 field_to_base = {
     "eth_type": "HEX",
