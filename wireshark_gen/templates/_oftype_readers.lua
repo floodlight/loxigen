@@ -89,6 +89,10 @@ function read_of_ipv4_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 4)
 end
 
+function read_of_ipv6_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 16)
+end
+
 function read_of_fm_cmd_t(reader, version, subtree, field_name)
     if version == 1 then
         read_scalar(reader, subtree, field_name, 2)
