@@ -126,7 +126,10 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
     end
     local list_len = reader.peek(-2,2):uint()
     local reader2 = reader.slice(list_len - 4)
-    local list = subtree:add(fields[field_name], reader2.peek_all(0))
+    local list = nil
+    if not reader2.is_empty() then
+        list = subtree:add(fields[field_name], reader2.peek_all(0))
+    end
     while not reader2.is_empty() do
         local match_len = 4 + reader2.peek(3,1):uint()
         local child_reader = reader2.slice(match_len)
