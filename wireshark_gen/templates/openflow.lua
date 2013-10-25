@@ -101,6 +101,24 @@ local of_message_dissectors = {
 :: #endfor
 }
 
+local of_oxm_dissectors = {
+:: for version in ir:
+    [${version}] = of_oxm_v${version}_dissectors,
+:: #endfor
+}
+
+local of_action_dissectors = {
+:: for version in ir:
+    [${version}] = of_action_v${version}_dissectors,
+:: #endfor
+}
+
+local of_instruction_dissectors = {
+:: for version in ir:
+    [${version}] = of_instruction_v${version}_dissectors,
+:: #endfor
+}
+
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
@@ -120,16 +138,36 @@ function dissect_of_message(buf, root)
     return protocol, info
 end
 
-function dissect_of_oxm_v3(reader, subtree)
+function dissect_of_oxm(reader, subtree, version_val)
     local type_val = reader.peek(0,4):uint()
-
     local info = "unknown"
-    if of_oxm_v3_dissectors[type_val] then
-        info = of_oxm_v3_dissectors[type_val](reader, subtree)
+    if of_oxm_dissectors[version_val] and of_oxm_dissectors[version_val][type_val] then
+        info = of_oxm_dissectors[version_val][type_val](reader, subtree)
     end
 
     return info
 end
+
+function dissect_of_action(reader, subtree, version_val)
+    local type_val = reader.peek(0,2):uint()
+    local info = "unknown"
+    if of_action_dissectors[version_val] and of_action_dissectors[version_val][type_val] then
+        info = of_action_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_instruction(reader, subtree, version_val)
+    local type_val = reader.peek(0,2):uint()
+    local info = "unknown"
+    if of_instruction_dissectors[version_val] and of_instruction_dissectors[version_val][type_val] then
+        info = of_instruction_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return info
+end
+
 -- of dissector function
 function p_of.dissector (buf, pkt, root)
     local offset = 0
