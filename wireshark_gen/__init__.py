@@ -43,6 +43,17 @@ def make_field_name(wire_version, ofclass_name, member_name):
                          ofclass_name[3:],
                          member_name)
 
+def get_reader(version, cls, m):
+    """
+    Decide on a reader function to use for the given field
+    """
+    ofproto = of_g.ir[version]
+    enum = ofproto.enum_by_name(m.oftype)
+    if enum and 'wire_type' in enum.params:
+        return "read_" + enum.params['wire_type']
+    else:
+        return "read_" + m.oftype.replace(')', '').replace('(', '_')
+
 def get_field_info(version, cls, name, oftype):
     """
     Decide on a Wireshark type and base for a given field.

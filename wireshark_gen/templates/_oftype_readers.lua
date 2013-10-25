@@ -97,10 +97,6 @@ function read_of_fm_cmd_t(reader, version, subtree, field_name)
     end
 end
 
-function read_ofp_flow_mod_flags(reader, version, subtree, field_name)
-    read_scalar(reader, subtree, field_name, 2)
-end
-
 function read_list_of_action_t(reader, version, subtree, field_name)
     if reader.is_empty() then
         return
