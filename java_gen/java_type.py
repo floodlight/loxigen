@@ -552,6 +552,9 @@ exceptions = {
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
 
+        'of_oxm_bsn_lag_id' : { 'value' : u32obj },
+        'of_oxm_bsn_lag_id_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,

@@ -174,6 +174,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
 
+    public final static MatchField<U32> BSN_LAG_ID =
+            new MatchField<U32>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+
     public String getName() {
         return name;
     }
