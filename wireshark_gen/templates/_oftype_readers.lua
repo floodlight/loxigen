@@ -89,16 +89,16 @@ function read_of_ipv4_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 4)
 end
 
+function read_of_ipv6_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 16)
+end
+
 function read_of_fm_cmd_t(reader, version, subtree, field_name)
     if version == 1 then
         read_scalar(reader, subtree, field_name, 2)
     else
         read_scalar(reader, subtree, field_name, 1)
     end
-end
-
-function read_ofp_flow_mod_flags(reader, version, subtree, field_name)
-    read_scalar(reader, subtree, field_name, 2)
 end
 
 function read_list_of_action_t(reader, version, subtree, field_name)
@@ -130,7 +130,10 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
     end
     local list_len = reader.peek(-2,2):uint()
     local reader2 = reader.slice(list_len - 4)
-    local list = subtree:add(fields[field_name], reader2.peek_all(0))
+    local list = nil
+    if not reader2.is_empty() then
+        list = subtree:add(fields[field_name], reader2.peek_all(0))
+    end
     while not reader2.is_empty() do
         local match_len = 4 + reader2.peek(3,1):uint()
         local child_reader = reader2.slice(match_len)
