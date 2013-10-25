@@ -91,8 +91,34 @@ def create_fields():
 
     return r
 
+enum_tables = {
+    'of13.flow_mod.type': 'enum_v4_ofp_type',
+    'of13.error_msg.type': 'enum_v4_ofp_type',
+    'of13.stats_request.type': 'enum_v4_ofp_type',
+    'of13.stats_request.stats_type': 'enum_v4_ofp_stats_type',
+    'of13.stats_request.flags': 'enum_v4_ofp_stats_request_flags',
+    'of13.stats_reply.type': 'enum_v4_ofp_type',
+    'of13.stats_reply.stats_type': 'enum_v4_ofp_stats_type',
+    'of13.stats_reply.flags': 'enum_v4_ofp_stats_reply_flags',
+    'of13.flow_mod.table_id': 'enum_v4_ofp_table',
+    'of13.flow_mod._command': 'enum_v4_ofp_flow_mod_command',
+    'of13.flow_mod.out_port': 'enum_v4_ofp_port',
+    'of13.flow_mod.out_group': 'enum_v4_ofp_group',
+    'of13.error_msg.err_type': 'enum_v4_ofp_error_type',
+    'of13.port_mod.type': 'enum_v4_ofp_type',
+    'of13.hello.type': 'enum_v4_ofp_type',
+    'of13.features_request.type': 'enum_v4_ofp_type',
+    'of13.features_reply.type': 'enum_v4_ofp_type',
+    'of13.barrier_request.type': 'enum_v4_ofp_type',
+    'of13.barrier_reply.type': 'enum_v4_ofp_type',
+    'of13.echo_request.type': 'enum_v4_ofp_type',
+    'of13.echo_reply.type': 'enum_v4_ofp_type',
+    'of13.match_t.type': 'enum_v4_ofp_match_type'
+}
+
 def generate(out, name):
     context = {
         'fields': create_fields(),
+        'enum_tables': enum_tables,
     }
     utils.render_template(out, "openflow.lua", [templates_dir], context)
