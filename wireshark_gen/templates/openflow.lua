@@ -57,7 +57,7 @@ local enum_v${version}_${enum.name} = {
 fields = {}
 :: for field in fields:
 :: if field.type in ["uint8", "uint16", "uint32", "uint64"]:
-fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base}, ${enum_tables.get(field.fullname, 'nil')})
+fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base}, ${field.enum_table})
 :: elif field.type in ["ipv4", "ipv6", "ether", "bytes", "stringz"]:
 fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}")
 :: else:
