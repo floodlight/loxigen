@@ -56,7 +56,7 @@ discriminator_member = P.Group(tag('discriminator') + any_type + identifier + s(
 type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
 
-struct_param_name = kw("align")
+struct_param_name = kw("align") | kw("length_includes_align")
 struct_param = P.Group(struct_param_name - s('=') - word)
 struct_param_list = P.Forward()
 struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))

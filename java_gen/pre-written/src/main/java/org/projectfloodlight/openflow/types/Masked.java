@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import com.google.common.hash.PrimitiveSink;
+
 
 
 public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> {
@@ -65,5 +67,11 @@ public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> 
             return res;
         else
             return mask.compareTo(o.mask);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        value.putTo(sink);
+        mask.putTo(sink);
     }
 }

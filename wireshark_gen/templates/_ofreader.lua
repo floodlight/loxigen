@@ -64,5 +64,9 @@ OFReader.new = function(buf, offset)
         return r
     end
     
+    self.skip_align = function()
+        offset = math.floor((offset + 7)/8)*8
+    end
+
     return self
 end

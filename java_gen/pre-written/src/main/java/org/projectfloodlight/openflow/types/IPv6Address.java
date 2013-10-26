@@ -5,6 +5,7 @@ import java.util.regex.Pattern;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
 /**
@@ -307,5 +308,11 @@ public class IPv6Address extends IPAddress<IPv6Address> {
             return res;
         else
             return Longs.compare(raw2, o.raw2);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putLong(raw1);
+        sink.putLong(raw2);
     }
 }

@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
 
 /** Represents an OpenFlow Vlan VID, as specified by the OpenFlow 1.3 spec.
@@ -159,5 +160,8 @@ public class VlanVid implements OFValueType<VlanVid> {
     public int compareTo(VlanVid o) {
         return Shorts.compare(vid, o.vid);
     }
-
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putShort(vid);
+    }
 }

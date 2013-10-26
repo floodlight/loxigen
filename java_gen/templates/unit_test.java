@@ -80,6 +80,7 @@ public class ${test.name} {
 
         // FIXME should invoke the overall reader once implemented
         ${var_type} ${var_name}Read = ${msg.name}.READER.readFrom(input);
+        assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
         assertEquals(${var_name}Built, ${var_name}Read);
    }
@@ -93,6 +94,7 @@ public class ${test.name} {
 
        // FIXME should invoke the overall reader once implemented
        ${var_type} ${var_name} = ${msg.name}.READER.readFrom(input);
+       assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
        // write message again
        ChannelBuffer bb = ChannelBuffers.dynamicBuffer();

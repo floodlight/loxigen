@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
@@ -67,5 +68,10 @@ public class ClassId implements OFValueType<ClassId> {
     @Override
     public int compareTo(ClassId o) {
         return UnsignedInts.compare(rawValue, rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

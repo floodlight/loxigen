@@ -22,6 +22,7 @@ import java.math.BigInteger;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
 public class U64 implements Writeable, OFValueType<U64> {
@@ -120,4 +121,8 @@ public class U64 implements Writeable, OFValueType<U64> {
         return UnsignedLongs.compare(raw, o.raw);
     }
 
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putLong(raw);
+    }
 }

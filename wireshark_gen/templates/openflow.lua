@@ -53,10 +53,11 @@ local enum_v${version}_${enum.name} = {
 
 :: #endfor
 
+
 fields = {}
 :: for field in fields:
 :: if field.type in ["uint8", "uint16", "uint32", "uint64"]:
-fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base})
+fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base}, ${field.enum_table})
 :: elif field.type in ["ipv4", "ipv6", "ether", "bytes", "stringz"]:
 fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}")
 :: else:
@@ -119,6 +120,16 @@ function dissect_of_message(buf, root)
     return protocol, info
 end
 
+function dissect_of_oxm_v3(reader, subtree)
+    local type_val = reader.peek(0,4):uint()
+
+    local info = "unknown"
+    if of_oxm_v3_dissectors[type_val] then
+        info = of_oxm_v3_dissectors[type_val](reader, subtree)
+    end
+
+    return info
+end
 -- of dissector function
 function p_of.dissector (buf, pkt, root)
     local offset = 0
