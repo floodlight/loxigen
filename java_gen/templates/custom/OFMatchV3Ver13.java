@@ -62,6 +62,7 @@
             case IPV6_SRC:
             case IPV6_DST:
             case IPV6_FLABEL:
+            case BSN_IN_PORTS_128:
                 return true;
             default:
                 return false;
