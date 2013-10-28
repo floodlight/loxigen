@@ -499,7 +499,13 @@ def populate_type_maps():
             if not (parent and subcls):
                 continue
             if parent == 'of_oxm':
-                val = (find_type_value(ofclass, 'type_len') >> 8) & 0xff
+                type_len = find_type_value(ofclass, 'type_len')
+                oxm_class = (type_len >> 16) & 0xffff
+                if oxm_class != 0x8000:
+                    # Do not include experimenter OXMs in the main table
+                    val = type_maps.invalid_type
+                else:
+                    val = (type_len >> 8) & 0xff
             else:
                 val = find_type_value(ofclass, 'type')
             type_maps.inheritance_data[parent][wire_version][subcls] = val
