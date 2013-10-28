@@ -12,6 +12,9 @@ public class LagId implements OFValueType<LagId> {
     static final int LENGTH = 4;
     private final int rawValue;
 
+    private final static int NONE_VAL = 0;
+    public final static LagId NONE = new LagId(NONE_VAL);
+
     private LagId(final int rawValue) {
         this.rawValue = rawValue;
     }
