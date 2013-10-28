@@ -10,6 +10,7 @@ import org.projectfloodlight.openflow.types.IPv6FlowLabel;
 import org.projectfloodlight.openflow.types.IpDscp;
 import org.projectfloodlight.openflow.types.IpEcn;
 import org.projectfloodlight.openflow.types.IpProtocol;
+import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
 import org.projectfloodlight.openflow.types.OFMetadata;
@@ -174,8 +175,8 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
 
-    public final static MatchField<U32> BSN_LAG_ID =
-            new MatchField<U32>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+    public final static MatchField<LagId> BSN_LAG_ID =
+            new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
 
     public String getName() {
         return name;

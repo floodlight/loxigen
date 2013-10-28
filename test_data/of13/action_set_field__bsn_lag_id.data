@@ -8,4 +8,4 @@
 ofp.action.set_field(field=ofp.oxm.bsn_lag_id(0x12345678))
 -- java
 OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
-builder.setField(oxms.bsnLagId(U32.of(0x12345678)))
+builder.setField(oxms.bsnLagId(LagId.of(0x12345678)))

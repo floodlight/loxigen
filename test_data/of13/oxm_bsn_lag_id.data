@@ -9,4 +9,4 @@ ofp.oxm.bsn_lag_id(0x12345678)
 obj = of_oxm_bsn_lag_id_new(OF_VERSION_1_3);
 of_oxm_bsn_lag_id_value_set(obj, 0x12345678);
 -- java
-builder.setValue(U32.of(0x12345678))
+builder.setValue(LagId.of(0x12345678))
