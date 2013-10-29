@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.protocol.match;
 
 import org.projectfloodlight.openflow.types.ArpOpcode;
+import org.projectfloodlight.openflow.types.ClassId;
 import org.projectfloodlight.openflow.types.EthType;
 import org.projectfloodlight.openflow.types.ICMPv4Code;
 import org.projectfloodlight.openflow.types.ICMPv4Type;
@@ -21,6 +22,7 @@ import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VlanVid;
+import org.projectfloodlight.openflow.types.VRF;
 
 @SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
@@ -177,6 +179,21 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+
+    public final static MatchField<VRF> BSN_VRF =
+            new MatchField<VRF>("bsn_vrf", MatchFields.BSN_VRF);
+
+    public final static MatchField<U8> BSN_GLOBAL_VRF_ALLOWED =
+            new MatchField<U8>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
+
+    public final static MatchField<ClassId> BSN_L3_INTERFACE_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_SRC_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_src_class_id", MatchFields.BSN_L3_SRC_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_DST_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
 
     public String getName() {
         return name;
