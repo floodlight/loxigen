@@ -160,9 +160,15 @@ function read_list_of_bucket_t(reader, version, subtree, field_name)
     if reader.is_empty() then
         return
     end
-    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
-    local info = dissect_of_bucket(reader, child_subtree, version)
-    child_subtree:set_text("Bucket")
+    local bucket_list_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    bucket_list_subtree:set_text("List of buckets")
+    while not reader.is_empty() do
+        local bucket_len = reader.peek(0,2):uint()
+        local child_reader = reader.slice(bucket_len)
+        local child_subtree = bucket_list_subtree:add(fields[field_name], child_reader.peek_all(0))
+        local info = dissect_of_bucket(child_reader, child_subtree, version)
+        child_subtree:set_text(info)
+    end
 end
 
 function read_of_oxm_t(reader, version, subtree, field_name)
