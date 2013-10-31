@@ -134,6 +134,7 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
     local list = nil
     if not reader2.is_empty() then
         list = subtree:add(fields[field_name], reader2.peek_all(0))
+        list:set_text("List of matches")
     end
     while not reader2.is_empty() do
         local match_len = 4 + reader2.peek(3,1):uint()
@@ -143,7 +144,6 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
         child_subtree:set_text(info)
     end
     subtree:set_text("OXM")
-    list:set_text("List of matches")
     reader.skip_align()
 end
 
@@ -154,4 +154,22 @@ function read_list_of_instruction_t(reader, version, subtree, field_name)
     local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
     local info = dissect_of_instruction(reader, child_subtree, version)
     child_subtree:set_text("Instructions")
+end
+
+function read_list_of_bucket_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    local info = dissect_of_bucket(reader, child_subtree, version)
+    child_subtree:set_text("Bucket")
+end
+
+function read_of_oxm_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    local info = dissect_of_oxm(reader, child_subtree, version)
+    child_subtree:set_text(info)
 end
