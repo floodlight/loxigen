@@ -14,6 +14,7 @@ import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
@@ -183,8 +184,8 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<VRF> BSN_VRF =
             new MatchField<VRF>("bsn_vrf", MatchFields.BSN_VRF);
 
-    public final static MatchField<U8> BSN_GLOBAL_VRF_ALLOWED =
-            new MatchField<U8>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
+    public final static MatchField<OFBooleanValue> BSN_GLOBAL_VRF_ALLOWED =
+            new MatchField<OFBooleanValue>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
 
     public final static MatchField<ClassId> BSN_L3_INTERFACE_CLASS_ID =
             new MatchField<ClassId>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);

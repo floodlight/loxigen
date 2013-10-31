@@ -468,6 +468,8 @@ vrf = JType("VRF") \
          .op(version=ANY, read="VRF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="VRF.ZERO")
 class_id = JType("ClassId") \
          .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
+boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
+        .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
 
 generic_t = JType("T")
 
@@ -564,8 +566,8 @@ exceptions = {
         'of_oxm_bsn_vrf' : { 'value' : vrf },
         'of_oxm_bsn_vrf_masked' : { 'value' : vrf, 'value_mask' : vrf },
 
-        'of_oxm_bsn_global_vrf_allowed' : { 'value' : u8obj },
-        'of_oxm_bsn_global_vrf_allowed_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        'of_oxm_bsn_global_vrf_allowed' : { 'value' : boolean_value },
+        'of_oxm_bsn_global_vrf_allowed_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
         'of_oxm_bsn_l3_interface_class_id' : { 'value' : class_id },
         'of_oxm_bsn_l3_interface_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
