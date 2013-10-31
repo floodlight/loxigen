@@ -600,6 +600,16 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
         case 0x01: return OF_OXM_BSN_IN_PORTS_128_MASKED;
         case 0x02: return OF_OXM_BSN_LAG_ID;
         case 0x03: return OF_OXM_BSN_LAG_ID_MASKED;
+        case 0x04: return OF_OXM_BSN_VRF;
+        case 0x05: return OF_OXM_BSN_VRF_MASKED;
+        case 0x06: return OF_OXM_BSN_GLOBAL_VRF_ALLOWED;
+        case 0x07: return OF_OXM_BSN_GLOBAL_VRF_ALLOWED_MASKED;
+        case 0x08: return OF_OXM_BSN_L3_INTERFACE_CLASS_ID;
+        case 0x09: return OF_OXM_BSN_L3_INTERFACE_CLASS_ID_MASKED;
+        case 0x0a: return OF_OXM_BSN_L3_SRC_CLASS_ID;
+        case 0x0b: return OF_OXM_BSN_L3_SRC_CLASS_ID_MASKED;
+        case 0x0c: return OF_OXM_BSN_L3_DST_CLASS_ID;
+        case 0x0d: return OF_OXM_BSN_L3_DST_CLASS_ID_MASKED;
         default: return OF_OBJECT_INVALID;
         }
     } else {

@@ -346,5 +346,10 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u8_slot_num(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u32_bsn_lag_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_vrf(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_bsn_global_vrf_allowed(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_interface_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_src_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_dst_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */
