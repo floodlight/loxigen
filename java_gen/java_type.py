@@ -462,6 +462,8 @@ of_group_default_any = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
 buffer_id = JType("OFBufferId") \
          .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+lag_id = JType("LagId") \
+         .op(version=ANY, read="LagId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="LagId.NONE")
 
 generic_t = JType("T")
 
@@ -551,6 +553,9 @@ exceptions = {
 
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
+
+        'of_oxm_bsn_lag_id' : { 'value' : lag_id },
+        'of_oxm_bsn_lag_id_masked' : { 'value' : lag_id, 'value_mask' : lag_id },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,

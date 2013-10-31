@@ -54,40 +54,10 @@ local enum_v${version}_${enum.name} = {
 :: #endfor
 
 
-:: values = {
-::     'of13.flow_mod.type': 'enum_v4_ofp_type',
-::     'of13.error_msg.type': 'enum_v4_ofp_type',
-::     'of13.stats_request.type': 'enum_v4_ofp_type',
-::     'of13.stats_request.stats_type': 'enum_v4_ofp_stats_type',
-::     'of13.stats_request.flags': 'enum_v4_ofp_stats_request_flags',
-::     'of13.stats_reply.type': 'enum_v4_ofp_type',
-::     'of13.stats_reply.stats_type': 'enum_v4_ofp_stats_type',
-::     'of13.stats_reply.flags': 'enum_v4_ofp_stats_reply_flags',
-::     'of13.flow_mod.table_id': 'enum_v4_ofp_table',
-::     'of13.flow_mod._command': 'enum_v4_ofp_flow_mod_command',
-::     'of13.flow_mod.out_port': 'enum_v4_ofp_port',
-::     'of13.flow_mod.out_group': 'enum_v4_ofp_group',
-::     'of13.error_msg.err_type': 'enum_v4_ofp_error_type',
-::     'of13.port_mod.type': 'enum_v4_ofp_type',
-::     'of13.hello.type': 'enum_v4_ofp_type',
-::     'of13.features_request.type': 'enum_v4_ofp_type',
-::     'of13.features_reply.type': 'enum_v4_ofp_type',
-::     'of13.barrier_request.type': 'enum_v4_ofp_type',
-::     'of13.barrier_reply.type': 'enum_v4_ofp_type',
-::     'of13.echo_request.type': 'enum_v4_ofp_type',
-::     'of13.echo_reply.type': 'enum_v4_ofp_type',
-::     'of13.match_t.type': 'enum_v4_ofp_match_type'
-:: }
-
-
 fields = {}
 :: for field in fields:
 :: if field.type in ["uint8", "uint16", "uint32", "uint64"]:
-:: if field.fullname in values:
-fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base}, ${values[field.fullname]})
-:: else:
-fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base})
-:: #endif
+fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}", base.${field.base}, ${field.enum_table})
 :: elif field.type in ["ipv4", "ipv6", "ether", "bytes", "stringz"]:
 fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", "${field.name}")
 :: else:
@@ -131,6 +101,24 @@ local of_message_dissectors = {
 :: #endfor
 }
 
+local of_oxm_dissectors = {
+:: for version in ir:
+    [${version}] = of_oxm_v${version}_dissectors,
+:: #endfor
+}
+
+local of_action_dissectors = {
+:: for version in ir:
+    [${version}] = of_action_v${version}_dissectors,
+:: #endfor
+}
+
+local of_instruction_dissectors = {
+:: for version in ir:
+    [${version}] = of_instruction_v${version}_dissectors,
+:: #endfor
+}
+
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
@@ -150,16 +138,36 @@ function dissect_of_message(buf, root)
     return protocol, info
 end
 
-function dissect_of_oxm_v3(reader, subtree)
+function dissect_of_oxm(reader, subtree, version_val)
     local type_val = reader.peek(0,4):uint()
-
     local info = "unknown"
-    if of_oxm_v3_dissectors[type_val] then
-        info = of_oxm_v3_dissectors[type_val](reader, subtree)
+    if of_oxm_dissectors[version_val] and of_oxm_dissectors[version_val][type_val] then
+        info = of_oxm_dissectors[version_val][type_val](reader, subtree)
     end
 
     return info
 end
+
+function dissect_of_action(reader, subtree, version_val)
+    local type_val = reader.peek(0,2):uint()
+    local info = "unknown"
+    if of_action_dissectors[version_val] and of_action_dissectors[version_val][type_val] then
+        info = of_action_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_instruction(reader, subtree, version_val)
+    local type_val = reader.peek(0,2):uint()
+    local info = "unknown"
+    if of_instruction_dissectors[version_val] and of_instruction_dissectors[version_val][type_val] then
+        info = of_instruction_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return info
+end
+
 -- of dissector function
 function p_of.dissector (buf, pkt, root)
     local offset = 0

@@ -89,16 +89,16 @@ function read_of_ipv4_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 4)
 end
 
+function read_of_ipv6_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 16)
+end
+
 function read_of_fm_cmd_t(reader, version, subtree, field_name)
     if version == 1 then
         read_scalar(reader, subtree, field_name, 2)
     else
         read_scalar(reader, subtree, field_name, 1)
     end
-end
-
-function read_ofp_flow_mod_flags(reader, version, subtree, field_name)
-    read_scalar(reader, subtree, field_name, 2)
 end
 
 function read_list_of_action_t(reader, version, subtree, field_name)
@@ -111,9 +111,10 @@ function read_list_of_action_t(reader, version, subtree, field_name)
         local action_len = reader.peek(2, 2):uint()
         local child_reader = reader.slice(action_len)
         local child_subtree = list:add(fields[field_name], child_reader.peek_all(0))
-        local info = dissect_of_action_v1(child_reader, child_subtree)
+        local info = dissect_of_action(child_reader, child_subtree, version)
         child_subtree:set_text(info)
     end
+    list:set_text("List of actions")
 end
 
 function read_list_of_port_desc_t(reader, version, subtree, field_name)
@@ -130,14 +131,19 @@ function read_list_of_oxm_t(reader, version, subtree, field_name)
     end
     local list_len = reader.peek(-2,2):uint()
     local reader2 = reader.slice(list_len - 4)
-    local list = subtree:add(fields[field_name], reader2.peek_all(0))
+    local list = nil
+    if not reader2.is_empty() then
+        list = subtree:add(fields[field_name], reader2.peek_all(0))
+    end
     while not reader2.is_empty() do
         local match_len = 4 + reader2.peek(3,1):uint()
         local child_reader = reader2.slice(match_len)
         local child_subtree = list:add(fields[field_name], child_reader.peek_all(0))
-        local info = dissect_of_oxm_v3(child_reader, child_subtree)
+        local info = dissect_of_oxm(child_reader, child_subtree, version)
         child_subtree:set_text(info)
     end
+    subtree:set_text("OXM")
+    list:set_text("List of matches")
     reader.skip_align()
 end
 
@@ -145,7 +151,7 @@ function read_list_of_instruction_t(reader, version, subtree, field_name)
     if reader.is_empty() then
         return
     end
-    if not reader.is_empty() then
-        subtree:add(fields[field_name], reader.read_all())
-    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    local info = dissect_of_instruction(reader, child_subtree, version)
+    child_subtree:set_text("Instructions")
 end

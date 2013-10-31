@@ -590,6 +590,12 @@ of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id)
     case OF_OXM_BSN_IN_PORTS_128_MASKED:
         type_len = 0x00030100 | (type_len & 0xff);
         break;
+    case OF_OXM_BSN_LAG_ID:
+        type_len = 0x00030200 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_LAG_ID_MASKED:
+        type_len = 0x00030300 | (type_len & 0xff);
+        break;
     default:
         wire_type = of_object_to_wire_type(id, obj->version);
         ASSERT(wire_type >= 0);

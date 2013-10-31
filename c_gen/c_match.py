@@ -288,6 +288,7 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
 
     OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
+    OF_OXM_INDEX_BSN_LAG_ID = 37,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
