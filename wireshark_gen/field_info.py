@@ -111,6 +111,11 @@ class_field_to_enum = {
     ('of_action_id', 'type'): 'ofp_action_type',
     ('of_instruction_apply_actions', 'type'): 'ofp_instruction_type',
     ('of_instruction_write_actions', 'type'): 'ofp_instruction_type',
+    ('of_group_mod', 'group_type'): 'ofp_group_type',
+    ('of_group_mod', 'type'): 'ofp_type',
+    ('of_group_mod', 'command'): 'ofp_group_mod_commane',
+    ('of_group_mod', 'group_id'): 'ofp_group',
+
 }
 
 # Override oftype_to_base for certain field names
