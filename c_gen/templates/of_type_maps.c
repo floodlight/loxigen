@@ -596,6 +596,36 @@ of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id)
     case OF_OXM_BSN_LAG_ID_MASKED:
         type_len = 0x00030300 | (type_len & 0xff);
         break;
+    case OF_OXM_BSN_VRF:
+        type_len = 0x00030400 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_VRF_MASKED:
+        type_len = 0x00030500 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_GLOBAL_VRF_ALLOWED:
+        type_len = 0x00030600 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_GLOBAL_VRF_ALLOWED_MASKED:
+        type_len = 0x00030700 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_INTERFACE_CLASS_ID:
+        type_len = 0x00030800 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_INTERFACE_CLASS_ID_MASKED:
+        type_len = 0x00030900 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_SRC_CLASS_ID:
+        type_len = 0x00030a00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_SRC_CLASS_ID_MASKED:
+        type_len = 0x00030b00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_DST_CLASS_ID:
+        type_len = 0x00030c00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_DST_CLASS_ID_MASKED:
+        type_len = 0x00030d00 | (type_len & 0xff);
+        break;
     default:
         wire_type = of_object_to_wire_type(id, obj->version);
         ASSERT(wire_type >= 0);
