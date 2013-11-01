@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
 
 public class TableId implements OFValueType<TableId>, Comparable<TableId> {
@@ -14,7 +15,9 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
     private static final short ALL_VAL = 0x00FF;
     private static final short NONE_VAL = 0x0000;
     public static final TableId NONE = new TableId(NONE_VAL);
+
     public static final TableId ALL = new TableId(ALL_VAL);
+    public static final TableId ZERO = NONE;
 
     private final short id;
 
@@ -87,6 +90,11 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
     @Override
     public int compareTo(TableId other) {
         return Shorts.compare(this.id, other.id);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte((byte) id);
     }
 
 }

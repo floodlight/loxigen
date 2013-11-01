@@ -61,6 +61,15 @@
             case VLAN_PCP:
                 result = vlanPcp;
                 break;
+            case ARP_OP:
+                result = ArpOpcode.of(ipProto.getIpProtocolNumber());
+                break;
+            case ARP_SPA:
+                result = ipv4Src;
+                break;
+            case ARP_TPA:
+                result = ipv4Dst;
+                break;
             case IP_DSCP:
                 result = ipDscp;
                 break;
@@ -68,7 +77,7 @@
                 result = ipProto;
                 break;
             case IPV4_SRC:
-                result = ipv4Dst;
+                result = ipv4Src;
                 break;
             case IPV4_DST:
                 result = ipv4Dst;
@@ -114,10 +123,12 @@
             return null;
         Object result;
         switch (field.id) {
+            case ARP_SPA:
             case IPV4_SRC:
                 int srcBitMask = (-1) << (32 - getIpv4SrcCidrMaskLen());
                 result = IPv4AddressWithMask.of(ipv4Src, IPv4Address.of(srcBitMask));
                 break;
+            case ARP_TPA:
             case IPV4_DST:
                 int dstBitMask = (-1) << (32 - getIpv4DstCidrMaskLen());
 
@@ -138,6 +149,9 @@
             case ETH_TYPE:
             case VLAN_VID:
             case VLAN_PCP:
+            case ARP_OP:
+            case ARP_SPA:
+            case ARP_TPA:
             case IP_DSCP:
             case IP_PROTO:
             case IPV4_SRC:
@@ -159,6 +173,8 @@
     @Override
     public boolean supportsMasked(MatchField<?> field) {
         switch (field.id) {
+            case ARP_SPA:
+            case ARP_TPA:
             case IPV4_SRC:
             case IPV4_DST:
                 return true;
@@ -185,6 +201,12 @@
                 return (this.wildcards & OFPFW_DL_VLAN) == 0;
             case VLAN_PCP:
                 return (this.wildcards & OFPFW_DL_VLAN_PCP) == 0;
+            case ARP_OP:
+                return (this.wildcards & OFPFW_NW_PROTO) == 0;
+            case ARP_SPA:
+                return this.getIpv4SrcCidrMaskLen() >= 32;
+            case ARP_TPA:
+                return this.getIpv4DstCidrMaskLen() >= 32;
             case IP_DSCP:
                 return (this.wildcards & OFPFW_NW_TOS) == 0;
             case IP_PROTO:
@@ -259,6 +281,12 @@
                 return (this.wildcards & OFPFW_DL_VLAN) != 0;
             case VLAN_PCP:
                 return (this.wildcards & OFPFW_DL_VLAN_PCP) != 0;
+            case ARP_OP:
+                return (this.wildcards & OFPFW_NW_PROTO) != 0;
+            case ARP_SPA:
+                return this.getIpv4SrcCidrMaskLen() <= 0;
+            case ARP_TPA:
+                return this.getIpv4DstCidrMaskLen() <= 0;
             case IP_DSCP:
                 return (this.wildcards & OFPFW_NW_TOS) != 0;
             case IP_PROTO:
@@ -294,9 +322,11 @@
             return false;
 
         switch (field.id) {
+            case ARP_SPA:
             case IPV4_SRC:
                 int srcCidrLen = getIpv4SrcCidrMaskLen();
                 return srcCidrLen > 0 && srcCidrLen < 32;
+            case ARP_TPA:
             case IPV4_DST:
                 int dstCidrLen = getIpv4SrcCidrMaskLen();
                 return dstCidrLen > 0 && dstCidrLen < 32;

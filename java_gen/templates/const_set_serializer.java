@@ -33,14 +33,8 @@
 
 package ${package};
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Set;
+//:: include('_imports.java')
 
-import org.projectfloodlight.openflow.types.*;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFVersion;
 import ${enum.package}.${enum.name};
 
 public class ${class_name} {
@@ -63,6 +57,11 @@ public class ${class_name} {
     public static void writeTo(ChannelBuffer bb, Set<${enum.name}> set) {
         ${wire_type.write_op(version=version, name="toWireValue(set)")};
     }
+
+    public static void putTo(Set<${enum.name}> set, PrimitiveSink sink) {
+        ${wire_type.funnel_op(version=version, name="toWireValue(set)")};
+    }
+
 
     public static Set<${enum.name}> ofWireValue(${int_wire_type} val) {
         EnumSet<${enum.name}> set = EnumSet.noneOf(${enum.name}.class);

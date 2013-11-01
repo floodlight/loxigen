@@ -2,26 +2,29 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
+import org.jboss.netty.buffer.ChannelBuffer;
+
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
-public class Metadata implements OFValueType<Metadata> {
+public class ClassId implements OFValueType<ClassId> {
     static final int LENGTH = 4;
 
     private final static int NONE_VAL = 0;
-    public final static Metadata NONE = new Metadata(NONE_VAL);
+    public final static ClassId NONE = new ClassId(NONE_VAL);
 
     private final int rawValue;
 
-    private Metadata(final int rawValue) {
+    private ClassId(final int rawValue) {
         this.rawValue = rawValue;
     }
 
-    public static Metadata of(final int raw) {
+    public static ClassId of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
 
-        return new Metadata(raw);
+        return new ClassId(raw);
     }
 
     public int getInt() {
@@ -39,8 +42,8 @@ public class Metadata implements OFValueType<Metadata> {
     }
 
     @Override
-    public Metadata applyMask(Metadata mask) {
-        return Metadata.of(rawValue & mask.rawValue);    }
+    public ClassId applyMask(ClassId mask) {
+        return ClassId.of(rawValue & mask.rawValue);    }
 
     @Override
     public int hashCode() {
@@ -58,14 +61,27 @@ public class Metadata implements OFValueType<Metadata> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Metadata other = (Metadata) obj;
+        ClassId other = (ClassId) obj;
         if (rawValue != other.rawValue)
             return false;
         return true;
     }
 
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(rawValue);
+    }
+
+    public static ClassId read4Bytes(ChannelBuffer c) {
+        return ClassId.of(c.readInt());
+    }
+
     @Override
-    public int compareTo(Metadata o) {
+    public int compareTo(ClassId o) {
         return UnsignedInts.compare(rawValue, rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

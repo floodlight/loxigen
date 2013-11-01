@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
@@ -75,5 +76,10 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
     @Override
     public int compareTo(IPv6FlowLabel o) {
         return UnsignedInts.compare(label, o.label);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(this.label);
     }
 }

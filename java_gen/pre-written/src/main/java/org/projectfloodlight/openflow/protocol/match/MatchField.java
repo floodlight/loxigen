@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.protocol.match;
 
 import org.projectfloodlight.openflow.types.ArpOpcode;
+import org.projectfloodlight.openflow.types.ClassId;
 import org.projectfloodlight.openflow.types.EthType;
 import org.projectfloodlight.openflow.types.ICMPv4Code;
 import org.projectfloodlight.openflow.types.ICMPv4Type;
@@ -10,7 +11,10 @@ import org.projectfloodlight.openflow.types.IPv6FlowLabel;
 import org.projectfloodlight.openflow.types.IpDscp;
 import org.projectfloodlight.openflow.types.IpEcn;
 import org.projectfloodlight.openflow.types.IpProtocol;
+import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
+import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
@@ -19,6 +23,7 @@ import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VlanVid;
+import org.projectfloodlight.openflow.types.VRF;
 
 @SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
@@ -80,35 +85,35 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
             "tcp_src", MatchFields.TCP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<TransportPort> TCP_DST = new MatchField<TransportPort>(
             "tcp_dst", MatchFields.TCP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_TCP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<TransportPort> UDP_SRC = new MatchField<TransportPort>(
             "udp_src", MatchFields.UDP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_UDP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
 
     public final static MatchField<TransportPort> UDP_DST = new MatchField<TransportPort>(
             "udp_dst", MatchFields.UDP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_UDP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
 
     public final static MatchField<TransportPort> SCTP_SRC = new MatchField<TransportPort>(
             "sctp_src", MatchFields.SCTP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_SCTP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<TransportPort> SCTP_DST = new MatchField<TransportPort>(
             "sctp_dst", MatchFields.SCTP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_SCTP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
             "icmpv4_src", MatchFields.ICMPV4_TYPE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_ICMP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
             "icmpv4_dst", MatchFields.ICMPV4_CODE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_ICMP));
+            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
             "arp_op", MatchFields.ARP_OP,
@@ -144,11 +149,11 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<U8> ICMPV6_TYPE =
             new MatchField<U8>("icmpv6_type", MatchFields.ICMPV6_TYPE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<U8> ICMPV6_CODE =
             new MatchField<U8>("icmpv6_code", MatchFields.ICMPV6_CODE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IP_PROTO_IPv6_ICMP));
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<IPv6Address> IPV6_ND_TARGET =
             new MatchField<IPv6Address>("ipv6_nd_target", MatchFields.IPV6_ND_TARGET,
@@ -169,6 +174,27 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U8> MPLS_TC =
             new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+
+    public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
+            new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
+
+    public final static MatchField<LagId> BSN_LAG_ID =
+            new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+
+    public final static MatchField<VRF> BSN_VRF =
+            new MatchField<VRF>("bsn_vrf", MatchFields.BSN_VRF);
+
+    public final static MatchField<OFBooleanValue> BSN_GLOBAL_VRF_ALLOWED =
+            new MatchField<OFBooleanValue>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
+
+    public final static MatchField<ClassId> BSN_L3_INTERFACE_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_SRC_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_src_class_id", MatchFields.BSN_L3_SRC_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_DST_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
 
     public String getName() {
         return name;

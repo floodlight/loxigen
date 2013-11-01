@@ -56,6 +56,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: for prop in msg.data_members:
     private final ${prop.java_type.public_type} ${prop.name};
 //:: #endfor
+//
+//:: if all(prop.default_value for prop in msg.data_members):
+    // Immutable default instance
+    final static ${impl_class} DEFAULT = new ${impl_class}(
+        ${", ".join(prop.default_name for prop in msg.data_members)}
+    );
+//:: #endif
 
     //:: if msg.data_members:
     // package private constructor - used by readers, builders, and factory
@@ -195,32 +202,40 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: elif prop.is_pad:
             // pad: ${prop.length} bytes
             bb.skipBytes(${prop.length});
-//:: elif prop.is_fixed_value:
-            // fixed value property ${prop.name} == ${prop.value}
-            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-            if(${prop.name} != ${prop.priv_value})
-                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
 //:: elif prop.is_length_value:
-            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};
+            //:: if prop.is_fixed_value:
+            if(${prop.name} != ${prop.value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+            //:: else:
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
-//:: elif prop.is_field_length_value:
-//::        fields_with_length_member[prop.member.field_name] = prop.name
-            int ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-//:: else:
-    // fixme: todo ${prop.name}
-//:: #endif
-//:: if prop.is_length_value or prop.is_field_length_value:
+            //:: #endif
             if(bb.readableBytes() + (bb.readerIndex() - start) < ${prop.name}) {
                 // Buffer does not have all data yet
                 bb.readerIndex(start);
                 return null;
             }
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} == ${prop.value}
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
+            if(${prop.name} != ${prop.priv_value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+//:: elif prop.is_field_length_value:
+//::        fields_with_length_member[prop.member.field_name] = prop.name
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};
+//:: else:
+    // fixme: todo ${prop.name}
 //:: #endif
 //:: #endfor
             //:: if msg.align:
-            // align message to ${msg.align} bytes
+            //:: if msg.length_includes_align:
+            // align message to ${msg.align} bytes (length contains aligned value)
+            bb.skipBytes(length - (bb.readerIndex() - start));
+            //:: else:
+            // align message to ${msg.align} bytes (length does not contain alignment)
             bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
             //:: #endif
 
             //:: if msg.data_members:
@@ -236,6 +251,33 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: #endif
         }
     }
+
+    public void putTo(PrimitiveSink sink) {
+        FUNNEL.funnel(this, sink);
+    }
+
+    final static ${impl_class}Funnel FUNNEL = new ${impl_class}Funnel();
+    static class ${impl_class}Funnel implements Funnel<${impl_class}> {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public void funnel(${impl_class} message, PrimitiveSink sink) {
+//:: for prop in msg.members:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
+            ${prop.java_type.funnel_op(version, "message." + prop.name, pub_type=True)};
+//:: elif prop.is_pad:
+            // skip pad (${prop.length} bytes)
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} = ${prop.value}
+            ${prop.java_type.funnel_op(version, prop.priv_value, pub_type=False)};
+//:: else:
+            // FIXME: skip funnel of ${prop.name}
+//:: #endif
+//:: #endfor
+        }
+    }
+
 
     public void writeTo(ChannelBuffer bb) {
         WRITER.write(bb, this);
@@ -290,10 +332,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
-            bb.setShort(lengthIndex, length);
+            //:: if msg.align:
+            int alignedLength = ((length + ${msg.align-1})/${msg.align} * ${msg.align});
+            //:: #endif
+            bb.setShort(lengthIndex, ${"alignedLength" if msg.length_includes_align else "length"});
             //:: if msg.align:
             // align message to ${msg.align} bytes
-            bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);
+            bb.writeZero(alignedLength - length);
             //:: #endif
 //:: #end
 
@@ -354,6 +399,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: for prop in msg.data_members:
         //:: if prop.java_type.pub_type == 'long':
         result = prime *  (int) (${prop.name} ^ (${prop.name} >>> 32));
+        //:: elif prop.java_type.pub_type == 'boolean':
+        result = prime * result + (${prop.name} ? 1231 : 1237);
         //:: elif prop.java_type.is_primitive:
         result = prime * result + ${prop.name};
         //:: elif prop.java_type.is_array:

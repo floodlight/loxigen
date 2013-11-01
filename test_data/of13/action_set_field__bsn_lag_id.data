@@ -1,0 +1,11 @@
+-- binary
+00 19 # type
+00 10 # length
+00 03 02 04 # OXM header
+12 34 56 78 # OXM value
+00 00 00 00 # pad
+-- python
+ofp.action.set_field(field=ofp.oxm.bsn_lag_id(0x12345678))
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
+builder.setField(oxms.bsnLagId(LagId.of(0x12345678)))

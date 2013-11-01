@@ -4,12 +4,16 @@ import javax.annotation.concurrent.Immutable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
 public class LagId implements OFValueType<LagId> {
     static final int LENGTH = 4;
     private final int rawValue;
+
+    private final static int NONE_VAL = 0;
+    public final static LagId NONE = new LagId(NONE_VAL);
 
     private LagId(final int rawValue) {
         this.rawValue = rawValue;
@@ -71,5 +75,10 @@ public class LagId implements OFValueType<LagId> {
     @Override
     public LagId applyMask(LagId mask) {
         return LagId.of(rawValue & mask.rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

@@ -94,6 +94,8 @@ typedef int (*loci_obj_dump_f)(loci_writer_f writer, void *cookie, of_object_t *
 int loci_dump_match(loci_writer_f writer, void* cookie, of_match_t *match);
 #define LOCI_DUMP_match(writer, cookie, val) loci_dump_match(writer, cookie, &val)
 
+#define LOCI_DUMP_bitmap_128(writer, cookie, val) writer(cookie, "%" PRIx64 "%" PRIx64, (val).hi, (val).lo)
+
 /**
  * Generic version for any object
  */

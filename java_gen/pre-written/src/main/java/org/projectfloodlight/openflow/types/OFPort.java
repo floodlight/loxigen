@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 /**
@@ -87,12 +88,17 @@ public class OFPort implements OFValueType<OFPort> {
      * output port). NOTE: OpenFlow 1.0 calls this 'NONE'
      */
     public final static OFPort ANY = new NamedPort(OFPP_ANY_INT, "any");
+    /** the wildcarded default for OpenFlow 1.0 (value: 0). Elsewhere in OpenFlow
+     *  we need "ANY" as the default
+     */
+    public static final OFPort ZERO = OFPort.of(0);
 
     public static final OFPort NO_MASK = OFPort.of(0xFFFFFFFF);
-    public static final OFPort FULL_MASK = OFPort.of(0x0);
+    public static final OFPort FULL_MASK = ZERO;
 
     /** cache of frequently used ports */
     private static class PrecachedPort {
+        private final static OFPort p0 = new OFPort(0);
         private final static OFPort p1 = new OFPort(1);
         private final static OFPort p2 = new OFPort(2);
         private final static OFPort p3 = new OFPort(3);
@@ -160,6 +166,8 @@ public class OFPort implements OFValueType<OFPort> {
      */
     public static OFPort ofInt(final int portNumber) {
         switch (portNumber) {
+            case 0:
+                return PrecachedPort.p0;
             case 1:
                 return PrecachedPort.p1;
             case 2:
@@ -302,6 +310,8 @@ public class OFPort implements OFValueType<OFPort> {
      */
     public static OFPort ofShort(final short portNumber) {
         switch (portNumber) {
+            case 0:
+                return PrecachedPort.p0;
             case 1:
                 return PrecachedPort.p1;
             case 2:
@@ -544,5 +554,10 @@ public class OFPort implements OFValueType<OFPort> {
     @Override
     public int compareTo(OFPort o) {
         return UnsignedInts.compare(this.portNumber, o.portNumber);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(portNumber);
     }
 }

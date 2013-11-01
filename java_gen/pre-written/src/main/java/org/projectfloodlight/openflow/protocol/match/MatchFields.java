@@ -37,5 +37,12 @@ public enum MatchFields {
     IPV6_ND_SLL,
     IPV6_ND_TLL,
     MPLS_LABEL,
-    MPLS_TC
+    MPLS_TC,
+    BSN_IN_PORTS_128,
+    BSN_LAG_ID,
+    BSN_VRF,
+    BSN_GLOBAL_VRF_ALLOWED,
+    BSN_L3_INTERFACE_CLASS_ID,
+    BSN_L3_SRC_CLASS_ID,
+    BSN_L3_DST_CLASS_ID,
 }
