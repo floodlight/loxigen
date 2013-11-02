@@ -110,10 +110,30 @@ function read_list_of_action_t(reader, version, subtree, field_name)
         return
     end
 
-    local list = subtree:add(fields[field_name], reader.peek_all(0))
-    while not reader.is_empty() do
-        local action_len = reader.peek(2, 2):uint()
-        local child_reader = reader.slice(action_len)
+    local list_len = 0
+
+    if string.find(field_name,'packet_out') then
+        if version == 1 then
+            list_len = reader.peek(-2,2):uint()
+        else
+            list_len = reader.peek(-8,2):uint()
+        end
+    end
+
+    local list = nil
+    local reader2 = nil
+
+    if list_len == 0 then
+        list = subtree:add(fields[field_name], reader.peek_all(0))
+        reader2 = reader
+    else
+        list = subtree:add(fields[field_name], reader.peek(0, list_len))
+        reader2 = reader.slice(list_len)
+    end
+
+    while not reader2.is_empty() do
+        local action_len = reader2.peek(2, 2):uint()
+        local child_reader = reader2.slice(action_len)
         local child_subtree = list:add(fields[field_name], child_reader.peek_all(0))
         local info = dissect_of_action(child_reader, child_subtree, version)
         child_subtree:set_text(info)
