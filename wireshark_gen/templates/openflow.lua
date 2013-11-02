@@ -125,6 +125,48 @@ local of_bucket_dissectors = {
 :: #endfor
 }
 
+local of_port_desc_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_port_desc_v${version},
+:: #endfor
+}
+
+local of_stats_reply_dissectors = {
+:: for version in ir:
+    [${version}] = of_stats_reply_v${version}_dissectors,
+:: #endfor
+}
+
+local of_stats_request_dissectors = {
+:: for version in ir:
+    [${version}] = of_stats_request_v${version}_dissectors,
+:: #endfor
+}
+
+local of_flow_stats_entry_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_flow_stats_entry_v${version},
+:: #endfor
+}
+
+local of_port_stats_entry_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_port_stats_entry_v${version},
+:: #endfor
+}
+
+local of_table_stats_entry_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_table_stats_entry_v${version},
+:: #endfor
+}
+
+local of_queue_stats_entry_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_queue_stats_entry_v${version},
+:: #endfor
+}
+
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
@@ -178,6 +220,51 @@ function dissect_of_bucket(reader, subtree, version_val)
     local info = "unknown"
     if of_bucket_dissectors[version_val] then
         info = of_bucket_dissectors[version_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_port_desc(reader, subtree, version_val)
+    local info = "unknown"
+    if of_port_desc_dissectors[version_val] then
+        info = of_port_desc_dissectors[version_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_flow_stats_entry(reader, subtree, version_val)
+    local info = "unknown"
+    if of_flow_stats_entry_dissectors[version_val] then
+        info = of_flow_stats_entry_dissectors[version_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_port_stats_entry(reader, subtree, version_val)
+    local info = "unknown"
+    if of_port_stats_entry_dissectors[version_val] then
+        info = of_port_stats_entry_dissectors[version_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_table_stats_entry(reader, subtree, version_val)
+    local info = "unknown"
+    if of_table_stats_entry_dissectors[version_val] then
+        info = of_table_stats_entry_dissectors[version_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_queue_stats_entry(reader, subtree, version_val)
+    local info = "unknown"
+    if of_queue_stats_entry_dissectors[version_val] then
+        info = of_queue_stats_entry_dissectors[version_val](reader, subtree)
     end
 
     return info
