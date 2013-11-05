@@ -143,6 +143,16 @@ class JavaModel(object):
                 "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True),
                 "OFOxmBsnLagId":            OxmMapEntry("LagId", "BSN_LAG_ID", False),
                 "OFOxmBsnLagIdMasked":      OxmMapEntry("LagId", "BSN_LAG_ID", True),
+                "OFOxmBsnVrf":              OxmMapEntry("VRF", "BSN_VRF", False),
+                "OFOxmBsnVrfMasked":        OxmMapEntry("VRF", "BSN_VRF", True),
+                "OFOxmBsnGlobalVrfAllowed":          OxmMapEntry("OFBooleanValue", "BSN_GLOBAL_VRF_ALLOWED", False),
+                "OFOxmBsnGlobalVrfAllowedMasked":    OxmMapEntry("OFBooleanValue", "BSN_GLOBAL_VRF_ALLOWED", True),
+                "OFOxmBsnL3InterfaceClassId":        OxmMapEntry("ClassId", "BSN_L3_INTERFACE_CLASS_ID", False),
+                "OFOxmBsnL3InterfaceClassIdMasked":  OxmMapEntry("ClassId", "BSN_L3_INTERFACE_CLASS_ID", True),
+                "OFOxmBsnL3SrcClassId":              OxmMapEntry("ClassId", "BSN_L3_SRC_CLASS_ID", False),
+                "OFOxmBsnL3SrcClassIdMasked":        OxmMapEntry("ClassId", "BSN_L3_SRC_CLASS_ID", True),
+                "OFOxmBsnL3DstClassId":              OxmMapEntry("ClassId", "BSN_L3_DST_CLASS_ID", False),
+                "OFOxmBsnL3DstClassIdMasked":        OxmMapEntry("ClassId", "BSN_L3_DST_CLASS_ID", True),
                 }
 
     # Registry of nullable properties:

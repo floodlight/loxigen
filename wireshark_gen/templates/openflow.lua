@@ -119,6 +119,12 @@ local of_instruction_dissectors = {
 :: #endfor
 }
 
+local of_bucket_dissectors = {
+:: for version in ir:
+    [${version}] = dissect_of_bucket_v${version},
+:: #endfor
+}
+
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
@@ -163,6 +169,15 @@ function dissect_of_instruction(reader, subtree, version_val)
     local info = "unknown"
     if of_instruction_dissectors[version_val] and of_instruction_dissectors[version_val][type_val] then
         info = of_instruction_dissectors[version_val][type_val](reader, subtree)
+    end
+
+    return info
+end
+
+function dissect_of_bucket(reader, subtree, version_val)
+    local info = "unknown"
+    if of_bucket_dissectors[version_val] then
+        info = of_bucket_dissectors[version_val](reader, subtree)
     end
 
     return info

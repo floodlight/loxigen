@@ -414,6 +414,51 @@ of_match_members = dict(
         takes_mask_in_spec=False,
         order=1001,
         ),
+
+    bsn_vrf = dict(
+        name="bsn_vrf",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1002,
+        ),
+
+    bsn_global_vrf_allowed = dict(
+        name="bsn_global_vrf_allowed",
+        m_type="uint8_t",
+        print_type="PRIu8",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1003,
+        ),
+
+    bsn_l3_interface_class_id = dict(
+        name="bsn_l3_interface_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1003,
+        ),
+
+    bsn_l3_src_class_id = dict(
+        name="bsn_l3_src_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1004,
+        ),
+
+    bsn_l3_dst_class_id = dict(
+        name="bsn_l3_dst_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1005,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()
