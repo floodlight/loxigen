@@ -18,12 +18,12 @@ import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
+import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
-import org.projectfloodlight.openflow.types.VlanPcp;
-import org.projectfloodlight.openflow.types.VlanVid;
 import org.projectfloodlight.openflow.types.VRF;
+import org.projectfloodlight.openflow.types.VlanPcp;
 
 @SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
@@ -56,12 +56,12 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<EthType> ETH_TYPE =
             new MatchField<EthType>("eth_type", MatchFields.ETH_TYPE);
 
-    public final static MatchField<VlanVid> VLAN_VID =
-            new MatchField<VlanVid>("vlan_vid", MatchFields.VLAN_VID);
+    public final static MatchField<OFVlanVidMatch> VLAN_VID =
+            new MatchField<OFVlanVidMatch>("vlan_vid", MatchFields.VLAN_VID);
 
     public final static MatchField<VlanPcp> VLAN_PCP =
             new MatchField<VlanPcp>("vlan_pcp", MatchFields.VLAN_PCP,
-                    new Prerequisite<VlanVid>(MatchField.VLAN_VID));
+                    new Prerequisite<OFVlanVidMatch>(MatchField.VLAN_VID));
 
     public final static MatchField<IpDscp> IP_DSCP =
             new MatchField<IpDscp>("ip_dscp", MatchFields.IP_DSCP,
