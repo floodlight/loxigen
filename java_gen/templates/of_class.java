@@ -220,9 +220,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 return null;
             }
             //:: if genopts.instrument:
-            if(OFInstrumentationOptions.TRACE_READS)
-                if(logger.isTraceEnabled())
-                    logger.trace("readFrom - length={}", ${prop.name});
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - length={}", ${prop.name});
             //:: #endif
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
@@ -255,16 +254,14 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                          [ prop.name for prop in msg.data_members])}
                     );
             //:: if genopts.instrument:
-            if(OFInstrumentationOptions.TRACE_READS)
-                if(logger.isTraceEnabled())
-                    logger.trace("readFrom - read={}", ${msg.variable_name});
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - read={}", ${msg.variable_name});
             //:: #endif
             return ${msg.variable_name};
             //:: else:
             //:: if genopts.instrument:
-            if(OFInstrumentationOptions.TRACE_READS)
-                if(logger.isTraceEnabled())
-                    logger.trace("readFrom - returning shared instance={}", INSTANCE);
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - returning shared instance={}", INSTANCE);
             //:: #endif
             return INSTANCE;
             //:: #endif
