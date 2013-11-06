@@ -681,7 +681,7 @@ class JavaOFClass(object):
 
     @property
     def variable_name(self):
-        return self.name[3:]
+        return self.name[2].lower() + self.name[3:]
 
     @property
     def length(self):
