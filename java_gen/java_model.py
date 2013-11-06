@@ -997,9 +997,10 @@ class JavaMember(object):
 
 class JavaVirtualMember(JavaMember):
     """ Models a virtual property (member) of an openflow class that is not backed by a loxi ir member """
-    def __init__(self, msg, name, java_type, value=None):
+    def __init__(self, msg, name, java_type, value=None, custom_template=None):
         JavaMember.__init__(self, msg, name, java_type, member=None)
         self._value = value
+        self.custom_template = custom_template
 
     @property
     def is_fixed_value(self):
