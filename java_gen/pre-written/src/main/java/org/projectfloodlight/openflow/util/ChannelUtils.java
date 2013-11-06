@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFInstrumentationOptions;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 import org.slf4j.Logger;
@@ -60,14 +59,12 @@ public class ChannelUtils {
     public static <T> List<T> readList(ChannelBuffer bb, int length, OFMessageReader<T> reader) throws OFParseError {
         int end = bb.readerIndex() + length;
         Builder<T> builder = ImmutableList.<T>builder();
-        if(OFInstrumentationOptions.TRACE_READS)
-            if(logger.isTraceEnabled())
-                logger.trace("readList(length={}, reader={})", length, reader.getClass());
+        if(logger.isTraceEnabled())
+            logger.trace("readList(length={}, reader={})", length, reader.getClass());
         while(bb.readerIndex() < end) {
             T read = reader.readFrom(bb);
-            if(OFInstrumentationOptions.TRACE_READS)
-                if(logger.isTraceEnabled())
-                    logger.trace("readList: read={}, left={}", read, end - bb.readerIndex());
+            if(logger.isTraceEnabled())
+                logger.trace("readList: read={}, left={}", read, end - bb.readerIndex());
             builder.add(read);
         }
         if(bb.readerIndex() != end) {
