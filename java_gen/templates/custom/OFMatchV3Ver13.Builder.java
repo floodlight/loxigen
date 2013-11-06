@@ -1,13 +1,13 @@
 
     private OFOxmList.Builder oxmListBuilder;
 
-    private synchronized void initBuilder() {
+    private void initBuilder() {
         if (oxmListBuilder != null)
             return;
         oxmListBuilder = new OFOxmList.Builder();
     }
 
-    private synchronized void updateOxmList() {
+    private void updateOxmList() {
         this.oxmList = this.oxmListBuilder.build();
         this.oxmListSet = true;
     }
@@ -21,7 +21,7 @@
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> F get(MatchField<F> field)
+    public <F extends OFValueType<F>> F get(MatchField<F> field)
             throws UnsupportedOperationException {
         OFOxm<F> value = getOxm(field);
         if (value == null)
@@ -30,7 +30,7 @@
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> Masked<F> getMasked(MatchField<F> field)
+    public <F extends OFValueType<F>> Masked<F> getMasked(MatchField<F> field)
             throws UnsupportedOperationException {
         OFOxm<F> value = getOxm(field);
         if (value == null || !value.isMasked())
@@ -50,25 +50,25 @@
     }
 
     @Override
-    public synchronized boolean isExact(MatchField<?> field) {
+    public boolean isExact(MatchField<?> field) {
         OFOxm<?> value = getOxm(field);
         return (value != null && !value.isMasked());
     }
 
     @Override
-    public synchronized boolean isFullyWildcarded(MatchField<?> field) {
+    public boolean isFullyWildcarded(MatchField<?> field) {
         OFOxm<?> value = getOxm(field);
         return (value == null);
     }
 
     @Override
-    public synchronized boolean isPartiallyMasked(MatchField<?> field) {
+    public boolean isPartiallyMasked(MatchField<?> field) {
         OFOxm<?> value = getOxm(field);
         return (value != null && value.isMasked());
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> Match.Builder setExact(
+    public <F extends OFValueType<F>> Match.Builder setExact(
             MatchField<F> field, F value) {
         initBuilder();
         OFOxm<F> oxm = OFFactories.getFactory(OFVersion.OF_13).oxms().fromValue(value, field);
@@ -78,7 +78,7 @@
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> Match.Builder setMasked(
+    public <F extends OFValueType<F>> Match.Builder setMasked(
             MatchField<F> field, F value, F mask) {
         initBuilder();
         OFOxm<F> oxm = OFFactories.getFactory(OFVersion.OF_13).oxms().fromValueAndMask(value, mask, field);
@@ -88,7 +88,7 @@
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> Match.Builder setMasked(
+    public <F extends OFValueType<F>> Match.Builder setMasked(
             MatchField<F> field, Masked<F> valueWithMask) {
         initBuilder();
         OFOxm<F> oxm = OFFactories.getFactory(OFVersion.OF_13).oxms().fromMasked(valueWithMask, field);
@@ -98,7 +98,7 @@
     }
 
     @Override
-    public synchronized <F extends OFValueType<F>> Match.Builder wildcard(MatchField<F> field) {
+    public <F extends OFValueType<F>> Match.Builder wildcard(MatchField<F> field) {
         initBuilder();
         this.oxmListBuilder.unset(field);
         updateOxmList();
