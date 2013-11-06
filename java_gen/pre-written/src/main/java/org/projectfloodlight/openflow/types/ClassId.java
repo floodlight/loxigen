@@ -11,6 +11,10 @@ public class ClassId implements OFValueType<ClassId> {
     private final static int NONE_VAL = 0;
     public final static ClassId NONE = new ClassId(NONE_VAL);
 
+    private final static int NO_MASK_VAL = 0xFFFFFFFF;
+    public final static ClassId NO_MASK = new ClassId(NO_MASK_VAL);
+    public final static ClassId FULL_MASK = NONE;
+
     private final int rawValue;
 
     private ClassId(final int rawValue) {
@@ -20,7 +24,8 @@ public class ClassId implements OFValueType<ClassId> {
     public static ClassId of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
-
+        else if(raw == NO_MASK_VAL)
+            return NO_MASK;
         return new ClassId(raw);
     }
 
