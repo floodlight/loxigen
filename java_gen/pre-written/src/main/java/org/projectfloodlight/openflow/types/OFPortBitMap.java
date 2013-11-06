@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.concurrent.Immutable;
+
 
 /** User-facing object representing a bitmap of ports that can be matched on.
  *  This is implemented by the custom BSN OXM type of_oxm_bsn_in_ports_182.
@@ -20,8 +22,22 @@ package org.projectfloodlight.openflow.types;
  *  The second term cannot be represented in OXM, the second can.
  *
  *  That said, all that craziness is hidden from the user of this object.
+ *
+ *  <h2>Usage</h2>
+ *  OFPortBitmap is meant to be used with MatchField <tt>BSN_IN_PORTS_128</tt> in place
+ *  of the raw type Masked&lt;OFBitMask128&gt;.
+ *
+ *  <h3>Example:</h3>:
+ *  <pre>
+ *  OFPortBitMap portBitMap;
+ *  Match.Builder matchBuilder;
+ *  // initialize
+ *  matchBuilder.setMasked(MatchField.BSN_IN_PORTS_128, portBitmap);
+ *  </pre>
+ *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
+@Immutable
 public class OFPortBitMap extends Masked<OFBitMask128> {
 
     private OFPortBitMap(OFBitMask128 mask) {
