@@ -15,11 +15,19 @@ public class LagId implements OFValueType<LagId> {
     private final static int NONE_VAL = 0;
     public final static LagId NONE = new LagId(NONE_VAL);
 
+    private final static int NO_MASK_VAL = 0xFFFFFFFF;
+    public final static LagId NO_MASK = new LagId(NO_MASK_VAL);
+    public final static LagId FULL_MASK = NONE;
+
     private LagId(final int rawValue) {
         this.rawValue = rawValue;
     }
 
     public static LagId of(final int raw) {
+        if(raw == NONE_VAL)
+            return NONE;
+        else if (raw == NO_MASK_VAL)
+            return NO_MASK;
         return new LagId(raw);
     }
 

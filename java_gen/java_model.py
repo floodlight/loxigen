@@ -602,6 +602,7 @@ class JavaOFInterface(object):
                     JavaVirtualMember(self, "mask", java_type.generic_t),
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype("T")),
                     JavaVirtualMember(self, "masked", java_type.boolean),
+                    JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype("T"))
                    ]
         elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
             field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
@@ -611,6 +612,8 @@ class JavaOFInterface(object):
             virtual_members += [
                     JavaVirtualMember(self, "matchField", field_type),
                     JavaVirtualMember(self, "masked", java_type.boolean),
+                    JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype(model.oxm_map[self.name].type_name),
+                            custom_template=lambda builder: "OFOxm{}_getCanonical.java".format(".Builder" if builder else "")),
                    ]
             if not find(lambda x: x.name == "mask", self.ir_model_members):
                 virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
@@ -745,17 +748,20 @@ class JavaOFClass(object):
                 virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
                     JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
-                   ]
+                    ]
             else:
                 virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
-                   ]
-
+                 ]
         if not find(lambda m: m.name == "version", self.ir_model_members):
             virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version, "OFVersion.%s" % self.version.constant_version))
 
         return tuple(virtual_members)
+
+    @memoize
+    def member_by_name(self, name):
+        return find(lambda m: m.name == name, self.members)
 
     def all_versions(self):
         return [ JavaOFVersion(int_version)
@@ -983,9 +989,10 @@ class JavaMember(object):
 
 class JavaVirtualMember(JavaMember):
     """ Models a virtual property (member) of an openflow class that is not backed by a loxi ir member """
-    def __init__(self, msg, name, java_type, value=None):
+    def __init__(self, msg, name, java_type, value=None, custom_template=None):
         JavaMember.__init__(self, msg, name, java_type, member=None)
         self._value = value
+        self.custom_template = custom_template
 
     @property
     def is_fixed_value(self):

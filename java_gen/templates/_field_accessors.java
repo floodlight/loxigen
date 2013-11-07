@@ -1,10 +1,13 @@
 //:: import os
 //:: for prop in msg.interface.members:
-//:: getter_template_file_name = "%s/custom/%s_%s.java" % (template_dir, msg.name if not builder else msg.name + '.Builder', prop.getter_name)
-//:: if os.path.exists(getter_template_file_name):
-//:: include(getter_template_file_name, msg=msg, builder=builder, has_parent=has_parent)
-
-//:: else:
+//::    if hasattr(prop, "custom_template") and prop.custom_template != None:
+//::        getter_template_file_name = "%s/custom/%s" % (template_dir, prop.custom_template(builder=builder))
+//::    else:
+//::        getter_template_file_name = "%s/custom/%s_%s.java" % (template_dir, msg.name if not builder else msg.name + '.Builder', prop.getter_name)
+//::    #endif
+//::    if os.path.exists(getter_template_file_name):
+//::        include(getter_template_file_name, msg=msg, builder=builder, has_parent=has_parent, prop=prop)
+//::    else:
     @Override
     public ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop in msg.members else "throws UnsupportedOperationException"} {
 //:: if prop in msg.members:
