@@ -381,7 +381,7 @@
                     wildcards &= ~OFPFW_DL_VLAN_PCP;
                     break;
                 case VLAN_VID:
-                    setVlanVid((VlanVid) value);
+                    setVlanVid((OFVlanVidMatch) value);
                     wildcards &= ~OFPFW_DL_VLAN;
                     break;
                 default:
@@ -492,7 +492,7 @@
                     wildcards |= OFPFW_DL_VLAN_PCP;
                     break;
                 case VLAN_VID:
-                    setVlanVid(VlanVid.NONE);
+                    setVlanVid(OFVlanVidMatch.NONE);
                     wildcards |= OFPFW_DL_VLAN;
                     break;
                 default:
