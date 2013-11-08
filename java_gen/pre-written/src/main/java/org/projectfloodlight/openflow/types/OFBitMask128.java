@@ -14,6 +14,9 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
     public static final OFBitMask128 ALL = new OFBitMask128(-1, -1);
     public static final OFBitMask128 NONE = new OFBitMask128(0, 0);
 
+    public static final OFBitMask128 NO_MASK = ALL;
+    public static final OFBitMask128 FULL_MASK = NONE;
+
     private OFBitMask128(long raw1, long raw2) {
         this.raw1 = raw1;
         this.raw2 = raw2;

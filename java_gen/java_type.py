@@ -620,6 +620,8 @@ def enum_java_types():
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
+def make_oxm_jtype(sub_type_name="?"):
+    return JType("OFOxm<{}>".format(sub_type_name))
 
 def list_cname_to_java_name(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
@@ -627,7 +629,6 @@ def list_cname_to_java_name(c_type):
         raise Exception("Not a recgonized standard list type declaration: %s" % c_type)
     base_name = m.group(1)
     return "OF" + name_c_to_caps_camel(base_name)
-
 
 #### main entry point for conversion of LOXI types (c_types) Java types.
 # FIXME: This badly needs a refactoring

@@ -40,7 +40,7 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
     public static IPv6AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
-        int maskBits = 0;
+        int maskBits = 128;
         IPv6Address maskAddress = null;
 
         // Read mask suffix
@@ -71,10 +71,13 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         if (maskAddress != null) {
             // Full address mask
             return IPv6AddressWithMask.of(ipv6, maskAddress);
-        } else if (maskBits == 0) {
+        } else if (maskBits == 128) {
             // No mask
             return IPv6AddressWithMask.of(ipv6, IPv6Address.NO_MASK);
-        } else {
+        } else if (maskBits == 0) {
+            // Entirely masked out
+            return IPv6AddressWithMask.of(ipv6, IPv6Address.FULL_MASK);
+        }else {
             // With mask
             BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);
             byte[] maskBytesTemp = mask.toByteArray();

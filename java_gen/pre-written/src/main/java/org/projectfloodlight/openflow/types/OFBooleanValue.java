@@ -28,6 +28,9 @@ public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
     public final static OFBooleanValue TRUE = new OFBooleanValue(true);
     public final static OFBooleanValue FALSE = new OFBooleanValue(false);
 
+    public final static OFBooleanValue NO_MASK = TRUE;
+    public final static OFBooleanValue FULL_MASK = FALSE;
+
     private final boolean value;
 
     private OFBooleanValue(boolean value) {

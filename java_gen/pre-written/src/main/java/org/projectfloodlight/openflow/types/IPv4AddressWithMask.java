@@ -46,7 +46,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     public static IPv4AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
-        int maskBits = 0;
+        int maskBits = 32;
         IPv4Address maskAddress = null;
 
         // Read mask suffix
@@ -77,9 +77,12 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
         if (maskAddress != null) {
             // Full address mask
             return IPv4AddressWithMask.of(ipv4, maskAddress);
-        } else if (maskBits == 0) {
+        } else if (maskBits == 32) {
             // No mask
             return IPv4AddressWithMask.of(ipv4, IPv4Address.NO_MASK);
+        } else if (maskBits == 0) {
+            // No mask
+            return IPv4AddressWithMask.of(ipv4, IPv4Address.FULL_MASK);
         } else {
             // With mask
             int mask = (-1) << (32 - maskBits);
