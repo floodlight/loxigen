@@ -2,7 +2,6 @@ package org.projectfloodlight.openflow.protocol;
 
 import java.util.EnumMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -13,11 +12,16 @@ import org.projectfloodlight.openflow.protocol.oxm.OFOxm;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.PrimitiveSinkable;
 import org.projectfloodlight.openflow.util.ChannelUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.PrimitiveSink;
 
 public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkable {
+    private static final Logger logger = LoggerFactory.getLogger(OFOxmList.class);
+
     private final Map<MatchFields, OFOxm<?>> oxmMap;
 
     public final static OFOxmList EMPTY = new OFOxmList(ImmutableMap.<MatchFields, OFOxm<?>>of());
@@ -51,7 +55,7 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkab
         }
 
         public OFOxmList build() {
-            return new OFOxmList(oxmMap);
+            return OFOxmList.ofList(oxmMap.values());
         }
     }
 
@@ -60,12 +64,19 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkab
         return oxmMap.values().iterator();
     }
 
-    public static OFOxmList ofList(List<OFOxm<?>> oxmList) {
+    public static OFOxmList ofList(Iterable<OFOxm<?>> oxmList) {
         Map<MatchFields, OFOxm<?>> map = new EnumMap<MatchFields, OFOxm<?>>(
                 MatchFields.class);
         for (OFOxm<?> o : oxmList) {
-            // TODO: if fully masked, ignore oxm.
-            map.put(o.getMatchField().id, o);
+            OFOxm<?> canonical = o.getCanonical();
+
+            if(logger.isDebugEnabled() && !Objects.equal(o, canonical)) {
+                logger.debug("OFOxmList: normalized non-canonical OXM {} to {}", o, canonical);
+            }
+
+            if(canonical != null)
+                map.put(canonical.getMatchField().id, canonical);
+
         }
         return new OFOxmList(map);
     }
@@ -74,8 +85,14 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkab
         Map<MatchFields, OFOxm<?>> map = new EnumMap<MatchFields, OFOxm<?>>(
                 MatchFields.class);
         for (OFOxm<?> o : oxms) {
-            // TODO: if fully masked, ignore oxm.
-            map.put(o.getMatchField().id, o);
+            OFOxm<?> canonical = o.getCanonical();
+
+            if(logger.isDebugEnabled() && !Objects.equal(o, canonical)) {
+                logger.debug("OFOxmList: normalized non-canonical OXM {} to {}", o, canonical);
+            }
+
+            if(canonical != null)
+                map.put(canonical.getMatchField().id, canonical);
         }
         return new OFOxmList(map);
     }

@@ -29,6 +29,10 @@ public class U8 implements Writeable, OFValueType<U8> {
     private final static byte ZERO_VAL = 0;
     public final static U8 ZERO = new U8(ZERO_VAL);
 
+    private static final byte NO_MASK_VAL = (byte) 0xFF;
+    public static final U8 NO_MASK = new U8(NO_MASK_VAL);
+    public static final U8 FULL_MASK = ZERO;
+
     private final byte raw;
 
     private U8(byte raw) {
@@ -38,6 +42,8 @@ public class U8 implements Writeable, OFValueType<U8> {
     public static final U8 of(short value) {
         if(value == ZERO_VAL)
             return ZERO;
+        if(value == NO_MASK_VAL)
+            return NO_MASK;
 
         return new U8(t(value));
     }

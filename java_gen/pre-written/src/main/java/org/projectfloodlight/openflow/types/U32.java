@@ -29,6 +29,10 @@ public class U32 implements Writeable, OFValueType<U32> {
     private final static int ZERO_VAL = 0;
     public final static U32 ZERO = new U32(ZERO_VAL);
 
+    private static final int NO_MASK_VAL = 0xFFffFFff;
+    public final static U32 NO_MASK = new U32(NO_MASK_VAL);
+    public static final U32 FULL_MASK = ZERO;
+
     private final int raw;
 
     private U32(int raw) {
@@ -42,6 +46,8 @@ public class U32 implements Writeable, OFValueType<U32> {
     public static U32 ofRaw(int raw) {
         if(raw == ZERO_VAL)
             return ZERO;
+        if(raw == NO_MASK_VAL)
+            return NO_MASK;
         return new U32(raw);
     }
 
