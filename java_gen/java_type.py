@@ -535,6 +535,8 @@ def enum_java_types():
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
+def make_oxm_jtype(sub_type_name="?"):
+    return JType("OFOxm<{}>".format(sub_type_name))
 
 # Create a default mapping for a list type. Type defauls to List<${java_mapping_of_name}>
 def make_standard_list_jtype(c_type):
@@ -553,7 +555,6 @@ def make_standard_list_jtype(c_type):
             write='ChannelUtils.writeList(bb, $name)',
             default="ImmutableList.<OF{}>of()".format(java_base_name)
             )
-
 
 
 #### main entry point for conversion of LOXI types (c_types) Java types.
