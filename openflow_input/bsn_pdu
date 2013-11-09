@@ -58,6 +58,8 @@ struct of_bsn_pdu_tx_reply : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 32;
     uint32_t status; // 0 means success
+    of_port_no_t port_no;
+    uint8_t slot_num;
 };
 
 struct of_bsn_pdu_rx_request : of_bsn_header {
@@ -82,6 +84,8 @@ struct of_bsn_pdu_rx_reply : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 34;
     uint32_t status; // 0 means success
+    of_port_no_t port_no;
+    uint8_t slot_num;
 };
 
 struct of_bsn_pdu_rx_timeout : of_bsn_header {
