@@ -44,12 +44,9 @@ struct of_bsn_set_lacp_request : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 41;
-    uint8_t enabled;  // 0 means stop running lacp on the given port,
-                      // anything else means start running lacp on the given port
-                      // with the given actor parameters.
+    uint8_t enabled;
     pad(1);
     of_port_no_t port_no;
-    // LACP Actor Parameters - valid only if enabled is not 0
     uint16_t actor_sys_priority;
     of_mac_addr_t actor_sys_mac;
     uint16_t actor_port_priority;
@@ -64,7 +61,7 @@ struct of_bsn_set_lacp_reply : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 42;
-    uint32_t status; // 0 means success
+    uint32_t status;
     of_port_no_t port_no;
     uint16_t actor_sys_priority;
     of_mac_addr_t actor_sys_mac;
@@ -83,14 +80,12 @@ struct of_bsn_lacp_convergence_notif : of_bsn_header {
     uint16_t convergence_status;
     of_port_no_t port_no;
 
-    // Actor Parameters configured by controller
     uint16_t actor_sys_priority;
     of_mac_addr_t actor_sys_mac;
     uint16_t actor_port_priority;
     uint16_t actor_port_num;
     uint16_t actor_key;
 
-    // Partner Parameters are valid only if convergence status is success
     uint16_t partner_sys_priority;
     of_mac_addr_t partner_sys_mac;
     uint16_t partner_port_priority;
