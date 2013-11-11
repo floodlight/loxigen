@@ -63,11 +63,6 @@ struct of_bsn_set_lacp_reply : of_bsn_header {
     uint32_t subtype == 42;
     uint32_t status;
     of_port_no_t port_no;
-    uint16_t actor_sys_priority;
-    of_mac_addr_t actor_sys_mac;
-    uint16_t actor_port_priority;
-    uint16_t actor_port_num;
-    uint16_t actor_key;
 };
 
 struct of_bsn_lacp_convergence_notif : of_bsn_header {
