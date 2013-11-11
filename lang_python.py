@@ -103,6 +103,7 @@ for version, subdir in versions.items():
         targets[filename] = make_gen(module, version)
 
 def generate():
+    py_gen.codegen.init()
     for (name, fn) in targets.items():
         with loxi_utils.open_output(name) as outfile:
             fn(outfile, os.path.basename(name))
