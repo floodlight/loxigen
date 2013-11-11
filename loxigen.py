@@ -630,12 +630,7 @@ def generate_all_files():
     """
     Create the files for the language target
     """
-    for (name, fn) in lang_module.targets.items():
-        path = of_g.options.install_dir + '/' + name
-        os.system("mkdir -p %s" % os.path.dirname(path))
-        with open(path, "w") as outfile:
-            fn(outfile, os.path.basename(name))
-        print("Wrote contents for " + name)
+    lang_module.generate()
 
 if __name__ == '__main__':
     of_g.loxigen_log_file = open("loxigen.log", "w")
