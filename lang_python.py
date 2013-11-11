@@ -61,6 +61,8 @@ the const module directly into their namespace so the user can access
 "ofp.OFPP_NONE".
 """
 
+import os
+import loxi_utils.loxi_utils as loxi_utils
 import py_gen
 import py_gen.util
 import py_gen.codegen
@@ -99,3 +101,8 @@ for version, subdir in versions.items():
     for module in modules[version]:
         filename = '%s/%s/%s.py' % (prefix, subdir, module)
         targets[filename] = make_gen(module, version)
+
+def generate():
+    for (name, fn) in targets.items():
+        with loxi_utils.open_output(name) as outfile:
+            fn(outfile, os.path.basename(name))

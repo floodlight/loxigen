@@ -42,9 +42,16 @@ define a single directory and generate everything in there.
 
 """
 
+import os
+import loxi_utils.loxi_utils as loxi_utils
 import java_gen.codegen as java_codegen
 
 
 targets = {
     'openflowj/README': java_codegen.gen_all_java
 }
+
+def generate():
+    for (name, fn) in targets.items():
+        with loxi_utils.open_output(name) as outfile:
+            fn(outfile, os.path.basename(name))

@@ -36,8 +36,15 @@ The user will copy openflow.lua into ~/.wireshark/plugins, where it will be
 loaded automatically by Wireshark.
 """
 
+import os
+import loxi_utils.loxi_utils as loxi_utils
 import wireshark_gen
 
 targets = {
     'wireshark/openflow.lua' : wireshark_gen.generate
 }
+
+def generate():
+    for (name, fn) in targets.items():
+        with loxi_utils.open_output(name) as outfile:
+            fn(outfile, os.path.basename(name))
