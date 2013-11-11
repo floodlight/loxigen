@@ -38,26 +38,6 @@ public class IPv6AddressTest {
             this.input = input;
         }
 
-        public WithMaskTaskCase hasMask() {
-            this.hasMask = true;
-            return this;
-        }
-
-        public WithMaskTaskCase maskLength(int l) {
-            this.hasMask = l < 128;
-            for(int j=0; j < 8; j++) {
-                int pos = j * 8;
-                int index = Math.max(0, Math.min(7, pos - l));
-
-                if(index == 0) {
-                    expectedMask[j] = 0;
-                } else {
-                    expectedMask[j] = (byte) (-1 << index);
-                }
-            }
-            return this;
-        }
-
         public WithMaskTaskCase maskHex(String string) {
             string = string.replaceAll(" ", "");
             this.hasMask = true;
