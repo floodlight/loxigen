@@ -44,9 +44,7 @@ import loxi_utils.loxi_utils as loxi_utils
 
 import java_gen.java_model as java_model
 
-def gen_all_java(out, name):
-    # close the virtual file - we don't need it
-    out.close()
+def gen_all_java():
     basedir= '%s/openflowj' % of_g.options.install_dir
     print "Outputting to %s" % basedir
     if os.path.exists(basedir):

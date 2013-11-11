@@ -111,8 +111,10 @@ def create_fields():
 
     return r
 
-def generate(out, name):
+def generate():
     context = {
         'fields': create_fields(),
     }
-    utils.render_template(out, "openflow.lua", [templates_dir], context)
+
+    with utils.open_output('openflow.lua') as out:
+        utils.render_template(out, "openflow.lua", [templates_dir], context)
