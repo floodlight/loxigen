@@ -28,10 +28,10 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-#version any
+#version 4
 
 // LACP Convergence Status set in of_bsn_lacp_convergence_notif message
-enum of_bsn_lacp_convergence_status_t(wire_type=uint16_t, complete=False) {
+enum of_bsn_lacp_convergence_status_t(wire_type=uint8_t, complete=False) {
     LACP_SUCCESS = 0,
     LACP_TIMEDOUT = 1,
     LACP_OUT_OF_SYNC = 2,
@@ -45,7 +45,7 @@ struct of_bsn_set_lacp_request : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 41;
     uint8_t enabled;
-    pad(1);
+    pad(3);
     of_port_no_t port_no;
     uint16_t actor_sys_priority;
     of_mac_addr_t actor_sys_mac;
@@ -63,11 +63,6 @@ struct of_bsn_set_lacp_reply : of_bsn_header {
     uint32_t subtype == 42;
     uint32_t status;
     of_port_no_t port_no;
-    uint16_t actor_sys_priority;
-    of_mac_addr_t actor_sys_mac;
-    uint16_t actor_port_priority;
-    uint16_t actor_port_num;
-    uint16_t actor_key;
 };
 
 struct of_bsn_lacp_convergence_notif : of_bsn_header {
@@ -77,7 +72,8 @@ struct of_bsn_lacp_convergence_notif : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 43;
-    uint16_t convergence_status;
+    uint8_t convergence_status;
+    pad(3);
     of_port_no_t port_no;
 
     uint16_t actor_sys_priority;
