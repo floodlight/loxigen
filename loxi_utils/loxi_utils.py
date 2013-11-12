@@ -34,6 +34,7 @@ These may need to be sorted out into language specific functions
 """
 
 import sys
+import os
 import of_g
 import tenjin
 from generic_utils import find, memoize
@@ -543,3 +544,16 @@ class TemplateEngine(tenjin.Engine):
         context.update(kwargs)
         template = self.get_template(template_name, context, globals)
         return template.render(context, globals, _buf=locals["_buf"])
+
+def open_output(name):
+    """
+    Open an output file for writing
+
+    'name' may include slashes. Subdirectories will be automatically created.
+    """
+    print "Writing %s" % name
+    path = os.path.join(of_g.options.install_dir, name)
+    dirpath = os.path.dirname(path)
+    if not os.path.exists(dirpath):
+        os.makedirs(dirpath)
+    return open(path, "w")

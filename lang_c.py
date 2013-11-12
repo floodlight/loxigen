@@ -39,6 +39,7 @@ import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
 import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
+import loxi_utils.loxi_utils as loxi_utils
 
 def static(out, name):
     c_gen.util.render_template(out, os.path.basename(name))
@@ -110,3 +111,8 @@ targets = {
     'locitest/src/main.c': static,
     'locitest/Makefile': static,
 }
+
+def generate():
+    for (name, fn) in targets.items():
+        with loxi_utils.open_output(name) as outfile:
+            fn(outfile, os.path.basename(name))
