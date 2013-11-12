@@ -26,7 +26,7 @@ import org.projectfloodlight.openflow.types.OFValueType;
  * them in part. For example, OF1.0 supports exact match and (full) wildcarding for all fields, but it
  * does only supports partial masking for IP source/destination fields, and this partial masking must be
  * in the CIDR prefix format. Thus, OF1.0 implementation may throw <code>UnsupportedOperationException</code> if given
- * in <code>setMaksed</code> an IP mask of, for example, 255.0.255.0, or if <code>setMasked</code> is called for any field
+ * in <code>setMasked</code> an IP mask of, for example, 255.0.255.0, or if <code>setMasked</code> is called for any field
  * which is not IP source/destination address.
  * <br><br>
  * On prerequisites:<br>
@@ -37,7 +37,7 @@ import org.projectfloodlight.openflow.types.OFValueType;
  * be ignored unless the Ethertype is specified as MPLS. Likewise, the IP header and
  * transport header fields will be ignored unless the Ethertype is specified as either
  * IPv4 or ARP. The tp_src and tp_dst fields will be ignored unless the network protocol
- * specified is as TCP, UDP or SCTP. Fields that are ignored don�t need to be wildcarded
+ * specified is as TCP, UDP or SCTP. Fields that are ignored don't need to be wildcarded
  * and should be set to 0."
  * <br><br>
  * This interface uses generics to assure type safety in users code. However, implementing classes may have to suppress
@@ -122,6 +122,15 @@ public interface Match extends OFObject {
      * @throws UnsupportedOperationException If field is not supported.
      */
     public boolean isPartiallyMasked(MatchField<?> field) throws UnsupportedOperationException;
+
+    /**
+     * Get an Iterable over the match fields that have been specified for the
+     * match. This includes the match fields that are exact or masked match
+     * (but not fully wildcarded).
+     *
+     * @return
+     */
+    public Iterable<MatchField<?>> getMatchFields();
 
     /**
      * Returns a builder to build new instances of this type of match object.
