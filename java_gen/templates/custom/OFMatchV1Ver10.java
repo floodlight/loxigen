@@ -83,7 +83,7 @@
                 result = ipv4Dst;
                 break;
             case TCP_SRC:
-                result = ipv4Src;
+                result = tcpSrc;
                 break;
             case TCP_DST:
                 result = tcpDst;
