@@ -27,6 +27,10 @@ public class OFMetadata implements OFValueType<OFMetadata> {
         return new OFMetadata(U64.ofRaw(raw));
     }
 
+    public U64 getValue() {
+        return u64;
+    }
+
     public static OFMetadata read8Bytes(ChannelBuffer cb) {
         return OFMetadata.ofRaw(cb.readLong());
     }

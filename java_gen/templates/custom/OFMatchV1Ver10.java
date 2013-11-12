@@ -334,3 +334,77 @@
                 throw new UnsupportedOperationException("OFMatch does not support masked matching on field " + field.getName());
         }
     }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        ImmutableList.Builder<MatchField<?>> builder = ImmutableList.builder();
+        if ((wildcards & OFPFW_IN_PORT) == 0)
+            builder.add(MatchField.IN_PORT);
+        if ((wildcards & OFPFW_DL_VLAN) == 0)
+            builder.add(MatchField.VLAN_VID);
+        if ((wildcards & OFPFW_DL_SRC) == 0)
+            builder.add(MatchField.ETH_SRC);
+        if ((wildcards & OFPFW_DL_DST) == 0)
+            builder.add(MatchField.ETH_DST);
+        if ((wildcards & OFPFW_DL_TYPE) == 0)
+            builder.add(MatchField.ETH_TYPE);
+        if ((wildcards & OFPFW_NW_PROTO) == 0) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_OP);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IP_PROTO);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on network protocol " + ethType);
+            }
+        }
+        if ((wildcards & OFPFW_TP_SRC) == 0) {
+            if (ipProto == IpProtocol.UDP) {
+                builder.add(MatchField.UDP_SRC);
+            } else if (ipProto == IpProtocol.TCP) {
+                builder.add(MatchField.TCP_SRC);
+            } else if (ipProto == IpProtocol.SCTP) {
+                builder.add(MatchField.SCTP_SRC);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported IP protocol for matching on source port " + ipProto);
+            }
+        }
+        if ((wildcards & OFPFW_TP_DST) == 0) {
+            if (ipProto == IpProtocol.UDP) {
+                builder.add(MatchField.UDP_DST);
+            } else if (ipProto == IpProtocol.TCP) {
+                builder.add(MatchField.TCP_DST);
+            } else if (ipProto == IpProtocol.SCTP) {
+                builder.add(MatchField.SCTP_DST);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported IP protocol for matching on destination port " + ipProto);
+            }
+        }
+        if (((wildcards & OFPFW_NW_SRC_MASK) >> OFPFW_NW_SRC_SHIFT) < 32) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_SPA);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IPV4_SRC);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on source IP " + ethType);
+            }
+        }
+        if (((wildcards & OFPFW_NW_DST_MASK) >> OFPFW_NW_DST_SHIFT) < 32) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_TPA);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IPV4_DST);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on destination IP " + ethType);
+            }
+        }
+        if ((wildcards & OFPFW_DL_VLAN_PCP) == 0)
+            builder.add(MatchField.VLAN_PCP);
+        if ((wildcards & OFPFW_NW_TOS) == 0)
+            builder.add(MatchField.IP_DSCP);
+        return builder.build();
+    }
