@@ -840,3 +840,27 @@ of_extension_object_wire_push(of_object_t *obj)
 
     return OF_ERROR_NONE;
 }
+
+int
+of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REQUEST;
+        }
+    }
+    return OF_OBJECT_INVALID;
+}
+
+int
+of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REPLY;
+        }
+    }
+    return OF_OBJECT_INVALID;
+}
