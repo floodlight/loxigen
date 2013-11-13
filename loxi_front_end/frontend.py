@@ -62,7 +62,7 @@ def create_member(m_ast, ctx):
     else:
         raise InputError("Dont know how to create member: %s" % m_ast[0])
 
-def create_ofinput(ast):
+def create_ofinput(name, ast):
 
     """
     Create an OFInput from an AST
@@ -72,7 +72,7 @@ def create_ofinput(ast):
     @returns An OFInput object
     """
     ctx = FrontendCtx(set())
-    ofinput = OFInput(wire_versions=set(), classes=[], enums=[])
+    ofinput = OFInput(name, wire_versions=set(), classes=[], enums=[])
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':

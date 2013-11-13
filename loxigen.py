@@ -332,7 +332,7 @@ def process_input_file(filename):
 
     # Create the OFInput from the AST
     try:
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput(os.path.basename(filename), ast)
     except frontend.InputError as e:
         print "Error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
