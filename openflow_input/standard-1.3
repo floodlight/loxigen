@@ -1527,6 +1527,30 @@ struct of_table_stats_reply : of_stats_reply {
     list(of_table_stats_entry_t) entries;
 };
 
+struct of_experimenter_stats_request : of_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == ?;
+    uint32_t subtype;
+};
+
+struct of_experimenter_stats_reply : of_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == ?;
+    uint32_t subtype;
+};
+
 // FIXME: These are padded to 8 byte align beyond the length indicated
 
 struct of_table_feature_prop {

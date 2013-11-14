@@ -128,6 +128,11 @@ def ignore_member(cls, version, m_name, m_type):
             m_name == "experimenter" or
             m_name == "subtype")):
         return True
+
+    if (cls in ["of_bsn_lacp_stats_request", "of_bsn_lacp_stats_reply"] and (
+            m_name == "experimenter" or
+            m_name == "subtype")):
+        return True
     return loxi_utils.skip_member_name(m_name) or m_type not in scalar_types
 
 def gen_fill_string(out):

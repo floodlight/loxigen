@@ -60,7 +60,11 @@ class JavaModel(object):
     interface_blacklist = set( ("OFUint8", "OFUint32",))
     # registry of interface properties that should not be generated
     # map: $java_type -> set(java_name_property)
-    read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    read_blacklist = defaultdict(lambda: set(),
+        OFExperimenter=set(('data','subtype')),
+        OFActionExperimenter=set(('data',)),
+        OFExperimenterStatsRequest=set(('data','subtype')),
+        OFExperimenterStatsReply=set(('data','subtype')))
     # map: $java_type -> set(java_name_property)
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
     # interfaces that are virtual
@@ -510,6 +514,14 @@ class JavaOFInterface(object):
         # inheritance information from the versioned lox_ir classes.
         if re.match(r'OFStatsRequest$', self.name):
             return ("", "OFMessage", "T extends OFStatsReply")
+        elif re.match(r'OFBsnStatsRequest$', self.name):
+            return ("", "OFExperimenterStatsRequest", None)
+        elif re.match(r'OFBsnStatsReply$', self.name):
+            return ("", "OFExperimenterStatsReply", None)
+        elif re.match(r'OFBsn.+StatsRequest$', self.name):
+            return ("", "OFBsnStatsRequest", None)
+        elif re.match(r'OFBsn.+StatsReply$', self.name):
+            return ("", "OFBsnStatsReply", None)
         elif re.match(r'OF.+StatsRequest$', self.name):
             return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif re.match(r'OF.+StatsReply$', self.name):

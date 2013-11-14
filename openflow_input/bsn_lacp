@@ -88,3 +88,45 @@ struct of_bsn_lacp_convergence_notif : of_bsn_header {
     uint16_t partner_port_num;
     uint16_t partner_key;
 };
+
+struct of_bsn_lacp_stats_request : of_bsn_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 1;
+};
+
+struct of_bsn_lacp_stats_entry {
+    of_port_no_t port_no;
+    uint16_t actor_sys_priority;
+    of_mac_addr_t actor_sys_mac;
+    uint16_t actor_port_priority;
+    uint16_t actor_port_num;
+    uint16_t actor_key;
+    uint8_t convergence_status;
+    pad(1);
+    uint16_t partner_sys_priority;
+    of_mac_addr_t partner_sys_mac;
+    uint16_t partner_port_priority;
+    uint16_t partner_port_num;
+    uint16_t partner_key;
+    pad(2);
+};
+
+struct of_bsn_lacp_stats_reply : of_bsn_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 1;
+    list(of_bsn_lacp_stats_entry_t) entries;
+};
