@@ -35,7 +35,7 @@ sys.path.insert(0, root_dir)
 
 import loxi_front_end.parser as parser
 import loxi_front_end.frontend as frontend
-from loxi_ir import *
+from loxi_front_end.frontend_ir import *
 
 class FrontendTests(unittest.TestCase):
     maxDiff = None
@@ -109,7 +109,7 @@ struct of_packet_queue {
         ]
         self.assertEquals(expected_ast, ast)
 
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput("standard-1.0", ast)
         self.assertEquals(set([1, 2]), ofinput.wire_versions)
         expected_classes = [
             OFClass(name='of_echo_reply', superclass=None, members=[
@@ -180,7 +180,7 @@ struct of_queue_prop_min_rate : of_queue_prop {
         ]
         self.assertEquals(expected_ast, ast)
 
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput("standard-1.0", ast)
         expected_classes = [
             OFClass(name='of_queue_prop', superclass=None, members=[
                 OFDiscriminatorMember('type', 'uint16_t'),

@@ -28,9 +28,8 @@
 from generic_utils import find
 from collections import namedtuple
 import copy
-import of_g
-import loxi_front_end.type_maps as type_maps
-from loxi_ir import *
+import loxi_globals
+import loxi_front_end.frontend_ir as ir
 
 class InputError(Exception):
     pass
@@ -46,23 +45,23 @@ def get_type(t_ast, ctx):
 
 def create_member(m_ast, ctx):
     if m_ast[0] == 'pad':
-        return OFPadMember(length=m_ast[1])
+        return ir.OFPadMember(length=m_ast[1])
     elif m_ast[0] == 'type':
-        return OFTypeMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), value=m_ast[3])
+        return ir.OFTypeMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), value=m_ast[3])
     elif m_ast[0] == 'data':
         if m_ast[2] == 'length' or m_ast[2] == 'len': # Should be moved to parser
-            return OFLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
+            return ir.OFLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
         elif m_ast[2] == 'actions_len':
             # HACK only usage so far
-            return OFFieldLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), field_name='actions')
+            return ir.OFFieldLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), field_name='actions')
         else:
-            return OFDataMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
+            return ir.OFDataMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     elif m_ast[0] == 'discriminator':
-        return OFDiscriminatorMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
+        return ir.OFDiscriminatorMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     else:
         raise InputError("Dont know how to create member: %s" % m_ast[0])
 
-def create_ofinput(ast):
+def create_ofinput(filename, ast):
 
     """
     Create an OFInput from an AST
@@ -72,7 +71,7 @@ def create_ofinput(ast):
     @returns An OFInput object
     """
     ctx = FrontendCtx(set())
-    ofinput = OFInput(wire_versions=set(), classes=[], enums=[])
+    ofinput = ir.OFInput(filename, wire_versions=set(), classes=[], enums=[])
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':
@@ -84,11 +83,11 @@ def create_ofinput(ast):
             superclass = decl_ast[3]
             members = [create_member(m_ast, ctx) for m_ast in decl_ast[4]]
 
-            discriminators = [ m for m in members if isinstance(m, OFDiscriminatorMember) ]
+            discriminators = [ m for m in members if isinstance(m, ir.OFDiscriminatorMember) ]
             if len(discriminators) > 1:
                 raise InputError("%s: Cannot support more than one discriminator by class - got %s" %
                         (decl_ast[1], repr(discriminators)))
-            ofclass = OFClass(name=decl_ast[1], members=members, superclass=superclass,
+            ofclass = ir.OFClass(name=decl_ast[1], members=members, superclass=superclass,
                     virtual = len(discriminators) > 0,
                     params = { param: value for param, value in decl_ast[2] })
             ofinput.classes.append(ofclass)
@@ -97,16 +96,16 @@ def create_ofinput(ast):
             # 1: name
             # 2: potentially list of [param_name, param_value]
             # 3: list of [constant_name, constant_value]+
-            enum = OFEnum(name=decl_ast[1],
-                    entries=[OFEnumEntry(name=x[0], value=x[2], params={param:value for param, value in x[1] }) for x in decl_ast[3]],
+            enum = ir.OFEnum(name=decl_ast[1],
+                    entries=[ir.OFEnumEntry(name=x[0], value=x[2], params={param:value for param, value in x[1] }) for x in decl_ast[3]],
                     params = { param: value for param, value in decl_ast[2] }
                     )
             ofinput.enums.append(enum)
         elif decl_ast[0] == 'metadata':
             if decl_ast[1] == 'version':
                 if decl_ast[2] == 'any':
-                    ofinput.wire_versions.update(of_g.wire_ver_map.keys())
-                elif int(decl_ast[2]) in of_g.supported_wire_protos:
+                    ofinput.wire_versions.update(v.wire_version for v in loxi_globals.OFVersions.all_supported)
+                elif int(decl_ast[2]) in loxi_globals.OFVersions.wire_version_map:
                     ofinput.wire_versions.add(int(decl_ast[2]))
                 else:
                     raise InputError("Unrecognized wire protocol version %r" % decl_ast[2])
