@@ -40,8 +40,8 @@
 # takes mask
 
 import sys
-import of_g
-import loxi_front_end.match as match
+import c_gen.of_g_legacy as of_g
+import c_gen.match as match
 import c_code_gen
 
 def match_c_top_matter(out, name):

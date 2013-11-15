@@ -33,10 +33,11 @@
 # to wire value.
 #
 
-import of_g
+import c_gen.of_g_legacy as of_g
 import sys
 from generic_utils import *
 import loxi_utils.loxi_utils as loxi_utils
+import c_gen.loxi_utils_legacy as loxi_utils
 
 invalid_type = "invalid_type"
 invalid_value = "0xeeee"  # Note, as a string

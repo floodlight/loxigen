@@ -27,8 +27,8 @@
 ::
 :: include('_copyright.c')
 :: import of_g
-:: from loxi_utils import loxi_utils
-:: from loxi_front_end import type_maps
+:: import c_gen.loxi_utils_legacy as loxi_utils
+:: from c_gen import type_maps
 
 /**
  * Test message validator

@@ -125,4 +125,3 @@ def loxi_name(ident):
             if re.match(id_from, ident):
                 return re.sub(id_from, id_to, ident)
     return ident
-

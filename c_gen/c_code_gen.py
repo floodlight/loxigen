@@ -34,13 +34,11 @@ import sys
 import of_g
 import c_match
 from generic_utils import *
-import c_gen.c_type_maps as c_type_maps
-import loxi_front_end.type_maps as type_maps
-import loxi_front_end.flags as flags
-import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.identifiers as identifiers
+from c_gen import flags, type_maps, c_type_maps
+import c_gen.loxi_utils_legacy as loxi_utils
+from c_gen.loxi_utils_legacy import config_check
 
-# 'property' is for queues. Could be trouble
+import c_gen.identifiers as identifiers
 
 
 ################################################################

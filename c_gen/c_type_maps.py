@@ -32,7 +32,7 @@
 import of_g
 import sys
 from generic_utils import *
-import loxi_front_end.type_maps as type_maps
+import c_gen.type_maps as type_maps
 
 
 # Some number larger than small type values, but less then

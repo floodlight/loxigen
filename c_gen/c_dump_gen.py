@@ -34,12 +34,12 @@ Generates dump function files.
 
 import sys
 import of_g
-import loxi_front_end.match as match
-import loxi_front_end.flags as flags
+import c_gen.match as match
+import c_gen.flags as flags
 from generic_utils import *
-import loxi_front_end.type_maps as type_maps
-import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.identifiers as identifiers
+import c_gen.type_maps as type_maps
+import c_gen.loxi_utils_legacy as loxi_utils
+import c_gen.identifiers as identifiers
 from c_test_gen import var_name_map
 
 def gen_obj_dump_h(out, name):
