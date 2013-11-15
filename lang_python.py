@@ -66,6 +66,7 @@ import loxi_utils.loxi_utils as loxi_utils
 import py_gen
 import py_gen.util
 import py_gen.codegen
+import template_utils
 
 versions = {
     1: "of10",
@@ -102,8 +103,8 @@ for version, subdir in versions.items():
         filename = '%s/%s/%s.py' % (prefix, subdir, module)
         targets[filename] = make_gen(module, version)
 
-def generate():
+def generate(install_dir):
     py_gen.codegen.init()
     for (name, fn) in targets.items():
-        with loxi_utils.open_output(name) as outfile:
+        with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))

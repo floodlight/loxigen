@@ -41,6 +41,7 @@ import test_data
 from collections import namedtuple
 from import_cleaner import ImportCleaner
 
+import template_utils
 import loxi_utils.loxi_utils as loxi_utils
 
 import java_gen.java_model as java_model
@@ -86,7 +87,7 @@ class JavaGenerator(object):
         prefix = '//::(?=[ \t]|$)'
         print "filename: %s" % filename
         with open(filename, "w") as f:
-            loxi_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
+            template_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
 
         try:
             cleaner = ImportCleaner(filename)

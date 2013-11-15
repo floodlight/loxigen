@@ -29,6 +29,7 @@ from collections import namedtuple
 import struct
 import of_g
 import loxi_front_end.type_maps as type_maps
+import template_utils
 import loxi_utils.loxi_utils as utils
 import util
 import oftype

@@ -31,15 +31,16 @@ Utilities for generating the target Python code
 
 import os
 import of_g
+import template_utils
 import loxi_utils.loxi_utils as utils
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
 def render_template(out, name, **context):
-    utils.render_template(out, name, [templates_dir], context)
+    template_utils.render_template(out, name, [templates_dir], context)
 
 def render_static(out, name):
-    utils.render_static(out, name, [templates_dir])
+    template_utils.render_static(out, name, [templates_dir])
 
 def constant_for_value(version, group, value):
     enums = of_g.ir[version].enums
