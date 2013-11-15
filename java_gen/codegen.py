@@ -29,11 +29,12 @@
 @brief Main Java Generation module
 """
 
+import logging
 import pdb
 import os
 import shutil
 
-import of_g
+import loxi_globals
 from loxi_ir import *
 import lang_java
 import test_data
@@ -44,9 +45,11 @@ import loxi_utils.loxi_utils as loxi_utils
 
 import java_gen.java_model as java_model
 
-def gen_all_java():
-    basedir= '%s/openflowj' % of_g.options.install_dir
-    print "Outputting to %s" % basedir
+logger = logging.getLogger(__name__)
+
+def gen_all_java(install_dir):
+    basedir= '%s/openflowj' % install_dir
+    logger.info("Outputting to %s" % basedir)
     if os.path.exists(basedir):
         shutil.rmtree(basedir)
     os.makedirs(basedir)

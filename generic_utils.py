@@ -30,30 +30,10 @@
 
 Intended to be imported into another namespace
 """
-
+import logging
 import collections
 import functools
 import sys
-import of_g
-
-
-################################################################
-#
-# Configuration related
-#
-################################################################
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
 
 ################################################################
 #
@@ -63,18 +43,17 @@ def config_check(str, dictionary = of_g.code_gen_config):
 
 def debug(obj):
     """
-    Debug output to the current both the log file and debug output
-    @param out_str The stringified output to write
+    Legacy logging method. Delegate to logging.debug.
+    Use logging.debug directly in the future.S
     """
-    of_g.loxigen_dbg_file.write(str(obj) + "\n")
-    log(obj)
+    logging.debug(obj)
 
 def log(obj):
     """
-    Log output to the current global log file
-    @param out_str The stringified output to write
+    Legacy logging method. Delegate to logging.info.
+    Use logging.info directly in the future.S
     """
-    of_g.loxigen_log_file.write(str(obj) + "\n")
+    logging.info(obj)
 
 ################################################################
 #
