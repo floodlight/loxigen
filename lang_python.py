@@ -62,6 +62,8 @@ the const module directly into their namespace so the user can access
 """
 
 import os
+from loxi_globals import OFVersions
+import loxi_globals
 import loxi_utils.loxi_utils as loxi_utils
 import py_gen
 import py_gen.util
@@ -101,7 +103,7 @@ for version, subdir in versions.items():
     targets['%s/%s/__init__.py' % (prefix, subdir)] = make_gen('init', version)
     for module in modules[version]:
         filename = '%s/%s/%s.py' % (prefix, subdir, module)
-        targets[filename] = make_gen(module, version)
+        targets[filename] = make_gen(module, OFVersions.from_wire(version))
 
 def generate(install_dir):
     py_gen.codegen.init()

@@ -26,7 +26,8 @@
 :: # under the EPL.
 ::
 :: import itertools
-:: import of_g
+:: from loxi_globals import OFVersions
+:: import loxi_globals
 :: import py_gen.util as util
 :: import py_gen.oftype
 :: include('_copyright.py')
@@ -38,10 +39,10 @@ import loxi
 import const
 import common
 import action # for unpack_list
-:: if version >= 2:
+:: if version >= OFVersions.VERSION_1_1:
 import instruction # for unpack_list
 :: #endif
-:: if version >= 4:
+:: if version >= OFVersions.VERSION_1_3:
 import meter_band # for unpack_list
 :: #endif
 import util
@@ -132,9 +133,9 @@ def parse_error(buf):
         raise loxi.ProtocolError("unexpected error type %u" % err_type)
 
 def parse_flow_mod(buf):
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
 :: offset = 57
-:: elif version >= 2:
+:: elif version >= OFVersions.VERSION_1_1:
 :: offset = 25
 :: #endif
     if len(buf) < ${offset} + 1:
@@ -202,18 +203,18 @@ error_msg_parsers = {
     const.OFPET_FLOW_MOD_FAILED : flow_mod_failed_error_msg.unpack,
     const.OFPET_PORT_MOD_FAILED : port_mod_failed_error_msg.unpack,
     const.OFPET_QUEUE_OP_FAILED : queue_op_failed_error_msg.unpack,
-:: if version >= of_g.VERSION_1_1:
+:: if version >= OFVersions.VERSION_1_1:
     const.OFPET_BAD_INSTRUCTION : bad_instruction_error_msg.unpack,
     const.OFPET_BAD_MATCH : bad_match_error_msg.unpack,
     const.OFPET_GROUP_MOD_FAILED : group_mod_failed_error_msg.unpack,
     const.OFPET_TABLE_MOD_FAILED : table_mod_failed_error_msg.unpack,
     const.OFPET_SWITCH_CONFIG_FAILED : switch_config_failed_error_msg.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_2:
+:: if version >= OFVersions.VERSION_1_2:
     const.OFPET_ROLE_REQUEST_FAILED : role_request_failed_error_msg.unpack,
     const.OFPET_EXPERIMENTER : experimenter_error_msg.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_3:
+:: if version >= OFVersions.VERSION_1_3:
     const.OFPET_METER_MOD_FAILED : meter_mod_failed_error_msg.unpack,
     const.OFPET_TABLE_FEATURES_FAILED : table_features_failed_error_msg.unpack,
 :: #endif
@@ -234,14 +235,14 @@ stats_reply_parsers = {
     const.OFPST_TABLE : table_stats_reply.unpack,
     const.OFPST_PORT : port_stats_reply.unpack,
     const.OFPST_QUEUE : queue_stats_reply.unpack,
-:: if version >= of_g.VERSION_1_1:
+:: if version >= OFVersions.VERSION_1_1:
     const.OFPST_GROUP : group_stats_reply.unpack,
     const.OFPST_GROUP_DESC : group_desc_stats_reply.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_2:
+:: if version >= OFVersions.VERSION_1_2:
     const.OFPST_GROUP_FEATURES : group_features_stats_reply.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_3:
+:: if version >= OFVersions.VERSION_1_3:
     const.OFPST_METER : meter_stats_reply.unpack,
     const.OFPST_METER_CONFIG : meter_config_stats_reply.unpack,
     const.OFPST_METER_FEATURES : meter_features_stats_reply.unpack,
@@ -257,14 +258,14 @@ stats_request_parsers = {
     const.OFPST_TABLE : table_stats_request.unpack,
     const.OFPST_PORT : port_stats_request.unpack,
     const.OFPST_QUEUE : queue_stats_request.unpack,
-:: if version >= of_g.VERSION_1_1:
+:: if version >= OFVersions.VERSION_1_1:
     const.OFPST_GROUP : group_stats_request.unpack,
     const.OFPST_GROUP_DESC : group_desc_stats_request.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_2:
+:: if version >= OFVersions.VERSION_1_2:
     const.OFPST_GROUP_FEATURES : group_features_stats_request.unpack,
 :: #endif
-:: if version >= of_g.VERSION_1_3:
+:: if version >= OFVersions.VERSION_1_3:
     const.OFPST_METER : meter_stats_request.unpack,
     const.OFPST_METER_CONFIG : meter_config_stats_request.unpack,
     const.OFPST_METER_FEATURES : meter_features_stats_request.unpack,

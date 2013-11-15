@@ -30,7 +30,7 @@ Utilities for generating the target Python code
 """
 
 import os
-import of_g
+import loxi_globals
 import template_utils
 import loxi_utils.loxi_utils as utils
 
@@ -43,7 +43,7 @@ def render_static(out, name):
     template_utils.render_static(out, name, [templates_dir])
 
 def constant_for_value(version, group, value):
-    enums = of_g.ir[version].enums
+    enums = loxi_globals.ir[version].enums
     enum = [x for x in enums if x.name == group][0]
     for name, value2 in enum.values:
         if value == value2:

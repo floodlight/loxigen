@@ -26,7 +26,7 @@
 :: # under the EPL.
 ::
 :: include('_copyright.py')
-
+:: from loxi_globals import OFVersions
 :: include('_autogen.py')
 
 import loxi
@@ -52,7 +52,7 @@ def pretty_flags(v, flag_names):
         set_flags.append("%#x" % v)
     return '|'.join(set_flags) or '0'
 
-:: if version in [1,2]:
+:: if version in (OFVersions.VERSION_1_0, OFVersions.VERSION_1_1):
 def pretty_wildcards(v):
     if v == const.OFPFW_ALL:
         return 'OFPFW_ALL'
@@ -71,70 +71,70 @@ def pretty_port(v):
     return v
 
 def pack_port_no(value):
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
     return struct.pack("!H", value)
 :: else:
     return struct.pack("!L", value)
 :: #endif
 
 def unpack_port_no(reader):
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
     return reader.read("!H")[0]
 :: else:
     return reader.read("!L")[0]
 :: #endif
 
 def pack_fm_cmd(value):
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
     return struct.pack("!H", value)
 :: else:
     return struct.pack("!B", value)
 :: #endif
 
 def unpack_fm_cmd(reader):
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
     return reader.read("!H")[0]
 :: else:
     return reader.read("!B")[0]
 :: #endif
 
 def init_wc_bmap():
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return const.OFPFW_ALL
 :: else:
     return 0
 :: #endif
 
 def pack_wc_bmap(value):
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return struct.pack("!L", value)
 :: else:
     return struct.pack("!Q", value)
 :: #endif
 
 def unpack_wc_bmap(reader):
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return reader.read("!L")[0]
 :: else:
     return reader.read("!Q")[0]
 :: #endif
 
 def init_match_bmap():
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return const.OFPFW_ALL
 :: else:
     return 0
 :: #endif
 
 def pack_match_bmap(value):
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return struct.pack("!L", value)
 :: else:
     return struct.pack("!Q", value)
 :: #endif
 
 def unpack_match_bmap(reader):
-:: if version <= 2:
+:: if version <= OFVersions.VERSION_1_1:
     return reader.read("!L")[0]
 :: else:
     return reader.read("!Q")[0]

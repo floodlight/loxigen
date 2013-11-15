@@ -26,23 +26,23 @@
 :: # under the EPL.
 ::
 :: include('_copyright.py')
-
+:: from loxi_globals import OFVersions
 :: include('_autogen.py')
 
 import sys
 import struct
 import action
-:: if version >= 2:
+:: if version >= OFVersions.VERSION_1_1:
 import instruction # for unpack_list
 :: #endif
-:: if version >= 4:
+:: if version >= OFVersions.VERSION_1_3:
 import meter_band # for unpack_list
 :: #endif
 import const
 import util
 import loxi.generic_util
 
-:: if version >= 3:
+:: if version >= OFVersions.VERSION_1_2:
 import oxm
 :: #endif
 
@@ -94,13 +94,13 @@ def unpack_list_meter_stats(reader):
 
 :: #endfor
 
-:: if version == 1:
+:: if version == OFVersions.VERSION_1_0:
 match = match_v1
-:: elif version == 2:
+:: elif version == OFVersions.VERSION_1_1:
 match = match_v2
-:: elif version == 3:
+:: elif version == OFVersions.VERSION_1_2:
 match = match_v3
-:: elif version == 4:
+:: elif version == OFVersions.VERSION_1_3:
 :: # HACK
 match = match_v3
 :: #endif
