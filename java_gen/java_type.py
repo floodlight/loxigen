@@ -4,9 +4,9 @@ import re
 import subprocess
 import time
 
+import loxi_globals
 from generic_utils import memoize
 import loxi_utils.loxi_utils as loxi_utils
-import of_g
 
 def erase_type_annotation(class_name):
     m=re.match(r'(.*)<.*>', class_name)
@@ -145,7 +145,7 @@ class JType(object):
         ver = ANY if version is None else version.int_version
 
         if not "version" in arguments:
-            arguments["version"] = version.of_version
+            arguments["version"] = version.dotless_version
 
         def lookup(ver, pub_type):
             if (ver, pub_type) in self.ops:
@@ -609,12 +609,9 @@ exceptions = {
 @memoize
 def enum_java_types():
     enum_types = {}
-
-    for protocol in of_g.ir.values():
-        for enum in protocol.enums:
-            java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
-
-            enum_types[enum.name] = gen_enum_jtype(java_name, enum.is_bitmask)
+    for enum in loxi_globals.unified.enums:
+        java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
+        enum_types[enum.name] = gen_enum_jtype(java_name, enum.is_bitmask)
     return enum_types
 
 def make_match_field_jtype(sub_type_name="?"):

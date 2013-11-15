@@ -36,15 +36,16 @@ import pdb
 import re
 
 from generic_utils import find, memoize, OrderedSet, OrderedDefaultDict
-import of_g
+from loxi_globals import OFVersions
+import loxi_globals
 from loxi_ir import *
-import loxi_front_end.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
-import py_gen.util as py_utils
 import test_data
 
 import java_gen.java_type as java_type
 from java_gen.java_type import erase_type_annotation
+
+logger = logging.getLogger(__name__)
 
 class JavaModel(object):
     # registry for enums that should not be generated
@@ -227,26 +228,12 @@ class JavaModel(object):
     @property
     @memoize
     def versions(self):
-        return OrderedSet( JavaOFVersion(raw_version) for raw_version in of_g.target_version_list )
+        return OrderedSet( JavaOFVersion(ir_version) for ir_version in OFVersions.target_versions)
 
     @property
     @memoize
     def interfaces(self):
-        version_map_per_class = collections.OrderedDict()
-
-        for raw_version, of_protocol in of_g.ir.items():
-            jversion = JavaOFVersion(of_protocol.wire_version)
-
-            for of_class in of_protocol.classes:
-                if not of_class.name in version_map_per_class:
-                    version_map_per_class[of_class.name] = collections.OrderedDict()
-
-                version_map_per_class[of_class.name][jversion] = of_class
-
-        interfaces = []
-        for class_name, version_map in version_map_per_class.items():
-            interfaces.append(JavaOFInterface(class_name, version_map))
-
+        interfaces = [ JavaOFInterface(ir_class) for ir_class in loxi_globals.unified.classes ]
         interfaces = [ i for i in interfaces if i.name not in self.interface_blacklist ]
 
         return interfaces
@@ -266,7 +253,8 @@ class JavaModel(object):
         name_version_enum_map = OrderedDefaultDict(lambda: OrderedDict())
 
         for version in self.versions:
-            of_protocol = of_g.ir[version.int_version]
+            logger.info("version: {}".format(version.ir_version))
+            of_protocol = loxi_globals.ir[version.ir_version]
             for enum in of_protocol.enums:
                 name_version_enum_map[enum.name][version] = enum
 
@@ -321,7 +309,7 @@ class JavaModel(object):
                         factory.members.append(i)
                         break
         return factories.values()
-    
+
     @memoize
     def factory_of(self, interface):
         for factory in self.of_factories:
@@ -355,8 +343,8 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
     @property
     def factory_classes(self):
             return [ OFFactoryClass(
-                    package="org.projectfloodlight.openflow.protocol.ver{}".format(version.of_version),
-                    name="{}Ver{}".format(self.name, version.of_version),
+                    package="org.projectfloodlight.openflow.protocol.ver{}".format(version.dotless_version),
+                    name="{}Ver{}".format(self.name, version.dotless_version),
                     interface=self,
                     version=version
                     ) for version in model.versions ]
@@ -370,7 +358,7 @@ class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_p
             return "build" + n[0].upper() + n[1:]
         else:
             return n
-    
+
     def of_version(self, version):
         for fc in self.factory_classes:
             if fc.version == version:
@@ -400,30 +388,32 @@ model = JavaModel()
 class JavaOFVersion(object):
     """ Models a version of OpenFlow. contains methods to convert the internal
         Loxi version to a java constant / a string """
-    def __init__(self, int_version):
-        self.int_version = int(int_version)
+    def __init__(self, ir_version):
+        assert isinstance(ir_version, OFVersion)
+        self.ir_version = ir_version
+        self.int_version = self.ir_version.wire_version
 
     @property
-    def of_version(self):
-        return "1" + str(int(self.int_version) - 1)
+    def dotless_version(self):
+        return self.ir_version.version.replace(".", "")
 
     @property
     def constant_version(self):
-        return "OF_" + self.of_version
+        return "OF_" + self.dotless_version
 
     def __repr__(self):
         return "JavaOFVersion(%d)" % self.int_version
 
     def __str__(self):
-        return of_g.param_version_names[self.int_version]
+        return self.ir_version.version
 
     def __hash__(self):
-        return hash(self.int_version)
+        return hash(self.ir_version)
 
     def __eq__(self, other):
         if other is None or type(self) != type(other):
             return False
-        return (self.int_version,) == (other.int_version,)
+        return (self.ir_version,) == (other.ir_version,)
 
 #######################################################################
 ### Interface
@@ -433,20 +423,21 @@ class JavaOFInterface(object):
     """ Models an OpenFlow Message class for the purpose of the java class.
         Version agnostic, in contrast to the loxi_ir python model.
     """
-    def __init__(self, c_name, version_map):
+    def __init__(self, ir_class):
         """"
         @param c_name: loxi style name (e.g., of_flow_add)
         @param version_map map of { JavaOFVersion: OFClass (from loxi_ir) }
         """
-        self.c_name = c_name
-        self.version_map = version_map
+        self.ir_class = ir_class
+        self.c_name = ir_class.name
+        self.version_map = { JavaOFVersion(v): c for v,c in ir_class.version_classes.items() }
         # name: the Java Type name, e.g., OFFlowAdd
-        self.name = java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
+        self.name = java_type.name_c_to_caps_camel(self.c_name) if self.c_name != "of_header" else "OFMessage"
         # variable_name name to use for variables of this type. i.e., flowAdd
         self.variable_name = self.name[2].lower() + self.name[3:]
         self.title_name = self.variable_name[0].upper() + self.variable_name[1:]
         # name for use in constants: FLOW_ADD
-        self.constant_name = c_name.upper().replace("OF_", "")
+        self.constant_name = self.c_name.upper().replace("OF_", "")
 
         pck_suffix, parent_interface, self.type_annotation = self.class_info()
         self.package = "org.projectfloodlight.openflow.protocol.%s" % pck_suffix if pck_suffix else "org.projectfloodlight.openflow.protocol"
@@ -510,30 +501,32 @@ class JavaOFInterface(object):
         # inheritance information from the versioned lox_ir classes.
         if re.match(r'OFStatsRequest$', self.name):
             return ("", "OFMessage", "T extends OFStatsReply")
-        elif re.match(r'OF.+StatsRequest$', self.name):
+        elif self.ir_class.is_subclassof('of_stats_request'):
             return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
-        elif re.match(r'OF.+StatsReply$', self.name):
+        elif self.ir_class.is_subclassof('of_stats_reply'):
             return ("", "OFStatsReply", None)
-        elif re.match(r'OF.+ErrorMsg$', self.name):
+        elif self.ir_class.is_subclassof('of_error_msg'):
             return ("", "OFErrorMsg", None)
-        elif re.match(r'OFFlow(Add|Modify(Strict)?|Delete(Strict)?)$', self.name):
+        elif self.ir_class.is_subclassof('of_flow_mod'):
             return ("", "OFFlowMod", None)
-        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFBsn.+$', self.name) and self.name != "OFBsnHeader":
+        elif self.ir_class.is_subclassof('of_group_mod'):
+            return ("", "OFGroupMod", None)
+        elif self.ir_class.is_subclassof('of_bsn_header'):
             return ("", "OFBsnHeader", None)
-        elif loxi_utils.class_is_message(self.c_name) and re.match(r'OFNicira.+$', self.name) and self.name != "OFNiciraHeader":
+        elif self.ir_class.is_subclassof('of_nicira_header'):
             return ("", "OFNiciraHeader", None)
-        elif self.name == "OFBsnHeader" or self.name =="OFNiciraHeader":
+        elif self.ir_class.is_subclassof('of_experimenter'):
             return ("", "OFExperimenter", None)
         elif re.match(r'OFMatch.*', self.name):
             return ("", "Match", None)
-        elif loxi_utils.class_is_message(self.c_name):
+        elif self.ir_class.is_message:
             return ("", "OFMessage", None)
-        elif loxi_utils.class_is_action(self.c_name):
-            if re.match(r'OFActionBsn.+', self.name):
+        elif self.ir_class.is_action:
+            if self.ir_class.is_subclassof('of_action_bsn'):
                 return ("action", "OFActionBsn", None)
-            elif re.match(r'OFActionNicira.+', self.name):
+            elif self.ir_class.is_subclassof('of_action_nicira'):
                 return ("action", "OFActionNicira", None)
-            elif self.name == "OFActionBsn" or self.name == "OFActionNicira":
+            elif self.ir_class.is_subclassof('of_action_experimenter'):
                 return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
@@ -560,6 +553,7 @@ class JavaOFInterface(object):
             return ("", None, None)
 
     @property
+
     @memoize
     def writeable_members(self):
         return [ m for m in self.members if m.is_writeable ]
@@ -582,14 +576,30 @@ class JavaOFInterface(object):
         all_versions = []
         member_map = collections.OrderedDict()
 
+        member_version_map = {}
         for (version, of_class) in self.version_map.items():
             for of_member in of_class.members:
                 if isinstance(of_member, OFLengthMember) or \
                    isinstance(of_member, OFFieldLengthMember) or \
                    isinstance(of_member, OFPadMember):
                     continue
+                java_member = JavaMember.for_of_member(self, of_member)
                 if of_member.name not in member_map:
-                    member_map[of_member.name] = JavaMember.for_of_member(self, of_member)
+                    member_map[of_member.name] = java_member
+                    member_version_map[of_member.name] = version
+                else:
+                    existing = member_map[of_member.name]
+
+                    if existing.java_type.public_type != java_member.java_type.public_type:
+                        raise Exception(
+                             "Error constructing interface {}: type signatures do not match up between versions.\n"
+                             " Member Name: {}\n"
+                             " Existing: Version={}, Java={}, IR={}\n"
+                             " New:      Version={}, Java={}, IR={}"
+                               .format(self.name, existing.name,
+                                   member_version_map[of_member.name], existing.java_type.public_type, existing.member.oftype,
+                                   version, java_member.java_type.public_type, java_member.member.oftype)
+                        )
 
         return tuple(m for m in member_map.values() if m.name not in model.read_blacklist[self.name])
 
@@ -604,7 +614,7 @@ class JavaOFInterface(object):
                     JavaVirtualMember(self, "masked", java_type.boolean),
                     JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype("T"))
                    ]
-        elif self.parent_interface and self.parent_interface.startswith("OFOxm"):
+        elif self.ir_class.is_subclassof("of_oxm"):
             field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
                 if self.name in model.oxm_map \
                 else java_type.make_match_field_jtype()
@@ -616,7 +626,8 @@ class JavaOFInterface(object):
                             custom_template=lambda builder: "OFOxm{}_getCanonical.java".format(".Builder" if builder else "")),
                    ]
             if not find(lambda x: x.name == "mask", self.ir_model_members):
-                virtual_members.append(JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+                virtual_members.append(
+                        JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
 
         if not find(lambda m: m.name == "version", self.ir_model_members):
             virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
@@ -670,7 +681,7 @@ class JavaOFClass(object):
         self.c_name = self.ir_class.name
         self.version = version
         self.constant_name = self.c_name.upper().replace("OF_", "")
-        self.package = "org.projectfloodlight.openflow.protocol.ver%s" % version.of_version
+        self.package = "org.projectfloodlight.openflow.protocol.ver%s" % version.dotless_version
         self.generated = False
 
     @property
@@ -680,7 +691,7 @@ class JavaOFClass(object):
 
     @property
     def name(self):
-        return "%sVer%s" % (self.interface.name, self.version.of_version)
+        return "%sVer%s" % (self.interface.name, self.version.dotless_version)
 
     @property
     def variable_name(self):
@@ -696,22 +707,15 @@ class JavaOFClass(object):
     @property
     def min_length(self):
         """ @return the minimum wire length of an instance of this class in bytes """
-        id_tuple = (self.ir_class.name, self.version.int_version)
-        return of_g.base_length[id_tuple] if id_tuple in of_g.base_length else -1
+        return self.ir_class.base_length
 
     @property
     def is_fixed_length(self):
         """ true iff this class serializes to a fixed length on the wire """
-        return (self.ir_class.name, self.version.int_version) in of_g.is_fixed_length and \
-                not self.is_virtual
+        return self.ir_class.is_fixed_length and not self.is_virtual
 
     def all_properties(self):
         return self.interface.members
-
-    def get_member(self, name):
-        for m in self.members:
-            if m.name == name:
-                return m
 
     @property
     @memoize
@@ -802,7 +806,8 @@ class JavaOFClass(object):
     @property
     @memoize
     def subclasses(self):
-        return [ c for c in model.all_classes if c.version == self.version and c.ir_class.superclass == self.c_name ]
+        return [ c for c in model.all_classes if c.version == self.version and c.ir_class.superclass
+                   and c.ir_class.superclass.name == self.c_name ]
 
 #######################################################################
 ### Member
@@ -957,16 +962,8 @@ class JavaMember(object):
 
     @property
     def is_universal(self):
-        if not self.msg.c_name in of_g.unified:
-            print("%s not self.unified" % self.msg.c_name)
-            return False
-        for version in of_g.unified[self.msg.c_name]:
-            if version == 'union' or version =='object_id':
-                continue
-            if 'use_version' in of_g.unified[self.msg.c_name][version]:
-                continue
-
-            if not self.member.name in (f['name'] for f in of_g.unified[self.msg.c_name][version]['members']):
+        for version, ir_class in self.msg.ir_class.version_classes.items():
+            if not ir_class.member_by_name(self.member.name):
                 return False
         return True
 
@@ -1022,9 +1019,9 @@ class JavaVirtualMember(JavaMember):
 class JavaUnitTestSet(object):
     def __init__(self, java_class):
         self.java_class = java_class
-        first_data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+        first_data_file_name = "of{version}/{name}.data".format(version=java_class.version.dotless_version,
                                                      name=java_class.c_name[3:])
-        glob_file_name = "of{version}/{name}__*.data".format(version=java_class.version.of_version,
+        glob_file_name = "of{version}/{name}__*.data".format(version=java_class.version.dotless_version,
                                                      name=java_class.c_name[3:])
         test_class_name = self.java_class.name + "Test"
         self.test_units = []
@@ -1062,7 +1059,7 @@ class JavaUnitTest(object):
     def __init__(self, java_class, file_name=None, test_class_name=None):
         self.java_class = java_class
         if file_name is None:
-            self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.of_version,
+            self.data_file_name = "of{version}/{name}.data".format(version=java_class.version.dotless_version,
                                                          name=java_class.c_name[3:])
         else:
             self.data_file_name = file_name

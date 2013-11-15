@@ -28,7 +28,6 @@
 //:: from loxi_ir import *
 //:: import os
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -50,6 +49,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 
 //:: for prop in msg.data_members:
+    //:: if prop.java_type.public_type != msg.interface.member_by_name(prop.name).java_type.public_type:
+    //::    raise Exception("Interface and Class types do not match up: C: {} <-> I: {}".format(prop.java_type.public_type, msg.interface.member_by_name(prop.name).java_type.public_type))
+    //:: #endif
     //:: if prop.default_value:
         private final static ${prop.java_type.public_type} ${prop.default_name} = ${prop.default_value};
     //:: #endif
