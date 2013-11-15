@@ -147,6 +147,18 @@ def parse_flow_mod(buf):
     else:
         raise loxi.ProtocolError("unexpected flow mod cmd %u" % cmd)
 
+:: if version >= OFVersions.VERSION_1_0:
+def parse_group_mod(buf):
+:: offset = 8
+    if len(buf) < ${offset} + 2:
+        raise loxi.ProtocolError("message too short")
+    cmd, = struct.unpack_from("!H", buf, ${offset})
+    if cmd in flow_mod_parsers:
+        return group_mod_parsers[cmd](buf)
+    else:
+        raise loxi.ProtocolError("unexpected group mod cmd %u" % cmd)
+:: #endif
+
 def parse_stats_reply(buf):
     if len(buf) < 8 + 2:
         raise loxi.ProtocolError("message too short")
@@ -227,6 +239,14 @@ flow_mod_parsers = {
     const.OFPFC_DELETE : flow_delete.unpack,
     const.OFPFC_DELETE_STRICT : flow_delete_strict.unpack,
 }
+
+:: if version >= OFVersions.VERSION_1_1:
+group_mod_parsers = {
+    const.OFPGC_ADD : group_add.unpack,
+    const.OFPGC_MODIFY : group_modify.unpack,
+    const.OFPGC_DELETE : group_delete.unpack,
+}
+:: #endif
 
 stats_reply_parsers = {
     const.OFPST_DESC : desc_stats_reply.unpack,

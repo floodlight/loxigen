@@ -328,6 +328,8 @@ of_match = JType('Match') \
         .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
             write='$name.writeTo(bb)',
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
+group_mod_cmd = JType('OFGroupModCommand', 'short') \
+        .op(version=ANY, read="bb.readShort()", write="bb.writeShort($name)")
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
         .op(version=1, read="bb.readShort()", write="bb.writeShort($name)") \
         .op(version=ANY, read="bb.readByte()", write="bb.writeByte($name)")
@@ -603,6 +605,13 @@ exceptions = {
         'of_action_set_tp_src': { 'tp_port': transport_port },
         'of_action_set_vlan_pcp': { 'vlan_pcp': vlan_pcp },
         'of_action_set_vlan_vid': { 'vlan_vid': vlan_vid },
+
+        'of_group_mod' : { 'command' : group_mod_cmd },
+        'of_group_add' : { 'command' : group_mod_cmd },
+        'of_group_modify' : { 'command' : group_mod_cmd },
+        'of_group_delete' : { 'command' : group_mod_cmd },
+
+        'of_bucket' : { 'watch_group': of_group },
 }
 
 
