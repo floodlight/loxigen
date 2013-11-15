@@ -26,6 +26,7 @@
 # under the EPL.
 
 from loxi_ir import *
+from collections import OrderedDict
 
 #######################################################################
 ### OFVersion registry
@@ -69,4 +70,4 @@ class OFVersions:
 #######################################################################
 
 # map OFVersion -> OFProtocol
-ir = {}
+ir = OrderedDict()

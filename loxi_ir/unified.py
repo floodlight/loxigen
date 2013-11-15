@@ -153,3 +153,4 @@ def build_unified_ir(name_protocol_map):
     unified = ir.OFProtocol(version=None, classes = tuple(unified_classes.values()), enums=unified_enums)
     for e in chain(unified.classes, unified.enums):
         e.protocol = unified
+    return unified
