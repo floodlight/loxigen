@@ -156,7 +156,7 @@ def class_is_virtual(cls):
     if loxi_utils.class_is_list(cls):
         return True
     # TODO get this from the input file when we have virtual class syntax
-    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira"]:
+    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira", "of_bsn_stats_request", "of_bsn_stats_reply", "of_experimenter_stats_request", "of_experimenter_stats_reply"]:
         return True
     return False
 
@@ -267,7 +267,8 @@ stats_types = {
         meter_features = 11,
         table_features = 12,
         port_desc = 13,
-        experimenter = 0xffff
+        experimenter = 0xffff,
+        bsn_lacp = 0xffff
         )
     }
 
@@ -452,7 +453,9 @@ stats_reply_list = [
     "of_port_desc_stats_reply",
     "of_queue_stats_reply",
     "of_table_stats_reply",
-    "of_table_features_stats_reply"
+    "of_table_features_stats_reply",
+    "of_bsn_stats_reply",
+    "of_bsn_lacp_stats_reply",
 ]
 
 stats_request_list = [
@@ -470,7 +473,9 @@ stats_request_list = [
     "of_port_desc_stats_request",
     "of_queue_stats_request",
     "of_table_stats_request",
-    "of_table_features_stats_request"
+    "of_table_features_stats_request",
+    "of_bsn_stats_request",
+    "of_bsn_lacp_stats_request",
 ]
 
 flow_mod_list = [

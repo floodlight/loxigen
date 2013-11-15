@@ -177,6 +177,30 @@ def parse_stats_request(buf):
     else:
         raise loxi.ProtocolError("unexpected stats type %u" % stats_type)
 
+def parse_experimenter_stats_request(buf):
+    if len(buf) < 24:
+        raise loxi.ProtocolError("experimenter stats request message too short")
+
+    experimenter, exp_type = struct.unpack_from("!LL", buf, 16)
+
+    if experimenter in experimenter_stats_request_parsers and \
+            exp_type in experimenter_stats_request_parsers[experimenter]:
+        return experimenter_stats_request_parsers[experimenter][exp_type](buf)
+    else:
+        raise loxi.ProtocolError("unexpected stats request experimenter %#x exp_type %#x" % (experimenter, exp_type))
+
+def parse_experimenter_stats_reply(buf):
+    if len(buf) < 24:
+        raise loxi.ProtocolError("experimenter stats reply message too short")
+
+    experimenter, exp_type = struct.unpack_from("!LL", buf, 16)
+
+    if experimenter in experimenter_stats_reply_parsers and \
+            exp_type in experimenter_stats_reply_parsers[experimenter]:
+        return experimenter_stats_reply_parsers[experimenter][exp_type](buf)
+    else:
+        raise loxi.ProtocolError("unexpected stats reply experimenter %#x exp_type %#x" % (experimenter, exp_type))
+
 def parse_experimenter(buf):
     if len(buf) < 16:
         raise loxi.ProtocolError("experimenter message too short")
@@ -255,6 +279,7 @@ stats_reply_parsers = {
     const.OFPST_TABLE : table_stats_reply.unpack,
     const.OFPST_PORT : port_stats_reply.unpack,
     const.OFPST_QUEUE : queue_stats_reply.unpack,
+    const.OFPST_EXPERIMENTER : parse_experimenter_stats_reply,
 :: if version >= OFVersions.VERSION_1_1:
     const.OFPST_GROUP : group_stats_reply.unpack,
     const.OFPST_GROUP_DESC : group_desc_stats_reply.unpack,
@@ -278,6 +303,7 @@ stats_request_parsers = {
     const.OFPST_TABLE : table_stats_request.unpack,
     const.OFPST_PORT : port_stats_request.unpack,
     const.OFPST_QUEUE : queue_stats_request.unpack,
+    const.OFPST_EXPERIMENTER : parse_experimenter_stats_request,
 :: if version >= OFVersions.VERSION_1_1:
     const.OFPST_GROUP : group_stats_request.unpack,
     const.OFPST_GROUP_DESC : group_desc_stats_request.unpack,
@@ -306,4 +332,20 @@ experimenter_parsers = {
 :: #endfor
     },
 :: #endfor
+}
+
+experimenter_stats_request_parsers = {
+    0x005c16c7: {
+:: if version >= OFVersions.VERSION_1_3:
+        1: bsn_lacp_stats_request.unpack,
+:: #endif
+    },
+}
+
+experimenter_stats_reply_parsers = {
+    0x005c16c7: {
+:: if version >= OFVersions.VERSION_1_3:
+        1: bsn_lacp_stats_reply.unpack,
+:: #endif
+    },
 }

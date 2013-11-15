@@ -424,7 +424,7 @@ def populate_type_maps():
 
             # Extensions
             experimenter = find_experimenter('of', cls)
-            if experimenter:
+            if experimenter and ofclass.is_subclassof("of_experimenter"):
                 val = find_type_value(ofclass, 'subtype')
                 type_maps.extension_message_subtype[wire_version][experimenter][cls] = val
 

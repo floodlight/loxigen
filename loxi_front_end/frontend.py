@@ -114,8 +114,4 @@ def create_ofinput(filename, ast):
     if not ofinput.wire_versions:
         raise InputError("Missing #version metadata")
 
-    for used_enum in ctx.used_enums:
-        if not find(lambda e: e.name == used_enum, ofinput.enums):
-            raise Exception("Undeclared enum used in OFInput: {}".format(used_enum))
-
     return ofinput

@@ -111,7 +111,7 @@ def process_input_file(filename):
 
     # Create the OFInput from the AST
     try:
-        ofinput = frontend.create_ofinput(filename, ast)
+        ofinput = frontend.create_ofinput(os.path.basename(filename), ast)
     except frontend.InputError as e:
         print "Error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
@@ -131,6 +131,8 @@ def read_input():
     # Ignore emacs backup files
     filenames = [x for x in filenames if not x.endswith('~')]
 
+    # Read input files
+    all_ofinputs = []
     for filename in filenames:
         log("Processing struct file: " + filename)
         ofinput = process_input_file(filename)

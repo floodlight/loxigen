@@ -61,7 +61,11 @@ class JavaModel(object):
     interface_blacklist = set( ("OFUint8", "OFUint32",))
     # registry of interface properties that should not be generated
     # map: $java_type -> set(java_name_property)
-    read_blacklist = defaultdict(lambda: set(), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    read_blacklist = defaultdict(lambda: set(),
+        OFExperimenter=set(('data','subtype')),
+        OFActionExperimenter=set(('data',)),
+        OFExperimenterStatsRequest=set(('data','subtype')),
+        OFExperimenterStatsReply=set(('data','subtype')))
     # map: $java_type -> set(java_name_property)
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
     # interfaces that are virtual
@@ -502,9 +506,19 @@ class JavaOFInterface(object):
         if re.match(r'OFStatsRequest$', self.name):
             return ("", "OFMessage", "T extends OFStatsReply")
         elif self.ir_class.is_subclassof('of_stats_request'):
-            return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
+            if self.ir_class.is_subclassof('of_bsn_stats_request'):
+                return ("", "OFBsnStatsRequest", None)
+            elif self.ir_class.is_subclassof('of_experimenter_stats_request'):
+                return ("", "OFExperimenterStatsRequest", None)
+            else:
+                return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
         elif self.ir_class.is_subclassof('of_stats_reply'):
-            return ("", "OFStatsReply", None)
+            if self.ir_class.is_subclassof('of_bsn_stats_reply'):
+                return ("", "OFBsnStatsReply", None)
+            elif self.ir_class.is_subclassof('of_experimenter_stats_reply'):
+                return ("", "OFExperimenterStatsReply", None)
+            else:
+                return ("", "OFStatsReply", None)
         elif self.ir_class.is_subclassof('of_error_msg'):
             return ("", "OFErrorMsg", None)
         elif self.ir_class.is_subclassof('of_flow_mod'):
