@@ -44,7 +44,7 @@ import sys
 def debug(obj):
     """
     Legacy logging method. Delegate to logging.debug.
-    Use logging.debug directly in the future.S
+    Use logging.debug directly in the future.
     """
     logging.debug(obj)
 

@@ -172,7 +172,7 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
         if self.is_fixed_length:
             return self.base_length
         else:
-            raise Exception("Not a fixed length class: {}".self.name)
+            raise Exception("Not a fixed length class: {}".format(self.name))
 
 """ one class unified across openflow versions. Keeps around a map version->versioned_class """
 class OFUnifiedClass(OFClass):
