@@ -38,6 +38,9 @@ package ${msg.package};
 //:: include("_imports.java", msg=msg)
 
 class ${impl_class} implements ${msg.interface.inherited_declaration()} {
+//:: if genopts.instrument:
+    private static final Logger logger = LoggerFactory.getLogger(${impl_class}.class);
+//:: #endif
     // version: ${version}
     final static byte WIRE_VERSION = ${version.int_version};
 //:: if msg.is_fixed_length:
@@ -216,6 +219,10 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 bb.readerIndex(start);
                 return null;
             }
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - length={}", ${prop.name});
+            //:: #endif
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
             ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
@@ -242,11 +249,20 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: if os.path.exists("%s/custom/%s.Reader_normalize_stanza.java" % (template_dir, msg.name)):
             //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
             //:: #endif
-             return new ${impl_class}(
+            ${impl_class} ${msg.variable_name} = new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
                     );
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - read={}", ${msg.variable_name});
+            //:: #endif
+            return ${msg.variable_name};
             //:: else:
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - returning shared instance={}", INSTANCE);
+            //:: #endif
             return INSTANCE;
             //:: #endif
         }

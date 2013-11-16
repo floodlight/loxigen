@@ -358,9 +358,11 @@ eth_type = JType("EthType")\
             write="$name.write2Bytes(bb)",
             default="EthType.NONE")
 vlan_vid = JType("VlanVid")\
-        .op(version=1, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
-        .op(version=2, read="VlanVid.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="VlanVid.NONE") \
-        .op(version=ANY, read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="VlanVid.NONE")
+        .op(version=ANY, read="VlanVid.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="VlanVid.ZERO")
+vlan_vid_match = JType("OFVlanVidMatch")\
+        .op(version=1, read="OFVlanVidMatch.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="OFVlanVidMatch.NONE") \
+        .op(version=2, read="OFVlanVidMatch.read2BytesOF10(bb)", write="$name.write2BytesOF10(bb)", default="OFVlanVidMatch.NONE") \
+        .op(version=ANY, read="OFVlanVidMatch.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFVlanVidMatch.NONE")
 vlan_pcp = JType("VlanPcp")\
         .op(read="VlanPcp.readByte(bb)",
             write="$name.writeByte(bb)",
@@ -523,8 +525,8 @@ exceptions = {
         'of_oxm_sctp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
         'of_oxm_eth_type' : { 'value' : eth_type },
         'of_oxm_eth_type_masked' : { 'value' : eth_type, 'value_mask' : eth_type },
-        'of_oxm_vlan_vid' : { 'value' : vlan_vid },
-        'of_oxm_vlan_vid_masked' : { 'value' : vlan_vid, 'value_mask' : vlan_vid },
+        'of_oxm_vlan_vid' : { 'value' : vlan_vid_match },
+        'of_oxm_vlan_vid_masked' : { 'value' : vlan_vid_match, 'value_mask' : vlan_vid_match },
         'of_oxm_vlan_pcp' : { 'value' : vlan_pcp },
         'of_oxm_vlan_pcp_masked' : { 'value' : vlan_pcp, 'value_mask' : vlan_pcp },
         'of_oxm_ip_dscp' : { 'value' : ip_dscp },
@@ -579,7 +581,7 @@ exceptions = {
         'of_oxm_bsn_l3_dst_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
-        'of_match_v1': { 'vlan_vid' : vlan_vid, 'vlan_pcp': vlan_pcp,
+        'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
                 'tcp_src': transport_port, 'tcp_dst': transport_port,
                 'in_port': of_port_match_v1
@@ -588,6 +590,19 @@ exceptions = {
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
         'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
         'of_flow_stats_request': { 'out_group': of_group_default_any },
+
+        'of_action_bsn_mirror': { 'dest_port': of_port },
+        'of_action_push_mpls': { 'ethertype': eth_type },
+        'of_action_push_pbb': { 'ethertype': eth_type },
+        'of_action_push_vlan': { 'ethertype': eth_type },
+        'of_action_set_nw_dst': { 'nw_addr': ipv4 },
+        'of_action_set_nw_ecn': { 'nw_ecn': ip_ecn },
+        'of_action_set_nw_src': { 'nw_addr': ipv4 },
+        'of_action_set_nw_dst': { 'tp_port': transport_port },
+        'of_action_set_tp_dst': { 'tp_port': transport_port },
+        'of_action_set_tp_src': { 'tp_port': transport_port },
+        'of_action_set_vlan_pcp': { 'vlan_pcp': vlan_pcp },
+        'of_action_set_vlan_vid': { 'vlan_vid': vlan_vid },
 }
 
 
@@ -605,6 +620,8 @@ def enum_java_types():
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
+def make_oxm_jtype(sub_type_name="?"):
+    return JType("OFOxm<{}>".format(sub_type_name))
 
 def list_cname_to_java_name(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
@@ -612,7 +629,6 @@ def list_cname_to_java_name(c_type):
         raise Exception("Not a recgonized standard list type declaration: %s" % c_type)
     base_name = m.group(1)
     return "OF" + name_c_to_caps_camel(base_name)
-
 
 #### main entry point for conversion of LOXI types (c_types) Java types.
 # FIXME: This badly needs a refactoring

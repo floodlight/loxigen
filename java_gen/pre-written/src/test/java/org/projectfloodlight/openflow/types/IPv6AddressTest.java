@@ -2,15 +2,19 @@ package org.projectfloodlight.openflow.types;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import org.hamcrest.CoreMatchers;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+
+import com.google.common.io.BaseEncoding;
 
 public class IPv6AddressTest {
 
@@ -21,61 +25,63 @@ public class IPv6AddressTest {
             "1:2:3:4:5:6:7:8"
     };
 
-    String[] ipsWithMask = {
-                            "1::1/80",
-                            "1:2:3:4::/ffff:ffff:ffff:ff00::",
-                            "ffff:ffee:1::/ff00:ff00:ff00:ff00::",
-                            "8:8:8:8:8:8:8:8",
-    };
 
-    byte[][] masks = {
-                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
-                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
-                                 (byte)0xff, (byte)0xff, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0xff, (byte)0xff, (byte)0xff, (byte)0xff,
-                                 (byte)0xff, (byte)0xff, (byte)0xff, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00,
-                                 (byte)0xff, (byte)0x00, (byte)0xff, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 },
-                    new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
-                                 (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 }
-    };
+    private final BaseEncoding hex = BaseEncoding.base16().omitPadding().lowerCase();
 
-    boolean[] hasMask = {
-                         true,
-                         true,
-                         true,
-                         false
+    private class WithMaskTaskCase {
+        final String input;
+        boolean hasMask;
+        byte[] expectedMask = hex.decode("ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff".replaceAll(" ", ""));
+
+        public WithMaskTaskCase(String input) {
+            super();
+            this.input = input;
+        }
+
+        public WithMaskTaskCase maskHex(String string) {
+            string = string.replaceAll(" ", "");
+            this.hasMask = true;
+            expectedMask = hex.decode(string);
+            return this;
+        }
+
+    }
+
+    WithMaskTaskCase[] withMasks = new WithMaskTaskCase[] {
+            new WithMaskTaskCase("1::1/80")
+                .maskHex("ff ff ff ff ff ff ff ff ff ff 00 00 00 00 00 00"),
+
+            new WithMaskTaskCase("ffff:ffee:1::/ff00:ff00:ff00:ff00::")
+                .maskHex("ff 00 ff 00 ff 00 ff 00 00 00 00 00 00 00 00 00"),
+            new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
+            new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
+            new WithMaskTaskCase("1:2:3:4:5:6:7:8/128"),
+            new WithMaskTaskCase("::/0")
+                .maskHex("00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
     };
 
     @Test
     public void testMasked() throws UnknownHostException {
-        for(int i=0; i < ipsWithMask.length; i++ ) {
-            IPv6AddressWithMask value = IPv6AddressWithMask.of(ipsWithMask[i]);
-            if (!hasMask[i]) {
+        for(WithMaskTaskCase w: withMasks) {
+            IPv6AddressWithMask value = IPv6AddressWithMask.of(w.input);
+            if (!w.hasMask) {
                 IPv6Address ip = value.getValue();
-                InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i]);
+                InetAddress inetAddress = InetAddress.getByName(w.input.split("/")[0]);
 
                 assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
-                assertEquals(ipsWithMask[i], ip.toString());
-            } else if (value instanceof IPv6AddressWithMask && hasMask[i]) {
-                InetAddress inetAddress = InetAddress.getByName(ipsWithMask[i].substring(0, ipsWithMask[i].indexOf('/')));
+                assertEquals(w.input.split("/")[0], ip.toString());
+            } else {
+                InetAddress inetAddress = InetAddress.getByName(w.input.substring(0, w.input.indexOf('/')));
 
                 byte[] address = inetAddress.getAddress();
                 assertEquals(address.length, value.getValue().getBytes().length);
 
                 for (int j = 0; j < address.length; j++) {
-                    address[j] &= masks[i][j];
+                    address[j] &= w.expectedMask[j];
                 }
 
-                assertArrayEquals(value.getValue().getBytes(), address);
-                assertArrayEquals(masks[i], value.getMask().getBytes());
+                assertThat("Address bytes for input " + w.input + ", value=" + value, value.getValue().getBytes(), CoreMatchers.equalTo(address));
+                assertThat("mask check for input " + w.input + ", value=" + value, value.getMask().getBytes(), CoreMatchers.equalTo(w.expectedMask));
             }
         }
     }

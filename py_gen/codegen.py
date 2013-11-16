@@ -34,6 +34,8 @@ import util
 import oftype
 from loxi_ir import *
 
+ofclasses_by_version = {}
+
 PyOFClass = namedtuple('PyOFClass', ['name', 'pyname', 'members', 'type_members',
                                      'min_length', 'is_fixed_length',
                                      'has_internal_alignment', 'has_external_alignment'])
@@ -99,17 +101,17 @@ def generate_init(out, name, version):
     util.render_template(out, 'init.py', version=version)
 
 def generate_action(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if utils.class_is_action(x.name)]
     util.render_template(out, 'action.py', ofclasses=ofclasses, version=version)
 
 def generate_oxm(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if utils.class_is_oxm(x.name)]
     util.render_template(out, 'oxm.py', ofclasses=ofclasses, version=version)
 
 def generate_common(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if not utils.class_is_message(x.name)
                     and not utils.class_is_action(x.name)
                     and not utils.class_is_instruction(x.name)
@@ -123,17 +125,17 @@ def generate_const(out, name, version):
                          enums=of_g.ir[version].enums)
 
 def generate_instruction(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if utils.class_is_instruction(x.name)]
     util.render_template(out, 'instruction.py', ofclasses=ofclasses, version=version)
 
 def generate_message(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if utils.class_is_message(x.name)]
     util.render_template(out, 'message.py', ofclasses=ofclasses, version=version)
 
 def generate_meter_band(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
+    ofclasses = [x for x in ofclasses_by_version[version]
                  if utils.class_is_meter_band(x.name)]
     util.render_template(out, 'meter_band.py', ofclasses=ofclasses, version=version)
 
@@ -142,3 +144,7 @@ def generate_pp(out, name, version):
 
 def generate_util(out, name, version):
     util.render_template(out, 'util.py', version=version)
+
+def init():
+    for version in of_g.supported_wire_protos:
+        ofclasses_by_version[version] = build_ofclasses(version)

@@ -62,7 +62,7 @@ def create_member(m_ast, ctx):
     else:
         raise InputError("Dont know how to create member: %s" % m_ast[0])
 
-def create_ofinput(ast):
+def create_ofinput(name, ast):
 
     """
     Create an OFInput from an AST
@@ -72,7 +72,7 @@ def create_ofinput(ast):
     @returns An OFInput object
     """
     ctx = FrontendCtx(set())
-    ofinput = OFInput(wire_versions=set(), classes=[], enums=[])
+    ofinput = OFInput(name, wire_versions=set(), classes=[], enums=[])
 
     for decl_ast in ast:
         if decl_ast[0] == 'struct':
@@ -114,9 +114,5 @@ def create_ofinput(ast):
 
     if not ofinput.wire_versions:
         raise InputError("Missing #version metadata")
-
-    for used_enum in ctx.used_enums:
-        if not find(lambda e: e.name == used_enum, ofinput.enums):
-            raise Exception("Undeclared enum used in OFInput: {}".format(used_enum))
 
     return ofinput

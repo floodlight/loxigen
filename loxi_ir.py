@@ -47,11 +47,12 @@ __all__ = [
 """
 One input file
 
+@param name Name of the input file
 @param wire_versions Set of integer wire versions this file applies to
 @param classes List of OFClass objects in the same order as in the file
 @param enums List of Enum objects in the same order as in the file
 """
-OFInput = namedtuple('OFInput', ['wire_versions', 'classes', 'enums'])
+OFInput = namedtuple('OFInput', ['name', 'wire_versions', 'classes', 'enums'])
 
 """
 One version of the OpenFlow protocol

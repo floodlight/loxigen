@@ -332,7 +332,7 @@ def process_input_file(filename):
 
     # Create the OFInput from the AST
     try:
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput(os.path.basename(filename), ast)
     except frontend.InputError as e:
         print "Error in %s: %s" % (os.path.basename(filename), str(e))
         sys.exit(1)
@@ -417,13 +417,35 @@ def read_input():
     # Ignore emacs backup files
     filenames = [x for x in filenames if not x.endswith('~')]
 
+    # Read input files
+    all_ofinputs = []
     for filename in filenames:
         log("Processing struct file: " + filename)
         ofinput = process_input_file(filename)
-
-        # Populate global state
+        all_ofinputs.append(ofinput)
         for wire_version in ofinput.wire_versions:
             ofinputs_by_version[wire_version].append(ofinput)
+
+    # Merge input files into per-version IR
+    for wire_version, ofinputs in ofinputs_by_version.items():
+        ofprotocol = OFProtocol(wire_version=wire_version, classes=[], enums=[])
+        for ofinput in ofinputs:
+            ofprotocol.classes.extend(ofinput.classes)
+            ofprotocol.enums.extend(ofinput.enums)
+        ofprotocol.classes.sort(key=lambda ofclass: ofclass.name)
+        of_g.ir[wire_version] = ofprotocol
+
+    # Extract enums
+    # An input file can refer to an enum in another file
+    enums_by_version = { ver: {} for ver in ofinputs_by_version }
+    for ofinput in all_ofinputs:
+        for wire_version in ofinput.wire_versions:
+            for enum in ofinput.enums:
+                enums_by_version[wire_version][enum.name] = enum
+
+    # Populate legacy maps
+    for ofinput in all_ofinputs:
+        for wire_version in ofinput.wire_versions:
             version_name = of_g.of_version_wire2name[wire_version]
 
             for ofclass in ofinput.classes:
@@ -442,7 +464,7 @@ def read_input():
                         if m.oftype == 'of_oxm_t':
                             m_type = 'of_octets_t'
                         else:
-                            enum = find(lambda e: e.name == m.oftype, ofinput.enums)
+                            enum = enums_by_version[wire_version].get(m.oftype)
                             if enum and "wire_type" in enum.params:
                                 m_type = enum.params["wire_type"]
                             else:
@@ -456,14 +478,6 @@ def read_input():
                         translation.loxi_name(entry.name),
                         entry.name, enum.name, entry.value, wire_version,
                         of_g.identifiers, of_g.identifiers_by_group)
-
-        for wire_version, ofinputs in ofinputs_by_version.items():
-            ofprotocol = OFProtocol(wire_version=wire_version, classes=[], enums=[])
-            for ofinput in ofinputs:
-                ofprotocol.classes.extend(ofinput.classes)
-                ofprotocol.enums.extend(ofinput.enums)
-            ofprotocol.classes.sort(key=lambda ofclass: ofclass.name)
-            of_g.ir[wire_version] = ofprotocol
 
 def populate_type_maps():
     """
@@ -535,7 +549,7 @@ def populate_type_maps():
 
             # Extensions
             experimenter = find_experimenter('of', cls)
-            if experimenter:
+            if experimenter and ofclass.superclass in ['of_bsn_header', 'of_nicira_header']:
                 val = find_type_value(ofclass, 'subtype')
                 type_maps.extension_message_subtype[wire_version][experimenter][cls] = val
 
@@ -630,12 +644,7 @@ def generate_all_files():
     """
     Create the files for the language target
     """
-    for (name, fn) in lang_module.targets.items():
-        path = of_g.options.install_dir + '/' + name
-        os.system("mkdir -p %s" % os.path.dirname(path))
-        with open(path, "w") as outfile:
-            fn(outfile, os.path.basename(name))
-        print("Wrote contents for " + name)
+    lang_module.generate()
 
 if __name__ == '__main__':
     of_g.loxigen_log_file = open("loxigen.log", "w")

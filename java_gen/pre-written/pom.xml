@@ -10,7 +10,7 @@
 
     <groupId>org.projectfloodlight</groupId>
     <artifactId>openflowj</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>OpenFlowJ-Loxi</name>
@@ -54,6 +54,11 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.5</version>
         </dependency>
     </dependencies>
     <build>

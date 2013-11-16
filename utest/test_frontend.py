@@ -109,7 +109,7 @@ struct of_packet_queue {
         ]
         self.assertEquals(expected_ast, ast)
 
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput("test", ast)
         self.assertEquals(set([1, 2]), ofinput.wire_versions)
         expected_classes = [
             OFClass(name='of_echo_reply', superclass=None, members=[
@@ -180,7 +180,7 @@ struct of_queue_prop_min_rate : of_queue_prop {
         ]
         self.assertEquals(expected_ast, ast)
 
-        ofinput = frontend.create_ofinput(ast)
+        ofinput = frontend.create_ofinput("test", ast)
         expected_classes = [
             OFClass(name='of_queue_prop', superclass=None, members=[
                 OFDiscriminatorMember('type', 'uint16_t'),

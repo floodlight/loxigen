@@ -62,6 +62,7 @@
             case IPV6_SRC:
             case IPV6_DST:
             case IPV6_FLABEL:
+            case BSN_IN_PORTS_128:
                 return true;
             default:
                 return false;
@@ -106,4 +107,32 @@
         OFOxm<?> oxm = this.oxmList.get(field);
 
         return oxm != null && oxm.isMasked();
+    }
+
+    private class MatchFieldIterator extends UnmodifiableIterator<MatchField<?>> {
+        private Iterator<OFOxm<?>> oxmIterator;
+
+        MatchFieldIterator() {
+            oxmIterator = oxmList.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return oxmIterator.hasNext();
+        }
+
+        @Override
+        public MatchField<?> next() {
+            OFOxm<?> next = oxmIterator.next();
+            return next.getMatchField();
+        }
+    }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        return new Iterable<MatchField<?>>() {
+            public Iterator<MatchField<?>> iterator() {
+                return new MatchFieldIterator();
+            }
+        };
     }
