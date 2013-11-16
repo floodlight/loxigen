@@ -53,14 +53,14 @@ def build_unified_ir(name_protocol_map):
                         self.members[v_member.name] = v_member
                     else:
                         if not type(self.members[v_member.name]) == type(v_member):
-                            raise Exception("Error unifying ir class {} - adding version: member_type {} <-> {}".format(
-                                    self.name, v_class.protocol.version, unified_members[v_member.name], v_member))
+                            raise Exception("Error unifying ir class {} - adding version: {} - member_type {} <-> {}".format(
+                                    self.name, v_class.protocol.version, self.members[v_member.name], v_member))
 
             if not self.superclass_set:
                 self.superclass_name = v_class.superclass.name if v_class.superclass else None
             else:
                 if self.superclass_name != v_class.superclass_name:
-                    raise Exception("Error unifying ir class {} - superclass: param {} <-> {}".format(
+                    raise Exception("Error unifying ir class {} - adding version {} - superclass: param {} <-> {}".format(
                             self.name, v_class.protocol.version, self.superclass_name, v_class.superclass_name))
 
             for name, value in v_class.params.items():
@@ -68,7 +68,7 @@ def build_unified_ir(name_protocol_map):
                     self.params[name] = value
                 else:
                     if self.params[name] != value:
-                        raise Exception("Error unifying ir class {} - adding version: param {} <-> {}".format(
+                        raise Exception("Error unifying ir class {} - adding version: {} - param {} <-> {}".format(
                                 self.name, v_class.protocol.version, self.params[name], value))
 
             if v_class.virtual:

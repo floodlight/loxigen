@@ -190,7 +190,3 @@ def member_length(version, fe_class, fe_member, existing_classes, existing_enums
             raise Exception("Unknown type for {}.{}: {}".format(fe_class.name, fe_member.name, base_type))
 
     return (count * bytes), length_fixed
-
-def calculate_offsets_and_lengths(protocol):
-    for ir_class in protocol.classes:
-        offset_and_length_for_class(ir_class)

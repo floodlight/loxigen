@@ -183,7 +183,7 @@ class OFUnifiedClass(OFClass):
         super(OFUnifiedClass, self).__init__(*a, **kw)
         self.version_classes = version_classes
 
-    def class_by_version(version):
+    def class_by_version(self, version):
         return self.version_classes[version]
 
 
