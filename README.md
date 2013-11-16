@@ -3,8 +3,8 @@ Introduction
 
 LoxiGen is a tool that generates OpenFlow protocol libraries for a number of
 languages. It is composed of a frontend that parses wire protocol descriptions
-and a backend for each supported language (currently C and Python, with Java on
-the way).
+and a backend for each supported language (currently C, Python, and Java, with an 
+auto-generated wireshark dissector in Lua on the way). 
 
 Prerequisites
 =============
@@ -45,7 +45,9 @@ To generate the library for a single language:
 make c
 ```
 
-The currently supported languages are `c` and `python`.
+The currently supported languages are `c`, `python` and `java`. There is an 
+experimental/partially completed backend that generates a lua wireshark dissector
+(`wireshark`).
 
 The generated libraries will be under the `loxi_output` directory. This can be
 changed with the `LOXI_OUTPUT_DIR` environment variable when using the Makefile.
