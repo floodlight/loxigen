@@ -28,11 +28,9 @@
 from generic_utils import find
 from collections import namedtuple
 
-# This module is intended to be imported like this: from loxi_ir import *
-# All public names are prefixed with 'OF'.
+# This module is represents the frontend IR.
 __all__ = [
     'OFInput',
-    'OFProtocol',
     'OFClass',
     'OFDataMember',
     'OFTypeMember',
@@ -47,28 +45,11 @@ __all__ = [
 """
 One input file
 
-@param name Name of the input file
 @param wire_versions Set of integer wire versions this file applies to
 @param classes List of OFClass objects in the same order as in the file
 @param enums List of Enum objects in the same order as in the file
 """
-OFInput = namedtuple('OFInput', ['name', 'wire_versions', 'classes', 'enums'])
-
-"""
-One version of the OpenFlow protocol
-
-Combination of multiple OFInput objects.
-
-@param wire_version
-@param classes List of OFClass objects
-@param enums List of Enum objects
-"""
-class OFProtocol(namedtuple('OFProtocol', ['wire_version', 'classes', 'enums'])):
-    def class_by_name(self, name):
-        return find(lambda ofclass: ofclass.name == name, self.classes)
-
-    def enum_by_name(self, name):
-        return find(lambda enum: enum.name == name, self.enums)
+OFInput = namedtuple('OFInput', ['filename', 'wire_versions', 'classes', 'enums'])
 
 """
 An OpenFlow class
@@ -83,13 +64,7 @@ The members are in the same order as on the wire.
 @param members List of *Member objects
 @param params optional dictionary of parameters
 """
-class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params'])):
-    def member_by_name(self, name):
-        return find(lambda m: hasattr(m, "name") and m.name == name, self.members)
-
-    @property
-    def discriminator(self):
-        return find(lambda m: type(m) == OFDiscriminatorMember, self.members)
+OFClass = namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params'])
 
 """
 Normal field
@@ -162,14 +137,5 @@ All values are Python ints.
 @params dict of optional params. Currently defined:
        - wire_type: the low_level type of the enum values (uint8,...)
 """
-class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
-    @property
-    def values(self):
-        return [(e.name, e.value) for e in self.entries]
-
-    @property
-    def is_bitmask(self):
-        return "bitmask" in self.params and self.params['bitmask']
-
-
+OFEnum = namedtuple('OFEnum', ['name', 'entries', 'params'])
 OFEnumEntry = namedtuple('OFEnumEntry', ['name', 'value', 'params'])

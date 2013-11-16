@@ -25,12 +25,15 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import of_g
 :: include('_copyright.py')
-
+:: import loxi_globals
 :: include('_autogen.py')
 
-version_names = ${repr(of_g.param_version_names)}
+version_names = {
+:: for v in loxi_globals.OFVersions.all_supported:
+    ${v.wire_version}: "${v.version}",
+:: #endfor
+}
 
 def protocol(ver):
     """

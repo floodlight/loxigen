@@ -27,7 +27,6 @@
 //::
 //:: from loxi_ir import *
 //:: import itertools
-//:: import of_g
 //:: import java_gen.java_model as java_model
 //:: include('_copyright.java')
 
@@ -39,6 +38,9 @@ package ${test.package};
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+
+import org.hamcrest.CoreMatchers;
+
 
 public class ${test.name} {
     //:: factory = java_model.model.factory_of(test.interface)
@@ -67,7 +69,7 @@ public class ${test.name} {
         byte[] written = new byte[bb.readableBytes()];
         bb.readBytes(written);
 
-        assertArrayEquals(${msg.constant_name}_SERIALIZED, written);
+        assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
     }
 
     @Test
@@ -102,7 +104,7 @@ public class ${test.name} {
        byte[] written = new byte[bb.readableBytes()];
        bb.readBytes(written);
 
-       assertArrayEquals(${msg.constant_name}_SERIALIZED, written);
+       assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
    }
 
 }

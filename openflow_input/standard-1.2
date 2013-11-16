@@ -898,8 +898,44 @@ struct of_group_mod : of_header {
     uint8_t type == 15;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
-    uint8_t group_type;
+    enum ofp_group_mod_command command == ?;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_add : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 0;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_modify : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 1;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_delete : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 2;
+    enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
@@ -1078,7 +1114,7 @@ struct of_role_request_failed_error_msg : of_error_msg {
     of_octets_t data;
 };
 
-struct of_experimenter_error_msg {
+struct of_experimenter_error_msg : of_error_msg {
     uint8_t version;
     uint8_t type == 1;
     uint16_t length;

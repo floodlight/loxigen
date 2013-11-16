@@ -31,5 +31,5 @@
 
 import java_gen.codegen as java_codegen
 
-def generate():
-    java_codegen.gen_all_java()
+def generate(install_dir):
+    java_codegen.gen_all_java(install_dir)

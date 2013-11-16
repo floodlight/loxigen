@@ -25,27 +25,7 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-##
-# @brief Utilities related to parsing C files
-#
-import of_g
-
-def type_dec_to_count_base(m_type):
-    """
-    Resolve a type declaration like uint8_t[4] to a count (4) and base_type
-    (uint8_t)
-
-    @param m_type The string type declaration to process
-    """
-    count = 1
-    chk_ar = m_type.split('[')
-    if len(chk_ar) > 1:
-        count_str = chk_ar[1].split(']')[0]
-        if count_str in of_g.ofp_constants:
-            count = of_g.ofp_constants[count_str]
-        else:
-            count = int(count_str)
-        base_type = chk_ar[0]
-    else:
-        base_type = m_type
-    return count, base_type
+# Import the model
+from ir import *
+from ir import build_protocol
+from unified import build_unified_ir
