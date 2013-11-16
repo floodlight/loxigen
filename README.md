@@ -6,6 +6,26 @@ languages. It is composed of a frontend that parses wire protocol descriptions
 and a backend for each supported language (currently C and Python, with Java on
 the way).
 
+Prerequisites
+=============
+
+Running the unit tests requires [nosetests](http://nose.readthedocs.org/en/latest/).
+You can install it via easy_install,
+```
+easy_install nose
+```
+pip,
+```
+pip install nose
+```
+or via your distribution's package manager (example for Debian/Ubuntu):
+```
+sudo apt-get install python-nose
+```
+
+Nosetests is only required for running the unit tests, not for running loxigen
+itself. We do ask you to install it and use it before submitting pull requests,
+though.
 
 Usage
 =====
@@ -39,3 +59,12 @@ Contributing
 
 Please fork the repository on GitHub and send us a pull request. You might also
 be interested in the INTERNALS file which has notes about how LoxiGen works.
+
+Loxigen comes with a set of internal unit-tests, as well as with a set of tests
+for the generated artifacts. Be sure to run
+
+```
+make check-all
+```
+
+and correct any problems before submitting a pull request.
