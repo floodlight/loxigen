@@ -26,7 +26,6 @@
 //:: # under the EPL.
 //::
 //:: import itertools
-//:: import of_g
 //:: import re
 //:: include('_copyright.java')
 
@@ -47,7 +46,7 @@ public class ${factory.name} implements ${factory.interface.name} {
 
     //:: for name, clazz in factory.interface.sub_factories.items():
     public ${clazz} ${name}() {
-        return ${clazz}Ver${factory.version.of_version}.INSTANCE;
+        return ${clazz}Ver${factory.version.dotless_version}.INSTANCE;
     }
     //:: #endfor
 

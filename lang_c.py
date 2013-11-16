@@ -33,6 +33,8 @@ defines the generated files and the functions used to generate them.
 """
 
 import os
+import c_gen.of_g_legacy as of_g
+import c_gen.build_of_g as build_of_g
 import c_gen.c_code_gen as c_code_gen
 import c_gen.c_test_gen as c_test_gen
 import c_gen.c_dump_gen as c_dump_gen
@@ -40,6 +42,7 @@ import c_gen.c_show_gen as c_show_gen
 import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
 import loxi_utils.loxi_utils as loxi_utils
+import template_utils
 
 def static(out, name):
     c_gen.util.render_template(out, os.path.basename(name))
@@ -112,7 +115,61 @@ targets = {
     'locitest/Makefile': static,
 }
 
-def generate():
+################################################################
+#
+# Configuration related
+#
+################################################################
+
+def config_check(str, dictionary = of_g.code_gen_config):
+    """
+    Return config value if in dictionary; else return False.
+    @param str The lookup index
+    @param dictionary The dict to check; use code_gen_config if None
+    """
+
+    if str in dictionary:
+        return dictionary[str]
+
+    return False
+
+def config_sanity_check():
+    """
+    Check the configuration for basic consistency
+
+    @fixme Needs update for generic language support
+    """
+
+    rv = True
+    # For now, only "error" supported for get returns
+    if config_check("copy_semantics") != "read":
+        debug("Only 'read' is supported for copy_semantics");
+        rv = False
+    if config_check("get_returns") != "error":
+        debug("Only 'error' is supported for get-accessor return types\m");
+        rv = False
+    if not config_check("use_fn_ptrs") and not config_check("gen_unified_fns"):
+        debug("Must have gen_fn_ptrs and/or gen_unified_fns set in config")
+        rv = False
+    if config_check("use_obj_id"):
+        debug("use_obj_id is set but not yet supported (change \
+config_sanity_check if it is)")
+        rv = False
+    if config_check("gen_unified_macros") and config_check("gen_unified_fns") \
+            and config_check("gen_unified_macro_lower"):
+        debug("Conflict: Cannot generate unified functions and lower case \
+unified macros")
+        rv = False
+
+    return rv
+
+def generate(install_dir):
+    build_of_g.initialize_versions()
+    build_of_g.build_ordered_classes()
+    build_of_g.populate_type_maps()
+    build_of_g.analyze_input()
+    build_of_g.unify_input()
+    build_of_g.order_and_assign_object_ids()
     for (name, fn) in targets.items():
-        with loxi_utils.open_output(name) as outfile:
+        with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))

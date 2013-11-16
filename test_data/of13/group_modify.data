@@ -37,9 +37,8 @@ ff ff ff ff # buckets[1].watch_group
 00 00 # buckets[1].actions[1].max_len
 00 00 00 00 00 00 # pad
 -- python
-ofp.message.group_mod(
+ofp.message.group_modify(
     xid=0x12345678,
-    command=ofp.OFPGC_MODIFY,
     group_type=ofp.OFPGT_FF,
     group_id=5,
     buckets=[
@@ -57,3 +56,31 @@ ofp.message.group_mod(
             actions=[
                 ofp.action.output(port=5, max_len=0),
                 ofp.action.output(port=6, max_len=0)])])
+-- java
+    OFActions actions = factory.actions();
+    builder
+      .setXid(0x12345678)
+      .setGroupType(OFGroupType.FF)
+      .setGroup(OFGroup.of(5))
+      .setBuckets(ImmutableList.<OFBucket>of(
+        factory.buildBucket()
+          .setWeight(1)
+          .setWatchPort(OFPort.of(5))
+          .setWatchGroup(OFGroup.ANY)
+          .setActions(ImmutableList.<OFAction>of(
+            actions.output(OFPort.of(5), 0),
+            actions.output(OFPort.of(6), 0)
+          ))
+          .build(),
+        factory.buildBucket()
+          .setWeight(1)
+          .setWatchPort(OFPort.of(6))
+          .setWatchGroup(OFGroup.ANY)
+          .setActions(ImmutableList.<OFAction>of(
+            actions.output(OFPort.of(5), 0),
+            actions.output(OFPort.of(6), 0)
+          ))
+          .build()
+         )
+      )
+      .build();

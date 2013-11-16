@@ -25,8 +25,8 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import of_g
-:: ir = of_g.ir
+:: import loxi_globals
+:: ir = loxi_globals.ir
 :: include('_copyright.lua')
 
 :: include('_ofreader.lua')
@@ -36,14 +36,14 @@
 p_of = Proto ("of", "OpenFlow")
 
 local openflow_versions = {
-:: for (version, name) in of_g.param_version_names.items():
-    [${version}] = "${name}",
+:: for version in loxi_globals.OFVersions.all_supported:
+    [${version.wire_version}] = "${version.version}",
 :: #endfor
 }
 
 :: for version, ofproto in ir.items():
 :: for enum in ofproto.enums:
-local enum_v${version}_${enum.name} = {
+local enum_v${version.wire_version}_${enum.name} = {
 :: for (name, value) in enum.values:
     [${value}] = "${name}",
 :: #endfor
@@ -75,7 +75,7 @@ p_of.fields = {
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: if ofclass.virtual:
-${ofclass.name}_v${version}_dissectors = {}
+${ofclass.name}_v${version.wire_version}_dissectors = {}
 :: #endif
 :: #endfor
 :: #endfor
@@ -84,12 +84,12 @@ ${ofclass.name}_v${version}_dissectors = {}
 
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
-:: name = 'dissect_%s_v%d' % (ofclass.name, version)
+:: name = 'dissect_%s_v%d' % (ofclass.name, version.wire_version)
 :: include('_ofclass_dissector.lua', name=name, ofclass=ofclass, version=version)
 :: if ofclass.superclass:
-:: discriminator = ofproto.class_by_name(ofclass.superclass).discriminator
+:: discriminator = ofclass.superclass.discriminator
 :: discriminator_value = ofclass.member_by_name(discriminator.name).value
-${ofclass.superclass}_v${version}_dissectors[${discriminator_value}] = ${name}
+${ofclass.superclass.name}_v${version.wire_version}_dissectors[${discriminator_value}] = ${name}
 
 :: #endif
 :: #endfor
@@ -97,73 +97,73 @@ ${ofclass.superclass}_v${version}_dissectors[${discriminator_value}] = ${name}
 
 local of_message_dissectors = {
 :: for version in ir:
-    [${version}] = of_header_v${version}_dissectors,
+    [${version.wire_version}] = of_header_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_oxm_dissectors = {
 :: for version in ir:
-    [${version}] = of_oxm_v${version}_dissectors,
+    [${version.wire_version}] = of_oxm_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_action_dissectors = {
 :: for version in ir:
-    [${version}] = of_action_v${version}_dissectors,
+    [${version.wire_version}] = of_action_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_instruction_dissectors = {
 :: for version in ir:
-    [${version}] = of_instruction_v${version}_dissectors,
+    [${version.wire_version}] = of_instruction_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_bucket_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_bucket_v${version},
+    [${version.wire_version}] = dissect_of_bucket_v${version.wire_version},
 :: #endfor
 }
 
 local of_port_desc_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_port_desc_v${version},
+    [${version.wire_version}] = dissect_of_port_desc_v${version.wire_version},
 :: #endfor
 }
 
 local of_stats_reply_dissectors = {
 :: for version in ir:
-    [${version}] = of_stats_reply_v${version}_dissectors,
+    [${version.wire_version}] = of_stats_reply_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_stats_request_dissectors = {
 :: for version in ir:
-    [${version}] = of_stats_request_v${version}_dissectors,
+    [${version.wire_version}] = of_stats_request_v${version.wire_version}_dissectors,
 :: #endfor
 }
 
 local of_flow_stats_entry_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_flow_stats_entry_v${version},
+    [${version.wire_version}] = dissect_of_flow_stats_entry_v${version.wire_version},
 :: #endfor
 }
 
 local of_port_stats_entry_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_port_stats_entry_v${version},
+    [${version.wire_version}] = dissect_of_port_stats_entry_v${version.wire_version},
 :: #endfor
 }
 
 local of_table_stats_entry_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_table_stats_entry_v${version},
+    [${version.wire_version}] = dissect_of_table_stats_entry_v${version.wire_version},
 :: #endfor
 }
 
 local of_queue_stats_entry_dissectors = {
 :: for version in ir:
-    [${version}] = dissect_of_queue_stats_entry_v${version},
+    [${version.wire_version}] = dissect_of_queue_stats_entry_v${version.wire_version},
 :: #endfor
 }
 

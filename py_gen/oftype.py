@@ -28,7 +28,6 @@
 from collections import namedtuple
 
 import loxi_utils.loxi_utils as loxi_utils
-import of_g
 
 OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 

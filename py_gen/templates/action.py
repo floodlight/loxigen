@@ -26,7 +26,7 @@
 :: # under the EPL.
 ::
 :: import itertools
-:: import of_g
+:: from loxi_globals import OFVersions
 :: import py_gen.util as util
 :: include('_copyright.py')
 
@@ -37,7 +37,7 @@ import const
 import util
 import loxi.generic_util
 import loxi
-:: if version >= 3:
+:: if version >= OFVersions.VERSION_1_2:
 import oxm # for unpack
 :: #endif
 
