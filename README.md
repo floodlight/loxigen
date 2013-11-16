@@ -6,8 +6,8 @@ languages. It is composed of a frontend that parses wire protocol descriptions
 and a backend for each supported language (currently C, Python, and Java, with an 
 auto-generated wireshark dissector in Lua on the way). 
 
-It currently supports OpenFlow Versions *1.0*, *1.1*, *1.2*, and *1.3.1*. 1.0
-and 1.3.1 are actively used in production. 1.1 and 1.2 support is considered experimental.
+LoxiGen currently supports OpenFlow Versions **1.0**, **1.1**, **1.2**, and **1.3.1**. Versions 1.0
+and 1.3.1 are actively used in production. Support for versions 1.1 and 1.2 is considered experimental.
 
 
 Prerequisites
@@ -27,7 +27,7 @@ or via your distribution's package manager (example for Debian/Ubuntu):
 sudo apt-get install python-nose
 ```
 
-Nosetests is only required for running the unit tests, not for running loxigen
+Nosetests is only required for running the unit tests, not for running LoxiGen
 itself. We do ask you to install it and use it before submitting pull requests,
 though.
 
