@@ -6,6 +6,10 @@ languages. It is composed of a frontend that parses wire protocol descriptions
 and a backend for each supported language (currently C, Python, and Java, with an 
 auto-generated wireshark dissector in Lua on the way). 
 
+It currently supports OpenFlow Versions *1.0*, *1.1*, *1.2*, and *1.3.1*. 1.0
+and 1.3.1 are actively used in production. 1.1 and 1.2 support is considered experimental.
+
+
 Prerequisites
 =============
 
