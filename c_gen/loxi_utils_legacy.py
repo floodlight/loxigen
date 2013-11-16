@@ -517,29 +517,3 @@ def render_static(out, name, path):
         raise ValueError("template %s not found" % name)
     with open(template_filename) as infile:
         out.write(infile.read())
-
-@memoize
-def lookup_ir_wiretype(oftype, version):
-    """ if of is a reference to an enum in ir, resolve it to the wiretype
-        declared in that enum. Else return oftype """
-    enums = of_g.ir[version].enums
-    enum = find(lambda e: e.name == oftype, enums)
-    if enum and 'wire_type' in enum.params:
-        return enum.params['wire_type']
-    else:
-        return oftype
-
-class TemplateEngine(tenjin.Engine):
-    def include(self, template_name, **kwargs):
-        """
-        Tenjin has an issue with nested includes that use the same local variable
-        names, because it uses the same context dict for each level of nesting.
-        The fix is to copy the context.
-        """
-        frame = sys._getframe(1)
-        locals  = frame.f_locals
-        globals = frame.f_globals
-        context = locals["_context"].copy()
-        context.update(kwargs)
-        template = self.get_template(template_name, context, globals)
-        return template.render(context, globals, _buf=locals["_buf"])

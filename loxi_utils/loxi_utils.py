@@ -80,38 +80,6 @@ def class_is_message(cls):
     else:
         return _unified_by_name(cls).is_instanceof("of_header")
 
-def class_is_tlv16(cls):
-    """
-    Return True if cls_name is an object which uses uint16 for type and length
-    """
-    if cls.find("of_action") == 0: # Includes of_action_id classes
-        return True
-    if cls.find("of_instruction") == 0:
-        return True
-    if cls.find("of_queue_prop") == 0:
-        return True
-    if cls.find("of_table_feature_prop") == 0:
-        return True
-    # *sigh*
-    if cls.find("of_meter_band_stats") == 0:  # NOT A TLV
-        return False
-    if cls.find("of_meter_band") == 0:
-        return True
-    if cls.find("of_hello_elem") == 0:
-        return True
-    if cls == "of_match_v3":
-        return True
-    if cls == "of_match_v4":
-        return True
-    return False
-
-def class_is_u16_len(cls):
-    """
-    Return True if cls_name is an object which uses initial uint16 length
-    """
-    return cls in ["of_group_desc_stats_entry", "of_group_stats_entry",
-                   "of_flow_stats_entry", "of_bucket", "of_table_features"]
-
 def class_is_oxm(cls):
     """
     Return True if cls_name is an OXM object
