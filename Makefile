@@ -106,10 +106,7 @@ debug:
 check-all: check check-c check-py check-java
 
 check:
-	./utest/test_parser.py
-	./utest/test_frontend.py
-	./utest/test_test_data.py
-	./utest/test_generic_utils.py
+	nosetests
 
 check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/generic_util.py
@@ -134,8 +131,10 @@ deploy-java: java
 install-java: java
 	cd ${OPENFLOWJ_WORKSPACE} && mvn install
 
-
 pylint:
 	pylint -E ${LOXI_PY_FILES}
+
+ctags:
+	ctags ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 
 .PHONY: all clean debug check pylint c python

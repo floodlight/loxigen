@@ -58,6 +58,10 @@ typedef uint8_t *of_message_t;
 #define OF_MESSAGE_EXPERIMENTER_SUBTYPE_OFFSET 12
 #define OF_MESSAGE_EXPERIMENTER_MIN_LENGTH 16
 
+#define OF_MESSAGE_STATS_EXPERIMENTER_ID_OFFSET 16
+#define OF_MESSAGE_STATS_EXPERIMENTER_SUBTYPE_OFFSET 20
+#define OF_MESSAGE_STATS_EXPERIMENTER_MIN_LENGTH 24
+
 /**
  * The "default" free message function; NULL means use nominal malloc/free
  */
@@ -268,6 +272,44 @@ of_message_flow_mod_command_set(of_message_t msg, of_version_t version,
     } else {
         buf_u8_set(msg + OF_MESSAGE_FLOW_MOD_COMMAND_OFFSET(version), command);
     }
+}
+
+/**
+ * @brief Get/set stats request/reply experimenter ID of a message
+ * @param msg Pointer to the message buffer of sufficient length
+ * @param experimenter_id Data for set operation
+ * @returns get returns experimenter id in host order
+ */
+
+static inline uint32_t
+of_message_stats_experimenter_id_get(of_message_t msg) {
+    uint32_t val;
+    buf_u32_get(msg + OF_MESSAGE_STATS_EXPERIMENTER_ID_OFFSET, &val);
+    return val;
+}
+
+static inline void
+of_message_stats_experimenter_id_set(of_message_t msg, uint32_t experimenter_id) {
+    buf_u32_set(msg + OF_MESSAGE_STATS_EXPERIMENTER_ID_OFFSET, experimenter_id);
+}
+
+/**
+ * @brief Get/set stats request/reply experimenter subtype of a message
+ * @param msg Pointer to the message buffer of sufficient length
+ * @param subtype Data for set operation
+ * @returns get returns experimenter subtype in host order
+ */
+
+static inline uint32_t
+of_message_stats_experimenter_subtype_get(of_message_t msg) {
+    uint32_t val;
+    buf_u32_get(msg + OF_MESSAGE_STATS_EXPERIMENTER_SUBTYPE_OFFSET, &val);
+    return val;
+}
+
+static inline void
+of_message_stats_experimenter_subtype_set(of_message_t msg, uint32_t subtype) {
+    buf_u32_set(msg + OF_MESSAGE_STATS_EXPERIMENTER_SUBTYPE_OFFSET, subtype);
 }
 
 #endif /* _OF_MESSAGE_H_ */

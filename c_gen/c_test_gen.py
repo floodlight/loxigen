@@ -59,13 +59,13 @@ is done with mcheck (if available).
 """
 
 import sys
-import of_g
-import loxi_front_end.match as match
-import loxi_front_end.flags as flags
+import c_gen.of_g_legacy as of_g
+import c_gen.match as match
+import c_gen.flags as flags
 from generic_utils import *
-import loxi_front_end.type_maps as type_maps
-import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.identifiers as identifiers
+import c_gen.type_maps as type_maps
+import c_gen.loxi_utils_legacy as loxi_utils
+import c_gen.identifiers as identifiers
 import util
 import test_data
 
@@ -125,6 +125,11 @@ def ignore_member(cls, version, m_name, m_type):
     """
     # This will probably need more granularity as more extensions are added
     if (type_maps.class_is_extension(cls, version) and (
+            m_name == "experimenter" or
+            m_name == "subtype")):
+        return True
+
+    if (cls in ["of_bsn_lacp_stats_request", "of_bsn_lacp_stats_reply"] and (
             m_name == "experimenter" or
             m_name == "subtype")):
         return True

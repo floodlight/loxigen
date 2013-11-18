@@ -26,7 +26,6 @@
 //:: # under the EPL.
 //::
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -43,13 +42,13 @@ public final class OFFactories {
         switch(version) {
             //:: for v in versions:
             case ${v.constant_version}:
-                return org.projectfloodlight.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
+                return org.projectfloodlight.openflow.protocol.ver${v.dotless_version}.OFFactoryVer${v.dotless_version}.INSTANCE;
             //:: #endfor
             default:
                 throw new IllegalArgumentException("Unknown version: "+version);
             }
     }
-    
+
     private static class GenericReader implements OFMessageReader<OFMessage> {
         public OFMessage readFrom(ChannelBuffer bb) throws OFParseError {
             short wireVersion = U8.f(bb.getByte(0));
@@ -57,7 +56,7 @@ public final class OFFactories {
             switch (wireVersion) {
             //:: for v in versions:
             case ${v.int_version}:
-                factory = org.projectfloodlight.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
+                factory = org.projectfloodlight.openflow.protocol.ver${v.dotless_version}.OFFactoryVer${v.dotless_version}.INSTANCE;
                 break;
             //:: #endfor
             default:

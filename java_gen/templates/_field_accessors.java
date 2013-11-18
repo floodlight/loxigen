@@ -11,7 +11,7 @@
     @Override
     public ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop in msg.members else "throws UnsupportedOperationException"} {
 //:: if prop in msg.members:
-//::    version_prop = msg.get_member(prop.name)
+//::    version_prop = msg.member_by_name(prop.name)
 //::    if version_prop.is_fixed_value:
         return ${version_prop.enum_value};
 //::    elif version_prop.is_length_value:

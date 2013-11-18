@@ -1058,8 +1058,44 @@ struct of_group_mod : of_header {
     uint8_t type == 15;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
-    uint8_t group_type;
+    enum ofp_group_mod_command command == ?;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_add : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 0;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_modify : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 1;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_delete : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 2;
+    enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
@@ -1302,7 +1338,7 @@ struct of_table_features_failed_error_msg : of_error_msg {
     of_octets_t data;
 };
 
-struct of_experimenter_error_msg {
+struct of_experimenter_error_msg : of_error_msg {
     uint8_t version;
     uint8_t type == 1;
     uint16_t length;
@@ -1525,6 +1561,30 @@ struct of_table_stats_reply : of_stats_reply {
     enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_table_stats_entry_t) entries;
+};
+
+struct of_experimenter_stats_request : of_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == ?;
+    uint32_t subtype;
+};
+
+struct of_experimenter_stats_reply : of_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == ?;
+    uint32_t subtype;
 };
 
 // FIXME: These are padded to 8 byte align beyond the length indicated

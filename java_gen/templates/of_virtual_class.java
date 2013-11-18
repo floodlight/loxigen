@@ -28,7 +28,6 @@
 //:: from loxi_ir import *
 //:: import os
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -87,7 +86,7 @@ abstract class ${msg.name} {
 //::           if not model.generate_class(sub):
                // skip ${sub.name} - excluded from generation
 //::           else:
-//::           m = sub.get_member(prop.name)
+//::           m = sub.member_by_name(prop.name)
 //::           if not m.is_fixed_value:
 //::                  raise Exception("subtype %s of %s does not have fixed value for discriminator %s" %
 //::                           (sub.name, msg.name, prop.name))

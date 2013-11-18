@@ -29,24 +29,28 @@
 @brief Main Java Generation module
 """
 
+import logging
 import pdb
 import os
 import shutil
 
-import of_g
+import loxi_globals
 from loxi_ir import *
 import lang_java
 import test_data
 from collections import namedtuple
 from import_cleaner import ImportCleaner
 
+import template_utils
 import loxi_utils.loxi_utils as loxi_utils
 
 import java_gen.java_model as java_model
 
-def gen_all_java():
-    basedir= '%s/openflowj' % of_g.options.install_dir
-    print "Outputting to %s" % basedir
+logger = logging.getLogger(__name__)
+
+def gen_all_java(install_dir):
+    basedir= '%s/openflowj' % install_dir
+    logger.info("Outputting to %s" % basedir)
     if os.path.exists(basedir):
         shutil.rmtree(basedir)
     os.makedirs(basedir)
@@ -81,16 +85,16 @@ class JavaGenerator(object):
         if not os.path.exists(dirname):
             os.makedirs(dirname)
         prefix = '//::(?=[ \t]|$)'
-        print "filename: %s" % filename
+        logger.debug("rendering filename: %s" % filename)
         with open(filename, "w") as f:
-            loxi_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
+            template_utils.render_template(f, template, [self.templates_dir], context, prefix=prefix)
 
         try:
             cleaner = ImportCleaner(filename)
             cleaner.find_used_imports()
             cleaner.rewrite_file(filename)
         except:
-            print 'Cannot clean imports from file %s' % filename
+            logger.info('Cannot clean imports from file %s' % filename)
 
     def create_of_const_enums(self):
         for enum in self.java_model.enums:
@@ -100,7 +104,7 @@ class JavaGenerator(object):
                     template='const.java', enum=enum, all_versions=self.java_model.versions)
 
             for version in enum.versions:
-                clazz = java_model.OFGenericClass(package="org.projectfloodlight.openflow.protocol.ver{}".format(version.of_version), name="{}SerializerVer{}".format(enum.name, version.of_version))
+                clazz = java_model.OFGenericClass(package="org.projectfloodlight.openflow.protocol.ver{}".format(version.dotless_version), name="{}SerializerVer{}".format(enum.name, version.dotless_version))
 
                 if enum.is_bitmask:
                     self.render_class(clazz=clazz, template="const_set_serializer.java", enum=enum, version=version)
@@ -133,9 +137,9 @@ class JavaGenerator(object):
                                 template='of_virtual_class.java', version=java_class.version, msg=java_class,
                                 impl_class=java_class.name, model=self.java_model)
                         else:
-                            print "Class %s virtual but no discriminator" % java_class.name
+                            logger.warn("Class %s virtual but no discriminator" % java_class.name)
                 else:
-                    print "Class %s ignored by generate_class" % java_class.name
+                    logger.info("Class %s ignored by generate_class" % java_class.name)
 
     def create_unit_test(self, unit_tests):
         if unit_tests.has_test_data:
@@ -158,4 +162,4 @@ class JavaGenerator(object):
 def copy_prewrite_tree(basedir):
     """ Recursively copy the directory structure from ./java_gen/pre-write
        into $basedir"""
-    print "Copying pre-written files into %s" % basedir
+    logger.info("Copying pre-written files into %s" % basedir)
