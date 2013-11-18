@@ -176,7 +176,7 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
-            new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
+            new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
