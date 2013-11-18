@@ -117,5 +117,5 @@ def generate(install_dir):
         'fields': create_fields(),
     }
 
-    with template_utils.open_output(install_dir, 'openflow.lua') as out:
+    with template_utils.open_output(install_dir, 'wireshark/openflow.lua') as out:
         template_utils.render_template(out, "openflow.lua", [templates_dir], context)
