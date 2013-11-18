@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Loxigen : OpenFlow protocol bindings for multiple languages" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Loxigen</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/floodlight/loxigen">View on GitHub</a>
+
+          <h1 id="project_title">Loxigen</h1>
+          <h2 id="project_tagline">OpenFlow protocol bindings for multiple languages</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/floodlight/loxigen/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/floodlight/loxigen/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="introduction" class="anchor" href="#introduction"><span class="octicon octicon-link"></span></a>Introduction</h1>
+
+<p>LoxiGen is a tool that generates OpenFlow protocol libraries for a number of
+languages. It is composed of a frontend that parses wire protocol descriptions
+and a backend for each supported language (currently C, Python, and Java, with an 
+auto-generated wireshark dissector in Lua on the way). </p>
+
+<p>LoxiGen currently supports OpenFlow Versions <strong>1.0</strong>, <strong>1.1</strong>, <strong>1.2</strong>, and <strong>1.3.1</strong>. Versions 1.0
+and 1.3.1 are actively used in production. Support for versions 1.1 and 1.2 is considered experimental.</p>
+
+<h1>
+<a name="prerequisites" class="anchor" href="#prerequisites"><span class="octicon octicon-link"></span></a>Prerequisites</h1>
+
+<p>Running the unit tests requires <a href="http://nose.readthedocs.org/en/latest/">nosetests</a>.
+You can install it via easy_install,</p>
+
+<pre><code>easy_install nose
+</code></pre>
+
+<p>pip,</p>
+
+<pre><code>pip install nose
+</code></pre>
+
+<p>or via your distribution's package manager (example for Debian/Ubuntu):</p>
+
+<pre><code>sudo apt-get install python-nose
+</code></pre>
+
+<p>Nosetests is only required for running the unit tests, not for running LoxiGen
+itself. We do ask you to install it and use it before submitting pull requests,
+though.</p>
+
+<h1>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<p>You can run LoxiGen directly from the repository. There's no need to install it,
+and it has no dependencies beyond Python 2.7+.</p>
+
+<p>To generate the libraries for all languages:</p>
+
+<pre><code>make
+</code></pre>
+
+<p>To generate the library for a single language:</p>
+
+<pre><code>make c
+</code></pre>
+
+<p>The currently supported languages are <code>c</code>, <code>python</code> and <code>java</code>. There is an 
+experimental/partially completed backend that generates a lua wireshark dissector
+(<code>wireshark</code>).</p>
+
+<p>The generated libraries will be under the <code>loxi_output</code> directory. This can be
+changed with the <code>LOXI_OUTPUT_DIR</code> environment variable when using the Makefile.</p>
+
+<p>Each generated library comes with its own set of documentation in the standard
+format for that language. Please see that documentation for more details on
+using the generated libraries.</p>
+
+<h1>
+<a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h1>
+
+<p>Please fork the repository on GitHub and send us a pull request. You might also
+be interested in the INTERNALS file which has notes about how LoxiGen works.</p>
+
+<p>Loxigen comes with a set of internal unit-tests, as well as with a set of tests
+for the generated artifacts. Be sure to run</p>
+
+<pre><code>make check-all
+</code></pre>
+
+<p>and correct any problems before submitting a pull request.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Loxigen maintained by <a href="https://github.com/floodlight">floodlight</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
