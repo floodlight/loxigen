@@ -43,7 +43,8 @@ LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
 INPUT_FILES = $(wildcard openflow_input/*)
 TEST_DATA = $(shell find test_data -name '*.data')
-OPENFLOWJ_WORKSPACE = openflowj-loxi
+OPENFLOWJ_OUTPUT_DIR = ${LOXI_OUTPUT_DIR}/openflowj
+OPENFLOWJ_ECLIPSE_WORKSPACE = openflowj-loxi
 
 all: c python java
 
@@ -69,20 +70,35 @@ python-doc: python
 	@echo "HTML documentation output to ${LOXI_OUTPUT_DIR}/pyloxi-doc"
 
 java: .loxi_ts.java
-	mkdir -p ${OPENFLOWJ_WORKSPACE}
-	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_WORKSPACE}/pom.xml
-	ln -sf ../java_gen/pre-written/LICENSE.txt ${OPENFLOWJ_WORKSPACE}/LICENSE.txt
-	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_WORKSPACE}
-	rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/src/ ${OPENFLOWJ_WORKSPACE}/gen-src
+	@rsync -rt java_gen/pre-written/ ${LOXI_OUTPUT_DIR}/openflowj/
+	@if [ -e ${OPENFLOWJ_ECLIPSE_WORKSPACE} ]; then \
+		rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/gen-src/ ${OPENFLOWJ_ECLIPSE_WORKSPACE}/gen-src; \
+	fi
 
 .loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
 	touch $@
 
-java-eclipse: java
-	cd ${OPENFLOWJ_WORKSPACE} && mvn eclipse:eclipse
+eclipse-workspace:
+	mkdir -p ${OPENFLOWJ_ECLIPSE_WORKSPACE}
+	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_ECLIPSE_WORKSPACE}/pom.xml
+	ln -sf ../java_gen/pre-written/LICENSE.txt ${OPENFLOWJ_ECLIPSE_WORKSPACE}/LICENSE.txt
+	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_ECLIPSE_WORKSPACE}
+	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && mvn eclipse:eclipse
 	# Unfortunately, mvn eclipse:eclipse resolves the symlink, which doesn't work with eclipse
-	cd ${OPENFLOWJ_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
+	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
+
+check-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn compile test-compile test
+
+package-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn package
+
+deploy-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn deploy
+
+install-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn install
 
 wireshark: .loxi_ts.wireshark
 
@@ -118,18 +134,6 @@ check-py: python
 check-c: c
 	make -C ${LOXI_OUTPUT_DIR}/locitest
 	${LOXI_OUTPUT_DIR}/locitest/locitest
-
-check-java: java
-	cd ${OPENFLOWJ_WORKSPACE} && mvn compile test-compile test
-
-package-java: java
-	cd ${OPENFLOWJ_WORKSPACE} && mvn package
-
-deploy-java: java
-	cd ${OPENFLOWJ_WORKSPACE} && mvn deploy
-
-install-java: java
-	cd ${OPENFLOWJ_WORKSPACE} && mvn install
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
