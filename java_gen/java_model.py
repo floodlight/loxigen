@@ -71,95 +71,6 @@ class JavaModel(object):
     # interfaces that are virtual
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
-    OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
-    oxm_map = { "OFOxmInPort":              OxmMapEntry("OFPort", "IN_PORT", False),
-                "OFOxmInPortMasked":        OxmMapEntry("OFPort", "IN_PORT", True),
-                "OFOxmInPhyPort":           OxmMapEntry("OFPort", "IN_PHY_PORT", False),
-                "OFOxmInPhyPortMasked":     OxmMapEntry("OFPort", "IN_PHY_PORT", True),
-                "OFOxmMetadata":            OxmMapEntry("OFMetadata", "METADATA", False),
-                "OFOxmMetadataMasked":      OxmMapEntry("OFMetadata", "METADATA", True),
-                "OFOxmEthDst":              OxmMapEntry("MacAddress", "ETH_DST", False),
-                "OFOxmEthDstMasked":        OxmMapEntry("MacAddress", "ETH_DST", True),
-                "OFOxmEthSrc":              OxmMapEntry("MacAddress", "ETH_SRC", False),
-                "OFOxmEthSrcMasked":        OxmMapEntry("MacAddress", "ETH_SRC", True),
-                "OFOxmEthType":             OxmMapEntry("EthType", "ETH_TYPE", False),
-                "OFOxmEthTypeMasked":       OxmMapEntry("EthType", "ETH_TYPE", True),
-                "OFOxmVlanVid":             OxmMapEntry("OFVlanVidMatch", "VLAN_VID", False),
-                "OFOxmVlanVidMasked":       OxmMapEntry("OFVlanVidMatch", "VLAN_VID", True),
-                "OFOxmVlanPcp":             OxmMapEntry("VlanPcp", "VLAN_PCP", False),
-                "OFOxmVlanPcpMasked":       OxmMapEntry("VlanPcp", "VLAN_PCP", True),
-                "OFOxmIpDscp":              OxmMapEntry("IpDscp", "IP_DSCP", False),
-                "OFOxmIpDscpMasked":        OxmMapEntry("IpDscp", "IP_DSCP", True),
-                "OFOxmIpEcn":               OxmMapEntry("IpEcn", "IP_ECN", False),
-                "OFOxmIpEcnMasked":         OxmMapEntry("IpEcn", "IP_ECN", True),
-                "OFOxmIpProto":             OxmMapEntry("IpProtocol", "IP_PROTO", False),
-                "OFOxmIpProtoMasked":       OxmMapEntry("IpProtocol", "IP_PROTO", True),
-                "OFOxmIpv4Src":             OxmMapEntry("IPv4Address", "IPV4_SRC", False),
-                "OFOxmIpv4SrcMasked":       OxmMapEntry("IPv4Address", "IPV4_SRC", True),
-                "OFOxmIpv4Dst":             OxmMapEntry("IPv4Address", "IPV4_DST", False),
-                "OFOxmIpv4DstMasked":       OxmMapEntry("IPv4Address", "IPV4_DST", True),
-                "OFOxmTcpSrc":              OxmMapEntry("TransportPort", "TCP_SRC", False),
-                "OFOxmTcpSrcMasked":        OxmMapEntry("TransportPort", "TCP_SRC", True),
-                "OFOxmTcpDst":              OxmMapEntry("TransportPort", "TCP_DST", False),
-                "OFOxmTcpDstMasked":        OxmMapEntry("TransportPort", "TCP_DST", True),
-                "OFOxmUdpSrc":              OxmMapEntry("TransportPort", "UDP_SRC", False),
-                "OFOxmUdpSrcMasked":        OxmMapEntry("TransportPort", "UDP_SRC", True),
-                "OFOxmUdpDst":              OxmMapEntry("TransportPort", "UDP_DST", False),
-                "OFOxmUdpDstMasked":        OxmMapEntry("TransportPort", "UDP_DST", True),
-                "OFOxmSctpSrc":             OxmMapEntry("TransportPort", "SCTP_SRC", False),
-                "OFOxmSctpSrcMasked":       OxmMapEntry("TransportPort", "SCTP_SRC", True),
-                "OFOxmSctpDst":             OxmMapEntry("TransportPort", "SCTP_DST", False),
-                "OFOxmSctpDstMasked":       OxmMapEntry("TransportPort", "SCTP_DST", True),
-                "OFOxmIcmpv4Type":          OxmMapEntry("ICMPv4Type", "ICMPV4_TYPE", False),
-                "OFOxmIcmpv4TypeMasked":    OxmMapEntry("ICMPv4Type", "ICMPV4_TYPE", True),
-                "OFOxmIcmpv4Code":          OxmMapEntry("ICMPv4Code", "ICMPV4_CODE", False),
-                "OFOxmIcmpv4CodeMasked":    OxmMapEntry("ICMPv4Code", "ICMPV4_CODE", True),
-                "OFOxmArpOp":               OxmMapEntry("ArpOpcode", "ARP_OP", False),
-                "OFOxmArpOpMasked":         OxmMapEntry("ArpOpcode", "ARP_OP", True),
-                "OFOxmArpSpa":              OxmMapEntry("IPv4Address", "ARP_SPA", False),
-                "OFOxmArpSpaMasked":        OxmMapEntry("IPv4Address", "ARP_SPA", True),
-                "OFOxmArpTpa":              OxmMapEntry("IPv4Address", "ARP_TPA", False),
-                "OFOxmArpTpaMasked":        OxmMapEntry("IPv4Address", "ARP_TPA", True),
-                "OFOxmArpSha":              OxmMapEntry("MacAddress", "ARP_SHA", False),
-                "OFOxmArpShaMasked":        OxmMapEntry("MacAddress", "ARP_SHA", True),
-                "OFOxmArpTha":              OxmMapEntry("MacAddress", "ARP_THA", False),
-                "OFOxmArpThaMasked":        OxmMapEntry("MacAddress", "ARP_THA", True),
-                "OFOxmIpv6Src":             OxmMapEntry("IPv6Address", "IPV6_SRC", False),
-                "OFOxmIpv6SrcMasked":       OxmMapEntry("IPv6Address", "IPV6_SRC", True),
-                "OFOxmIpv6Dst":             OxmMapEntry("IPv6Address", "IPV6_DST", False),
-                "OFOxmIpv6DstMasked":       OxmMapEntry("IPv6Address", "IPV6_DST", True),
-                "OFOxmIpv6Flabel":          OxmMapEntry("IPv6FlowLabel", "IPV6_FLABEL", False),
-                "OFOxmIpv6FlabelMasked":    OxmMapEntry("IPv6FlowLabel", "IPV6_FLABEL", True),
-                "OFOxmIcmpv6Type":          OxmMapEntry("U8", "ICMPV6_TYPE", False),
-                "OFOxmIcmpv6TypeMasked":    OxmMapEntry("U8", "ICMPV6_TYPE", True),
-                "OFOxmIcmpv6Code":          OxmMapEntry("U8", "ICMPV6_CODE", False),
-                "OFOxmIcmpv6CodeMasked":    OxmMapEntry("U8", "ICMPV6_CODE", True),
-                "OFOxmIpv6NdTarget":        OxmMapEntry("IPv6Address", "IPV6_ND_TARGET", False),
-                "OFOxmIpv6NdTargetMasked":  OxmMapEntry("IPv6Address", "IPV6_ND_TARGET", True),
-                "OFOxmIpv6NdSll":           OxmMapEntry("MacAddress", "IPV6_ND_SLL", False),
-                "OFOxmIpv6NdSllMasked":     OxmMapEntry("MacAddress", "IPV6_ND_SLL", True),
-                "OFOxmIpv6NdTll":           OxmMapEntry("MacAddress", "IPV6_ND_TLL", False),
-                "OFOxmIpv6NdTllMasked":     OxmMapEntry("MacAddress", "IPV6_ND_TLL", True),
-                "OFOxmMplsLabel":           OxmMapEntry("U32", "MPLS_LABEL", False),
-                "OFOxmMplsLabelMasked":     OxmMapEntry("U32", "MPLS_LABEL", True),
-                "OFOxmMplsTc":              OxmMapEntry("U8", "MPLS_TC", False),
-                "OFOxmMplsTcMasked":        OxmMapEntry("U8", "MPLS_TC", True),
-                "OFOxmBsnInPorts128":       OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", False),
-                "OFOxmBsnInPorts128Masked": OxmMapEntry("OFBitMask128", "BSN_IN_PORTS_128", True),
-                "OFOxmBsnLagId":            OxmMapEntry("LagId", "BSN_LAG_ID", False),
-                "OFOxmBsnLagIdMasked":      OxmMapEntry("LagId", "BSN_LAG_ID", True),
-                "OFOxmBsnVrf":              OxmMapEntry("VRF", "BSN_VRF", False),
-                "OFOxmBsnVrfMasked":        OxmMapEntry("VRF", "BSN_VRF", True),
-                "OFOxmBsnGlobalVrfAllowed":          OxmMapEntry("OFBooleanValue", "BSN_GLOBAL_VRF_ALLOWED", False),
-                "OFOxmBsnGlobalVrfAllowedMasked":    OxmMapEntry("OFBooleanValue", "BSN_GLOBAL_VRF_ALLOWED", True),
-                "OFOxmBsnL3InterfaceClassId":        OxmMapEntry("ClassId", "BSN_L3_INTERFACE_CLASS_ID", False),
-                "OFOxmBsnL3InterfaceClassIdMasked":  OxmMapEntry("ClassId", "BSN_L3_INTERFACE_CLASS_ID", True),
-                "OFOxmBsnL3SrcClassId":              OxmMapEntry("ClassId", "BSN_L3_SRC_CLASS_ID", False),
-                "OFOxmBsnL3SrcClassIdMasked":        OxmMapEntry("ClassId", "BSN_L3_SRC_CLASS_ID", True),
-                "OFOxmBsnL3DstClassId":              OxmMapEntry("ClassId", "BSN_L3_DST_CLASS_ID", False),
-                "OFOxmBsnL3DstClassIdMasked":        OxmMapEntry("ClassId", "BSN_L3_DST_CLASS_ID", True),
-                }
-
     # Registry of nullable properties:
     # ${java_class_name} -> set(${java_property_name})
     nullable_map = defaultdict(lambda: set(),
@@ -342,6 +253,14 @@ class JavaModel(object):
         else:
             return True
 
+    @property
+    @memoize
+    def oxm_map(self):
+        OxmMapEntry = namedtuple("OxmMapEntry", ["type_name", "value", "masked" ])
+        return OrderedDict( (oxm.name, OxmMapEntry(type_name=oxm.member_by_name("value").java_type.public_type,
+                                       value=re.sub(r'^of_oxm_', r'', re.sub(r'_masked$', r'', oxm.ir_class.name)).upper(),
+                                       masked=oxm.ir_class.name.endswith("_masked")))
+                  for oxm in self.interfaces if oxm.ir_class.is_subclassof("of_oxm") )
 
 class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories", "xid_generator"))):
     @property
@@ -549,8 +468,8 @@ class JavaOFInterface(object):
         elif self.name == "OFOxm":
             return ("oxm", None, "T extends OFValueType<T>")
         elif loxi_utils.class_is_oxm(self.c_name):
-            if self.name in model.oxm_map:
-                return ("oxm", "OFOxm<%s>" % model.oxm_map[self.name].type_name, None)
+            if self.member_by_name("value") is not None:
+                return ("oxm", "OFOxm<%s>" % self.member_by_name("value").java_type.public_type, None)
             else:
                 return ("oxm", "OFOxm", None)
         elif loxi_utils.class_is_instruction(self.c_name):
@@ -629,14 +548,16 @@ class JavaOFInterface(object):
                     JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype("T"))
                    ]
         elif self.ir_class.is_subclassof("of_oxm"):
-            field_type = java_type.make_match_field_jtype(model.oxm_map[self.name].type_name) \
-                if self.name in model.oxm_map \
-                else java_type.make_match_field_jtype()
+            value = find(lambda m: m.name=="value", self.ir_model_members)
+            if value:
+                field_type = java_type.make_match_field_jtype(value.java_type.public_type)
+            else:
+                field_type = java_type.make_match_field_jtype()
 
             virtual_members += [
                     JavaVirtualMember(self, "matchField", field_type),
                     JavaVirtualMember(self, "masked", java_type.boolean),
-                    JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype(model.oxm_map[self.name].type_name),
+                    JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype(value.java_type.public_type),
                             custom_template=lambda builder: "OFOxm{}_getCanonical.java".format(".Builder" if builder else "")),
                    ]
             if not find(lambda x: x.name == "mask", self.ir_model_members):
@@ -760,11 +681,12 @@ class JavaOFClass(object):
     @property
     def virtual_members(self):
         virtual_members = []
-        if self.interface.parent_interface and self.interface.parent_interface.startswith("OFOxm"):
-            if self.interface.name in model.oxm_map:
+        if self.ir_class.is_subclassof("of_oxm"):
+            value_member = find(lambda m: m.name, self.ir_model_members)
+            if value_member:
                 oxm_entry = model.oxm_map[self.interface.name]
                 virtual_members += [
-                    JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(oxm_entry.type_name), "MatchField.%s" % oxm_entry.value),
+                    JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(value_member.java_type.public_type), "MatchField.%s" % oxm_entry.value),
                     JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxm_entry.masked else "false"),
                     ]
             else:
