@@ -360,7 +360,7 @@ def build_protocol(version, ofinputs):
         member = ir_class(offset = length_info.offset,
                         base_length = length_info.base_length,
                         is_fixed_length=length_info.is_fixed_length,
-                        **convert_member_properties(vars(fe_member)))
+                        **convert_member_properties(fe_member._asdict()))
         member.of_class = of_class
         return member
 
