@@ -403,6 +403,9 @@ def populate_type_maps():
                 if wire_version >= of_g.VERSION_1_3:
                     cls2 = parent + "_id" + cls[len(parent):]
                     type_maps.extension_action_id_subtype[wire_version][experimenter][cls2] = val
+            elif parent == 'of_instruction' and experimenter:
+                val = find_type_value(ofclass, 'subtype')
+                type_maps.extension_instruction_subtype[wire_version][experimenter][cls] = val
 
     # Messages
     for version, protocol in loxi_globals.ir.items():

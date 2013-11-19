@@ -37,6 +37,9 @@
 #include <loci/loci.h>
 #include <loci/of_message.h>
 
+#define OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET 4
+#define OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET 8
+
 /****************************************************************
  * Top level OpenFlow message length functions
  ****************************************************************/
@@ -207,8 +210,6 @@ extension_action_object_id_get(of_object_t *obj, of_object_id_t *id)
 
 /**
  * Set wire data for extension objects, not messages.
- *
- * Currently only handles BSN mirror; ignores all others
  */
 
 void
@@ -234,6 +235,11 @@ of_extension_object_id_set(of_object_t *obj, of_object_id_t id)
         buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
                     OF_EXPERIMENTER_ID_NICIRA);
         buf_u16_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 18);
+        break;
+    case OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK:
+        buf_u32_set(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET,
+                    OF_EXPERIMENTER_ID_BSN);
+        buf_u32_set(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, 0);
         break;
     default:
         break;
@@ -339,9 +345,25 @@ of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 static int
 extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
-    (void)obj;
+    uint32_t exp_id;
+    uint8_t *buf;
 
     *id = OF_INSTRUCTION_EXPERIMENTER;
+
+    buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+
+    buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET, &exp_id);
+
+    switch (exp_id) {
+    case OF_EXPERIMENTER_ID_BSN: {
+        uint32_t subtype;
+        buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, &subtype);
+        switch (subtype) {
+        case 0: *id = OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK; break;
+        }
+        break;
+    }
+    }
 
     return OF_ERROR_NONE;
 }
