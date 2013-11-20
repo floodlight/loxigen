@@ -73,7 +73,7 @@ class JavaGenerator(object):
 
     def render_class(self, clazz, template, src_dir=None, **context):
         if not src_dir:
-            src_dir = "src/main/java/"
+            src_dir = "gen-src/main/java/"
 
         context['class_name'] = clazz.name
         context['package'] = clazz.package
@@ -147,7 +147,7 @@ class JavaGenerator(object):
                 unit_test = unit_tests.get_test_unit(i)
                 if unit_test.has_test_data:
                     self.render_class(clazz=unit_test,
-                            template='unit_test.java', src_dir="src/test/java",
+                            template='unit_test.java', src_dir="gen-src/test/java",
                             version=unit_test.java_class.version,
                             test=unit_test, msg=unit_test.java_class,
                             test_data=unit_test.test_data)
