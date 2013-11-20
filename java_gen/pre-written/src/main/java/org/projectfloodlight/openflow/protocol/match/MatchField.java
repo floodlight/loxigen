@@ -108,11 +108,11 @@ public class MatchField<F extends OFValueType<F>> {
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
-            "icmpv4_src", MatchFields.ICMPV4_TYPE,
+            "icmpv4_type", MatchFields.ICMPV4_TYPE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
-            "icmpv4_dst", MatchFields.ICMPV4_CODE,
+            "icmpv4_code", MatchFields.ICMPV4_CODE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
