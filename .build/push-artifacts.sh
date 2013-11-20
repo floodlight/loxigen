@@ -19,10 +19,19 @@ loxi_head=$(git rev-parse HEAD)
 last_loxi_log=$(git log --format=oneline -1)
 git_log_file=$(mktemp --tmpdir "git-log-file.XXXXXXX")
 
+last_loxi_revision=""
+
 if [[ -e "${ARTIFACT_REPO}/loxi-revision" ]]; then
     last_loxi_revision=$(cat "${ARTIFACT_REPO}/loxi-revision" |  cut -d ' ' -f 1)
+    if [[ $(git cat-file -t "$last_loxi_revision" 2>/dev/null) != "commit" ]]; then
+        echo "Last loxi revision ${last_loxi_revision} specified in ${ARTIFACT_REPO_URL}/loxi-revision not found in loxigen repo"
+        last_loxi_revision=""
+    fi
+fi
+
+if [[ $last_loxi_revision ]]; then
     echo "Last loxi revision committed: $last_loxi_revision"
-    git log $last_loxi_revision..HEAD >>$git_log_file
+    git log $last_loxi_revision..${loxi_head} >>$git_log_file
     loxi_github_url="https://github.com/floodlight/loxigen/compare/${last_loxi_revision}...${loxi_head}"
 else
     echo "No Previous loxi revision info found"
