@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -eu
 
 # Push the loxigen artifacts to a dedicated git repository,
 # along with a nice commit message and a tag
@@ -9,19 +9,18 @@ if [[ ! $ARTIFACT_REPO_URL ]]; then
     exit 1
 fi
 
-set -e
-ARTIFACT_REPO=$(mktemp -d)
+ARTIFACT_REPO=$(mktemp -d --tmpdir "push-artifacts-repo.XXXXXXX")
 
 git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO}
+find ${ARTIFACT_REPO} -mindepth 1 -maxdepth 1 -type d \! -name '.*' -print0 | xargs -0 rm -r
 make LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
-
-last_msg=$(cd $ARTIFACT_REPO && git log -1)
-last_loxi_revision=$(echo "$last_msg" | perl -n -e 'm{Loxigen HEAD commit floodlight/loxigen@([a-f0-9]+)} && print $1')
 
 loxi_head=$(git rev-parse HEAD)
 last_loxi_log=$(git log --format=oneline -1)
-git_log_file=$(mktemp)
-if [[ $last_loxi_revision ]]; then
+git_log_file=$(mktemp --tmpdir "git-log-file.XXXXXXX")
+
+if [[ -e "${ARTIFACT_REPO}/loxi-revision" ]]; then
+    last_loxi_revision=$(cat "${ARTIFACT_REPO}/loxi-revision" |  cut -d ' ' -f 1)
     echo "Last loxi revision committed: $last_loxi_revision"
     git log $last_loxi_revision..HEAD >>$git_log_file
     loxi_github_url="https://github.com/floodlight/loxigen/compare/${last_loxi_revision}...${loxi_head}"
@@ -41,8 +40,7 @@ fi
     (
        echo "Artifacts from ${loxi_github_url}"
        echo
-       echo "Loxigen HEAD commit floodlight/loxigen@${loxi_head}"
-       echo
+       echo "Loxigen Head commit floodlight/loxigen@${loxi_head}"
        cat $git_log_file
     ) | git commit --file=-
 
