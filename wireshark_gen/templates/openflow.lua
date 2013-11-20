@@ -29,6 +29,14 @@
 :: ir = loxi_globals.ir
 :: include('_copyright.lua')
 
+-- Copy this file to your wireshark plugin directory:
+--   Linux / OS X: ~/.wireshark/plugins/
+--   Windows: C:\Documents and Settings\<username>\Application Data\Wireshark\plugins\
+-- You may need to create the directory.
+
+-- The latest version of this dissector is always available at:
+-- http://www.projectfloodlight.org/openflow.lua
+
 :: include('_ofreader.lua')
 
 :: include('_oftype_readers.lua')
