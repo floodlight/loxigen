@@ -190,7 +190,7 @@ enum ofp_capabilities(wire_type=uint32_t, bitmask=True) {
     OFPC_ARP_MATCH_IP = 0x80,
 };
 
-enum ofp_config_flags(wire_type=uint32_t, bitmask=True) {
+enum ofp_config_flags(wire_type=uint16_t, bitmask=True) {
     OFPC_FRAG_NORMAL = 0x0,
     OFPC_FRAG_DROP = 0x1,
     OFPC_FRAG_REASM = 0x2,
@@ -371,7 +371,7 @@ struct of_get_config_reply : of_header {
     uint8_t type == 8;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
@@ -380,7 +380,7 @@ struct of_set_config : of_header {
     uint8_t type == 9;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
