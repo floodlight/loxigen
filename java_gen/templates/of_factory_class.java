@@ -121,7 +121,7 @@ public class ${factory.name} implements ${factory.interface.name} {
                 return (OFOxm<F>)((Object)${method_name}((${type_name})((Object)value)));
             //:: #endfor
             default:
-                return null;
+                throw new IllegalArgumentException("No OXM known for match field " + field);
         }
     }
 
@@ -140,7 +140,7 @@ public class ${factory.name} implements ${factory.interface.name} {
                 return (OFOxm<F>)((Object)${method_name}((${type_name})((Object)value), (${type_name})((Object)mask)));
             //:: #endfor
             default:
-                return null;
+                throw new IllegalArgumentException("No OXM known for match field " + field);
         }
     }
 

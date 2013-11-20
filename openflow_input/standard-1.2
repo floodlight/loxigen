@@ -515,7 +515,7 @@ struct of_get_config_reply : of_header {
     uint8_t type == 8;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
@@ -524,7 +524,7 @@ struct of_set_config : of_header {
     uint8_t type == 9;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
@@ -1208,7 +1208,7 @@ struct of_group_stats_entry {
 
 struct of_group_desc_stats_entry {
     uint16_t length;
-    uint8_t group_type;
+    enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
