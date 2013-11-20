@@ -68,7 +68,7 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpEcn> IP_ECN =
-            new MatchField<IpEcn>("ip_dscp", MatchFields.IP_ECN,
+            new MatchField<IpEcn>("ip_ecn", MatchFields.IP_ECN,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpProtocol> IP_PROTO =
