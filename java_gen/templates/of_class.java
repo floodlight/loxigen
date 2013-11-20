@@ -430,5 +430,4 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return result;
     }
 
-
 }

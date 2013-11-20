@@ -93,6 +93,12 @@ class JavaModel(object):
             OFTableConfig = (
                 MaskedEnumGroup("table_miss_flags", mask="TABLE_MISS_MASK", members=set(("TABLE_MISS_CONTROLLER", "TABLE_MISS_CONTINUE", "TABLE_MISS_DROP"))),
             ),
+            OFGetConfigReply = (
+                MaskedEnumGroup("flags", mask="OFP_FRAG_MASK", members=set(("FRAG_NORMAL", "FRAG_DROP", "FRAG_REASM"))),
+            ),
+            OFSetConfig = (
+                MaskedEnumGroup("flags", mask="OFP_FRAG_MASK", members=set(("FRAG_NORMAL", "FRAG_DROP", "FRAG_REASM"))),
+            ),
     )
 
     # represents a metadata property associated with an EnumClass
