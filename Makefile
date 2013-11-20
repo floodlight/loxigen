@@ -46,7 +46,7 @@ TEST_DATA = $(shell find test_data -name '*.data')
 OPENFLOWJ_OUTPUT_DIR = ${LOXI_OUTPUT_DIR}/openflowj
 OPENFLOWJ_ECLIPSE_WORKSPACE = openflowj-loxi
 
-all: c python java
+all: c python java wireshark
 
 c: .loxi_ts.c
 
