@@ -65,7 +65,8 @@ class JavaModel(object):
         OFExperimenter=set(('data','subtype')),
         OFActionExperimenter=set(('data',)),
         OFExperimenterStatsRequest=set(('data','subtype')),
-        OFExperimenterStatsReply=set(('data','subtype')))
+        OFExperimenterStatsReply=set(('data','subtype')),
+        OFInstructionExperimenter=set(('data',)))
     # map: $java_type -> set(java_name_property)
     write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
     # interfaces that are virtual
@@ -469,6 +470,13 @@ class JavaOFInterface(object):
                 return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
+        elif self.ir_class.is_instruction:
+            if self.ir_class.is_subclassof('of_instruction_bsn'):
+                return ("instruction", "OFInstructionBsn", None)
+            elif self.ir_class.is_subclassof('of_instruction_experimenter'):
+                return ("instruction", "OFInstructionExperimenter", None)
+            else:
+                return ("instruction", "OFInstruction", None)
         elif re.match(r'OFBsnVport.+$', self.name):
             return ("", "OFBsnVport", None)
         elif self.name == "OFOxm":
