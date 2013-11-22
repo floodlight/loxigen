@@ -72,7 +72,7 @@ parsers = {
 :: for (k, v) in msgtype_groups:
 :: k = util.constant_for_value(version, "ofp_instruction_type", k)
 :: v = list(v)
-:: if len(v) == 1 or k == 0xffff:
+:: if len(v) == 1 and k != 'const.OFPIT_EXPERIMENTER':
     ${k} : ${v[0].pyname}.unpack,
 :: else:
     ${k} : parse_${k[12:].lower()},
