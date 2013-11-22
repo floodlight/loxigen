@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.ArrayList;
+
 import javax.annotation.concurrent.Immutable;
 
 
@@ -59,6 +61,20 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
             builder.set(port);
         }
         return builder.build();
+    }
+
+    public static OFPortBitMap of(OFBitMask128 mask) {
+        return new OFPortBitMap(mask);
+    }
+
+    public Iterable<OFPort> getOnPorts() {
+        ArrayList<OFPort> ports = new ArrayList<>();
+        for(int i=0; i < 127; i++) {
+            if(!(this.mask.isOn(i))) {
+                ports.add(OFPort.of(i));
+            }
+        }
+        return ports;
     }
 
     @Override
