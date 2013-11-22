@@ -156,7 +156,7 @@ def class_is_virtual(cls):
     if loxi_utils.class_is_list(cls):
         return True
     # TODO get this from the input file when we have virtual class syntax
-    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira", "of_bsn_stats_request", "of_bsn_stats_reply", "of_experimenter_stats_request", "of_experimenter_stats_reply"]:
+    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira", "of_bsn_stats_request", "of_bsn_stats_reply", "of_experimenter_stats_request", "of_experimenter_stats_reply", "of_instruction_experimenter", "of_instruction_bsn"]:
         return True
     return False
 
@@ -597,7 +597,18 @@ extension_action_id_subtype = {
 }
 
 # Set to empty dict if no extension instructions defined
-extension_instruction_subtype = {}
+extension_instruction_subtype = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(
+        bsn = {   # of_instruction_bsn_
+            },
+        nicira = {   # of_instruction_nicira_
+            }
+        ),
+}
 
 # Set to empty dict if no extension instructions defined
 extension_queue_prop_subtype = {}
