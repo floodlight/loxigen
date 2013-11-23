@@ -27,7 +27,6 @@
 //::
 //:: from loxi_ir import *
 //:: import itertools
-//:: import of_g
 //:: import java_gen.java_model as java_model
 //:: include('_copyright.java')
 
@@ -40,11 +39,15 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import org.hamcrest.CoreMatchers;
+
+
 public class ${test.name} {
     //:: factory = java_model.model.factory_of(test.interface)
     //:: var_type = msg.interface.name
     //:: var_name = msg.interface.variable_name
-    //:: builder_method = factory.method_name(msg.interface)
+    //:: use_builder = len(msg.data_members) > 0
+    //:: factory_method = factory.method_name(msg.interface, builder=use_builder)
     //:: factory_impl = java_model.model.factory_of(test.interface).of_version(test.java_class.version).name
     ${factory.name if factory.name is not None else "OFFactory"} factory;
 
@@ -59,22 +62,30 @@ public class ${test.name} {
     //:: if "java" in test_data:
     @Test
     public void testWrite() {
-        ${var_type}.Builder builder = factory.${builder_method}();
+        //:: if use_builder:
+        ${var_type}.Builder builder = factory.${factory_method}();
         ${test_data["java"]};
         ${var_type} ${var_name} = builder.build();
+        //:: else:
+        ${var_type} ${var_name} = factory.${factory_method}();
+        //:: #endif
         ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
         ${var_name}.writeTo(bb);
         byte[] written = new byte[bb.readableBytes()];
         bb.readBytes(written);
 
-        assertArrayEquals(${msg.constant_name}_SERIALIZED, written);
+        assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
     }
 
     @Test
     public void testRead() throws Exception {
-        ${var_type}.Builder builder = factory.${builder_method}();
+        //:: if use_builder:
+        ${var_type}.Builder builder = factory.${factory_method}();
         ${test_data["java"]};
         ${var_type} ${var_name}Built = builder.build();
+        //:: else:
+        ${var_type} ${var_name}Built = factory.${factory_method}();
+        //:: #endif
 
         ChannelBuffer input = ChannelBuffers.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
@@ -102,7 +113,7 @@ public class ${test.name} {
        byte[] written = new byte[bb.readableBytes()];
        bb.readBytes(written);
 
-       assertArrayEquals(${msg.constant_name}_SERIALIZED, written);
+       assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
    }
 
 }

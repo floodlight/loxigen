@@ -36,7 +36,7 @@ them to OF versions.
 import sys
 import copy
 import type_maps
-import of_g
+import c_gen.of_g_legacy as of_g
 import re
 
 # These mark idents as _not_ flags and have precedence
@@ -73,4 +73,3 @@ def ident_is_flag(ident):
             return True
 
     return False
-

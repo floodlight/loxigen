@@ -30,9 +30,9 @@
 # @fixme This still has lots of C specific code that should be moved into c_gen
 
 import sys
-import of_g
+import c_gen.of_g_legacy as of_g
 from generic_utils import *
-import loxi_utils.loxi_utils as loxi_utils
+import c_gen.loxi_utils_legacy as loxi_utils
 
 #
 # Use 1.2 match semantics for common case
@@ -556,5 +556,3 @@ def match_sanity_check():
             debug("Type mismatch for key %s in oxm data: %s vs %s" %
                   (key, of_match_members[key]["m_type"], oxm_type))
             sys.exit(1)
-
-

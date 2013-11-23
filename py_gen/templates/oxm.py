@@ -26,7 +26,6 @@
 :: # under the EPL.
 ::
 :: import itertools
-:: import of_g
 :: import py_gen.oftype
 :: include('_copyright.py')
 

@@ -27,7 +27,6 @@
 //::
 //:: import itertools
 //:: import re
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')

@@ -31,17 +31,16 @@ Code generation functions for LOCI
 """
 
 import sys
-import of_g
+import c_gen.of_g_legacy as of_g
 import c_match
 from generic_utils import *
-import c_gen.c_type_maps as c_type_maps
-import loxi_front_end.type_maps as type_maps
-import loxi_front_end.flags as flags
-import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.identifiers as identifiers
+from c_gen import flags, type_maps, c_type_maps
+import c_gen.loxi_utils_legacy as loxi_utils
+from c_gen.loxi_utils_legacy import config_check
+
+import c_gen.identifiers as identifiers
 
 # 'property' is for queues. Could be trouble
-
 
 ################################################################
 #
@@ -2730,7 +2729,8 @@ static inline int
             # Some tlv16 types may be extensions requiring more work
             if cls in ["of_action_bsn_mirror", "of_action_id_bsn_mirror",
                        "of_action_bsn_set_tunnel_dst", "of_action_id_bsn_set_tunnel_dst",
-                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl"]:
+                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl",
+                       "of_instruction_bsn_disable_src_mac_check"]:
                 out.write("""
     /* Extended TLV obj; Call specific accessor */
     of_extension_object_id_set(obj, %(enum)s);

@@ -4,9 +4,9 @@ import re
 import subprocess
 import time
 
+import loxi_globals
 from generic_utils import memoize
 import loxi_utils.loxi_utils as loxi_utils
-import of_g
 
 def erase_type_annotation(class_name):
     m=re.match(r'(.*)<.*>', class_name)
@@ -145,7 +145,7 @@ class JType(object):
         ver = ANY if version is None else version.int_version
 
         if not "version" in arguments:
-            arguments["version"] = version.of_version
+            arguments["version"] = version.dotless_version
 
         def lookup(ver, pub_type):
             if (ver, pub_type) in self.ops:
@@ -328,6 +328,8 @@ of_match = JType('Match') \
         .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
             write='$name.writeTo(bb)',
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
+group_mod_cmd = JType('OFGroupModCommand', 'short') \
+        .op(version=ANY, read="bb.readShort()", write="bb.writeShort($name)")
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
         .op(version=1, read="bb.readShort()", write="bb.writeShort($name)") \
         .op(version=ANY, read="bb.readByte()", write="bb.writeByte($name)")
@@ -595,26 +597,30 @@ exceptions = {
         'of_action_push_mpls': { 'ethertype': eth_type },
         'of_action_push_pbb': { 'ethertype': eth_type },
         'of_action_push_vlan': { 'ethertype': eth_type },
+        'of_action_pop_mpls': { 'ethertype': eth_type },
         'of_action_set_nw_dst': { 'nw_addr': ipv4 },
         'of_action_set_nw_ecn': { 'nw_ecn': ip_ecn },
         'of_action_set_nw_src': { 'nw_addr': ipv4 },
-        'of_action_set_nw_dst': { 'tp_port': transport_port },
         'of_action_set_tp_dst': { 'tp_port': transport_port },
         'of_action_set_tp_src': { 'tp_port': transport_port },
         'of_action_set_vlan_pcp': { 'vlan_pcp': vlan_pcp },
         'of_action_set_vlan_vid': { 'vlan_vid': vlan_vid },
+
+        'of_group_mod' : { 'command' : group_mod_cmd },
+        'of_group_add' : { 'command' : group_mod_cmd },
+        'of_group_modify' : { 'command' : group_mod_cmd },
+        'of_group_delete' : { 'command' : group_mod_cmd },
+
+        'of_bucket' : { 'watch_group': of_group },
 }
 
 
 @memoize
 def enum_java_types():
     enum_types = {}
-
-    for protocol in of_g.ir.values():
-        for enum in protocol.enums:
-            java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
-
-            enum_types[enum.name] = gen_enum_jtype(java_name, enum.is_bitmask)
+    for enum in loxi_globals.unified.enums:
+        java_name = name_c_to_caps_camel(re.sub(r'_t$', "", enum.name))
+        enum_types[enum.name] = gen_enum_jtype(java_name, enum.is_bitmask)
     return enum_types
 
 def make_match_field_jtype(sub_type_name="?"):

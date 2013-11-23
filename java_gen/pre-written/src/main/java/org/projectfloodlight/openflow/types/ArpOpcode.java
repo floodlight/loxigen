@@ -159,10 +159,6 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
         return ArpOpcode.of(this.opcode & mask.opcode);
     }
 
-    public int getOpCode() {
-        return opcode;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;

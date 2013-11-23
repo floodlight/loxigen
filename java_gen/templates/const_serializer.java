@@ -26,7 +26,6 @@
 //:: # under the EPL.
 //::
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')

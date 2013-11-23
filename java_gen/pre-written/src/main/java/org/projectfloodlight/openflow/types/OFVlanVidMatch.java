@@ -4,6 +4,8 @@ import javax.annotation.Nullable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
@@ -21,6 +23,7 @@ import com.google.common.primitives.Shorts;
  *
  */
 public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
+    private static final Logger logger = LoggerFactory.getLogger(OFVlanVidMatch.class);
 
     private static final short VALIDATION_MASK = 0x1FFF;
     private static final short PRESENT_VAL = 0x1000;
@@ -59,7 +62,11 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
             return UNTAGGED;
         else if(vid == PRESENT_VAL)
             return PRESENT;
-        else if ((vid & VALIDATION_MASK) != vid)
+        else if(vid == UNTAGGED_VAL_OF10) {
+            // workaround for IVS sometimes sending 0F1.0 untagged (0xFFFF) values
+            logger.warn("Warning: received OF1.0 untagged vlan value (0xFFFF) in OF1.3 VlanVid. Treating as UNTAGGED");
+            return UNTAGGED;
+        } else if ((vid & VALIDATION_MASK) != vid)
             throw new IllegalArgumentException(String.format("Illegal VLAN value: %x", vid));
         return new OFVlanVidMatch(vid);
     }

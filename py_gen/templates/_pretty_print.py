@@ -24,6 +24,7 @@
 :: # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
+:: from loxi_globals import OFVersions
 :: import loxi_utils.loxi_utils as loxi_utils
 ::
         q.text("${ofclass.pyname} {")
@@ -49,7 +50,7 @@
                 q.text(util.pretty_mac(self.${m.name}))
 :: elif m.oftype == 'of_ipv4_t':
                 q.text(util.pretty_ipv4(self.${m.name}))
-:: elif m.oftype == 'of_wc_bmap_t' and version in [1,2]:
+:: elif m.oftype == 'of_wc_bmap_t' and version in OFVersions.from_strings("1.0", "1.1"):
                 q.text(util.pretty_wildcards(self.${m.name}))
 :: elif m.oftype == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))

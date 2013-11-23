@@ -68,7 +68,7 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpEcn> IP_ECN =
-            new MatchField<IpEcn>("ip_dscp", MatchFields.IP_ECN,
+            new MatchField<IpEcn>("ip_ecn", MatchFields.IP_ECN,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpProtocol> IP_PROTO =
@@ -108,11 +108,11 @@ public class MatchField<F extends OFValueType<F>> {
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
-            "icmpv4_src", MatchFields.ICMPV4_TYPE,
+            "icmpv4_type", MatchFields.ICMPV4_TYPE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
-            "icmpv4_dst", MatchFields.ICMPV4_CODE,
+            "icmpv4_code", MatchFields.ICMPV4_CODE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
@@ -176,7 +176,7 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
-            new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
+            new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
