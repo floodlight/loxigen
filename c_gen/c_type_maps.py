@@ -29,10 +29,10 @@
 # @brief C code generation for LOXI type related maps
 #
 
-import of_g
+import c_gen.of_g_legacy as of_g
 import sys
 from generic_utils import *
-import loxi_front_end.type_maps as type_maps
+import c_gen.type_maps as type_maps
 
 
 # Some number larger than small type values, but less then
@@ -75,7 +75,8 @@ def gen_object_id_to_type(out):
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_flow_mod", version)],
                            comma, cls))
-            elif (cls, version) in type_maps.type_val:
+            elif (cls, version) in type_maps.type_val and \
+                    type_maps.type_val[(cls, version)] != type_maps.invalid_type:
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[(cls, version)], comma, cls))
             elif type_maps.message_is_extension(cls, version):
@@ -502,6 +503,7 @@ of_message_to_object_id(of_message_t msg, int length) {
     uint16_t stats_type;
     uint16_t err_type;
     uint8_t flow_mod_cmd;
+    uint32_t experimenter, subtype;
 
     if (length < OF_MESSAGE_MIN_LENGTH) {
         return OF_OBJECT_INVALID;
@@ -540,10 +542,23 @@ of_message_to_object_id(of_message_t msg, int length) {
             return OF_OBJECT_INVALID;
         }
         stats_type = of_message_stats_type_get(msg);
-        if (obj_id == OF_STATS_REQUEST) {
-            obj_id = of_stats_request_to_object_id(stats_type, ver);
+        if (stats_type == OF_STATS_TYPE_EXPERIMENTER) {
+            if (length < OF_MESSAGE_STATS_EXPERIMENTER_MIN_LENGTH) {
+                return OF_OBJECT_INVALID;
+            }
+            experimenter = of_message_stats_experimenter_id_get(msg);
+            subtype = of_message_stats_experimenter_subtype_get(msg);
+            if (obj_id == OF_STATS_REQUEST) {
+                obj_id = of_experimenter_stats_request_to_object_id(experimenter, subtype, ver);
+            } else {
+                obj_id = of_experimenter_stats_reply_to_object_id(experimenter, subtype, ver);
+            }
         } else {
-            obj_id = of_stats_reply_to_object_id(stats_type, ver);
+            if (obj_id == OF_STATS_REQUEST) {
+                obj_id = of_stats_request_to_object_id(stats_type, ver);
+            } else {
+                obj_id = of_stats_reply_to_object_id(stats_type, ver);
+            }
         }
     }
 
@@ -597,6 +612,18 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
         switch (masked_type) {
         case 0x00: return OF_OXM_BSN_IN_PORTS_128;
         case 0x01: return OF_OXM_BSN_IN_PORTS_128_MASKED;
+        case 0x02: return OF_OXM_BSN_LAG_ID;
+        case 0x03: return OF_OXM_BSN_LAG_ID_MASKED;
+        case 0x04: return OF_OXM_BSN_VRF;
+        case 0x05: return OF_OXM_BSN_VRF_MASKED;
+        case 0x06: return OF_OXM_BSN_GLOBAL_VRF_ALLOWED;
+        case 0x07: return OF_OXM_BSN_GLOBAL_VRF_ALLOWED_MASKED;
+        case 0x08: return OF_OXM_BSN_L3_INTERFACE_CLASS_ID;
+        case 0x09: return OF_OXM_BSN_L3_INTERFACE_CLASS_ID_MASKED;
+        case 0x0a: return OF_OXM_BSN_L3_SRC_CLASS_ID;
+        case 0x0b: return OF_OXM_BSN_L3_SRC_CLASS_ID_MASKED;
+        case 0x0c: return OF_OXM_BSN_L3_DST_CLASS_ID;
+        case 0x0d: return OF_OXM_BSN_L3_DST_CLASS_ID_MASKED;
         default: return OF_OBJECT_INVALID;
         }
     } else {
@@ -932,6 +959,9 @@ def gen_type_maps_header(out):
  * top level message: Action, instruction, error, stats, queue_props, oxm
  */
 #define OF_EXPERIMENTER_TYPE 0xffff
+
+int of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
+int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
 """)
     gen_type_to_obj_map_functions(out)
     gen_obj_to_type_map_functions(out)
@@ -1034,6 +1064,17 @@ of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
     if ((type = of_object_to_stats_type(id, ver)) >= 0) {
         /* It's a stats obj */
         of_message_stats_type_set(msg, type);
+        if (type == OF_STATS_TYPE_EXPERIMENTER) {
+            switch (id) {
+            case OF_BSN_LACP_STATS_REQUEST:
+            case OF_BSN_LACP_STATS_REPLY:
+                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
+                of_message_stats_experimenter_subtype_set(msg, 1);
+                break;
+            default:
+                break;
+            }
+        }
     }
     if ((type = of_object_to_error_type(id, ver)) >= 0) {
         /* It's an error obj */

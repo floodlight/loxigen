@@ -28,7 +28,6 @@
 //:: from loxi_ir import *
 //:: import os
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -38,6 +37,9 @@ package ${msg.package};
 //:: include("_imports.java", msg=msg)
 
 class ${impl_class} implements ${msg.interface.inherited_declaration()} {
+//:: if genopts.instrument:
+    private static final Logger logger = LoggerFactory.getLogger(${impl_class}.class);
+//:: #endif
     // version: ${version}
     final static byte WIRE_VERSION = ${version.int_version};
 //:: if msg.is_fixed_length:
@@ -47,6 +49,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 
 //:: for prop in msg.data_members:
+    //:: if prop.java_type.public_type != msg.interface.member_by_name(prop.name).java_type.public_type:
+    //::    raise Exception("Interface and Class types do not match up: C: {} <-> I: {}".format(prop.java_type.public_type, msg.interface.member_by_name(prop.name).java_type.public_type))
+    //:: #endif
     //:: if prop.default_value:
         private final static ${prop.java_type.public_type} ${prop.default_name} = ${prop.default_value};
     //:: #endif
@@ -216,6 +221,10 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 bb.readerIndex(start);
                 return null;
             }
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - length={}", ${prop.name});
+            //:: #endif
 //:: elif prop.is_fixed_value:
             // fixed value property ${prop.name} == ${prop.value}
             ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
@@ -229,23 +238,64 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 //:: #endfor
             //:: if msg.align:
-            // align message to ${msg.align} bytes
+            //:: if msg.length_includes_align:
+            // align message to ${msg.align} bytes (length contains aligned value)
+            bb.skipBytes(length - (bb.readerIndex() - start));
+            //:: else:
+            // align message to ${msg.align} bytes (length does not contain alignment)
             bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
             //:: #endif
 
             //:: if msg.data_members:
             //:: if os.path.exists("%s/custom/%s.Reader_normalize_stanza.java" % (template_dir, msg.name)):
             //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
             //:: #endif
-             return new ${impl_class}(
+            ${impl_class} ${msg.variable_name} = new ${impl_class}(
                     ${",\n                      ".join(
                          [ prop.name for prop in msg.data_members])}
                     );
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - read={}", ${msg.variable_name});
+            //:: #endif
+            return ${msg.variable_name};
             //:: else:
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - returning shared instance={}", INSTANCE);
+            //:: #endif
             return INSTANCE;
             //:: #endif
         }
     }
+
+    public void putTo(PrimitiveSink sink) {
+        FUNNEL.funnel(this, sink);
+    }
+
+    final static ${impl_class}Funnel FUNNEL = new ${impl_class}Funnel();
+    static class ${impl_class}Funnel implements Funnel<${impl_class}> {
+        private static final long serialVersionUID = 1L;
+        @Override
+        public void funnel(${impl_class} message, PrimitiveSink sink) {
+//:: for prop in msg.members:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
+            ${prop.java_type.funnel_op(version, "message." + prop.name, pub_type=True)};
+//:: elif prop.is_pad:
+            // skip pad (${prop.length} bytes)
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} = ${prop.value}
+            ${prop.java_type.funnel_op(version, prop.priv_value, pub_type=False)};
+//:: else:
+            // FIXME: skip funnel of ${prop.name}
+//:: #endif
+//:: #endfor
+        }
+    }
+
 
     public void writeTo(ChannelBuffer bb) {
         WRITER.write(bb, this);
@@ -300,10 +350,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: if not msg.is_fixed_length:
             // update length field
             int length = bb.writerIndex() - startIndex;
-            bb.setShort(lengthIndex, length);
+            //:: if msg.align:
+            int alignedLength = ((length + ${msg.align-1})/${msg.align} * ${msg.align});
+            //:: #endif
+            bb.setShort(lengthIndex, ${"alignedLength" if msg.length_includes_align else "length"});
             //:: if msg.align:
             // align message to ${msg.align} bytes
-            bb.writeZero( ((length + ${msg.align-1})/${msg.align} * ${msg.align}) - length);
+            bb.writeZero(alignedLength - length);
             //:: #endif
 //:: #end
 
@@ -376,6 +429,5 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: #endfor
         return result;
     }
-
 
 }

@@ -1,4 +1,5 @@
-
+//:: from generic_utils import OrderedSet
+//:: from java_gen.java_model import model
     @Override
     public <F extends OFValueType<F>> F get(MatchField<F> field)
             throws UnsupportedOperationException {
@@ -33,36 +34,9 @@
 
     private static boolean supportsField(MatchField<?> field) {
         switch (field.id) {
-            case IN_PORT:
-            case IN_PHY_PORT:
-            case METADATA:
-            case ETH_DST:
-            case ETH_SRC:
-            case ETH_TYPE:
-            case VLAN_VID:
-            case VLAN_PCP:
-            case IP_DSCP:
-            case IP_ECN:
-            case IP_PROTO:
-            case IPV4_SRC:
-            case IPV4_DST:
-            case TCP_SRC:
-            case TCP_DST:
-            case UDP_SRC:
-            case UDP_DST:
-            case SCTP_SRC:
-            case SCTP_DST:
-            case ICMPV4_TYPE:
-            case ICMPV4_CODE:
-            case ARP_OP:
-            case ARP_SPA:
-            case ARP_TPA:
-            case ARP_SHA:
-            case ARP_THA:
-            case IPV6_SRC:
-            case IPV6_DST:
-            case IPV6_FLABEL:
-            case BSN_IN_PORTS_128:
+            //:: for id_constant in sorted(set(id_constant for _, id_constant, _ in model.oxm_map.values())):
+            case ${id_constant}:
+            //:: #endfor
                 return true;
             default:
                 return false;
@@ -108,3 +82,32 @@
 
         return oxm != null && oxm.isMasked();
     }
+
+    private class MatchFieldIterator extends UnmodifiableIterator<MatchField<?>> {
+        private Iterator<OFOxm<?>> oxmIterator;
+
+        MatchFieldIterator() {
+            oxmIterator = oxmList.iterator();
+        }
+
+        @Override
+        public boolean hasNext() {
+            return oxmIterator.hasNext();
+        }
+
+        @Override
+        public MatchField<?> next() {
+            OFOxm<?> next = oxmIterator.next();
+            return next.getMatchField();
+        }
+    }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        return new Iterable<MatchField<?>>() {
+            public Iterator<MatchField<?>> iterator() {
+                return new MatchFieldIterator();
+            }
+        };
+    }
+

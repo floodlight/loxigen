@@ -1,0 +1,18 @@
+-- binary
+04 12 # version, type
+00 18 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 1 # subtype
+-- python
+ofp.message.bsn_lacp_stats_request(
+    xid=0x12345678,
+    flags=0)
+-- java
+builder.setXid(0x12345678)
+-- c
+obj = of_bsn_lacp_stats_request_new(OF_VERSION_1_3);
+of_bsn_lacp_stats_request_xid_set(obj, 0x12345678);

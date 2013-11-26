@@ -10,14 +10,16 @@ import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.match.MatchFields;
 import org.projectfloodlight.openflow.protocol.oxm.OFOxm;
 import org.projectfloodlight.openflow.types.OFValueType;
+import org.projectfloodlight.openflow.types.PrimitiveSinkable;
 import org.projectfloodlight.openflow.util.ChannelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.hash.PrimitiveSink;
 
-public class OFOxmList implements Iterable<OFOxm<?>>, Writeable {
+public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkable {
     private static final Logger logger = LoggerFactory.getLogger(OFOxmList.class);
 
     private final Map<MatchFields, OFOxm<?>> oxmMap;
@@ -139,6 +141,13 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable {
     @Override
     public String toString() {
         return "OFOxmList" + oxmMap;
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        for (OFOxm<?> o : this) {
+            o.putTo(sink);
+        }
     }
 
 

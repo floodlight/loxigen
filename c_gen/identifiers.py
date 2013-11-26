@@ -31,7 +31,6 @@
 
 import sys
 from generic_utils import *
-import of_g
 
 ##
 # The value to use when an identifier is not defined for a version

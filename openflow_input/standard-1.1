@@ -72,9 +72,6 @@ enum ofp_port(wire_type=uint32_t) {
     OFPP_ALL = 0xfffffffc,
     OFPP_CONTROLLER = 0xfffffffd,
     OFPP_LOCAL = 0xfffffffe,
-};
-
-enum ofp_port_no(wire_type=uint32_t, complete=False) {
     OFPP_ANY = 0xffffffff,
 };
 
@@ -135,6 +132,7 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_NO_RECV = 0x4,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
+    OFPPC_BSN_MIRROR_DEST = 0x80000000,
 };
 
 enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
@@ -398,6 +396,11 @@ enum ofp_stats_type(wire_type=uint16_t) {
     OFPST_EXPERIMENTER = 0xffff,
 };
 
+// none defined
+enum ofp_stats_request_flags(wire_type=uint16_t, bitmask=True) {
+};
+
+
 enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
     OFPSF_REPLY_MORE = 0x1,
 };
@@ -474,7 +477,7 @@ struct of_get_config_reply : of_header {
     uint8_t type == 8;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
@@ -483,7 +486,7 @@ struct of_set_config : of_header {
     uint8_t type == 9;
     uint16_t length;
     uint32_t xid;
-    uint16_t flags;
+    enum ofp_config_flags flags;
     uint16_t miss_send_len;
 };
 
@@ -981,8 +984,44 @@ struct of_group_mod : of_header {
     uint8_t type == 15;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
-    uint8_t group_type;
+    enum ofp_group_mod_command command == ?;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_add : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 0;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_modify : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 1;
+    enum ofp_group_type group_type;
+    pad(1);
+    uint32_t group_id;
+    list(of_bucket_t) buckets;
+};
+
+struct of_group_delete : of_group_mod {
+    uint8_t version;
+    uint8_t type == 15;
+    uint16_t length;
+    uint32_t xid;
+    enum ofp_group_mod_command command == 2;
+    enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
@@ -1202,7 +1241,7 @@ struct of_group_stats_entry {
 
 struct of_group_desc_stats_entry {
     uint16_t length;
-    uint8_t type;
+    enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
     list(of_bucket_t) buckets;
@@ -1216,7 +1255,7 @@ struct of_stats_request : of_header {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == ?;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
 };
 
@@ -1226,7 +1265,7 @@ struct of_stats_reply : of_header {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == ?;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
 };
 
@@ -1236,7 +1275,7 @@ struct of_desc_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 0;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
 };
 
@@ -1246,7 +1285,7 @@ struct of_desc_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 0;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     of_desc_str_t mfr_desc;
     of_desc_str_t hw_desc;
@@ -1261,7 +1300,7 @@ struct of_flow_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 1;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     uint8_t table_id;
     pad(3);
@@ -1279,7 +1318,7 @@ struct of_flow_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 1;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_flow_stats_entry_t) entries;
 };
@@ -1290,7 +1329,7 @@ struct of_aggregate_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 2;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     uint8_t table_id;
     pad(3);
@@ -1308,7 +1347,7 @@ struct of_aggregate_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 2;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     uint64_t packet_count;
     uint64_t byte_count;
@@ -1322,7 +1361,7 @@ struct of_table_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 3;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
 };
 
@@ -1332,7 +1371,7 @@ struct of_table_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 3;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_table_stats_entry_t) entries;
 };
@@ -1343,7 +1382,7 @@ struct of_port_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 4;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     of_port_no_t port_no;
     pad(4);
@@ -1355,7 +1394,7 @@ struct of_port_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 4;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_port_stats_entry_t) entries;
 };
@@ -1366,7 +1405,7 @@ struct of_queue_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 5;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     of_port_no_t port_no;
     uint32_t queue_id;
@@ -1378,7 +1417,7 @@ struct of_queue_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 5;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_queue_stats_entry_t) entries;
 };
@@ -1389,7 +1428,7 @@ struct of_group_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 6;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     uint32_t group_id;
     pad(4);
@@ -1401,7 +1440,7 @@ struct of_group_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 6;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_group_stats_entry_t) entries;
 };
@@ -1412,7 +1451,7 @@ struct of_group_desc_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 7;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
 };
 
@@ -1422,7 +1461,7 @@ struct of_group_desc_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 7;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_group_desc_stats_entry_t) entries;
 };
@@ -1433,7 +1472,7 @@ struct of_experimenter_stats_request : of_stats_request {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 0xffff;
-    uint16_t flags;
+    enum ofp_stats_request_flags flags;
     pad(4);
     uint32_t experimenter == ?;
     pad(4);
@@ -1446,7 +1485,7 @@ struct of_experimenter_stats_reply : of_stats_reply {
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 0xffff;
-    uint16_t flags;
+    enum ofp_stats_reply_flags flags;
     pad(4);
     uint32_t experimenter == ?;
     pad(4);

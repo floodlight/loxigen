@@ -42,3 +42,8 @@
         // FIXME yotam - please replace with real implementation
         return false;
     }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        throw new UnsupportedOperationException();
+    }

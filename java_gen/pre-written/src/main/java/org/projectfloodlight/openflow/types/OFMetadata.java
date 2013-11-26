@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
+
 public class OFMetadata implements OFValueType<OFMetadata> {
 
     static int LENGTH = 8;
@@ -23,6 +25,10 @@ public class OFMetadata implements OFValueType<OFMetadata> {
 
     public static OFMetadata ofRaw(long raw) {
         return new OFMetadata(U64.ofRaw(raw));
+    }
+
+    public U64 getValue() {
+        return u64;
     }
 
     public static OFMetadata read8Bytes(ChannelBuffer cb) {
@@ -66,5 +72,10 @@ public class OFMetadata implements OFValueType<OFMetadata> {
     @Override
     public int compareTo(OFMetadata o) {
         return u64.compareTo(o.u64);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        u64.putTo(sink);
     }
 }

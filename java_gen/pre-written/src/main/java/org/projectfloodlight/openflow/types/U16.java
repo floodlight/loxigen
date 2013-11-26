@@ -22,6 +22,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Ints;
 
 public class U16 implements Writeable, OFValueType<U16> {
@@ -116,5 +117,10 @@ public class U16 implements Writeable, OFValueType<U16> {
     @Override
     public int compareTo(U16 o) {
         return Ints.compare(f(raw), f(o.raw));
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putShort(raw);
     }
 }

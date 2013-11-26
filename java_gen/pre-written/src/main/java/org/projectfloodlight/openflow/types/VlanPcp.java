@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
 
 public class VlanPcp implements OFValueType<VlanPcp> {
@@ -74,5 +75,8 @@ public class VlanPcp implements OFValueType<VlanPcp> {
     public int compareTo(VlanPcp o) {
         return UnsignedBytes.compare(pcp, o.pcp);
     }
-
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte(pcp);
+    }
 }

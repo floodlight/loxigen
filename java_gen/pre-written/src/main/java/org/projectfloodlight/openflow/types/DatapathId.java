@@ -1,16 +1,20 @@
 package org.projectfloodlight.openflow.types;
 
+import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.hash.PrimitiveSink;
+import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedLongs;
 
 /**
  * Abstraction of a datapath ID that can be set and/or accessed as either a
- * long value or a colon-separated string.
+ * long value or a colon-separated string. Immutable
  *
  * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
  */
-public class DatapathId implements Comparable<DatapathId> {
+@Immutable
+public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
 
     public static final DatapathId NONE = new DatapathId(0);
 
@@ -28,12 +32,20 @@ public class DatapathId implements Comparable<DatapathId> {
         return new DatapathId(HexString.toLong(s));
     }
 
+    public static DatapathId of(byte[] bytes) {
+        return new DatapathId(Longs.fromByteArray(bytes));
+    }
+
     public long getLong() {
         return rawValue;
     }
 
     public U64 getUnsignedLong() {
         return U64.of(rawValue);
+    }
+
+    public byte[] getBytes() {
+        return Longs.toByteArray(rawValue);
     }
 
     @Override
@@ -61,6 +73,11 @@ public class DatapathId implements Comparable<DatapathId> {
         if (rawValue != other.rawValue)
             return false;
         return true;
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putLong(rawValue);
     }
 
     @Override

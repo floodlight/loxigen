@@ -6,6 +6,8 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
@@ -18,10 +20,16 @@ import com.google.common.collect.ImmutableList.Builder;
  */
 
 public class ChannelUtils {
+    private static final Logger logger = LoggerFactory.getLogger(ChannelUtils.class);
     public static String readFixedLengthString(ChannelBuffer bb, int length) {
         byte[] dst = new byte[length];
         bb.readBytes(dst, 0, length);
-        return new String(dst, Charsets.US_ASCII);
+        int validLength = 0;
+        for (validLength = 0; validLength < length; validLength++) {
+            if (dst[validLength] == 0)
+                break;
+        }
+        return new String(dst, 0, validLength, Charsets.US_ASCII);
     }
 
     public static void writeFixedLengthString(ChannelBuffer bb, String string,
@@ -51,8 +59,13 @@ public class ChannelUtils {
     public static <T> List<T> readList(ChannelBuffer bb, int length, OFMessageReader<T> reader) throws OFParseError {
         int end = bb.readerIndex() + length;
         Builder<T> builder = ImmutableList.<T>builder();
+        if(logger.isTraceEnabled())
+            logger.trace("readList(length={}, reader={})", length, reader.getClass());
         while(bb.readerIndex() < end) {
-            builder.add(reader.readFrom(bb));
+            T read = reader.readFrom(bb);
+            if(logger.isTraceEnabled())
+                logger.trace("readList: read={}, left={}", read, end - bb.readerIndex());
+            builder.add(read);
         }
         if(bb.readerIndex() != end) {
             throw new IllegalStateException("Overread length: length="+length + " overread by "+ (bb.readerIndex() - end) + " reader: "+reader);
