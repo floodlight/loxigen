@@ -37,6 +37,9 @@
 #include <loci/loci.h>
 #include <loci/of_message.h>
 
+#define OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET 4
+#define OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET 8
+
 /****************************************************************
  * Top level OpenFlow message length functions
  ****************************************************************/
@@ -207,8 +210,6 @@ extension_action_object_id_get(of_object_t *obj, of_object_id_t *id)
 
 /**
  * Set wire data for extension objects, not messages.
- *
- * Currently only handles BSN mirror; ignores all others
  */
 
 void
@@ -234,6 +235,11 @@ of_extension_object_id_set(of_object_t *obj, of_object_id_t id)
         buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
                     OF_EXPERIMENTER_ID_NICIRA);
         buf_u16_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 18);
+        break;
+    case OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK:
+        buf_u32_set(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET,
+                    OF_EXPERIMENTER_ID_BSN);
+        buf_u32_set(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, 0);
         break;
     default:
         break;
@@ -339,9 +345,25 @@ of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 static int
 extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
-    (void)obj;
+    uint32_t exp_id;
+    uint8_t *buf;
 
     *id = OF_INSTRUCTION_EXPERIMENTER;
+
+    buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+
+    buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET, &exp_id);
+
+    switch (exp_id) {
+    case OF_EXPERIMENTER_ID_BSN: {
+        uint32_t subtype;
+        buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, &subtype);
+        switch (subtype) {
+        case 0: *id = OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK; break;
+        }
+        break;
+    }
+    }
 
     return OF_ERROR_NONE;
 }
@@ -590,6 +612,42 @@ of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id)
     case OF_OXM_BSN_IN_PORTS_128_MASKED:
         type_len = 0x00030100 | (type_len & 0xff);
         break;
+    case OF_OXM_BSN_LAG_ID:
+        type_len = 0x00030200 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_LAG_ID_MASKED:
+        type_len = 0x00030300 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_VRF:
+        type_len = 0x00030400 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_VRF_MASKED:
+        type_len = 0x00030500 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_GLOBAL_VRF_ALLOWED:
+        type_len = 0x00030600 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_GLOBAL_VRF_ALLOWED_MASKED:
+        type_len = 0x00030700 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_INTERFACE_CLASS_ID:
+        type_len = 0x00030800 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_INTERFACE_CLASS_ID_MASKED:
+        type_len = 0x00030900 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_SRC_CLASS_ID:
+        type_len = 0x00030a00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_SRC_CLASS_ID_MASKED:
+        type_len = 0x00030b00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_DST_CLASS_ID:
+        type_len = 0x00030c00 | (type_len & 0xff);
+        break;
+    case OF_OXM_BSN_L3_DST_CLASS_ID_MASKED:
+        type_len = 0x00030d00 | (type_len & 0xff);
+        break;
     default:
         wire_type = of_object_to_wire_type(id, obj->version);
         ASSERT(wire_type >= 0);
@@ -803,4 +861,28 @@ of_extension_object_wire_push(of_object_t *obj)
     }
 
     return OF_ERROR_NONE;
+}
+
+int
+of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REQUEST;
+        }
+    }
+    return OF_OBJECT_INVALID;
+}
+
+int
+of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REPLY;
+        }
+    }
+    return OF_OBJECT_INVALID;
 }

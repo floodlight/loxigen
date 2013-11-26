@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 
@@ -258,6 +259,11 @@ public class EthType implements OFValueType<EthType> {
     @Override
     public int compareTo(EthType o) {
         return UnsignedInts.compare(rawValue, o.rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 
 

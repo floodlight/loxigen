@@ -2,6 +2,9 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
+import org.jboss.netty.buffer.ChannelBuffer;
+
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
@@ -69,8 +72,21 @@ public class ClassId implements OFValueType<ClassId> {
         return true;
     }
 
+    public void write4Bytes(ChannelBuffer c) {
+        c.writeInt(rawValue);
+    }
+
+    public static ClassId read4Bytes(ChannelBuffer c) {
+        return ClassId.of(c.readInt());
+    }
+
     @Override
     public int compareTo(ClassId o) {
         return UnsignedInts.compare(rawValue, rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

@@ -4,8 +4,12 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
+import org.projectfloodlight.openflow.protocol.match.Match;
+
+import com.google.common.hash.PrimitiveSink;
 
 
 /**
@@ -56,8 +60,7 @@ public class ChannelUtilsVer10 {
         return supportedActions;
     }
 
-    public static void writeSupportedActions(ChannelBuffer bb,
-            Set<OFActionType> supportedActions) {
+    public static int supportedActionsToWire(Set<OFActionType> supportedActions) {
         int supportedActionsVal = 0;
         if (supportedActions.contains(OFActionType.OUTPUT))
             supportedActionsVal |= (1 << OFActionTypeSerializerVer10.OUTPUT_VAL);
@@ -83,6 +86,15 @@ public class ChannelUtilsVer10 {
             supportedActionsVal |= (1 << OFActionTypeSerializerVer10.SET_TP_DST_VAL);
         if (supportedActions.contains(OFActionType.ENQUEUE))
             supportedActionsVal |= (1 << OFActionTypeSerializerVer10.ENQUEUE_VAL);
-        bb.writeInt(supportedActionsVal);
+        return supportedActionsVal;
     }
+
+    public static void putSupportedActionsTo(Set<OFActionType> supportedActions, PrimitiveSink sink) {
+        sink.putInt(supportedActionsToWire(supportedActions));
+    }
+
+    public static void writeSupportedActions(ChannelBuffer bb, Set<OFActionType> supportedActions) {
+        bb.writeInt(supportedActionsToWire(supportedActions));
+    }
+
 }

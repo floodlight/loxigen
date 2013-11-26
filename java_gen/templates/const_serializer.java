@@ -26,17 +26,13 @@
 //:: # under the EPL.
 //::
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
 
 package ${package};
 
-import org.projectfloodlight.openflow.types.*;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFVersion;
+//:: include('_imports.java')
 import ${enum.package}.${enum.name};
 
 public class ${class_name} {
@@ -60,6 +56,10 @@ public class ${class_name} {
         ${wire_type.write_op(version=version, name="toWireValue(e)")};
     }
 
+    public static void putTo(${enum.name} e, PrimitiveSink sink) {
+        ${wire_type.funnel_op(version=version, name="toWireValue(e)")};
+    }
+
     public static ${enum.name} ofWireValue(${int_wire_type} val) {
         switch(val) {
         //:: for entry, _ in entries:
@@ -70,6 +70,7 @@ public class ${class_name} {
                 throw new IllegalArgumentException("Illegal wire value for type ${enum.name} in version ${version}: " + val);
         }
     }
+
 
     public static ${int_wire_type} toWireValue(${enum.name} e) {
         switch(e) {

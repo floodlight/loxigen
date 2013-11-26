@@ -1,0 +1,11 @@
+-- binary
+ff ff # type
+00 10 # length
+00 5c 16 c7 # experimenter
+00 00 00 00 # subtype
+00 00 00 00 # pad
+-- python
+ofp.instruction.bsn_disable_src_mac_check()
+-- java
+-- c
+obj = of_instruction_bsn_disable_src_mac_check_new(OF_VERSION_1_3);

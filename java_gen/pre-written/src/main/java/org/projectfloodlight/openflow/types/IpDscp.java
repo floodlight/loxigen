@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
+
 public enum IpDscp implements OFValueType<IpDscp> {
     DSCP_0((byte)0),
     DSCP_1((byte)1),
@@ -243,5 +245,10 @@ public enum IpDscp implements OFValueType<IpDscp> {
 
     public byte getDscpValue() {
         return dscp;
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte(dscp);
     }
 }

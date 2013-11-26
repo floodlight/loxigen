@@ -4,6 +4,7 @@ import javax.annotation.concurrent.Immutable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
@@ -11,6 +12,7 @@ public class VRF implements OFValueType<VRF> {
     static final int LENGTH = 4;
     private final int rawValue;
 
+    public static final VRF ZERO = VRF.of(0x0);
     public static final VRF NO_MASK = VRF.of(0xFFFFFFFF);
     public static final VRF FULL_MASK = VRF.of(0x00000000);
 
@@ -74,5 +76,10 @@ public class VRF implements OFValueType<VRF> {
     @Override
     public int compareTo(VRF o) {
         return UnsignedInts.compare(rawValue, o.rawValue);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(rawValue);
     }
 }

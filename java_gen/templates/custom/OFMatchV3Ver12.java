@@ -107,3 +107,8 @@
 
         return oxm != null && oxm.isMasked();
     }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        throw new UnsupportedOperationException();
+    }

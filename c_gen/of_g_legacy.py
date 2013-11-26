@@ -32,7 +32,6 @@
 #
 
 import sys
-from optparse import OptionParser
 # @fixme Replace with argparse
 
 ################################################################
@@ -48,83 +47,8 @@ from optparse import OptionParser
 wire_ver_map = {}
 
 ##
-# Command line options
-options = {}
-
-##
-# Command line arguments
-args = []
-
-##@var config_default
-# The default configuration dictionary for LOXI code generation
-options_default = {
-    "lang"               : "c",
-    "version-list"       : "1.0 1.3",
-    "install-dir"        : "loxi_output",
-}
-
-##
 # The list of wire versions which are to be supported
 target_version_list = []
-
-def lang_normalize(lang):
-    """
-    Normalize the representation of the language
-    """
-    return lang.lower()
-
-def version_list_normalize(vlist):
-    """
-    Normalize the version list and return as an array
-    """
-    out_list = []
-    # @fixme Map to OF version references
-    if vlist.find(',') > 0:
-        vlist = vlist.split(',')
-    else:
-        vlist = vlist.split()
-    vlist.sort()
-    for ver in vlist:
-        try:
-            out_list.append(of_param_version_map[ver])
-        except KeyError:
-            sys.stderr.write("Bad version input, %s" % str(ver))
-            sys.exit(1)
-
-    return out_list
-
-def process_commandline(default_vals=options_default):
-    """
-    Set up the options dictionary
-
-    @param cfg_dflt The default configuration dictionary
-    @return A pair (options, args) as per parser return
-    """
-    global options
-    global args
-    global target_version_list
-
-    parser = OptionParser(version="%prog 0.1")
-
-    #@todo Add options via dictionary
-    parser.add_option("--list-files", action="store_true", default=False,
-                      help="List output files generated")
-    parser.add_option("-l", "--lang", "--language",
-                      default=default_vals["lang"],
-                      help="Select the target language: c, python")
-    parser.add_option("-i", "--install-dir",
-                      default=default_vals["install-dir"],
-                      help="Directory to install generated files to (default %s)" % default_vals["install-dir"])
-    parser.add_option("-v", "--version-list",
-                      default=default_vals["version-list"],
-                      help="Specify the versions to target as 1.0 1.1 etc")
-
-    (options, args) = parser.parse_args()
-
-    options.lang = lang_normalize(options.lang)
-    target_version_list = version_list_normalize(options.version_list)
-    target_version_list.sort()
-    return (options, args)
 
 ##
 # The dictionary of config variables related to code
@@ -351,12 +275,6 @@ base_object_members = """\
      */
     uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
 """
-
-# LOXI intermediate representation
-# This is a hash from wire versions to OFProtocol objects.
-# See loxi_ir.py
-
-ir = {}
 
 ##
 # LOXI identifiers

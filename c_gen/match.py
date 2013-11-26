@@ -30,9 +30,9 @@
 # @fixme This still has lots of C specific code that should be moved into c_gen
 
 import sys
-import of_g
+import c_gen.of_g_legacy as of_g
 from generic_utils import *
-import loxi_utils.loxi_utils as loxi_utils
+import c_gen.loxi_utils_legacy as loxi_utils
 
 #
 # Use 1.2 match semantics for common case
@@ -145,24 +145,7 @@ of_match_members = dict(
         takes_mask_in_spec=False,
         order=211,
         ),
-    ipv4_src = dict(
-        name="ipv4_src",
-        m_type="of_ipv4_t",
-        v1_wc_shift=8,
-        print_type="PRIx32",
-        conditions="is_ipv4(match)",
-        takes_mask_in_spec=True,
-        order=300,
-        ),
-    ipv4_dst = dict(
-        name="ipv4_dst",
-        m_type="of_ipv4_t",
-        v1_wc_shift=14,
-        print_type="PRIx32",
-        conditions="is_ipv4(match)",
-        takes_mask_in_spec=True,
-        order=301,
-        ),
+
     ip_dscp = dict(
         name="ip_dscp",
         m_type="uint8_t",
@@ -190,6 +173,24 @@ of_match_members = dict(
         conditions="is_ip(match)",
         takes_mask_in_spec=False,
         order=320,
+        ),
+    ipv4_src = dict(
+        name="ipv4_src",
+        m_type="of_ipv4_t",
+        v1_wc_shift=8,
+        print_type="PRIx32",
+        conditions="is_ipv4(match)",
+        takes_mask_in_spec=True,
+        order=330,
+        ),
+    ipv4_dst = dict(
+        name="ipv4_dst",
+        m_type="of_ipv4_t",
+        v1_wc_shift=14,
+        print_type="PRIx32",
+        conditions="is_ipv4(match)",
+        takes_mask_in_spec=True,
+        order=331,
         ),
 
     tcp_dst = dict(
@@ -270,7 +271,7 @@ of_match_members = dict(
         print_type="PRIx16",
         conditions="is_arp(match)",
         takes_mask_in_spec=False,
-        order=250,
+        order=450,
         ),
 
     arp_spa = dict(
@@ -279,7 +280,7 @@ of_match_members = dict(
         print_type="PRIx32",
         conditions="is_arp(match)",
         takes_mask_in_spec=True,
-        order=251,
+        order=451,
         ),
     arp_tpa = dict(
         name="arp_tpa",
@@ -287,7 +288,7 @@ of_match_members = dict(
         print_type="PRIx32",
         conditions="is_arp(match)",
         takes_mask_in_spec=True,
-        order=252,
+        order=452,
         ),
 
     arp_sha = dict(
@@ -296,7 +297,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="is_arp(match)",
         takes_mask_in_spec=False,
-        order=253,
+        order=453,
         ),
     arp_tha = dict(
         name="arp_tha",
@@ -304,7 +305,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="is_arp(match)",
         takes_mask_in_spec=False,
-        order=254,
+        order=454,
         ),
 
     ipv6_src = dict(
@@ -313,7 +314,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="is_ipv6(match)",
         takes_mask_in_spec=True,
-        order=350,
+        order=500,
         ),
     ipv6_dst = dict(
         name="ipv6_dst",
@@ -321,7 +322,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="is_ipv6(match)",
         takes_mask_in_spec=True,
-        order=351,
+        order=501,
         ),
 
     ipv6_flabel = dict(
@@ -330,7 +331,7 @@ of_match_members = dict(
         print_type="PRIx32",
         conditions="is_ipv6(match)",
         takes_mask_in_spec=False, # Comment in openflow.h says True
-        order=360,
+        order=502,
         ),
 
     icmpv6_type = dict(
@@ -339,7 +340,7 @@ of_match_members = dict(
         print_type="PRIx8",
         conditions="is_icmp_v6(match)",
         takes_mask_in_spec=False,
-        order=440,
+        order=510,
         ),
     icmpv6_code = dict(
         name="icmpv6_code",
@@ -347,7 +348,7 @@ of_match_members = dict(
         print_type="PRIx8",
         conditions="is_icmp_v6(match)",
         takes_mask_in_spec=False,
-        order=441,
+        order=511,
         ),
 
     ipv6_nd_target = dict(
@@ -356,7 +357,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="", # fixme
         takes_mask_in_spec=False,
-        order=442,
+        order=512,
         ),
 
     ipv6_nd_sll = dict(
@@ -365,7 +366,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="", # fixme
         takes_mask_in_spec=False,
-        order=443,
+        order=520,
         ),
     ipv6_nd_tll = dict(
         name="ipv6_nd_tll",
@@ -373,7 +374,7 @@ of_match_members = dict(
         print_type="\"p\"",
         conditions="", # fixme
         takes_mask_in_spec=False,
-        order=444,
+        order=521,
         ),
 
     mpls_label = dict(
@@ -383,7 +384,7 @@ of_match_members = dict(
         print_type="PRIx32",
         conditions="",
         takes_mask_in_spec=False,
-        order=500,
+        order=600,
         ),
     mpls_tc = dict(
         name="mpls_tc",
@@ -392,7 +393,7 @@ of_match_members = dict(
         print_type="PRIx8",
         conditions="",
         takes_mask_in_spec=False,
-        order=501,
+        order=601,
         ),
 
     bsn_in_ports_128 = dict(
@@ -403,6 +404,60 @@ of_match_members = dict(
         conditions="",
         takes_mask_in_spec=True,
         order=1000,
+        ),
+
+    bsn_lag_id = dict(
+        name="bsn_lag_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1001,
+        ),
+
+    bsn_vrf = dict(
+        name="bsn_vrf",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1002,
+        ),
+
+    bsn_global_vrf_allowed = dict(
+        name="bsn_global_vrf_allowed",
+        m_type="uint8_t",
+        print_type="PRIu8",
+        conditions="",
+        takes_mask_in_spec=False,
+        order=1003,
+        ),
+
+    bsn_l3_interface_class_id = dict(
+        name="bsn_l3_interface_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1003,
+        ),
+
+    bsn_l3_src_class_id = dict(
+        name="bsn_l3_src_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1004,
+        ),
+
+    bsn_l3_dst_class_id = dict(
+        name="bsn_l3_dst_class_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1005,
         ),
 )
 
@@ -501,5 +556,3 @@ def match_sanity_check():
             debug("Type mismatch for key %s in oxm data: %s vs %s" %
                   (key, of_match_members[key]["m_type"], oxm_type))
             sys.exit(1)
-
-

@@ -61,6 +61,15 @@
             case VLAN_PCP:
                 result = vlanPcp;
                 break;
+            case ARP_OP:
+                result = ArpOpcode.of(ipProto.getIpProtocolNumber());
+                break;
+            case ARP_SPA:
+                result = ipv4Src;
+                break;
+            case ARP_TPA:
+                result = ipv4Dst;
+                break;
             case IP_DSCP:
                 result = ipDscp;
                 break;
@@ -68,13 +77,13 @@
                 result = ipProto;
                 break;
             case IPV4_SRC:
-                result = ipv4Dst;
+                result = ipv4Src;
                 break;
             case IPV4_DST:
                 result = ipv4Dst;
                 break;
             case TCP_SRC:
-                result = ipv4Src;
+                result = tcpSrc;
                 break;
             case TCP_DST:
                 result = tcpDst;
@@ -114,10 +123,12 @@
             return null;
         Object result;
         switch (field.id) {
+            case ARP_SPA:
             case IPV4_SRC:
                 int srcBitMask = (-1) << (32 - getIpv4SrcCidrMaskLen());
                 result = IPv4AddressWithMask.of(ipv4Src, IPv4Address.of(srcBitMask));
                 break;
+            case ARP_TPA:
             case IPV4_DST:
                 int dstBitMask = (-1) << (32 - getIpv4DstCidrMaskLen());
 
@@ -138,6 +149,9 @@
             case ETH_TYPE:
             case VLAN_VID:
             case VLAN_PCP:
+            case ARP_OP:
+            case ARP_SPA:
+            case ARP_TPA:
             case IP_DSCP:
             case IP_PROTO:
             case IPV4_SRC:
@@ -159,6 +173,8 @@
     @Override
     public boolean supportsMasked(MatchField<?> field) {
         switch (field.id) {
+            case ARP_SPA:
+            case ARP_TPA:
             case IPV4_SRC:
             case IPV4_DST:
                 return true;
@@ -185,6 +201,12 @@
                 return (this.wildcards & OFPFW_DL_VLAN) == 0;
             case VLAN_PCP:
                 return (this.wildcards & OFPFW_DL_VLAN_PCP) == 0;
+            case ARP_OP:
+                return (this.wildcards & OFPFW_NW_PROTO) == 0;
+            case ARP_SPA:
+                return this.getIpv4SrcCidrMaskLen() >= 32;
+            case ARP_TPA:
+                return this.getIpv4DstCidrMaskLen() >= 32;
             case IP_DSCP:
                 return (this.wildcards & OFPFW_NW_TOS) == 0;
             case IP_PROTO:
@@ -259,6 +281,12 @@
                 return (this.wildcards & OFPFW_DL_VLAN) != 0;
             case VLAN_PCP:
                 return (this.wildcards & OFPFW_DL_VLAN_PCP) != 0;
+            case ARP_OP:
+                return (this.wildcards & OFPFW_NW_PROTO) != 0;
+            case ARP_SPA:
+                return this.getIpv4SrcCidrMaskLen() <= 0;
+            case ARP_TPA:
+                return this.getIpv4DstCidrMaskLen() <= 0;
             case IP_DSCP:
                 return (this.wildcards & OFPFW_NW_TOS) != 0;
             case IP_PROTO:
@@ -294,13 +322,89 @@
             return false;
 
         switch (field.id) {
+            case ARP_SPA:
             case IPV4_SRC:
                 int srcCidrLen = getIpv4SrcCidrMaskLen();
                 return srcCidrLen > 0 && srcCidrLen < 32;
+            case ARP_TPA:
             case IPV4_DST:
                 int dstCidrLen = getIpv4SrcCidrMaskLen();
                 return dstCidrLen > 0 && dstCidrLen < 32;
             default:
                 throw new UnsupportedOperationException("OFMatch does not support masked matching on field " + field.getName());
         }
+    }
+
+    @Override
+    public Iterable<MatchField<?>> getMatchFields() {
+        ImmutableList.Builder<MatchField<?>> builder = ImmutableList.builder();
+        if ((wildcards & OFPFW_IN_PORT) == 0)
+            builder.add(MatchField.IN_PORT);
+        if ((wildcards & OFPFW_DL_VLAN) == 0)
+            builder.add(MatchField.VLAN_VID);
+        if ((wildcards & OFPFW_DL_SRC) == 0)
+            builder.add(MatchField.ETH_SRC);
+        if ((wildcards & OFPFW_DL_DST) == 0)
+            builder.add(MatchField.ETH_DST);
+        if ((wildcards & OFPFW_DL_TYPE) == 0)
+            builder.add(MatchField.ETH_TYPE);
+        if ((wildcards & OFPFW_NW_PROTO) == 0) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_OP);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IP_PROTO);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on network protocol " + ethType);
+            }
+        }
+        if ((wildcards & OFPFW_TP_SRC) == 0) {
+            if (ipProto == IpProtocol.UDP) {
+                builder.add(MatchField.UDP_SRC);
+            } else if (ipProto == IpProtocol.TCP) {
+                builder.add(MatchField.TCP_SRC);
+            } else if (ipProto == IpProtocol.SCTP) {
+                builder.add(MatchField.SCTP_SRC);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported IP protocol for matching on source port " + ipProto);
+            }
+        }
+        if ((wildcards & OFPFW_TP_DST) == 0) {
+            if (ipProto == IpProtocol.UDP) {
+                builder.add(MatchField.UDP_DST);
+            } else if (ipProto == IpProtocol.TCP) {
+                builder.add(MatchField.TCP_DST);
+            } else if (ipProto == IpProtocol.SCTP) {
+                builder.add(MatchField.SCTP_DST);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported IP protocol for matching on destination port " + ipProto);
+            }
+        }
+        if (((wildcards & OFPFW_NW_SRC_MASK) >> OFPFW_NW_SRC_SHIFT) < 32) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_SPA);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IPV4_SRC);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on source IP " + ethType);
+            }
+        }
+        if (((wildcards & OFPFW_NW_DST_MASK) >> OFPFW_NW_DST_SHIFT) < 32) {
+            if (ethType == EthType.ARP) {
+                builder.add(MatchField.ARP_TPA);
+            } else if (ethType == EthType.IPv4) {
+                builder.add(MatchField.IPV4_DST);
+            } else {
+                throw new UnsupportedOperationException(
+                        "Unsupported Ethertype for matching on destination IP " + ethType);
+            }
+        }
+        if ((wildcards & OFPFW_DL_VLAN_PCP) == 0)
+            builder.add(MatchField.VLAN_PCP);
+        if ((wildcards & OFPFW_NW_TOS) == 0)
+            builder.add(MatchField.IP_DSCP);
+        return builder.build();
     }

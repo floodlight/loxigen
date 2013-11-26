@@ -28,7 +28,6 @@
 from collections import namedtuple
 
 import loxi_utils.loxi_utils as loxi_utils
-import of_g
 
 OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 
@@ -204,6 +203,7 @@ fixed_elem_len_lists = {
     'list(of_table_stats_entry_t)': 'common.table_stats_entry.unpack',
     'list(of_uint32_t)': 'common.uint32.unpack',
     'list(of_uint8_t)': 'common.uint8.unpack',
+    'list(of_bsn_lacp_stats_entry_t)': 'common.bsn_lacp_stats_entry.unpack',
 }
 
 for (cls, element_deserializer) in fixed_elem_len_lists.items():

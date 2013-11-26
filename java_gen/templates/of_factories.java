@@ -26,7 +26,6 @@
 //:: # under the EPL.
 //::
 //:: import itertools
-//:: import of_g
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -36,14 +35,38 @@ package org.projectfloodlight.openflow.protocol;
 //:: include("_imports.java")
 
 public final class OFFactories {
+
+    private static final GenericReader GENERIC_READER = new GenericReader();
+
     public static OFFactory getFactory(OFVersion version) {
         switch(version) {
             //:: for v in versions:
             case ${v.constant_version}:
-                return org.projectfloodlight.openflow.protocol.ver${v.of_version}.OFFactoryVer${v.of_version}.INSTANCE;
+                return org.projectfloodlight.openflow.protocol.ver${v.dotless_version}.OFFactoryVer${v.dotless_version}.INSTANCE;
             //:: #endfor
             default:
                 throw new IllegalArgumentException("Unknown version: "+version);
             }
+    }
+
+    private static class GenericReader implements OFMessageReader<OFMessage> {
+        public OFMessage readFrom(ChannelBuffer bb) throws OFParseError {
+            short wireVersion = U8.f(bb.getByte(0));
+            OFFactory factory;
+            switch (wireVersion) {
+            //:: for v in versions:
+            case ${v.int_version}:
+                factory = org.projectfloodlight.openflow.protocol.ver${v.dotless_version}.OFFactoryVer${v.dotless_version}.INSTANCE;
+                break;
+            //:: #endfor
+            default:
+                throw new IllegalArgumentException("Unknown wire version: " + wireVersion);
+            }
+            return factory.getReader().readFrom(bb);
+        }
+    }
+
+    public static OFMessageReader<OFMessage> getGenericReader() {
+        return GENERIC_READER;
     }
 }

@@ -38,6 +38,5 @@ loaded automatically by Wireshark.
 
 import wireshark_gen
 
-targets = {
-    'wireshark/openflow.lua' : wireshark_gen.generate
-}
+def generate(install_dir):
+    wireshark_gen.generate(install_dir)

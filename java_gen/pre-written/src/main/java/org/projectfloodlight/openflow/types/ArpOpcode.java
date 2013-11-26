@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 public class ArpOpcode implements OFValueType<ArpOpcode> {
@@ -158,10 +159,6 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
         return ArpOpcode.of(this.opcode & mask.opcode);
     }
 
-    public int getOpCode() {
-        return opcode;
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -187,6 +184,11 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
     @Override
     public int compareTo(ArpOpcode o) {
         return UnsignedInts.compare(opcode, o.opcode);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putShort((short) this.opcode);
     }
 
 }

@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.hash.PrimitiveSink;
+
 public class OFBitMask128 implements OFValueType<OFBitMask128> {
 
     static final int LENGTH = 16;
@@ -20,7 +22,7 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
         this.raw2 = raw2;
     }
 
-    static OFBitMask128 of(long raw1, long raw2) {
+    public static OFBitMask128 of(long raw1, long raw2) {
         if (raw1 == -1 && raw2 == -1)
             return ALL;
         if (raw1 == 0 && raw2 == 0)
@@ -90,6 +92,12 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
         if (c != 0)
             return Long.signum(c);
         return Long.signum(this.raw2 - o.raw2);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putLong(raw1);
+        sink.putLong(raw2);
     }
 
 }

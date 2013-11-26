@@ -40,8 +40,8 @@
 # takes mask
 
 import sys
-import of_g
-import loxi_front_end.match as match
+import c_gen.of_g_legacy as of_g
+import c_gen.match as match
 import c_code_gen
 
 def match_c_top_matter(out, name):
@@ -288,6 +288,12 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
 
     OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
+    OF_OXM_INDEX_BSN_LAG_ID = 37,
+    OF_OXM_INDEX_BSN_VRF = 38,
+    OF_OXM_INDEX_BSN_GLOBAL_VRF_ALLOWED = 39,
+    OF_OXM_INDEX_BSN_L3_INTERFACE_CLASS_ID = 40,
+    OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
+    OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
@@ -602,8 +608,8 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
 
     /* For each active member, add an OXM entry to the list */
 """)
-    # @fixme Would like to generate the list in some reasonable order
-    for key, entry in match.of_match_members.items():
+    for key in match.match_keys_sorted:
+        entry = match.of_match_members[key]
         out.write("""\
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(src)) {
         if (!OF_MATCH_MASK_%(ku)s_EXACT_TEST(src)) {

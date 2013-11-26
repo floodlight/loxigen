@@ -27,24 +27,9 @@
 
 """
 @brief Java language specific LOXI generating configuration
-
-This language specific file defines:
-
-target_files:  List of internal references to files to generate
-file_gen_map: The map from above file references to generator functions
-file_to_name_map: The map from internal references to external file names
-file_to_subdir_map: The map from internal references to external subdirectories
-
-HOWEVER, since java files are all a function of their class name, we don't
-know in advance what the names of the files/classes will be, so we just
-define a single directory and generate everything in there.
-    @fixme talk to DanT to see if there isn't something that makes more sense
-
 """
 
 import java_gen.codegen as java_codegen
 
-
-targets = {
-    'openflowj/README': java_codegen.gen_all_java
-}
+def generate(install_dir):
+    java_codegen.gen_all_java(install_dir)

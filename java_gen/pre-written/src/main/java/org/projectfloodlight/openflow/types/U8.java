@@ -22,6 +22,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
 
 public class U8 implements Writeable, OFValueType<U8> {
@@ -125,4 +126,8 @@ public class U8 implements Writeable, OFValueType<U8> {
         return UnsignedBytes.compare(raw, o.raw);
     }
 
-}
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putByte(raw);
+    }
+ }

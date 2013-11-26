@@ -4,6 +4,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 /**
@@ -553,5 +554,10 @@ public class OFPort implements OFValueType<OFPort> {
     @Override
     public int compareTo(OFPort o) {
         return UnsignedInts.compare(this.portNumber, o.portNumber);
+    }
+
+    @Override
+    public void putTo(PrimitiveSink sink) {
+        sink.putInt(portNumber);
     }
 }

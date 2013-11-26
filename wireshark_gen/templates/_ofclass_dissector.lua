@@ -26,14 +26,14 @@
 :: # under the EPL.
 ::
 :: from loxi_ir import *
-:: from wireshark_gen import make_field_name
+:: from wireshark_gen import make_field_name, get_reader
 :: attrs = []
 :: if ofclass.virtual: attrs.append("virtual")
 :: if ofclass.superclass: attrs.append("child")
 :: if not ofclass.superclass: attrs.append("top-level")
 -- ${' '.join(attrs)} class ${ofclass.name}
 :: if ofclass.superclass:
--- Child of ${ofclass.superclass}
+-- Child of ${ofclass.superclass.name}
 :: #endif
 :: if ofclass.virtual:
 -- Discriminator is ${ofclass.discriminator.name}
@@ -45,8 +45,8 @@ function ${name}(reader, subtree)
 :: continue
 :: #endif
 :: field_name = make_field_name(version, ofclass.name, m.name)
-:: reader_name = "read_" + m.oftype.replace(')', '').replace('(', '_')
-    ${reader_name}(reader, ${version}, subtree, '${field_name}')
+:: reader_name = get_reader(version, ofclass, m)
+    ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
 :: #endfor
     return '${ofclass.name}'
 end

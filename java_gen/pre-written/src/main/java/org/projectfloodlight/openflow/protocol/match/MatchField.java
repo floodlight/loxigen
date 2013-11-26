@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.protocol.match;
 
 import org.projectfloodlight.openflow.types.ArpOpcode;
+import org.projectfloodlight.openflow.types.ClassId;
 import org.projectfloodlight.openflow.types.EthType;
 import org.projectfloodlight.openflow.types.ICMPv4Code;
 import org.projectfloodlight.openflow.types.ICMPv4Type;
@@ -10,16 +11,19 @@ import org.projectfloodlight.openflow.types.IPv6FlowLabel;
 import org.projectfloodlight.openflow.types.IpDscp;
 import org.projectfloodlight.openflow.types.IpEcn;
 import org.projectfloodlight.openflow.types.IpProtocol;
+import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
+import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
+import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
-import org.projectfloodlight.openflow.types.VlanVid;
 
 @SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
@@ -52,19 +56,19 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<EthType> ETH_TYPE =
             new MatchField<EthType>("eth_type", MatchFields.ETH_TYPE);
 
-    public final static MatchField<VlanVid> VLAN_VID =
-            new MatchField<VlanVid>("vlan_vid", MatchFields.VLAN_VID);
+    public final static MatchField<OFVlanVidMatch> VLAN_VID =
+            new MatchField<OFVlanVidMatch>("vlan_vid", MatchFields.VLAN_VID);
 
     public final static MatchField<VlanPcp> VLAN_PCP =
             new MatchField<VlanPcp>("vlan_pcp", MatchFields.VLAN_PCP,
-                    new Prerequisite<VlanVid>(MatchField.VLAN_VID));
+                    new Prerequisite<OFVlanVidMatch>(MatchField.VLAN_VID));
 
     public final static MatchField<IpDscp> IP_DSCP =
             new MatchField<IpDscp>("ip_dscp", MatchFields.IP_DSCP,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpEcn> IP_ECN =
-            new MatchField<IpEcn>("ip_dscp", MatchFields.IP_ECN,
+            new MatchField<IpEcn>("ip_ecn", MatchFields.IP_ECN,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpProtocol> IP_PROTO =
@@ -104,11 +108,11 @@ public class MatchField<F extends OFValueType<F>> {
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
     public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
-            "icmpv4_src", MatchFields.ICMPV4_TYPE,
+            "icmpv4_type", MatchFields.ICMPV4_TYPE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
-            "icmpv4_dst", MatchFields.ICMPV4_CODE,
+            "icmpv4_code", MatchFields.ICMPV4_CODE,
             new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
     public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
@@ -172,7 +176,25 @@ public class MatchField<F extends OFValueType<F>> {
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
-            new MatchField<OFBitMask128>("bsn_in_port_masked_128", MatchFields.BSN_IN_PORTS_128);
+            new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
+
+    public final static MatchField<LagId> BSN_LAG_ID =
+            new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+
+    public final static MatchField<VRF> BSN_VRF =
+            new MatchField<VRF>("bsn_vrf", MatchFields.BSN_VRF);
+
+    public final static MatchField<OFBooleanValue> BSN_GLOBAL_VRF_ALLOWED =
+            new MatchField<OFBooleanValue>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
+
+    public final static MatchField<ClassId> BSN_L3_INTERFACE_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_SRC_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_src_class_id", MatchFields.BSN_L3_SRC_CLASS_ID);
+
+    public final static MatchField<ClassId> BSN_L3_DST_CLASS_ID =
+            new MatchField<ClassId>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
 
     public String getName() {
         return name;

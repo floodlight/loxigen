@@ -1,0 +1,72 @@
+-- binary
+04 13 # version, type
+00 3c # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 1 # subtype
+00 00 f1 11 # entries[0].port_no
+f2 22 # entries[0].actor_sys_priority
+01 02 03 04 05 06 # entries[0].actor_sys_mac
+f3 33 # entries[0].actor_port_priority
+f4 44 # entries[0].actor_port_num
+f5 55 # entries[0].actor_port_key
+02 # entries[0].convergence_status
+00 # pad
+f6 66 # entries[0].partner_sys_priority
+0a 0b 0c 0d 0e 0f # entries[0].partner_sys_mac
+f7 77 # entries[0].partner_port_priority
+f8 88 # entries[0].partner_port_num
+f9 99 # entries[0].partner_port_key
+00 00 # pad
+-- python
+ofp.message.bsn_lacp_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    entries=[
+        ofp.bsn_lacp_stats_entry(
+            port_no=0xf111,
+            actor_sys_priority=0xf222,
+            actor_sys_mac=[1, 2, 3, 4, 5, 6],
+            actor_port_priority=0xf333,
+            actor_port_num=0xf444,
+            actor_key=0xf555,
+            convergence_status=ofp.LACP_OUT_OF_SYNC,
+            partner_sys_priority=0xf666,
+            partner_sys_mac=[0xa, 0xb, 0xc, 0xd, 0xe, 0xf],
+            partner_port_priority=0xf777,
+            partner_port_num=0xf888,
+            partner_key=0xf999)])
+-- c
+obj = of_bsn_lacp_stats_reply_new(OF_VERSION_1_3);
+of_bsn_lacp_stats_reply_xid_set(obj, 0x12345678);
+{
+    of_object_t *entries = of_list_bsn_lacp_stats_entry_new(OF_VERSION_1_3);
+    {
+        of_object_t *elem = of_bsn_lacp_stats_entry_new(OF_VERSION_1_3);
+        of_bsn_lacp_stats_entry_port_no_set(elem, 0xf111);
+        of_bsn_lacp_stats_entry_actor_sys_priority_set(elem, 0xf222);
+        {
+            of_mac_addr_t mac = { { 1, 2, 3, 4, 5, 6 } };
+            of_bsn_lacp_stats_entry_actor_sys_mac_set(elem, mac);
+        }
+        of_bsn_lacp_stats_entry_actor_port_priority_set(elem, 0xf333);
+        of_bsn_lacp_stats_entry_actor_port_num_set(elem, 0xf444);
+        of_bsn_lacp_stats_entry_actor_key_set(elem, 0xf555);
+        of_bsn_lacp_stats_entry_partner_sys_priority_set(elem, 0xf666);
+        of_bsn_lacp_stats_entry_convergence_status_set(elem, LACP_OUT_OF_SYNC);
+        {
+            of_mac_addr_t mac = { { 0xa, 0xb, 0xc, 0xd, 0xe, 0xf } };
+            of_bsn_lacp_stats_entry_partner_sys_mac_set(elem, mac);
+        }
+        of_bsn_lacp_stats_entry_partner_port_priority_set(elem, 0xf777);
+        of_bsn_lacp_stats_entry_partner_port_num_set(elem, 0xf888);
+        of_bsn_lacp_stats_entry_partner_key_set(elem, 0xf999);
+        of_list_append(entries, elem);
+        of_object_delete(elem);
+    }
+    of_bsn_lacp_stats_reply_entries_set(obj, entries);
+    of_object_delete(entries);
+}
