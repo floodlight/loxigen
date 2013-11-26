@@ -22,7 +22,7 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
         this.raw2 = raw2;
     }
 
-    static OFBitMask128 of(long raw1, long raw2) {
+    public static OFBitMask128 of(long raw1, long raw2) {
         if (raw1 == -1 && raw2 == -1)
             return ALL;
         if (raw1 == 0 && raw2 == 0)
