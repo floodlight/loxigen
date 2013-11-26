@@ -1,24 +1,18 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertThat;
 import junit.framework.TestCase;
 
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableList;
-
 public class OFPortBitMapTest extends TestCase {
     @Test
     public void testCreateAndIterate() {
         OFPortBitMap map = OFPortBitMap.ofPorts(OFPort.of(1), OFPort.of(2), OFPort.of(5));
 
-        assertThat(
-                ImmutableList.copyOf(map.getOnPorts()),
-                equalTo(
-                   ImmutableList.of(OFPort.of(1), OFPort.of(2), OFPort.of(5))
-                ));
+        assertThat(map.getOnPorts(), contains(OFPort.of(1), OFPort.of(2), OFPort.of(5)));
     }
 
     @Test
@@ -27,11 +21,7 @@ public class OFPortBitMapTest extends TestCase {
 
         OFPortBitMap map = OFPortBitMap.of(bitmap);
 
-        assertThat(
-                ImmutableList.copyOf(map.getOnPorts()),
-                equalTo(
-                   ImmutableList.of(OFPort.of(1), OFPort.of(2), OFPort.of(5))
-                ));
+        assertThat(map.getOnPorts(), contains(OFPort.of(1), OFPort.of(2), OFPort.of(5)));
     }
 
     @Test

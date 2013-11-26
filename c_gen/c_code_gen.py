@@ -2729,7 +2729,8 @@ static inline int
             # Some tlv16 types may be extensions requiring more work
             if cls in ["of_action_bsn_mirror", "of_action_id_bsn_mirror",
                        "of_action_bsn_set_tunnel_dst", "of_action_id_bsn_set_tunnel_dst",
-                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl"]:
+                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl",
+                       "of_instruction_bsn_disable_src_mac_check"]:
                 out.write("""
     /* Extended TLV obj; Call specific accessor */
     of_extension_object_id_set(obj, %(enum)s);
