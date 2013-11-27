@@ -63,10 +63,17 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
         return builder.build();
     }
 
+    /** @return an OFPortBitmap based on the 'mask' part of an OFBitMask128, as, e.g., returned
+     *  by the switch.
+     **/
     public static OFPortBitMap of(OFBitMask128 mask) {
         return new OFPortBitMap(mask);
     }
 
+    /** @return iterating over all ports that are logically included in the
+     *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+     *  this OXM.
+     */
     public Iterable<OFPort> getOnPorts() {
         ArrayList<OFPort> ports = new ArrayList<>();
         for(int i=0; i < 127; i++) {
