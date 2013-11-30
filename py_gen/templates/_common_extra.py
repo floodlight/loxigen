@@ -25,23 +25,14 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import itertools
-:: import py_gen.util as util
-:: include('_copyright.py')
-
-:: include('_autogen.py')
-
-import struct
-import const
-import util
-import loxi.generic_util
-import loxi
-
-:: for ofclass in ofclasses:
-:: if ofclass.virtual:
-:: include('_virtual_ofclass.py', ofclass=ofclass)
-:: else:
-:: include('_ofclass.py', ofclass=ofclass)
+:: from loxi_globals import OFVersions
+:: if version == OFVersions.VERSION_1_0:
+match = match_v1
+:: elif version == OFVersions.VERSION_1_1:
+match = match_v2
+:: elif version == OFVersions.VERSION_1_2:
+match = match_v3
+:: elif version == OFVersions.VERSION_1_3:
+:: # HACK
+match = match_v3
 :: #endif
-
-:: #endfor

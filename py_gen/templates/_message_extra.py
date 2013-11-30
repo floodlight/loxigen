@@ -25,23 +25,15 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import itertools
-:: import py_gen.oftype
-:: include('_copyright.py')
+def parse_header(buf):
+    if len(buf) < 8:
+        raise loxi.ProtocolError("too short to be an OpenFlow message")
+    return struct.unpack_from("!BBHL", buf)
 
-:: include('_autogen.py')
-
-import struct
-import const
-import util
-import loxi.generic_util
-import loxi
-
-:: for ofclass in ofclasses:
-:: if ofclass.virtual:
-:: include('_virtual_ofclass.py', ofclass=ofclass)
-:: else:
-:: include('_ofclass.py', ofclass=ofclass)
-:: #endif
-
-:: #endfor
+def parse_message(buf):
+    msg_ver, msg_type, msg_len, msg_xid = parse_header(buf)
+    if msg_ver != const.OFP_VERSION and msg_type != const.OFPT_HELLO:
+        raise loxi.ProtocolError("wrong OpenFlow version (expected %d, got %d)" % (const.OFP_VERSION, msg_ver))
+    if len(buf) != msg_len:
+        raise loxi.ProtocolError("incorrect message size")
+    return message.unpack(loxi.generic_util.OFReader(buf))

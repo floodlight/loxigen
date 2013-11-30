@@ -70,36 +70,38 @@ def generate_init(out, name, version):
     util.render_template(out, 'init.py', version=version)
 
 def generate_action(out, name, version):
-    util.render_template(out, 'action.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['action'],
                          version=version)
 
 def generate_oxm(out, name, version):
-    util.render_template(out, 'oxm.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['oxm'],
                          version=version)
 
 def generate_common(out, name, version):
-    util.render_template(out, 'common.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['common'],
-                         version=version)
+                         version=version,
+                         extra_template='_common_extra.py')
 
 def generate_const(out, name, version):
     util.render_template(out, 'const.py', version=version,
                          enums=loxi_globals.ir[version].enums)
 
 def generate_instruction(out, name, version):
-    util.render_template(out, 'instruction.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['instruction'],
                          version=version)
 
 def generate_message(out, name, version):
-    util.render_template(out, 'message.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['message'],
-                         version=version)
+                         version=version,
+                         extra_template='_message_extra.py')
 
 def generate_meter_band(out, name, version):
-    util.render_template(out, 'meter_band.py',
+    util.render_template(out, 'module.py',
                          ofclasses=modules_by_version[version]['meter_band'],
                          version=version)
 

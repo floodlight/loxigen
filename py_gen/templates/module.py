@@ -17,7 +17,7 @@
 :: # You may not use this file except in compliance with the EPL or LOXI Exception. You may obtain
 :: # a copy of the EPL at:
 :: #
-:: # http::: #www.eclipse.org/legal/epl-v10.html
+:: # http://www.eclipse.org/legal/epl-v10.html
 :: #
 :: # Unless required by applicable law or agreed to in writing, software
 :: # distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
@@ -25,10 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import itertools
 :: from loxi_globals import OFVersions
-:: import loxi_globals
-:: import py_gen.util as util
 :: import py_gen.oftype
 :: include('_copyright.py')
 
@@ -38,12 +35,15 @@ import struct
 import loxi
 import const
 import common
-import action # for unpack_list
+import action
 :: if version >= OFVersions.VERSION_1_1:
-import instruction # for unpack_list
+import instruction
+:: #endif
+:: if version >= OFVersions.VERSION_1_2:
+import oxm
 :: #endif
 :: if version >= OFVersions.VERSION_1_3:
-import meter_band # for unpack_list
+import meter_band
 :: #endif
 import util
 import loxi.generic_util
@@ -57,15 +57,6 @@ import loxi.generic_util
 
 :: #endfor
 
-def parse_header(buf):
-    if len(buf) < 8:
-        raise loxi.ProtocolError("too short to be an OpenFlow message")
-    return struct.unpack_from("!BBHL", buf)
-
-def parse_message(buf):
-    msg_ver, msg_type, msg_len, msg_xid = parse_header(buf)
-    if msg_ver != const.OFP_VERSION and msg_type != const.OFPT_HELLO:
-        raise loxi.ProtocolError("wrong OpenFlow version (expected %d, got %d)" % (const.OFP_VERSION, msg_ver))
-    if len(buf) != msg_len:
-        raise loxi.ProtocolError("incorrect message size")
-    return message.unpack(loxi.generic_util.OFReader(buf))
+:: if 'extra_template' in locals():
+:: include(extra_template)
+:: #endif
