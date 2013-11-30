@@ -28,10 +28,6 @@
 :: # TODO coalesce format strings
 :: from loxi_ir import *
 :: from py_gen.oftype import gen_unpack_expr
-        if type(buf) == loxi.generic_util.OFReader:
-            reader = buf
-        else:
-            reader = loxi.generic_util.OFReader(buf)
 :: field_length_members = {}
 :: for m in ofclass.members:
 ::     if type(m) == OFPadMember:

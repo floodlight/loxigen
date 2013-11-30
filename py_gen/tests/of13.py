@@ -110,7 +110,7 @@ class TestAllOF13(unittest.TestCase):
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)

@@ -30,6 +30,7 @@ import unittest
 try:
     import loxi
     import loxi.of11 as ofp
+    from loxi.generic_util import OFReader
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
@@ -78,7 +79,7 @@ class TestAllOF11(unittest.TestCase):
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)

@@ -28,7 +28,7 @@ class ${ofclass.pyname}(${superclass_pyname}):
         return ''.join(packed)
 
     @staticmethod
-    def unpack(buf):
+    def unpack(reader):
         obj = ${ofclass.pyname}()
 :: include("_unpack.py", ofclass=ofclass)
         return obj

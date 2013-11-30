@@ -130,7 +130,7 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(match.wildcards, ofp.OFPFW_ALL)
         self.assertEquals(match.tcp_src, 0)
         buf = match.pack()
-        match2 = ofp.match.unpack(buf)
+        match2 = ofp.match.unpack(OFReader(buf))
         self.assertEquals(match, match2)
 
 class TestMessages(unittest.TestCase):
@@ -154,7 +154,7 @@ class TestMessages(unittest.TestCase):
     def test_echo_request_invalid_length(self):
         buf = "\x01\x02\x00\x07\x12\x34\x56"
         with self.assertRaisesRegexp(ofp.ProtocolError, "Buffer too short"):
-            ofp.message.echo_request.unpack(buf)
+            ofp.message.echo_request.unpack(OFReader(buf))
 
     def test_echo_request_equality(self):
         msg = ofp.message.echo_request(xid=0x12345678, data="abc")
@@ -241,7 +241,7 @@ class TestAll(unittest.TestCase):
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
