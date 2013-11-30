@@ -36,10 +36,6 @@ from loxi_ir import *
 
 ofclasses_by_version = {}
 
-PyOFClass = namedtuple('PyOFClass', ['name', 'pyname', 'members', 'type_members',
-                                     'min_length', 'is_fixed_length',
-                                     'has_internal_alignment', 'has_external_alignment'])
-
 # Return the name for the generated Python class
 def generate_pyname(cls):
     if utils.class_is_action(cls):
@@ -54,50 +50,15 @@ def generate_pyname(cls):
         return cls[3:]
 
 # Create intermediate representation, extended from the LOXI IR
-# HACK the oftype member attribute is replaced with an OFType instance
 def build_ofclasses(version):
     ofclasses = []
     for ofclass in loxi_globals.ir[version].classes:
-        cls = ofclass.name
         if ofclass.virtual:
             continue
 
-        members = []
-        type_members = []
+        ofclass.pyname = generate_pyname(ofclass.name)
+        ofclasses.append(ofclass)
 
-        for m in ofclass.members:
-            if type(m) == OFTypeMember:
-                members.append(m)
-                type_members.append(members[-1])
-            elif type(m) == OFLengthMember:
-                members.append(m)
-            elif type(m) == OFFieldLengthMember:
-                members.append(m)
-            elif type(m) == OFPadMember:
-                members.append(m)
-            elif type(m) == OFDataMember:
-                if utils.class_is_message(ofclass.name) and m.name == 'version':
-                    # HACK move to frontend
-                    members.append(OFTypeMember(
-                        name=m.name,
-                        oftype=m.oftype,
-                        value=version.wire_version,
-                        base_length=m.base_length,
-                        is_fixed_length=m.is_fixed_length,
-                        offset=m.offset))
-                    type_members.append(members[-1])
-                else:
-                    members.append(m)
-
-        ofclasses.append(
-            PyOFClass(name=cls,
-                      pyname=generate_pyname(cls),
-                      members=members,
-                      type_members=type_members,
-                      min_length=ofclass.base_length,
-                      is_fixed_length=ofclass.is_fixed_length,
-                      has_internal_alignment=cls == 'of_action_set_field',
-                      has_external_alignment=cls == 'of_match_v3'))
     return ofclasses
 
 def generate_init(out, name, version):

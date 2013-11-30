@@ -54,7 +54,7 @@ class MeterBand(object):
 :: #endfor
 
 parsers = {
-:: sort_key = lambda x: x.type_members[0].value
+:: sort_key = lambda x: x.member_by_name('type').value
 :: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
 :: k = util.constant_for_value(version, "ofp_meter_band_type", k)

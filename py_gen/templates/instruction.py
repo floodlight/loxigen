@@ -67,7 +67,7 @@ def parse_experimenter(reader):
         raise loxi.ProtocolError("unexpected experimenter id %#x subtype %#x" % (experimenter, subtype))
 
 parsers = {
-:: sort_key = lambda x: x.type_members[0].value
+:: sort_key = lambda x: x.member_by_name('type').value
 :: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
 :: k = util.constant_for_value(version, "ofp_instruction_type", k)
@@ -80,15 +80,15 @@ parsers = {
 :: #endfor
 }
 
-:: experimenter_ofclasses = [x for x in ofclasses if x.type_members[0].value == 0xffff]
-:: sort_key = lambda x: x.type_members[1].value
+:: experimenter_ofclasses = [x for x in ofclasses if x.member_by_name('type').value == 0xffff]
+:: sort_key = lambda x: x.member_by_name('experimenter').value
 :: experimenter_ofclasses.sort(key=sort_key)
 :: grouped = itertools.groupby(experimenter_ofclasses, sort_key)
 experimenter_parsers = {
 :: for (experimenter, v) in grouped:
     ${experimenter} : {
 :: for ofclass in v:
-        ${ofclass.type_members[2].value}: ${ofclass.pyname}.unpack,
+        ${ofclass.member_by_name('subtype').value}: ${ofclass.pyname}.unpack,
 :: #endfor
     },
 :: #endfor

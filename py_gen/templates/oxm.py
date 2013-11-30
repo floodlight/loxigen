@@ -58,7 +58,7 @@ class OXM(object):
 :: #endfor
 
 parsers = {
-:: key = lambda x: x.type_members[0].value
+:: key = lambda x: x.member_by_name('type_len').value
 :: for ofclass in sorted(ofclasses, key=key):
     ${key(ofclass)} : ${ofclass.pyname}.unpack,
 :: #endfor

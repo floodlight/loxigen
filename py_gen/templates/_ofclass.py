@@ -1,8 +1,9 @@
 :: from loxi_ir import *
 :: import py_gen.oftype
+:: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
 :: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
 class ${ofclass.pyname}(${superclass}):
-:: for m in ofclass.type_members:
+:: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
 
