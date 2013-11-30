@@ -48,13 +48,12 @@ import meter_band # for unpack_list
 import util
 import loxi.generic_util
 
-class Message(object):
-    version = const.OFP_VERSION
-    type = None # override in subclass
-    xid = None
-
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="Message")
+:: if ofclass.virtual:
+:: include('_virtual_ofclass.py', ofclass=ofclass)
+:: else:
+:: include('_ofclass.py', ofclass=ofclass)
+:: #endif
 
 :: #endfor
 
@@ -170,8 +169,9 @@ def parse_experimenter(buf):
         raise loxi.ProtocolError("unexpected experimenter %#x subtype %#x" % (experimenter, subtype))
 
 parsers = {
+:: concrete_ofclasses = [x for x in ofclasses if not x.virtual]
 :: sort_key = lambda x: x.member_by_name('type').value
-:: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
+:: msgtype_groups = itertools.groupby(sorted(concrete_ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
 :: k = util.constant_for_value(version, "ofp_type", k)
 :: v = list(v)
@@ -271,7 +271,7 @@ stats_request_parsers = {
 :: #endif
 }
 
-:: experimenter_ofclasses = [x for x in ofclasses if x.member_by_name('type').value == 4]
+:: experimenter_ofclasses = [x for x in concrete_ofclasses if x.member_by_name('type').value == 4]
 :: sort_key = lambda x: x.member_by_name('experimenter').value
 :: experimenter_ofclasses.sort(key=sort_key)
 :: grouped = itertools.groupby(experimenter_ofclasses, sort_key)

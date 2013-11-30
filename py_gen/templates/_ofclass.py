@@ -1,8 +1,9 @@
+:: superclass_pyname = ofclass.superclass.pyname if ofclass.superclass else "loxi.OFObject"
 :: from loxi_ir import *
 :: import py_gen.oftype
 :: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
 :: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
-class ${ofclass.pyname}(${superclass}):
+class ${ofclass.pyname}(${superclass_pyname}):
 :: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
@@ -38,13 +39,6 @@ class ${ofclass.pyname}(${superclass}):
         if self.${m.name} != other.${m.name}: return False
 :: #endfor
         return True
-
-    def __ne__(self, other):
-        return not self.__eq__(other)
-
-    def show(self):
-        import loxi.pp
-        return loxi.pp.pp(self)
 
     def pretty_print(self, q):
 :: include('_pretty_print.py', ofclass=ofclass)

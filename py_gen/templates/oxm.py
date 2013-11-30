@@ -48,18 +48,19 @@ def unpack(reader):
 def unpack_list(reader):
     return loxi.generic_util.unpack_list(reader, unpack)
 
-class OXM(object):
-    type_len = None # override in subclass
-    pass
-
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="OXM")
+:: if ofclass.virtual:
+:: include('_virtual_ofclass.py', ofclass=ofclass)
+:: else:
+:: include('_ofclass.py', ofclass=ofclass)
+:: #endif
 
 :: #endfor
 
 parsers = {
+:: concrete_ofclasses = [x for x in ofclasses if not x.virtual]
 :: key = lambda x: x.member_by_name('type_len').value
-:: for ofclass in sorted(ofclasses, key=key):
+:: for ofclass in sorted(concrete_ofclasses, key=key):
     ${key(ofclass)} : ${ofclass.pyname}.unpack,
 :: #endfor
 }

@@ -90,7 +90,11 @@ def unpack_list_meter_stats(reader):
     return loxi.generic_util.unpack_list(reader, wrapper)
 
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="object")
+:: if ofclass.virtual:
+:: include('_virtual_ofclass.py', ofclass=ofclass)
+:: else:
+:: include('_ofclass.py', ofclass=ofclass)
+:: #endif
 
 :: #endfor
 

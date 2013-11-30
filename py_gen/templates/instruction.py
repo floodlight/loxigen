@@ -45,12 +45,12 @@ def unpack_list(reader):
         return parser(reader)
     return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
 
-class Instruction(object):
-    type = None # override in subclass
-    pass
-
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="Instruction")
+:: if ofclass.virtual:
+:: include('_virtual_ofclass.py', ofclass=ofclass)
+:: else:
+:: include('_ofclass.py', ofclass=ofclass)
+:: #endif
 
 :: #endfor
 
@@ -67,8 +67,9 @@ def parse_experimenter(reader):
         raise loxi.ProtocolError("unexpected experimenter id %#x subtype %#x" % (experimenter, subtype))
 
 parsers = {
+:: concrete_ofclasses = [x for x in ofclasses if not x.virtual]
 :: sort_key = lambda x: x.member_by_name('type').value
-:: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
+:: msgtype_groups = itertools.groupby(sorted(concrete_ofclasses, key=sort_key), sort_key)
 :: for (k, v) in msgtype_groups:
 :: k = util.constant_for_value(version, "ofp_instruction_type", k)
 :: v = list(v)
@@ -80,7 +81,7 @@ parsers = {
 :: #endfor
 }
 
-:: experimenter_ofclasses = [x for x in ofclasses if x.member_by_name('type').value == 0xffff]
+:: experimenter_ofclasses = [x for x in concrete_ofclasses if x.member_by_name('type').value == 0xffff]
 :: sort_key = lambda x: x.member_by_name('experimenter').value
 :: experimenter_ofclasses.sort(key=sort_key)
 :: grouped = itertools.groupby(experimenter_ofclasses, sort_key)

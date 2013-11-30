@@ -28,6 +28,7 @@
 import unittest
 
 try:
+    import loxi
     import loxi.of11 as ofp
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
@@ -65,7 +66,9 @@ class TestAllOF11(unittest.TestCase):
         mods = [ofp.action,ofp.message,ofp.common]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
-                              if hasattr(klass, 'show')]
+                              if isinstance(klass, type) and
+                                 issubclass(klass, loxi.OFObject) and
+                                 hasattr(klass, 'pack')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
@@ -85,7 +88,7 @@ class TestAllOF11(unittest.TestCase):
     def test_parse_message(self):
         expected_failures = []
         for klass in self.klasses:
-            if not issubclass(klass, ofp.message.Message):
+            if not issubclass(klass, ofp.message.message):
                 continue
             def fn():
                 obj = klass(xid=42)

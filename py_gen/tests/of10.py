@@ -30,6 +30,7 @@ import test_data
 from testutil import add_datafiles_tests
 
 try:
+    import loxi
     import loxi.of10 as ofp
     from loxi.generic_util import OFReader
 except ImportError:
@@ -195,11 +196,11 @@ class TestParse(unittest.TestCase):
         msg = ofp.message.parse_message(buf)
         assert(msg.xid == 0x12345678)
 
-        # Get a list of all message classes
+        # Get a list of all concrete message classes
         test_klasses = [x for x in ofp.message.__dict__.values()
                         if type(x) == type
-                           and issubclass(x, ofp.message.Message)
-                           and x != ofp.message.Message]
+                           and issubclass(x, ofp.message.message)
+                           and hasattr(x, 'pack')]
 
         for klass in test_klasses:
             self.assertIsInstance(ofp.message.parse_message(klass(xid=1).pack()), klass)
@@ -228,7 +229,9 @@ class TestAll(unittest.TestCase):
         mods = [ofp.action,ofp.message,ofp.common]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
-                              if hasattr(klass, 'show')]
+                              if isinstance(klass, type) and
+                                 issubclass(klass, loxi.OFObject) and
+                                 hasattr(klass, 'pack')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
@@ -248,7 +251,7 @@ class TestAll(unittest.TestCase):
     def test_parse_message(self):
         expected_failures = []
         for klass in self.klasses:
-            if not issubclass(klass, ofp.message.Message):
+            if not issubclass(klass, ofp.message.message):
                 continue
             def fn():
                 obj = klass(xid=42)
