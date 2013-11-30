@@ -42,3 +42,10 @@ class ${ofclass.pyname}(${superclass_pyname}):
 
     def pretty_print(self, q):
 :: include('_pretty_print.py', ofclass=ofclass)
+
+:: # Register with our superclass
+:: if ofclass.superclass:
+:: type_field_name = ofclass.superclass.discriminator.name
+:: type_value = ofclass.member_by_name(type_field_name).value
+${superclass_pyname}.subtypes[${type_value}] = ${ofclass.pyname}
+:: #endif

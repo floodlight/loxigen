@@ -97,11 +97,11 @@ class OFReader(object):
         self.offset += len(buf)
         return str(buf)
 
-    def peek(self, fmt):
+    def peek(self, fmt, offset=0):
         st = struct.Struct(fmt)
-        if self.offset + st.size > len(self.buf):
+        if self.offset + offset + st.size > len(self.buf):
             raise loxi.ProtocolError("Buffer too short")
-        result = st.unpack_from(self.buf, self.offset)
+        result = st.unpack_from(self.buf, self.offset + offset)
         return result
 
     def skip(self, length):

@@ -38,12 +38,7 @@ import loxi.generic_util
 import loxi
 
 def unpack(reader):
-    type_len, = reader.peek('!L')
-    if type_len in parsers:
-        return parsers[type_len](reader)
-    else:
-        raise loxi.ProtocolError("unknown OXM cls=%#x type=%#x masked=%d len=%d (%#x)" % \
-            ((type_len >> 16) & 0xffff, (type_len >> 9) & 0x7f, (type_len >> 8) & 1, type_len & 0xff, type_len))
+    return oxm.unpack(reader)
 
 def unpack_list(reader):
     return loxi.generic_util.unpack_list(reader, unpack)
@@ -56,11 +51,3 @@ def unpack_list(reader):
 :: #endif
 
 :: #endfor
-
-parsers = {
-:: concrete_ofclasses = [x for x in ofclasses if not x.virtual]
-:: key = lambda x: x.member_by_name('type_len').value
-:: for ofclass in sorted(concrete_ofclasses, key=key):
-    ${key(ofclass)} : ${ofclass.pyname}.unpack,
-:: #endfor
-}

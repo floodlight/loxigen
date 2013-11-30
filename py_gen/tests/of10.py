@@ -114,7 +114,7 @@ class TestActionList(unittest.TestCase):
 
     def test_invalid_action_type(self):
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
-        with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action type'):
+        with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action subtype'):
             ofp.action.unpack_list(OFReader(buf))
 
 class TestConstants(unittest.TestCase):
