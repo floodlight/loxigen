@@ -152,7 +152,7 @@ class TestMessages(unittest.TestCase):
 
     def test_echo_request_invalid_length(self):
         buf = "\x01\x02\x00\x07\x12\x34\x56"
-        with self.assertRaisesRegexp(ofp.ProtocolError, "buffer too short"):
+        with self.assertRaisesRegexp(ofp.ProtocolError, "Buffer too short"):
             ofp.message.echo_request.unpack(buf)
 
     def test_echo_request_equality(self):

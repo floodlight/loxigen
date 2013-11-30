@@ -11,7 +11,12 @@ class ${ofclass.pyname}(${superclass}):
         if ${m.name} != None:
             self.${m.name} = ${m.name}
         else:
+:: if m.name == 'xid':
+:: # HACK for message xid
+            self.${m.name} = None
+:: else:
             self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype, version=version)}
+:: #endif
 :: #endfor
         return
 
