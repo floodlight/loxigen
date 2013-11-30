@@ -88,34 +88,34 @@ class TestActionList(unittest.TestCase):
         add(ofp.action.bsn_set_tunnel_dst(dst=0x12345678))
         add(ofp.action.nicira_dec_ttl())
 
-        actions = ofp.action.unpack_list(OFReader(''.join(bufs)))
+        actions = ofp.util.unpack_list_action(OFReader(''.join(bufs)))
         self.assertEquals(actions, expected)
 
     def test_empty_list(self):
-        self.assertEquals(ofp.action.unpack_list(OFReader('')), [])
+        self.assertEquals(ofp.util.unpack_list_action(OFReader('')), [])
 
     def test_invalid_list_length(self):
         buf = '\x00' * 9
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            ofp.util.unpack_list_action(OFReader(buf))
 
     def test_invalid_action_length(self):
         buf = '\x00' * 8
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            ofp.util.unpack_list_action(OFReader(buf))
 
         buf = '\x00\x00\x00\x04'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            ofp.util.unpack_list_action(OFReader(buf))
 
         buf = '\x00\x00\x00\x10\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            ofp.util.unpack_list_action(OFReader(buf))
 
     def test_invalid_action_type(self):
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action subtype'):
-            ofp.action.unpack_list(OFReader(buf))
+            ofp.util.unpack_list_action(OFReader(buf))
 
 class TestConstants(unittest.TestCase):
     def test_ports(self):

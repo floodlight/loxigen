@@ -37,11 +37,6 @@ import util
 import loxi.generic_util
 import loxi
 
-def unpack_list(reader):
-    def deserializer(reader, typ):
-        return meter_band.unpack(reader)
-    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
-
 :: for ofclass in ofclasses:
 :: if ofclass.virtual:
 :: include('_virtual_ofclass.py', ofclass=ofclass)

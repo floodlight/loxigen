@@ -29,9 +29,20 @@
 :: from loxi_globals import OFVersions
 :: include('_autogen.py')
 
+import struct
 import loxi
 import const
-import struct
+import common
+import action
+:: if version >= OFVersions.VERSION_1_1:
+import instruction
+:: #endif
+:: if version >= OFVersions.VERSION_1_2:
+import oxm
+:: #endif
+:: if version >= OFVersions.VERSION_1_3:
+import meter_band
+:: #endif
 
 def pretty_mac(mac):
     return ':'.join(["%02x" % x for x in mac])
@@ -162,3 +173,58 @@ def unpack_bitmap_128(reader):
         i += 1
         x >>= 1
     return value
+
+def unpack_list_flow_stats_entry(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, common.flow_stats_entry.unpack)
+
+def unpack_list_queue_prop(reader):
+    def deserializer(reader, typ):
+        return common.queue_prop.unpack(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
+
+def unpack_list_packet_queue(reader):
+    def wrapper(reader):
+        length, = reader.peek('!4xH')
+        return common.packet_queue.unpack(reader.slice(length))
+    return loxi.generic_util.unpack_list(reader, wrapper)
+
+def unpack_list_hello_elem(reader):
+    def deserializer(reader, typ):
+        try:
+            return common.hello_elem.unpack(reader)
+        except loxi.ProtocolError:
+            return None
+    return [x for x in loxi.generic_util.unpack_list_tlv16(reader, deserializer) if x != None]
+
+def unpack_list_bucket(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, common.bucket.unpack)
+
+def unpack_list_group_desc_stats_entry(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, common.group_desc_stats_entry.unpack)
+
+def unpack_list_group_stats_entry(reader):
+    return loxi.generic_util.unpack_list_lv16(reader, common.group_stats_entry.unpack)
+
+def unpack_list_meter_stats(reader):
+    def wrapper(reader):
+        length, = reader.peek('!4xH')
+        return common.meter_stats.unpack(reader.slice(length))
+    return loxi.generic_util.unpack_list(reader, wrapper)
+
+def unpack_list_action(reader):
+    def deserializer(reader, typ):
+        return action.action.unpack(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
+
+def unpack_list_instruction(reader):
+    def deserializer(reader, typ):
+        return instruction.instruction.unpack(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
+
+def unpack_list_meter_band(reader):
+    def deserializer(reader, typ):
+        return meter_band.meter_band.unpack(reader)
+    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
+
+def unpack_list_oxm(reader):
+    return loxi.generic_util.unpack_list(reader, oxm.oxm.unpack)

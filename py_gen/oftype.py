@@ -109,12 +109,12 @@ type_data_map = {
     'list(of_oxm_t)': OFTypeData(
         init='[]',
         pack='util.pack_list(%s)',
-        unpack='oxm.unpack_list(%s.slice(_length-4))'),
+        unpack='util.unpack_list_oxm(%s.slice(_length-4))'),
 
     'of_oxm_t': OFTypeData(
         init='None',
         pack='%s.pack()',
-        unpack='oxm.unpack(%s)'),
+        unpack='oxm.oxm.unpack(%s)'),
 
     # TODO implement unpack
     'list(of_table_features_t)': OFTypeData(
@@ -171,17 +171,17 @@ for (cls, pyclass) in embedded_structs.items():
 
 # Map from list class name to list deserializer
 variable_elem_len_lists = {
-    'list(of_action_t)': 'action.unpack_list',
-    'list(of_bucket_t)': 'common.unpack_list_bucket',
-    'list(of_flow_stats_entry_t)': 'common.unpack_list_flow_stats_entry',
-    'list(of_group_desc_stats_entry_t)': 'common.unpack_list_group_desc_stats_entry',
-    'list(of_group_stats_entry_t)': 'common.unpack_list_group_stats_entry',
-    'list(of_hello_elem_t)': 'common.unpack_list_hello_elem',
-    'list(of_instruction_t)': 'instruction.unpack_list',
-    'list(of_meter_band_t)': 'meter_band.unpack_list',
-    'list(of_meter_stats_t)': 'common.unpack_list_meter_stats',
-    'list(of_packet_queue_t)': 'common.unpack_list_packet_queue',
-    'list(of_queue_prop_t)': 'common.unpack_list_queue_prop',
+    'list(of_action_t)': 'util.unpack_list_action',
+    'list(of_bucket_t)': 'util.unpack_list_bucket',
+    'list(of_flow_stats_entry_t)': 'util.unpack_list_flow_stats_entry',
+    'list(of_group_desc_stats_entry_t)': 'util.unpack_list_group_desc_stats_entry',
+    'list(of_group_stats_entry_t)': 'util.unpack_list_group_stats_entry',
+    'list(of_hello_elem_t)': 'util.unpack_list_hello_elem',
+    'list(of_instruction_t)': 'util.unpack_list_instruction',
+    'list(of_meter_band_t)': 'util.unpack_list_meter_band',
+    'list(of_meter_stats_t)': 'util.unpack_list_meter_stats',
+    'list(of_packet_queue_t)': 'util.unpack_list_packet_queue',
+    'list(of_queue_prop_t)': 'util.unpack_list_queue_prop',
 }
 
 for (cls, deserializer) in variable_elem_len_lists.items():

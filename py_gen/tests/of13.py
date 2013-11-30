@@ -67,7 +67,7 @@ class TestCommon(unittest.TestCase):
             '\x00\x00\x00\x04', # unknown type
             '\x00\x01\x00\x04', # versionbitmap
         ])
-        l = ofp.unpack_list_hello_elem(OFReader(buf))
+        l = ofp.util.unpack_list_hello_elem(OFReader(buf))
         self.assertEquals(len(l), 2)
         self.assertTrue(isinstance(l[0], ofp.hello_elem_versionbitmap))
         self.assertTrue(isinstance(l[1], ofp.hello_elem_versionbitmap))

@@ -37,12 +37,6 @@ import util
 import loxi.generic_util
 import loxi
 
-def unpack(reader):
-    return oxm.unpack(reader)
-
-def unpack_list(reader):
-    return loxi.generic_util.unpack_list(reader, unpack)
-
 :: for ofclass in ofclasses:
 :: if ofclass.virtual:
 :: include('_virtual_ofclass.py', ofclass=ofclass)

@@ -41,11 +41,6 @@ import loxi
 import oxm # for unpack
 :: #endif
 
-def unpack_list(reader):
-    def deserializer(reader, typ):
-        return action.unpack(reader)
-    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
-
 :: for ofclass in ofclasses:
 :: if ofclass.virtual:
 :: include('_virtual_ofclass.py', ofclass=ofclass)

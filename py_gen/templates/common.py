@@ -49,43 +49,6 @@ import oxm
 # HACK make this module visible as 'common' to simplify code generation
 common = sys.modules[__name__]
 
-def unpack_list_flow_stats_entry(reader):
-    return loxi.generic_util.unpack_list_lv16(reader, flow_stats_entry.unpack)
-
-def unpack_list_queue_prop(reader):
-    def deserializer(reader, typ):
-        return queue_prop.unpack(reader)
-    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
-
-def unpack_list_packet_queue(reader):
-    def wrapper(reader):
-        length, = reader.peek('!4xH')
-        return packet_queue.unpack(reader.slice(length))
-    return loxi.generic_util.unpack_list(reader, wrapper)
-
-def unpack_list_hello_elem(reader):
-    def deserializer(reader, typ):
-        try:
-            return hello_elem.unpack(reader)
-        except loxi.ProtocolError:
-            return None
-    return [x for x in loxi.generic_util.unpack_list_tlv16(reader, deserializer) if x != None]
-
-def unpack_list_bucket(reader):
-    return loxi.generic_util.unpack_list_lv16(reader, bucket.unpack)
-
-def unpack_list_group_desc_stats_entry(reader):
-    return loxi.generic_util.unpack_list_lv16(reader, group_desc_stats_entry.unpack)
-
-def unpack_list_group_stats_entry(reader):
-    return loxi.generic_util.unpack_list_lv16(reader, group_stats_entry.unpack)
-
-def unpack_list_meter_stats(reader):
-    def wrapper(reader):
-        length, = reader.peek('!4xH')
-        return meter_stats.unpack(reader.slice(length))
-    return loxi.generic_util.unpack_list(reader, wrapper)
-
 :: for ofclass in ofclasses:
 :: if ofclass.virtual:
 :: include('_virtual_ofclass.py', ofclass=ofclass)
