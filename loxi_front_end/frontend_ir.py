@@ -38,6 +38,7 @@ __all__ = [
     'OFLengthMember',
     'OFFieldLengthMember',
     'OFPadMember',
+    'OFVersionMember',
     'OFEnum',
     'OFEnumEntry'
 ]
@@ -126,6 +127,16 @@ Zero-filled padding
 Example: packet_in.pad
 """
 OFPadMember = namedtuple('OFPadMember', ['length'])
+
+"""
+Field with the version of an OpenFlow object
+
+@param name
+@param oftype C-like type string
+
+Example: hello.version
+"""
+OFVersionMember = namedtuple('OFVersionMember', ['name', 'oftype'])
 
 """
 An OpenFlow enumeration
