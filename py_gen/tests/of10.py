@@ -88,34 +88,34 @@ class TestActionList(unittest.TestCase):
         add(ofp.action.bsn_set_tunnel_dst(dst=0x12345678))
         add(ofp.action.nicira_dec_ttl())
 
-        actions = ofp.util.unpack_list_action(OFReader(''.join(bufs)))
+        actions = loxi.generic_util.unpack_list(OFReader(''.join(bufs)), ofp.action.action.unpack)
         self.assertEquals(actions, expected)
 
     def test_empty_list(self):
-        self.assertEquals(ofp.util.unpack_list_action(OFReader('')), [])
+        self.assertEquals(loxi.generic_util.unpack_list(OFReader(''), ofp.action.action.unpack), [])
 
     def test_invalid_list_length(self):
         buf = '\x00' * 9
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.util.unpack_list_action(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
     def test_invalid_action_length(self):
         buf = '\x00' * 8
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.util.unpack_list_action(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
         buf = '\x00\x00\x00\x04'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.util.unpack_list_action(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
         buf = '\x00\x00\x00\x10\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.util.unpack_list_action(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
     def test_invalid_action_type(self):
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action subtype'):
-            ofp.util.unpack_list_action(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
 class TestConstants(unittest.TestCase):
     def test_ports(self):

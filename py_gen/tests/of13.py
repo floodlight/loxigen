@@ -97,13 +97,6 @@ class TestAllOF13(unittest.TestCase):
     def test_serialization(self):
         expected_failures = [
             ofp.action.set_field, # field defaults to None
-            ofp.common.table_feature_prop_apply_actions,
-            ofp.common.table_feature_prop_apply_actions_miss,
-            ofp.common.table_feature_prop_write_actions,
-            ofp.common.table_feature_prop_write_actions_miss,
-            ofp.common.table_features,
-            ofp.message.table_features_stats_reply,
-            ofp.message.table_features_stats_request,
         ]
         for klass in self.klasses:
             def fn():
@@ -119,8 +112,6 @@ class TestAllOF13(unittest.TestCase):
 
     def test_parse_message(self):
         expected_failures = [
-            ofp.message.table_features_stats_reply,
-            ofp.message.table_features_stats_request,
         ]
         for klass in self.klasses:
             if not issubclass(klass, ofp.message.message):

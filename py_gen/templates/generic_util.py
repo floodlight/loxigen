@@ -44,25 +44,6 @@ def unpack_list(reader, deserializer):
         entries.append(deserializer(reader))
     return entries
 
-def unpack_list_lv16(reader, deserializer):
-    """
-    The deserializer function should take an OFReader and return the new object.
-    """
-    def wrapper(reader):
-        length, = reader.peek('!H')
-        return deserializer(reader.slice(length))
-    return unpack_list(reader, wrapper)
-
-def unpack_list_tlv16(reader, deserializer):
-    """
-    The deserializer function should take an OFReader and an integer type
-    and return the new object.
-    """
-    def wrapper(reader):
-        typ, length, = reader.peek('!HH')
-        return deserializer(reader.slice(length), typ)
-    return unpack_list(reader, wrapper)
-
 def pad_to(alignment, length):
     """
     Return a string of zero bytes that will pad a string of length 'length' to

@@ -43,15 +43,6 @@ class TestUnpackList(unittest.TestCase):
         a = loxi.generic_util.unpack_list(reader, deserializer)
         self.assertEquals(['\x04abc', '\x03de', '\x02f', '\x01'], a)
 
-class TestUnpackListLV16(unittest.TestCase):
-    def test_simple(self):
-        def deserializer(reader):
-            reader.skip(2)
-            return reader.read_all()
-        reader = loxi.generic_util.OFReader("\x00\x05abc\x00\x04de\x00\x03f\x00\x02")
-        a = loxi.generic_util.unpack_list_lv16(reader, deserializer)
-        self.assertEquals(['abc', 'de', 'f', ''], a)
-
 class TestOFReader(unittest.TestCase):
     def test_empty(self):
         reader = OFReader("")
