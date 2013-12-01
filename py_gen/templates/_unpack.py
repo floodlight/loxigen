@@ -34,6 +34,8 @@
         reader.skip(${m.length})
 ::     elif type(m) == OFLengthMember:
         _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        orig_reader = reader
+        reader = orig_reader.slice(_${m.name} - (${m.offset} + ${m.length}))
 ::     elif type(m) == OFFieldLengthMember:
 ::         field_length_members[m.field_name] = m
         _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
@@ -50,5 +52,5 @@
 ::     #endif
 :: #endfor
 :: if ofclass.params.get('length_includes_align') != None:
-        reader.skip_align()
+        orig_reader.skip_align()
 :: #endif
