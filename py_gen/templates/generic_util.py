@@ -35,6 +35,9 @@ Utility functions independent of the protocol version
 import loxi
 import struct
 
+def pack_list(values):
+    return "".join([x.pack() for x in values])
+
 def unpack_list(reader, deserializer):
     """
     The deserializer function should take an OFReader and return the new object.

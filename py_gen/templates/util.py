@@ -151,9 +151,6 @@ def unpack_match_bmap(reader):
     return reader.read("!Q")[0]
 :: #endif
 
-def pack_list(values):
-    return "".join([x.pack() for x in values])
-
 MASK64 = (1 << 64) - 1
 
 def pack_bitmap_128(value):
