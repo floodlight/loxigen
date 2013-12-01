@@ -105,12 +105,6 @@ type_data_map = {
         pack='util.pack_bitmap_128(%s)',
         unpack="util.unpack_bitmap_128(%s)"),
 
-    # HACK need the match_v3 length field
-    'list(of_oxm_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='util.unpack_list_oxm(%s.slice(_length-4))'),
-
     'of_oxm_t': OFTypeData(
         init='None',
         pack='%s.pack()',
@@ -182,6 +176,7 @@ variable_elem_len_lists = {
     'list(of_meter_stats_t)': 'util.unpack_list_meter_stats',
     'list(of_packet_queue_t)': 'util.unpack_list_packet_queue',
     'list(of_queue_prop_t)': 'util.unpack_list_queue_prop',
+    'list(of_oxm_t)': 'util.unpack_list_oxm',
 }
 
 for (cls, deserializer) in variable_elem_len_lists.items():
