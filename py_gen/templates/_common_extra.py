@@ -25,32 +25,14 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: # TODO coalesce format strings
-:: from loxi_ir import *
-:: from py_gen.oftype import gen_unpack_expr
-:: field_length_members = {}
-:: for m in ofclass.members:
-::     if type(m) == OFPadMember:
-        reader.skip(${m.length})
-::     elif type(m) == OFLengthMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-        orig_reader = reader
-        reader = orig_reader.slice(_${m.name} - (${m.offset} + ${m.length}))
-::     elif type(m) == OFFieldLengthMember:
-::         field_length_members[m.field_name] = m
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-::     elif type(m) == OFTypeMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-        assert(_${m.name} == ${m.value})
-::     elif type(m) == OFDataMember:
-::         if m.name in field_length_members:
-::             reader_expr = 'reader.slice(_%s)' % field_length_members[m.name].name
-::         else:
-::             reader_expr = 'reader'
-::         #endif
-        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
-::     #endif
-:: #endfor
-:: if ofclass.has_external_alignment:
-        orig_reader.skip_align()
+:: from loxi_globals import OFVersions
+:: if version == OFVersions.VERSION_1_0:
+match = match_v1
+:: elif version == OFVersions.VERSION_1_1:
+match = match_v2
+:: elif version == OFVersions.VERSION_1_2:
+match = match_v3
+:: elif version == OFVersions.VERSION_1_3:
+:: # HACK
+match = match_v3
 :: #endif

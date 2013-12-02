@@ -29,7 +29,9 @@ import unittest
 from testutil import add_datafiles_tests
 
 try:
+    import loxi
     import loxi.of12 as ofp
+    from loxi.generic_util import OFReader
 except ImportError:
     exit("loxi package not found. Try setting PYTHONPATH.")
 
@@ -74,7 +76,9 @@ class TestAllOF12(unittest.TestCase):
         mods = [ofp.action,ofp.message,ofp.common,ofp.oxm]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
-                              if hasattr(klass, 'show')]
+                              if isinstance(klass, type) and
+                                 issubclass(klass, loxi.OFObject) and
+                                 hasattr(klass, 'pack')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
@@ -86,7 +90,7 @@ class TestAllOF12(unittest.TestCase):
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
@@ -96,7 +100,7 @@ class TestAllOF12(unittest.TestCase):
     def test_parse_message(self):
         expected_failures = []
         for klass in self.klasses:
-            if not issubclass(klass, ofp.message.Message):
+            if not issubclass(klass, ofp.message.message):
                 continue
             def fn():
                 obj = klass(xid=42)

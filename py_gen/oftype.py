@@ -28,6 +28,8 @@
 from collections import namedtuple
 
 import loxi_utils.loxi_utils as loxi_utils
+import py_gen.codegen
+import loxi_globals
 
 OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 
@@ -105,34 +107,10 @@ type_data_map = {
         pack='util.pack_bitmap_128(%s)',
         unpack="util.unpack_bitmap_128(%s)"),
 
-    # HACK need the match_v3 length field
-    'list(of_oxm_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='oxm.unpack_list(%s.slice(_length-4))'),
-
     'of_oxm_t': OFTypeData(
         init='None',
         pack='%s.pack()',
-        unpack='oxm.unpack(%s)'),
-
-    # TODO implement unpack
-    'list(of_table_features_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack=None),
-
-    # TODO implement unpack
-    'list(of_action_id_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack=None),
-
-    # TODO implement unpack
-    'list(of_table_feature_prop_t)': OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack=None),
+        unpack='oxm.oxm.unpack(%s)'),
 }
 
 ## Fixed length strings
@@ -167,50 +145,11 @@ for (cls, pyclass) in embedded_structs.items():
         pack='%s.pack()',
         unpack='%s.unpack(%%s)' % pyclass)
 
-## Variable element length lists
-
-# Map from list class name to list deserializer
-variable_elem_len_lists = {
-    'list(of_action_t)': 'action.unpack_list',
-    'list(of_bucket_t)': 'common.unpack_list_bucket',
-    'list(of_flow_stats_entry_t)': 'common.unpack_list_flow_stats_entry',
-    'list(of_group_desc_stats_entry_t)': 'common.unpack_list_group_desc_stats_entry',
-    'list(of_group_stats_entry_t)': 'common.unpack_list_group_stats_entry',
-    'list(of_hello_elem_t)': 'common.unpack_list_hello_elem',
-    'list(of_instruction_t)': 'instruction.unpack_list',
-    'list(of_meter_band_t)': 'meter_band.unpack_list',
-    'list(of_meter_stats_t)': 'common.unpack_list_meter_stats',
-    'list(of_packet_queue_t)': 'common.unpack_list_packet_queue',
-    'list(of_queue_prop_t)': 'common.unpack_list_queue_prop',
-}
-
-for (cls, deserializer) in variable_elem_len_lists.items():
-    type_data_map[cls] = OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='%s(%%s)' % deserializer)
-
-## Fixed element length lists
-
-# Map from list class name to list element deserializer
-fixed_elem_len_lists = {
-    'list(of_bsn_interface_t)': 'common.bsn_interface.unpack',
-    'list(of_bucket_counter_t)': 'common.bucket_counter.unpack',
-    'list(of_meter_band_stats_t)': 'common.meter_band_stats.unpack',
-    'list(of_port_desc_t)': 'common.port_desc.unpack',
-    'list(of_port_stats_entry_t)': 'common.port_stats_entry.unpack',
-    'list(of_queue_stats_entry_t)': 'common.queue_stats_entry.unpack',
-    'list(of_table_stats_entry_t)': 'common.table_stats_entry.unpack',
-    'list(of_uint32_t)': 'common.uint32.unpack',
-    'list(of_uint8_t)': 'common.uint8.unpack',
-    'list(of_bsn_lacp_stats_entry_t)': 'common.bsn_lacp_stats_entry.unpack',
-}
-
-for (cls, element_deserializer) in fixed_elem_len_lists.items():
-    type_data_map[cls] = OFTypeData(
-        init='[]',
-        pack='util.pack_list(%s)',
-        unpack='loxi.generic_util.unpack_list(%%s, %s)' % element_deserializer)
+# Special case for lists of hello_elem, which must ignore unknown types
+type_data_map['list(of_hello_elem_t)'] = OFTypeData(
+    init='[]',
+    pack='loxi.generic_util.pack_list(%s)',
+    unpack='util.unpack_list_hello_elem(%s)')
 
 ## Public interface
 
@@ -222,6 +161,8 @@ def gen_init_expr(oftype, version):
     type_data = lookup_type_data(oftype, version)
     if type_data and type_data.init:
         return type_data.init
+    elif oftype_is_list(oftype):
+        return "[]"
     else:
         return "loxi.unimplemented('init %s')" % oftype
 
@@ -233,6 +174,8 @@ def gen_pack_expr(oftype, value_expr, version):
     type_data = lookup_type_data(oftype, version)
     if type_data and type_data.pack:
         return type_data.pack % value_expr
+    elif oftype_is_list(oftype):
+        return "loxi.generic_util.pack_list(%s)" % value_expr
     else:
         return "loxi.unimplemented('pack %s')" % oftype
 
@@ -244,5 +187,19 @@ def gen_unpack_expr(oftype, reader_expr, version):
     type_data = lookup_type_data(oftype, version)
     if type_data and type_data.unpack:
         return type_data.unpack % reader_expr
+    elif oftype_is_list(oftype):
+        ofproto = loxi_globals.ir[version]
+        ofclass = ofproto.class_by_name(oftype_list_elem(oftype))
+        module_name, class_name = py_gen.codegen.generate_pyname(ofclass)
+        return 'loxi.generic_util.unpack_list(%s, %s.%s.unpack)' % \
+            (reader_expr, module_name, class_name)
     else:
         return "loxi.unimplemented('unpack %s')" % oftype
+
+def oftype_is_list(oftype):
+    return (oftype.find("list(") == 0)
+
+# Converts "list(of_flow_stats_entry_t)" to "of_flow_stats_entry"
+def oftype_list_elem(oftype):
+    assert oftype.find("list(") == 0
+    return oftype[5:-3]

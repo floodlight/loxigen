@@ -49,3 +49,10 @@ def constant_for_value(version, group, value):
         if value == value2:
             return "const." + name
     return repr(value)
+
+def ancestors(ofclass):
+    r = []
+    while ofclass:
+        r.append(ofclass)
+        ofclass = ofclass.superclass
+    return r

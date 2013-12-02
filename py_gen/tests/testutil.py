@@ -32,6 +32,7 @@ import re
 import os
 import unittest
 import test_data
+from loxi.generic_util import OFReader
 
 # Human-friendly format for binary strings. 8 bytes per line.
 def format_binary(buf):
@@ -55,7 +56,7 @@ def test_serialization(obj, buf):
         b = format_binary(packed)
         raise AssertionError("Serialization of %s failed\nExpected:\n%s\nActual:\n%s\nDiff:\n%s" % \
             (type(obj).__name__, a, b, diff(a, b)))
-    unpacked = type(obj).unpack(buf)
+    unpacked = type(obj).unpack(OFReader(buf))
     if obj != unpacked:
         a = obj.show()
         b = unpacked.show()
