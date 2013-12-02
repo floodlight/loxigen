@@ -175,6 +175,14 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
         else:
             raise Exception("Not a fixed length class: {}".format(self.name))
 
+    @property
+    def has_internal_alignment(self):
+        return self.params.get('length_includes_align') == 'True'
+
+    @property
+    def has_external_alignment(self):
+        return self.params.get('length_includes_align') == 'False'
+
 """ one class unified across openflow versions. Keeps around a map version->versioned_class """
 class OFUnifiedClass(OFClass):
     def __new__(cls, version_classes, *a, **kw):

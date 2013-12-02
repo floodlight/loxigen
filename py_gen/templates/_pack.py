@@ -56,12 +56,12 @@
 :: #endfor
 :: if length_member_index != None:
         length = sum([len(x) for x in packed])
-:: if ofclass.params.get('length_includes_align') == 'True':
+:: if ofclass.has_internal_alignment:
         packed.append(loxi.generic_util.pad_to(8, length))
         length += len(packed[-1])
 :: #endif
         packed[${length_member_index}] = ${gen_pack_expr(length_member.oftype, 'length', version=version)}
 :: #endif
-:: if ofclass.params.get('length_includes_align') == 'False':
+:: if ofclass.has_external_alignment:
         packed.append(loxi.generic_util.pad_to(8, length))
 :: #endif

@@ -51,6 +51,6 @@
         obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
 ::     #endif
 :: #endfor
-:: if ofclass.params.get('length_includes_align') != None:
+:: if ofclass.has_external_alignment:
         orig_reader.skip_align()
 :: #endif
