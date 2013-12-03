@@ -68,7 +68,15 @@ class JavaModel(object):
         OFExperimenterStatsReply=set(('data','subtype')),
         OFInstructionExperimenter=set(('data',)))
     # map: $java_type -> set(java_name_property)
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    write_blacklist = defaultdict(
+        lambda: set(),
+        OFOxm=set(('typeLen',)),
+        OFAction=set(('type',)),
+        OFInstruction=set(('type',)),
+        OFFlowMod=set(('command', )),
+        OFExperimenter=set(('data','subtype')),
+        OFActionExperimenter=set(('data',)),
+        OFBsnTlv=set(('type',)))
     # interfaces that are virtual
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
@@ -512,6 +520,8 @@ class JavaOFInterface(object):
             return ("", "OFHelloElem", None)
         elif loxi_utils.class_is_table_feature_prop(self.c_name):
             return ("", "OFTableFeatureProp", None)
+        elif loxi_utils.class_is_bsn_tlv(self.c_name):
+            return ("", "OFBsnTlv", None)
         else:
             return ("", None, None)
 
