@@ -33,6 +33,7 @@ import sys
 from collections import namedtuple, OrderedDict
 from generic_utils import find, memoize, OrderedSet
 from loxi_ir import ir_offset
+import loxi_front_end.frontend_ir as frontend_ir
 
 logger = logging.getLogger(__name__)
 
@@ -173,6 +174,14 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
             return self.base_length
         else:
             raise Exception("Not a fixed length class: {}".format(self.name))
+
+    @property
+    def has_internal_alignment(self):
+        return self.params.get('length_includes_align') == 'True'
+
+    @property
+    def has_external_alignment(self):
+        return self.params.get('length_includes_align') == 'False'
 
 """ one class unified across openflow versions. Keeps around a map version->versioned_class """
 class OFUnifiedClass(OFClass):
@@ -356,11 +365,18 @@ def build_protocol(version, ofinputs):
         return { name if name != "length" else "pad_length" : value for name, value in props.items() }
 
     def build_member(of_class, fe_member, length_info):
-        ir_class = globals()[type(fe_member).__name__]
-        member = ir_class(offset = length_info.offset,
-                        base_length = length_info.base_length,
-                        is_fixed_length=length_info.is_fixed_length,
-                        **convert_member_properties(fe_member._asdict()))
+        if isinstance(fe_member, frontend_ir.OFVersionMember):
+            member = OFTypeMember(offset = length_info.offset,
+                                  base_length = length_info.base_length,
+                                  is_fixed_length=length_info.is_fixed_length,
+                                  value = version.wire_version,
+                                  **convert_member_properties(fe_member._asdict()))
+        else:
+            ir_class = globals()[type(fe_member).__name__]
+            member = ir_class(offset = length_info.offset,
+                              base_length = length_info.base_length,
+                              is_fixed_length=length_info.is_fixed_length,
+                              **convert_member_properties(fe_member._asdict()))
         member.of_class = of_class
         return member
 

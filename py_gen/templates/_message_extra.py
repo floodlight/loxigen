@@ -25,32 +25,15 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: # TODO coalesce format strings
-:: from loxi_ir import *
-:: from py_gen.oftype import gen_unpack_expr
-:: field_length_members = {}
-:: for m in ofclass.members:
-::     if type(m) == OFPadMember:
-        reader.skip(${m.length})
-::     elif type(m) == OFLengthMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-        orig_reader = reader
-        reader = orig_reader.slice(_${m.name} - (${m.offset} + ${m.length}))
-::     elif type(m) == OFFieldLengthMember:
-::         field_length_members[m.field_name] = m
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-::     elif type(m) == OFTypeMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
-        assert(_${m.name} == ${m.value})
-::     elif type(m) == OFDataMember:
-::         if m.name in field_length_members:
-::             reader_expr = 'reader.slice(_%s)' % field_length_members[m.name].name
-::         else:
-::             reader_expr = 'reader'
-::         #endif
-        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
-::     #endif
-:: #endfor
-:: if ofclass.has_external_alignment:
-        orig_reader.skip_align()
-:: #endif
+def parse_header(buf):
+    if len(buf) < 8:
+        raise loxi.ProtocolError("too short to be an OpenFlow message")
+    return struct.unpack_from("!BBHL", buf)
+
+def parse_message(buf):
+    msg_ver, msg_type, msg_len, msg_xid = parse_header(buf)
+    if msg_ver != const.OFP_VERSION and msg_type != const.OFPT_HELLO:
+        raise loxi.ProtocolError("wrong OpenFlow version (expected %d, got %d)" % (const.OFP_VERSION, msg_ver))
+    if len(buf) != msg_len:
+        raise loxi.ProtocolError("incorrect message size")
+    return message.unpack(loxi.generic_util.OFReader(buf))

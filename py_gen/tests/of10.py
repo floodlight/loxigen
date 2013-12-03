@@ -30,6 +30,7 @@ import test_data
 from testutil import add_datafiles_tests
 
 try:
+    import loxi
     import loxi.of10 as ofp
     from loxi.generic_util import OFReader
 except ImportError:
@@ -87,34 +88,34 @@ class TestActionList(unittest.TestCase):
         add(ofp.action.bsn_set_tunnel_dst(dst=0x12345678))
         add(ofp.action.nicira_dec_ttl())
 
-        actions = ofp.action.unpack_list(OFReader(''.join(bufs)))
+        actions = loxi.generic_util.unpack_list(OFReader(''.join(bufs)), ofp.action.action.unpack)
         self.assertEquals(actions, expected)
 
     def test_empty_list(self):
-        self.assertEquals(ofp.action.unpack_list(OFReader('')), [])
+        self.assertEquals(loxi.generic_util.unpack_list(OFReader(''), ofp.action.action.unpack), [])
 
     def test_invalid_list_length(self):
         buf = '\x00' * 9
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
     def test_invalid_action_length(self):
         buf = '\x00' * 8
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
         buf = '\x00\x00\x00\x04'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
         buf = '\x00\x00\x00\x10\x00\x00\x00\x00'
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
-            ofp.action.unpack_list(OFReader(buf))
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
     def test_invalid_action_type(self):
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
-        with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action type'):
-            ofp.action.unpack_list(OFReader(buf))
+        with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action subtype'):
+            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
 class TestConstants(unittest.TestCase):
     def test_ports(self):
@@ -129,7 +130,7 @@ class TestCommon(unittest.TestCase):
         self.assertEquals(match.wildcards, ofp.OFPFW_ALL)
         self.assertEquals(match.tcp_src, 0)
         buf = match.pack()
-        match2 = ofp.match.unpack(buf)
+        match2 = ofp.match.unpack(OFReader(buf))
         self.assertEquals(match, match2)
 
 class TestMessages(unittest.TestCase):
@@ -152,8 +153,8 @@ class TestMessages(unittest.TestCase):
 
     def test_echo_request_invalid_length(self):
         buf = "\x01\x02\x00\x07\x12\x34\x56"
-        with self.assertRaisesRegexp(ofp.ProtocolError, "buffer too short"):
-            ofp.message.echo_request.unpack(buf)
+        with self.assertRaisesRegexp(ofp.ProtocolError, "Buffer too short"):
+            ofp.message.echo_request.unpack(OFReader(buf))
 
     def test_echo_request_equality(self):
         msg = ofp.message.echo_request(xid=0x12345678, data="abc")
@@ -195,11 +196,11 @@ class TestParse(unittest.TestCase):
         msg = ofp.message.parse_message(buf)
         assert(msg.xid == 0x12345678)
 
-        # Get a list of all message classes
+        # Get a list of all concrete message classes
         test_klasses = [x for x in ofp.message.__dict__.values()
                         if type(x) == type
-                           and issubclass(x, ofp.message.Message)
-                           and x != ofp.message.Message]
+                           and issubclass(x, ofp.message.message)
+                           and hasattr(x, 'pack')]
 
         for klass in test_klasses:
             self.assertIsInstance(ofp.message.parse_message(klass(xid=1).pack()), klass)
@@ -228,7 +229,9 @@ class TestAll(unittest.TestCase):
         mods = [ofp.action,ofp.message,ofp.common]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
-                              if hasattr(klass, 'show')]
+                              if isinstance(klass, type) and
+                                 issubclass(klass, loxi.OFObject) and
+                                 hasattr(klass, 'pack')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
@@ -238,7 +241,7 @@ class TestAll(unittest.TestCase):
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
@@ -248,7 +251,7 @@ class TestAll(unittest.TestCase):
     def test_parse_message(self):
         expected_failures = []
         for klass in self.klasses:
-            if not issubclass(klass, ofp.message.Message):
+            if not issubclass(klass, ofp.message.message):
                 continue
             def fn():
                 obj = klass(xid=42)

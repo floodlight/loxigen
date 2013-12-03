@@ -25,7 +25,7 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-from collections import namedtuple
+from collections import defaultdict
 import loxi_globals
 import struct
 import template_utils
@@ -34,113 +34,76 @@ import util
 import oftype
 from loxi_ir import *
 
-ofclasses_by_version = {}
+modules_by_version = {}
 
-PyOFClass = namedtuple('PyOFClass', ['name', 'pyname', 'members', 'type_members',
-                                     'min_length', 'is_fixed_length',
-                                     'has_internal_alignment', 'has_external_alignment'])
+# Map from inheritance root to module name
+roots = {
+    'of_header': 'message',
+    'of_action': 'action',
+    'of_oxm': 'oxm',
+    'of_instruction': 'instruction',
+    'of_meter_band': 'meter_band',
+}
 
-# Return the name for the generated Python class
-def generate_pyname(cls):
-    if utils.class_is_action(cls):
-        return cls[10:]
-    elif utils.class_is_oxm(cls):
-        return cls[7:]
-    elif utils.class_is_meter_band(cls):
-        return cls[14:]
-    elif utils.class_is_instruction(cls):
-        return cls[15:]
-    else:
-        return cls[3:]
+# Return the module and class names for the generated Python class
+def generate_pyname(ofclass):
+    for root, module_name in roots.items():
+        if ofclass.name == root:
+            return module_name, module_name
+        elif ofclass.is_instanceof(root):
+            if root == 'of_header':
+                # The input files don't prefix message names
+                return module_name, ofclass.name[3:]
+            else:
+                return module_name, ofclass.name[len(root)+1:]
+    return 'common', ofclass.name[3:]
 
 # Create intermediate representation, extended from the LOXI IR
-# HACK the oftype member attribute is replaced with an OFType instance
 def build_ofclasses(version):
-    ofclasses = []
+    modules = defaultdict(list)
     for ofclass in loxi_globals.ir[version].classes:
-        cls = ofclass.name
-        if ofclass.virtual:
-            continue
-
-        members = []
-        type_members = []
-
-        for m in ofclass.members:
-            if type(m) == OFTypeMember:
-                members.append(m)
-                type_members.append(members[-1])
-            elif type(m) == OFLengthMember:
-                members.append(m)
-            elif type(m) == OFFieldLengthMember:
-                members.append(m)
-            elif type(m) == OFPadMember:
-                members.append(m)
-            elif type(m) == OFDataMember:
-                if utils.class_is_message(ofclass.name) and m.name == 'version':
-                    # HACK move to frontend
-                    members.append(OFTypeMember(
-                        name=m.name,
-                        oftype=m.oftype,
-                        value=version.wire_version,
-                        base_length=m.base_length,
-                        is_fixed_length=m.is_fixed_length,
-                        offset=m.offset))
-                    type_members.append(members[-1])
-                else:
-                    members.append(m)
-
-        ofclasses.append(
-            PyOFClass(name=cls,
-                      pyname=generate_pyname(cls),
-                      members=members,
-                      type_members=type_members,
-                      min_length=ofclass.base_length,
-                      is_fixed_length=ofclass.is_fixed_length,
-                      has_internal_alignment=cls == 'of_action_set_field',
-                      has_external_alignment=cls == 'of_match_v3'))
-    return ofclasses
+        module_name, ofclass.pyname = generate_pyname(ofclass)
+        modules[module_name].append(ofclass)
+    return modules
 
 def generate_init(out, name, version):
     util.render_template(out, 'init.py', version=version)
 
 def generate_action(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if utils.class_is_action(x.name)]
-    util.render_template(out, 'action.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['action'],
+                         version=version)
 
 def generate_oxm(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if utils.class_is_oxm(x.name)]
-    util.render_template(out, 'oxm.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['oxm'],
+                         version=version)
 
 def generate_common(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if not utils.class_is_message(x.name)
-                    and not utils.class_is_action(x.name)
-                    and not utils.class_is_instruction(x.name)
-                    and not utils.class_is_meter_band(x.name)
-                    and not utils.class_is_oxm(x.name)
-                    and not utils.class_is_list(x.name)]
-    util.render_template(out, 'common.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['common'],
+                         version=version,
+                         extra_template='_common_extra.py')
 
 def generate_const(out, name, version):
     util.render_template(out, 'const.py', version=version,
                          enums=loxi_globals.ir[version].enums)
 
 def generate_instruction(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if utils.class_is_instruction(x.name)]
-    util.render_template(out, 'instruction.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['instruction'],
+                         version=version)
 
 def generate_message(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if utils.class_is_message(x.name)]
-    util.render_template(out, 'message.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['message'],
+                         version=version,
+                         extra_template='_message_extra.py')
 
 def generate_meter_band(out, name, version):
-    ofclasses = [x for x in ofclasses_by_version[version]
-                 if utils.class_is_meter_band(x.name)]
-    util.render_template(out, 'meter_band.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['meter_band'],
+                         version=version)
 
 def generate_pp(out, name, version):
     util.render_template(out, 'pp.py')
@@ -150,4 +113,4 @@ def generate_util(out, name, version):
 
 def init():
     for version in loxi_globals.OFVersions.target_versions:
-        ofclasses_by_version[version] = build_ofclasses(version)
+        modules_by_version[version] = build_ofclasses(version)

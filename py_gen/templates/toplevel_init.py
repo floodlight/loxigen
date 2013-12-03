@@ -68,3 +68,17 @@ class Unimplemented(Exception):
 
 def unimplemented(msg):
     raise Unimplemented(msg)
+
+class OFObject(object):
+    """
+    Superclass of all OpenFlow classes
+    """
+    def __init__(self, *args):
+        raise NotImplementedError("cannot instantiate abstract class")
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def show(self):
+        import loxi.pp
+        return loxi.pp.pp(self)

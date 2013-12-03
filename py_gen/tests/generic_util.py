@@ -43,15 +43,6 @@ class TestUnpackList(unittest.TestCase):
         a = loxi.generic_util.unpack_list(reader, deserializer)
         self.assertEquals(['\x04abc', '\x03de', '\x02f', '\x01'], a)
 
-class TestUnpackListLV16(unittest.TestCase):
-    def test_simple(self):
-        def deserializer(reader):
-            reader.skip(2)
-            return reader.read_all()
-        reader = loxi.generic_util.OFReader("\x00\x05abc\x00\x04de\x00\x03f\x00\x02")
-        a = loxi.generic_util.unpack_list_lv16(reader, deserializer)
-        self.assertEquals(['abc', 'de', 'f', ''], a)
-
 class TestOFReader(unittest.TestCase):
     def test_empty(self):
         reader = OFReader("")
@@ -115,6 +106,19 @@ class TestOFReader(unittest.TestCase):
         self.assertEquals(reader.slice(3).read_all(), "cde")
         self.assertEquals(reader.slice(2).read_all(), "fg")
         self.assertEquals(reader.is_empty(), True)
+
+    def test_skip_align(self):
+        reader = OFReader("abcd" + "efgh" + "ijkl" + "mnop" + "qr")
+        reader.skip_align()
+        self.assertEquals(reader.peek('2s')[0], 'ab')
+        self.assertEquals(reader.read('2s')[0], "ab")
+        reader.skip_align()
+        self.assertEquals(reader.peek('2s')[0], 'ij')
+        self.assertEquals(reader.read('2s')[0], 'ij')
+        child = reader.slice(8)
+        self.assertEquals(child.peek('2s')[0], 'kl')
+        child.skip_align()
+        self.assertEquals(child.peek('2s')[0], 'qr')
 
 if __name__ == '__main__':
     unittest.main()
