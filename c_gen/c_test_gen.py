@@ -129,7 +129,12 @@ def ignore_member(cls, version, m_name, m_type):
             m_name == "subtype")):
         return True
 
-    if (cls in ["of_bsn_lacp_stats_request", "of_bsn_lacp_stats_reply"] and (
+    classes = ["of_bsn_lacp_stats_request",
+               "of_bsn_lacp_stats_reply",
+               "of_bsn_switch_pipeline_stats_request",
+               "of_bsn_switch_pipeline_stats_reply"]
+
+    if (cls in classes and (
             m_name == "experimenter" or
             m_name == "subtype")):
         return True

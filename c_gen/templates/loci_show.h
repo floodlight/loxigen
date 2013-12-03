@@ -194,6 +194,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_desc_str_sw_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_ser_num_serial_num(writer, cookie, val) LOCI_SHOW_ser_num(writer, cookie, val)
 #define LOCI_SHOW_desc_str_dp_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_desc_str_pipeline(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_octets_data(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
 #define LOCI_SHOW_u16_err_type(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u16_code(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
