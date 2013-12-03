@@ -268,7 +268,8 @@ stats_types = {
         table_features = 12,
         port_desc = 13,
         experimenter = 0xffff,
-        bsn_lacp = 0xffff
+        bsn_lacp = 0xffff,
+        bsn_switch_pipeline = 0xffff
         )
     }
 
@@ -456,6 +457,7 @@ stats_reply_list = [
     "of_table_features_stats_reply",
     "of_bsn_stats_reply",
     "of_bsn_lacp_stats_reply",
+    "of_bsn_switch_pipeline_stats_reply",
 ]
 
 stats_request_list = [
@@ -476,6 +478,7 @@ stats_request_list = [
     "of_table_features_stats_request",
     "of_bsn_stats_request",
     "of_bsn_lacp_stats_request",
+    "of_bsn_switch_pipeline_stats_request",
 ]
 
 flow_mod_list = [
