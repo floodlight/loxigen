@@ -456,6 +456,7 @@ stats_reply_list = [
     "of_table_features_stats_reply",
     "of_bsn_stats_reply",
     "of_bsn_lacp_stats_reply",
+    "of_bsn_switch_pipeline_stats_reply",
 ]
 
 stats_request_list = [
@@ -476,6 +477,7 @@ stats_request_list = [
     "of_table_features_stats_request",
     "of_bsn_stats_request",
     "of_bsn_lacp_stats_request",
+    "of_bsn_switch_pipeline_stats_request",
 ]
 
 flow_mod_list = [
