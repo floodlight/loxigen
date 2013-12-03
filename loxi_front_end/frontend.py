@@ -54,6 +54,8 @@ def create_member(m_ast, ctx):
         elif m_ast[2] == 'actions_len':
             # HACK only usage so far
             return ir.OFFieldLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), field_name='actions')
+        if m_ast[2] == 'version': # Should be moved to parser
+            return ir.OFVersionMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
         else:
             return ir.OFDataMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     elif m_ast[0] == 'discriminator':
