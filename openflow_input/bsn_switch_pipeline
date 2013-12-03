@@ -69,7 +69,7 @@ struct of_bsn_set_switch_pipeline_reply : of_bsn_header {
     uint32_t status;
 };
 
-struct of_bsn_get_switch_pipeline_stats_request : of_bsn_stats_request {
+struct of_bsn_switch_pipeline_stats_request : of_bsn_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -81,7 +81,7 @@ struct of_bsn_get_switch_pipeline_stats_request : of_bsn_stats_request {
     uint32_t subtype == 1;
 };
 
-struct of_bsn_get_switch_pipeline_stats_reply : of_bsn_stats_request {
+struct of_bsn_switch_pipeline_stats_reply : of_bsn_stats_request {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
