@@ -268,7 +268,8 @@ stats_types = {
         table_features = 12,
         port_desc = 13,
         experimenter = 0xffff,
-        bsn_lacp = 0xffff
+        bsn_lacp = 0xffff,
+        bsn_switch_pipeline = 0xffff
         )
     }
 
