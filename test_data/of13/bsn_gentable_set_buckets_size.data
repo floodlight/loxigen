@@ -1,0 +1,14 @@
+-- binary
+04 04 # version, type
+00 18 # length
+12 34 56 78 # xid
+00 5c 16 c7 # experimenter
+00 00 00 32 # subtype
+00 14 # table_id
+00 00 # pad
+00 11 22 33 # buckets_size
+-- python
+ofp.message.bsn_gentable_set_buckets_size(
+    xid=0x12345678,
+    table_id=20,
+    buckets_size=0x00112233)
