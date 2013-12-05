@@ -1076,6 +1076,16 @@ of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
                 of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
                 of_message_stats_experimenter_subtype_set(msg, 6);
                 break;
+            case OF_BSN_PORT_COUNTER_STATS_REQUEST:
+            case OF_BSN_PORT_COUNTER_STATS_REPLY:
+                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
+                of_message_stats_experimenter_subtype_set(msg, 7);
+                break;
+            case OF_BSN_VLAN_COUNTER_STATS_REQUEST:
+            case OF_BSN_VLAN_COUNTER_STATS_REPLY:
+                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
+                of_message_stats_experimenter_subtype_set(msg, 8);
+                break;
             default:
                 break;
             }
