@@ -371,6 +371,4 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u16_partner_key(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u64_time_ms(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 
-
-
 #endif /* _LOCI_SHOW_H_ */
