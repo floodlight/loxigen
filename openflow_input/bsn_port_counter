@@ -30,8 +30,19 @@
 
 #version 4
 
-struct of_bsn_port_entry {
-    of_port_no_t port_no;
+enum ofp_bsn_port_counter(wire_type=uint8_t, complete=False) {
+  OFP_RX_BYTES = 0,
+  OFP_RX_PACKETS_UNICAST = 1,
+  OFP_RX_PACKETS_BROADCAST = 2,
+  OFP_RX_PACKETS_MULTICAST = 3,
+  OFP_RX_DROPPED = 4,
+  OFP_RX_ERRORS = 5,
+  OFP_TX_BYTES = 6,
+  OFP_TX_PACKETS_UNICAST = 7,
+  OFP_TX_PACKETS_BROADCAST = 8,
+  OFP_TX_PACKETS_MULTICAST = 9,
+  OFP_TX_DROPPED = 10,
+  OFP_TX_ERRORS = 11,
 };
 
 struct of_bsn_port_counter_stats_request : of_bsn_stats_request {
@@ -44,24 +55,14 @@ struct of_bsn_port_counter_stats_request : of_bsn_stats_request {
     pad(4);
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 8;
-    list(of_bsn_port_entry_t) port_entries; //if port_entries is empty, reply counters of all ports.
+    of_port_no_t port_no;
 };
 
 struct of_bsn_port_counter_stats_entry {
+    uint16_t length;
+    pad(2);
     of_port_no_t port_no;
-    pad(4);
-    uint64_t rx_bytes;
-    uint64_t rx_packets_unicast;
-    uint64_t rx_packets_broadcast;
-    uint64_t rx_packets_multicast;
-    uint64_t rx_dropped;
-    uint64_t rx_errors;
-    uint64_t tx_bytes;
-    uint64_t tx_packets_unicast;
-    uint64_t tx_packets_broadcast;
-    uint64_t tx_packets_multicast;
-    uint64_t tx_dropped;
-    uint64_t tx_errors;
+    list(of_uint64_t) port_values;
 };
 
 struct of_bsn_port_counter_stats_reply : of_bsn_stats_reply {
@@ -74,5 +75,5 @@ struct of_bsn_port_counter_stats_reply : of_bsn_stats_reply {
     pad(4);
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 8;
-    list(of_bsn_port_counter_stats_entry_t) port_counter_entries;
+    list(of_bsn_port_counter_stats_entry_t) entries;
 };

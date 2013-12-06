@@ -239,6 +239,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u64_rx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_packets_broadcast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_uint64_value(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_packets(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)

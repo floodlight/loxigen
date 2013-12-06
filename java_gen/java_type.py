@@ -298,6 +298,12 @@ u32_list = JType('List<U32>', 'int[]') \
                 write='ChannelUtils.writeList(bb, $name)',
                 default="ImmutableList.<U32>of()",
                 funnel="FunnelUtils.putList($name, sink)")
+u64_list = JType('List<U64>', 'int[]') \
+        .op(
+                read='ChannelUtils.readList(bb, $length, U64.READER)',
+                write='ChannelUtils.writeList(bb, $name)',
+                default="ImmutableList.<U64>of()",
+                funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
 u32obj = JType('U32', 'U32') \
@@ -489,6 +495,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_bucket_t)': buckets_list,
         'list(of_port_desc_t)' : port_desc_list,
         'list(of_packet_queue_t)' : packet_queue_list,
+        'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
