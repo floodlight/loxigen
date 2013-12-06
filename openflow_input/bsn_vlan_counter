@@ -31,10 +31,10 @@
 #version 4
 
 enum of_bsn_vlan_counter_t(wire_type=uint8_t, complete=False) {
-  OFP_RX_BYTES = 0,
-  OFP_RX_PACKETS = 1,
-  OFP_TX_BYTES = 2,
-  OFP_TX_PACKETS = 3,
+  OFP_BSN_VLAN_COUNTER_RX_BYTES = 0,
+  OFP_BSN_VLAN_COUNTER_RX_PACKETS = 1,
+  OFP_BSN_VLAN_COUNTER_TX_BYTES = 2,
+  OFP_BSN_VLAN_COUNTER_TX_PACKETS = 3,
 };
 
 struct of_bsn_vlan_counter_stats_request : of_bsn_stats_request {
