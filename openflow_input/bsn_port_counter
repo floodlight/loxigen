@@ -62,7 +62,7 @@ struct of_bsn_port_counter_stats_entry {
     uint16_t length;
     pad(2);
     of_port_no_t port_no;
-    list(of_uint64_t) port_values;
+    list(of_uint64_t) values;
 };
 
 struct of_bsn_port_counter_stats_reply : of_bsn_stats_reply {
