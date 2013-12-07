@@ -317,8 +317,6 @@ def build_ordered_classes():
         version_name = of_g.of_version_wire2name[wire_version]
 
         for ofclass in protocol.classes:
-            if ofclass.name in ("of_group_add", "of_group_modify", "of_group_delete"):
-                continue
             of_g.ordered_classes[wire_version].append(ofclass.name)
             legacy_members = []
             pad_count = 0
@@ -416,9 +414,6 @@ def populate_type_maps():
             if not [x for x in ofclass.members if isinstance(x, OFDataMember) and x.name == 'xid']:
                 continue
             if type_maps.class_is_virtual(cls):
-                continue
-            # HACK hide of_group subclasses from legacy c backend
-            if ofclass.name in ("of_group_add", "of_group_modify", "of_group_delete"):
                 continue
             subcls = cls[3:]
             val = find_type_value(ofclass, 'type')
