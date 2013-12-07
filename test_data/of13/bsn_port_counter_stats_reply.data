@@ -28,15 +28,15 @@ ofp.message.bsn_port_counter_stats_reply(
         ofp.bsn_port_counter_stats_entry(
             port_no=3,
             values=[
-		ofp.uint64(0x123456789abcdef0),
-		ofp.uint64(0x1122334455667788),
+                ofp.uint64(0x123456789abcdef0),
+                ofp.uint64(0x1122334455667788),
             ]),
         ofp.bsn_port_counter_stats_entry(
             port_no=4,
             values=[
-		ofp.uint64(0x123456789abcdef0),
-		ofp.uint64(0x1122334455667788),
-		ofp.uint64(0xffffffffffffffff),
+                ofp.uint64(0x123456789abcdef0),
+                ofp.uint64(0x1122334455667788),
+                ofp.uint64(0xffffffffffffffff),
             ])
     ]
 )
