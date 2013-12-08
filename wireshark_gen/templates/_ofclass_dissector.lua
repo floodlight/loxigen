@@ -26,7 +26,7 @@
 :: # under the EPL.
 ::
 :: from loxi_ir import *
-:: from wireshark_gen import make_field_name, get_reader
+:: from wireshark_gen import make_field_name, get_reader, get_peeker
 :: attrs = []
 :: if ofclass.virtual: attrs.append("virtual")
 :: if ofclass.superclass: attrs.append("child")
@@ -46,7 +46,15 @@ function ${name}(reader, subtree)
 :: #endif
 :: field_name = make_field_name(version, ofclass.name, m.name)
 :: reader_name = get_reader(version, ofclass, m)
+:: peeker_name = get_peeker(version, ofclass, m)
+:: if (field_name == discriminator_name):
+    return ${peeker_name}(reader, ${version.wire_version}, subtree, '${field_name}')
+::    break
+:: else:
     ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
+:: #endif
 :: #endfor
+:: if not ofclass.virtual:
     return '${ofclass.name}'
+:: #endif
 end

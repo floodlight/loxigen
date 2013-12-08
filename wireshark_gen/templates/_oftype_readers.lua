@@ -51,6 +51,32 @@ function read_of_octets_t(reader, version, subtree, field_name)
     end
 end
 
+function peek_scalar(reader, subtree, field_name, length)
+    return reader.read(length):uint()
+end
+
+function peek_uint8_t(reader, version, subtree, field_name)
+    return peek_scalar(reader, subtree, field_name, 1)
+end
+
+function peek_uint16_t(reader, version, subtree, field_name)
+    return peek_scalar(reader, subtree, field_name, 2)
+end
+
+function peek_uint32_t(reader, version, subtree, field_name)
+    return peek_scalar(reader, subtree, field_name, 4)
+end
+
+function peek_uint64_t(reader, version, subtree, field_name)
+    return peek_scalar(reader, subtree, field_name, 8)
+end
+
+function peek_of_octets_t(reader, version, subtree, field_name)
+    if not reader.is_empty() then
+        return reader.peek_all()
+    end
+end
+
 function read_list_of_hello_elem_t(reader, version, subtree, field_name)
     -- TODO
 end
@@ -102,6 +128,14 @@ function read_of_fm_cmd_t(reader, version, subtree, field_name)
         read_scalar(reader, subtree, field_name, 2)
     else
         read_scalar(reader, subtree, field_name, 1)
+    end
+end
+
+function peek_of_fm_cmd_t(reader, version, subtree, field_name)
+    if version == 1 then
+        return peek_scalar(reader, subtree, field_name, 2)
+    else
+        return peek_scalar(reader, subtree, field_name, 1)
     end
 end
 

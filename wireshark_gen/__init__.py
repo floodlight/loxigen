@@ -55,6 +55,17 @@ def get_reader(version, cls, m):
     else:
         return "read_" + m.oftype.replace(')', '').replace('(', '_')
 
+def get_peeker(version, cls, m):
+    """
+    Decide on a peeker function to use for the given field
+    """
+    ofproto = loxi_globals.ir[version]
+    enum = ofproto.enum_by_name(m.oftype)
+    if enum and 'wire_type' in enum.params:
+        return "peek_" + enum.params['wire_type']
+    else:
+        return "peek_" + m.oftype.replace(')', '').replace('(', '_')
+
 def get_field_info(version, cls, name, oftype):
     """
     Decide on a Wireshark type and base for a given field.
