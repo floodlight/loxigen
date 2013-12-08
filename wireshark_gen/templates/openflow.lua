@@ -84,28 +84,49 @@ p_of.fields = {
 :: for ofclass in ofproto.classes:
 :: if ofclass.virtual:
 ${ofclass.name}_v${version.wire_version}_dissectors = {}
+${ofclass.name}_v${version.wire_version}_dissectors_virtual = {}
 :: #endif
 :: #endfor
 :: #endfor
 
---- Dissectors for each class
+:: virtual_classes = []
 
+--- Dissectors for each class
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: name = 'dissect_%s_v%d' % (ofclass.name, version.wire_version)
+:: name_virtual = '%s_v%d_dissectors' % (ofclass.name, version.wire_version)
 :: include('_ofclass_dissector.lua', name=name, ofclass=ofclass, version=version)
 :: if ofclass.superclass:
 :: discriminator = ofclass.superclass.discriminator
 :: discriminator_value = ofclass.member_by_name(discriminator.name).value
+:: if ofclass.virtual:
+:: if discriminator_value not in virtual_classes:
+:: virtual_classes.append(discriminator_value)
+:: #endif
+${ofclass.superclass.name}_v${version.wire_version}_dissectors_virtual[${discriminator_value}] = ${name_virtual}
+:: #endif
 ${ofclass.superclass.name}_v${version.wire_version}_dissectors[${discriminator_value}] = ${name}
 
 :: #endif
 :: #endfor
 :: #endfor
 
+local virtual_classes = {
+:: for classes in virtual_classes:
+    [${classes}] = ${classes},
+:: #endfor
+}
+
 local of_message_dissectors = {
 :: for version in ir:
     [${version.wire_version}] = of_header_v${version.wire_version}_dissectors,
+:: #endfor
+}
+
+local of_message_dissectors_virtual = {
+:: for version in ir:
+    [${version.wire_version}] = of_header_v${version.wire_version}_dissectors_virtual,
 :: #endfor
 }
 
@@ -181,19 +202,15 @@ function dissect_of_message(buf, root)
     local version_val = buf(0,1):uint()
     local type_val = buf(1,1):uint()
 
+    local virtual_reader = OFReader.new(buf)
+
     local protocol = "OF ?"
     if openflow_versions[version_val] then
         protocol = "OF " .. openflow_versions[version_val]
     end
-
-    local info = "unknown"
-    if type_val == 19 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_reply_dissectors[version_val][stats_type](reader,subtree)
-    elseif type_val == 18 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_request_dissectors[version_val][stats_type](reader,subtree)
-    elseif of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
+    if virtual_classes[type_val] then
+        info = of_message_dissectors_virtual[version_val][type_val][of_message_dissectors[version_val][type_val](virtual_reader, subtree)](reader, subtree)
+    else
         info = of_message_dissectors[version_val][type_val](reader, subtree)
     end
 

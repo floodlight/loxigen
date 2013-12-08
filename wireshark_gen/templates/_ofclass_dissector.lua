@@ -39,6 +39,10 @@
 -- Discriminator is ${ofclass.discriminator.name}
 :: #endif
 function ${name}(reader, subtree)
+:: discriminator_name = "unknown"
+:: if ofclass.virtual:
+:: discriminator_name = make_field_name(version, ofclass.name, ofclass.discriminator.name)
+:: #endif
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
     reader.skip(${m.length})
