@@ -132,7 +132,11 @@ def ignore_member(cls, version, m_name, m_type):
     classes = ["of_bsn_lacp_stats_request",
                "of_bsn_lacp_stats_reply",
                "of_bsn_switch_pipeline_stats_request",
-               "of_bsn_switch_pipeline_stats_reply"]
+               "of_bsn_switch_pipeline_stats_reply",
+               "of_bsn_port_counter_stats_request",
+               "of_bsn_port_counter_stats_reply",
+               "of_bsn_vlan_counter_stats_request",
+               "of_bsn_vlan_counter_stats_reply"]
 
     if (cls in classes and (
             m_name == "experimenter" or

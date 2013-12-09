@@ -20,6 +20,8 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
@@ -124,5 +126,14 @@ public class U64 implements Writeable, OFValueType<U64> {
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(raw);
+    }
+
+    public final static Reader READER = new Reader();
+
+    private static class Reader implements OFMessageReader<U64> {
+        @Override
+        public U64 readFrom(ChannelBuffer bb) throws OFParseError {
+            return U64.ofRaw(bb.readLong());
+        }
     }
 }

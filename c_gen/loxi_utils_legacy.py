@@ -125,7 +125,8 @@ def class_is_u16_len(cls):
     Return True if cls_name is an object which uses initial uint16 length
     """
     return cls in ["of_group_desc_stats_entry", "of_group_stats_entry",
-                   "of_flow_stats_entry", "of_bucket", "of_table_features"]
+                   "of_flow_stats_entry", "of_bucket", "of_table_features",
+                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry"]
 
 def class_is_oxm(cls):
     """
