@@ -75,6 +75,10 @@ def gen_object_id_to_type(out):
                 out.write("    %d%s /* %s */\n" %
                           (type_maps.type_val[("of_flow_mod", version)],
                            comma, cls))
+            elif cls in type_maps.group_mod_list and version > 1:
+                out.write("    %d%s /* %s */\n" %
+                          (type_maps.type_val[("of_group_mod", version)],
+                           comma, cls))
             elif (cls, version) in type_maps.type_val and \
                     type_maps.type_val[(cls, version)] != type_maps.invalid_type:
                 out.write("    %d%s /* %s */\n" %
@@ -260,6 +264,9 @@ def gen_type_maps(out):
                           max_type_value)
     gen_type_to_object_id(out, "hello_elem_type_to_id", "OF_HELLO_ELEM",
                           "OF_HELLO_ELEM_%s", type_maps.hello_elem_types,
+                          max_type_value)
+    gen_type_to_object_id(out, "group_mod_type_to_id", "OF_GROUP_MOD",
+                          "OF_GROUP_%s", type_maps.group_mod_types,
                           max_type_value)
 
     # FIXME:  Multipart re-organization
@@ -504,6 +511,7 @@ of_message_to_object_id(of_message_t msg, int length) {
     uint16_t err_type;
     uint8_t flow_mod_cmd;
     uint32_t experimenter, subtype;
+    uint16_t group_mod_cmd;
 
     if (length < OF_MESSAGE_MIN_LENGTH) {
         return OF_OBJECT_INVALID;
@@ -568,6 +576,14 @@ of_message_to_object_id(of_message_t msg, int length) {
         }
         err_type = of_message_error_type_get(msg);
         obj_id = of_error_msg_to_object_id(err_type, ver);
+    }
+
+    if (obj_id == OF_GROUP_MOD) {
+        if (length < OF_MESSAGE_MIN_GROUP_MOD_LENGTH) {
+            return OF_OBJECT_INVALID;
+        }
+        group_mod_cmd = of_message_group_mod_command_get(msg);
+        obj_id = of_group_mod_to_object_id(group_mod_cmd, ver);
     }
 
     return obj_id;
@@ -691,6 +707,11 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     ar_len = type_maps.type_array_len(type_maps.flow_mod_types, max_type_value)
     out.write(map_template %
               dict(name="flow_mod", u_name="FLOW_MOD", ar_len=ar_len))
+
+    ar_len = type_maps.type_array_len(type_maps.group_mod_types,
+                                      max_type_value)
+    out.write(map_template %
+              dict(name="group_mod", u_name="GROUP_MOD", ar_len=ar_len))
 
     # OXM
     ar_len = type_maps.type_array_len(type_maps.oxm_types, max_type_value)
@@ -947,6 +968,48 @@ of_object_to_flow_mod_command(of_object_id_t id, of_version_t version)
 
 """)
 
+    ################################################################
+    # Generate object ID to the group mod sub-type map
+    ################################################################
+
+    out.write("""
+/**
+ * Map an object ID to a group-mod command value
+ * @param id An object ID
+ * @return The wire value for the group-mod command
+ * @return -1 if not supported for this version
+ * @return -1 if id is not a specific stats type ID
+ *
+ * Note that the value is returned as a signed integer.  So -1 is
+ * an error code, while 0xffff is the usual "experimenter" code.
+ */
+
+static inline int
+of_object_to_group_mod_command(of_object_id_t id, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return -1;
+    }
+    switch (id) {""")
+    group_mod_names = set()
+    for ver in of_g.of_version_range:
+        for name in type_maps.group_mod_types[ver]:
+            group_mod_names.add(name)
+    for name in group_mod_names:
+        out.write("""
+    case OF_GROUP_%(name)s:
+        if (OF_GROUP_MOD_COMMAND_%(name)s_SUPPORTED(version))
+            return OF_GROUP_MOD_COMMAND_%(name)s_BY_VERSION(version);
+        break;""" % {"name": name.upper()})
+    out.write("""
+    default:
+        break;
+    }
+    return -1; /* Not recognized as group mod type object for this version */
+}
+
+""")
+
 def gen_type_maps_header(out):
     """
     Generate various header file declarations for type maps
@@ -1098,6 +1161,10 @@ of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
     if ((type = of_object_to_flow_mod_command(id, ver)) >= 0) {
         /* It's a flow mod obj */
         of_message_flow_mod_command_set(msg, ver, type);
+    }
+    if ((type = of_object_to_group_mod_command(id, ver)) >= 0) {
+        /* It's a group mod obj */
+        of_message_group_mod_command_set(msg, type);
     }
     if (of_object_id_is_extension(id, ver)) {
         uint32_t val32;
