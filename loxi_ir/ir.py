@@ -419,8 +419,51 @@ def build_protocol(version, ofinputs):
         build_touch_classes.remove(name)
         return c
 
+    def build_id_class(orig_name, base_name):
+        name = base_name + '_id' + orig_name[len(base_name):]
+        if name in name_classes:
+            return name_classes[name]
+        orig_fe, _ = name_frontend_classes[orig_name]
+
+        if orig_fe.superclass:
+            superclass_name = base_name + '_id' + orig_fe.superclass[len(base_name):]
+            superclass = build_id_class(orig_fe.superclass, base_name)
+        else:
+            superclass_name = None
+            superclass = None
+
+        fe = frontend_ir.OFClass(
+            name=name,
+            superclass=superclass_name,
+            members=[m for m in orig_fe.members if not isinstance(m, frontend_ir.OFDataMember)],
+            virtual=orig_fe.virtual,
+            params={})
+
+        base_length, is_fixed_length, member_lengths = \
+           ir_offset.calc_lengths(version, fe, name_classes, name_enums)
+        assert fe.virtual or is_fixed_length
+
+        members = []
+        c = OFClass(name=fe.name, superclass=superclass,
+                members=members, virtual=fe.virtual, params=fe.params,
+                is_fixed_length=is_fixed_length, base_length=base_length)
+
+        members.extend( build_member(c, fe_member, member_lengths[fe_member])
+                  for fe_member in fe.members)
+
+        name_classes[name] = c
+        return c
+
+    id_class_roots = ["of_action", "of_instruction"]
+
     for name in sorted(name_frontend_classes.keys()):
         c = build_class(name)
+
+        # Build ID classes for OF 1.3+
+        if version.wire_version >= 4:
+            for root in id_class_roots:
+                if c.is_instanceof(root):
+                    build_id_class(name, root)
 
     protocol = OFProtocol(version=version, classes=tuple(name_classes.values()), enums=tuple(name_enums.values()))
     for e in chain(protocol.classes, protocol.enums):

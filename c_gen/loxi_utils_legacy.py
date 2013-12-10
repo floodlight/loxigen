@@ -180,6 +180,8 @@ def class_is_instruction(cls):
     """
     Return True if cls_name is an instruction object
     """
+    if cls.find("of_instruction_id") == 0:
+        return False
     if cls.find("of_instruction") == 0:
         return True
 
