@@ -426,7 +426,6 @@ extern int of_wire_buffer_of_match_get(of_object_t *obj, int offset,
                                     of_match_t *match);
 extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
                                     of_match_t *match, int cur_len);
-extern void of_extension_object_id_set(of_object_t *obj, of_object_id_t id);
 """)
 
     # gen_base_types(out)
