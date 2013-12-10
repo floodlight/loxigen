@@ -37,6 +37,7 @@ from generic_utils import *
 from c_gen import flags, type_maps, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 from c_gen.loxi_utils_legacy import config_check
+import loxi_globals
 
 import c_gen.identifiers as identifiers
 
@@ -2502,7 +2503,7 @@ def gen_acc_pointer_typedefs(out):
 typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
 typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
 typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj, of_object_id_t id);
+typedef void (*of_wire_type_set_f)(of_object_t *obj);
 """)
     # If not using function pointers in classes, don't gen typedefs below
     if not config_check("gen_fn_ptrs"):
@@ -2710,12 +2711,6 @@ static inline int
             out.write("""
     /* TLV obj; set length */
     of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-        if loxi_utils.class_is_oxm(cls):
-            out.write("""\
-    /* OXM obj; set length */
-    of_oxm_wire_length_set((of_object_t *)obj, obj->length);
 """ % dict(enum=enum_name(cls)))
 
         if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
@@ -3025,6 +3020,12 @@ def gen_coerce_ops(out, cls):
     /* Set up the object's function pointers */
 """)
 
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if uclass and not uclass.virtual and uclass.has_type_members:
+        out.write("""
+    obj->wire_type_set = %(cls)s_push_wire_types;
+""" % dict(cls=cls))
+
     if loxi_utils.class_is_message(cls):
         out.write("""
     obj->wire_length_get = of_object_message_wire_length_get;
@@ -3035,7 +3036,6 @@ def gen_coerce_ops(out, cls):
             if not (cls in type_maps.inheritance_map): # Don't set for super
                 out.write("""
     obj->wire_length_set = of_tlv16_wire_length_set;
-    obj->wire_type_set = of_tlv16_wire_object_id_set;\
 """)
             out.write("""
     obj->wire_length_get = of_tlv16_wire_length_get;
@@ -3071,9 +3071,7 @@ def gen_coerce_ops(out, cls):
         if loxi_utils.class_is_oxm(cls):
             out.write("""
     obj->wire_length_get = of_oxm_wire_length_get;
-    obj->wire_length_set = of_oxm_wire_length_set;
     obj->wire_type_get = of_oxm_wire_object_id_get;
-    obj->wire_type_set = of_oxm_wire_object_id_set;
 """)
         if loxi_utils.class_is_u16_len(cls):
             out.write("""
