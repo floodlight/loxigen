@@ -60,21 +60,25 @@ instruction_types = {
     of_g.VERSION_1_3:dict()
     }
 
-# HACK shared between actions and action_ids
-of_1_3_action_types = dict()
+instruction_id_types = {
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict()
+    }
 
 action_types = {
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
     of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:of_1_3_action_types
+    of_g.VERSION_1_3:dict(),
     }
 
 action_id_types = {
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
     of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:of_1_3_action_types
+    of_g.VERSION_1_3:dict(),
     }
 
 queue_prop_types = {
@@ -134,6 +138,7 @@ meter_band_types = {
 # All inheritance data for non-messages
 inheritance_data = dict(
     of_instruction = instruction_types,
+    of_instruction_id = instruction_id_types,
     of_action = action_types,
     of_action_id = action_id_types,
     of_oxm = oxm_types,
