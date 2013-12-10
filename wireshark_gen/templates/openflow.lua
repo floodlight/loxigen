@@ -185,6 +185,7 @@ function dissect_of_message(buf, root)
         protocol = "OF " .. openflow_versions[version_val]
     end
 
+    local info = "unknown"
     info = of_message_dissectors[version_val][type_val](reader, subtree)
 
     return protocol, info
