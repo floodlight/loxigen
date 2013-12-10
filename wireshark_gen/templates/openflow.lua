@@ -89,7 +89,6 @@ ${ofclass.name}_v${version.wire_version}_dissectors = {}
 :: #endfor
 
 --- Dissectors for each class
-
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: name = 'dissect_%s_v%d' % (ofclass.name, version.wire_version)
@@ -187,15 +186,7 @@ function dissect_of_message(buf, root)
     end
 
     local info = "unknown"
-    if type_val == 19 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_reply_dissectors[version_val][stats_type](reader,subtree)
-    elseif type_val == 18 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_request_dissectors[version_val][stats_type](reader,subtree)
-    elseif of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
-        info = of_message_dissectors[version_val][type_val](reader, subtree)
-    end
+    info = of_message_dissectors[version_val][type_val](reader, subtree)
 
     return protocol, info
 end

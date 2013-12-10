@@ -106,6 +106,7 @@ class_field_to_enum = {
     ('of_echo_reply', 'type'): 'ofp_type',
     ('of_match_v3', 'type'): 'ofp_match_type',
     ('of_action_set_nw_ttl', 'type'): 'ofp_action_type',
+    ('of_action_set_field', 'type'): 'ofp_action_type',
     ('of_action_output', 'type'): 'ofp_action_type',
     ('of_action_group', 'type'): 'ofp_action_type',
     ('of_action_id', 'type'): 'ofp_action_type',
