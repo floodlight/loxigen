@@ -39,6 +39,9 @@
 -- Discriminator is ${ofclass.discriminator.name}
 :: #endif
 function ${name}(reader, subtree)
+:: if ofclass.virtual:
+    return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
+:: else:
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
     reader.skip(${m.length})
@@ -49,4 +52,5 @@ function ${name}(reader, subtree)
     ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
 :: #endfor
     return '${ofclass.name}'
+:: #endif
 end
