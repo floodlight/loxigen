@@ -443,28 +443,6 @@ def analyze_input():
                 of_g.ordered_classes[wire_version].append(new_cls)
                 classes[new_cls] = classes[cls]
 
-    # Generate action_id classes for OF 1.3
-    for wire_version, ordered_classes in of_g.ordered_classes.items():
-        if not wire_version in [of_g.VERSION_1_3]:
-            continue
-        classes = versions[of_g.of_version_wire2name[wire_version]]['classes']
-        for cls in ordered_classes:
-            if not loxi_utils.class_is_action(cls):
-                continue
-            action = cls[10:]
-            if action == '' or action == 'header':
-                continue
-            name = "of_action_id_" + action
-            members = classes["of_action"][:]
-            of_g.ordered_classes[wire_version].append(name)
-            if type_maps.action_id_is_extension(name, wire_version):
-                # Copy the base action classes thru subtype
-                members = classes["of_action_" + action][:4]
-            classes[name] = members
-
-    # @fixme If we support extended actions in OF 1.3, need to add IDs
-    # for them here
-
     for wire_version in of_g.wire_ver_map.keys():
         version_name = of_g.of_version_wire2name[wire_version]
         calculate_offsets_and_lengths(

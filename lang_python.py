@@ -50,6 +50,8 @@ Target directory structure:
             of12: ...           # (code generation incomplete)
                 oxm.py          # OXM classes
             of13: ...           # (code generation incomplete)
+                action_id.py    # Action ID classes
+                instruction_id.py # Instruction ID classes
                 meter_band.py   # Meter band classes
 
 The user will add the pyloxi directory to PYTHONPATH. Then they can
@@ -83,7 +85,7 @@ modules = {
     1: ["action", "common", "const", "message", "util"],
     2: ["action", "common", "const", "instruction", "message", "util"],
     3: ["action", "common", "const", "instruction", "message", "oxm", "util"],
-    4: ["action", "common", "const", "instruction", "message", "meter_band", "oxm", "util"],
+    4: ["action", "action_id", "common", "const", "instruction", "instruction_id", "message", "meter_band", "oxm", "util"],
 }
 
 def make_gen(name, version):
