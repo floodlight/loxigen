@@ -43,6 +43,8 @@ import instruction
 import oxm
 :: #endif
 :: if version >= OFVersions.VERSION_1_3:
+import action_id
+import instruction_id
 import meter_band
 :: #endif
 import util
