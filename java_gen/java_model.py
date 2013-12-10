@@ -470,6 +470,15 @@ class JavaOFInterface(object):
                 return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
+        elif self.ir_class.is_instanceof("of_action_id"):
+            if self.ir_class.is_subclassof('of_action_id_bsn'):
+                return ("actionid", "OFActionIdBsn", None)
+            elif self.ir_class.is_subclassof('of_action_id_nicira'):
+                return ("actionid", "OFActionIdNicira", None)
+            elif self.ir_class.is_subclassof('of_action_id_experimenter'):
+                return ("actionid", "OFActionIdExperimenter", None)
+            else:
+                return ("actionid", "OFActionId", None)
         elif self.ir_class.is_instruction:
             if self.ir_class.is_subclassof('of_instruction_bsn'):
                 return ("instruction", "OFInstructionBsn", None)
@@ -477,6 +486,13 @@ class JavaOFInterface(object):
                 return ("instruction", "OFInstructionExperimenter", None)
             else:
                 return ("instruction", "OFInstruction", None)
+        elif self.ir_class.is_instanceof('of_instruction_id'):
+            if self.ir_class.is_subclassof('of_instruction_id_bsn'):
+                return ("instructionid", "OFInstructionIdBsn", None)
+            elif self.ir_class.is_subclassof('of_instruction_id_experimenter'):
+                return ("instructionid", "OFInstructionIdExperimenter", None)
+            else:
+                return ("instructionid", "OFInstructionId", None)
         elif re.match(r'OFBsnVport.+$', self.name):
             return ("", "OFBsnVport", None)
         elif self.name == "OFOxm":
