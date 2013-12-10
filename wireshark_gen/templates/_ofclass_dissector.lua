@@ -39,33 +39,18 @@
 -- Discriminator is ${ofclass.discriminator.name}
 :: #endif
 function ${name}(reader, subtree)
-:: discriminator_name = "unknown"
 :: if ofclass.virtual:
-:: discriminator_name = make_field_name(version, ofclass.name, ofclass.discriminator.name)
-:: #endif
-:: offset = 0
+    return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
+:: else:
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
-:: if not ofclass.virtual:
     reader.skip(${m.length})
-:: #endif
 :: continue
 :: #endif
 :: field_name = make_field_name(version, ofclass.name, m.name)
 :: reader_name = get_reader(version, ofclass, m)
-:: if ofclass.virtual:
-:: var_len = m.length
-:: if (field_name == discriminator_name):
-    return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${offset},${var_len}):uint()](reader, subtree)
-::    break
-:: else:
-:: offset = offset + var_len
-:: #endif
-:: else:
     ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
-:: #endif
 :: #endfor
-:: if not ofclass.virtual:
     return '${ofclass.name}'
 :: #endif
 end
