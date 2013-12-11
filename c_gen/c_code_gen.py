@@ -37,6 +37,7 @@ from generic_utils import *
 from c_gen import flags, type_maps, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 from c_gen.loxi_utils_legacy import config_check
+import loxi_globals
 
 import c_gen.identifiers as identifiers
 
@@ -425,7 +426,6 @@ extern int of_wire_buffer_of_match_get(of_object_t *obj, int offset,
                                     of_match_t *match);
 extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
                                     of_match_t *match, int cur_len);
-extern void of_extension_object_id_set(of_object_t *obj, of_object_id_t id);
 """)
 
     # gen_base_types(out)
@@ -785,6 +785,7 @@ def top_c_gen(out, name):
 #include <loci/loci.h>
 #include <loci/of_object.h>
 #include "loci_log.h"
+#include "loci_push_wire_types.h"
 
 """)
     gen_object_enum_str(out)
@@ -2501,7 +2502,7 @@ def gen_acc_pointer_typedefs(out):
 typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
 typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
 typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj, of_object_id_t id);
+typedef void (*of_wire_type_set_f)(of_object_t *obj);
 """)
     # If not using function pointers in classes, don't gen typedefs below
     if not config_check("gen_fn_ptrs"):
@@ -2687,62 +2688,30 @@ static inline int
 {
 """ % dict(cls=cls))
 
+    import loxi_globals
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if uclass and not uclass.virtual and uclass.has_type_members:
+        out.write("""
+    %(cls)s_push_wire_types(obj);
+""" % dict(cls=cls))
+
     if loxi_utils.class_is_message(cls):
         out.write("""
-    /* Message obj; push version, length and type to wire */
+    /* Message obj; set length */
     of_message_t msg;
 
     if ((msg = OF_OBJECT_TO_MESSAGE(obj)) != NULL) {
-        of_message_version_set(msg, obj->version);
         of_message_length_set(msg, obj->length);
-        OF_TRY(of_wire_message_object_id_set(OF_OBJECT_TO_WBUF(obj),
-                 %(name)s));
     }
 """ % dict(name = enum_name(cls)))
-
-        for version in of_g.of_version_range:
-            if type_maps.class_is_extension(cls, version):
-                exp_name = type_maps.extension_to_experimenter_macro_name(cls)
-                subtype = type_maps.extension_message_to_subtype(cls, version)
-                if subtype is None or exp_name is None:
-                    print "Error in mapping extension message"
-                    print cls, version
-                    sys.exit(1)
-                out.write("""
-    if (obj->version == %(version)s) {
-        of_message_experimenter_id_set(OF_OBJECT_TO_MESSAGE(obj),
-                                       %(exp_name)s);
-        of_message_experimenter_subtype_set(OF_OBJECT_TO_MESSAGE(obj),
-                                            %(subtype)s);
-    }
-""" % dict(exp_name=exp_name, version=of_g.wire_ver_map[version],
-           subtype=str(subtype)))
 
     else: # Not a message
         if loxi_utils.class_is_tlv16(cls):
             out.write("""
-    /* TLV obj; set length and type */
+    /* TLV obj; set length */
     of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-    of_tlv16_wire_object_id_set((of_object_t *)obj,
-           %(enum)s);
 """ % dict(enum=enum_name(cls)))
-            # Some tlv16 types may be extensions requiring more work
-            if cls in ["of_action_bsn_mirror", "of_action_id_bsn_mirror",
-                       "of_action_bsn_set_tunnel_dst", "of_action_id_bsn_set_tunnel_dst",
-                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl",
-                       "of_instruction_bsn_disable_src_mac_check"]:
-                out.write("""
-    /* Extended TLV obj; Call specific accessor */
-    of_extension_object_id_set(obj, %(enum)s);
-""" % dict(cls=cls, enum=enum_name(cls)))
 
-
-        if loxi_utils.class_is_oxm(cls):
-            out.write("""\
-    /* OXM obj; set length and type */
-    of_oxm_wire_length_set((of_object_t *)obj, obj->length);
-    of_oxm_wire_object_id_set((of_object_t *)obj, %(enum)s);
-""" % dict(enum=enum_name(cls)))
         if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
             out.write("""
     obj->wire_length_set((of_object_t *)obj, obj->length);
@@ -3050,6 +3019,12 @@ def gen_coerce_ops(out, cls):
     /* Set up the object's function pointers */
 """)
 
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if uclass and not uclass.virtual and uclass.has_type_members:
+        out.write("""
+    obj->wire_type_set = %(cls)s_push_wire_types;
+""" % dict(cls=cls))
+
     if loxi_utils.class_is_message(cls):
         out.write("""
     obj->wire_length_get = of_object_message_wire_length_get;
@@ -3060,7 +3035,6 @@ def gen_coerce_ops(out, cls):
             if not (cls in type_maps.inheritance_map): # Don't set for super
                 out.write("""
     obj->wire_length_set = of_tlv16_wire_length_set;
-    obj->wire_type_set = of_tlv16_wire_object_id_set;\
 """)
             out.write("""
     obj->wire_length_get = of_tlv16_wire_length_get;
@@ -3096,9 +3070,7 @@ def gen_coerce_ops(out, cls):
         if loxi_utils.class_is_oxm(cls):
             out.write("""
     obj->wire_length_get = of_oxm_wire_length_get;
-    obj->wire_length_set = of_oxm_wire_length_set;
     obj->wire_type_get = of_oxm_wire_object_id_get;
-    obj->wire_type_set = of_oxm_wire_object_id_set;
 """)
         if loxi_utils.class_is_u16_len(cls):
             out.write("""

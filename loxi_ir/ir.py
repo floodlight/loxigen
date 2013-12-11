@@ -183,6 +183,10 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
     def has_external_alignment(self):
         return self.params.get('length_includes_align') == 'False'
 
+    @property
+    def has_type_members(self):
+        return find(lambda m: isinstance(m, OFTypeMember), self.members) is not None
+
 """ one class unified across openflow versions. Keeps around a map version->versioned_class """
 class OFUnifiedClass(OFClass):
     def __new__(cls, version_classes, *a, **kw):
