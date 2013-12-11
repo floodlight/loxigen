@@ -16,11 +16,20 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
     }
 
     public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
+        if (value == null) {
+            throw new NullPointerException("Value must not be null");
+        }
+        if (mask == null) {
+            throw new NullPointerException("Mask must not be null");
+        }
         return new IPv6AddressWithMask(value, mask);
     }
 
 
     public static IPv6AddressWithMask of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         int slashPos;
         String ip = string;
         int maskBits = 128;

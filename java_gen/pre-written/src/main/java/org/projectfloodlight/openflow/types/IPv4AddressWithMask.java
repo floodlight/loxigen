@@ -22,10 +22,19 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     }
 
     public static IPv4AddressWithMask of(IPv4Address value, IPv4Address mask) {
+        if (value == null) {
+            throw new NullPointerException("Value must not be null");
+        }
+        if (mask == null) {
+            throw new NullPointerException("Mask must not be null");
+        }
         return new IPv4AddressWithMask(value, mask);
     }
 
     public static IPv4AddressWithMask of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         int slashPos;
         String ip = string;
         int maskBits = 32;

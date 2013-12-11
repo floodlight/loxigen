@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -179,6 +180,56 @@ public class IPv6AddressTest {
             IPAddressWithMask<?> superIp = IPAddressWithMask.of(ipMaskedString);
             assertEquals(IPVersion.IPv6, superIp.getIpVersion());
             assertEquals(IPv6AddressWithMask.of(ipMaskedString), superIp);
+        }
+    }
+
+    @Test
+    public void testOfExceptions() throws Exception {
+        try {
+            IPv6AddressWithMask.of(null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            String s = null;
+            IPv6Address.of(s);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            byte[] b = null;
+            IPv6Address.of(b);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            byte[] b = new byte[7];
+            IPv6Address.of(b);
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            byte[] b = new byte[9];
+            IPv6Address.of(b);
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            IPv6AddressWithMask.of(IPv6Address.of("1::"), null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            IPv6AddressWithMask.of(null, IPv6Address.of("255::"));
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
         }
     }
 }

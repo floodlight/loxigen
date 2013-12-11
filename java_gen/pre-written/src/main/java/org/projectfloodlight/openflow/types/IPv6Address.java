@@ -53,6 +53,9 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
     public static IPv6Address of(final byte[] address) {
+        if (address == null) {
+            throw new NullPointerException("Address must not be null");
+        }
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv6 address: " + address.length);
@@ -98,6 +101,9 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private final static Pattern colonPattern = Pattern.compile(":");
 
     public static IPv6Address of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         IPv6Builder builder = new IPv6Builder();
         String[] parts = colonPattern.split(string, -1);
 

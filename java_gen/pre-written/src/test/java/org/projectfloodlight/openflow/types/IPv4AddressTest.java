@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -191,6 +192,59 @@ public class IPv4AddressTest {
             IPAddressWithMask<?> superIp = IPAddressWithMask.of(ipMaskedString);
             assertEquals(IPVersion.IPv4, superIp.getIpVersion());
             assertEquals(IPv4AddressWithMask.of(ipMaskedString), superIp);
+        }
+    }
+
+    @Test
+    public void testOfExceptions() {
+        // We check if the message of a caught NPE is set to a useful message
+        // as a hacky way of verifying that we got an NPE thrown by use rather
+        // than one the JVM created for a null access.
+        try {
+            String s = null;
+            IPv4Address.of(s);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            byte[] b = null;
+            IPv4Address.of(b);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            byte[] b = new byte[3];
+            IPv4Address.of(b);
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            byte[] b = new byte[5];
+            IPv4Address.of(b);
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            // expected
+        }
+        try {
+            IPv4AddressWithMask.of(null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            IPv4AddressWithMask.of(IPv4Address.of("1.2.3.4"), null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+        try {
+            IPv4AddressWithMask.of(null, IPv4Address.of("255.0.0.0"));
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
         }
     }
 }

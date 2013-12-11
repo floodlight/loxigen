@@ -28,6 +28,9 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract int hashCode();
 
     public static IPAddress<?> of(String ip) {
+        if (ip == null) {
+            throw new NullPointerException("String ip must not be null");
+        }
         if (ip.indexOf('.') != -1)
             return IPv4Address.of(ip);
         else if (ip.indexOf(':') != -1)

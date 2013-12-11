@@ -49,6 +49,9 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     public static IPv4Address of(final byte[] address) {
+        if (address == null) {
+            throw new NullPointerException("Address must not be null");
+        }
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv4Address address: " + address.length);
@@ -67,6 +70,9 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     public static IPv4Address of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         int start = 0;
         int shift = 24;
 
