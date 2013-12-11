@@ -41,6 +41,7 @@ import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
 import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
+import c_gen.codegen
 import loxi_utils.loxi_utils as loxi_utils
 import template_utils
 
@@ -173,3 +174,4 @@ def generate(install_dir):
     for (name, fn) in targets.items():
         with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))
+    c_gen.codegen.gen_push_wire_types(install_dir)

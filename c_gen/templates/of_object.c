@@ -510,7 +510,7 @@ of_list_append_bind(of_object_t *parent, of_object_t *child)
     }
 
     if (child->wire_type_set) {
-        child->wire_type_set(child, child->object_id);
+        child->wire_type_set(child);
     }
 
     /* Update the parent's length */
