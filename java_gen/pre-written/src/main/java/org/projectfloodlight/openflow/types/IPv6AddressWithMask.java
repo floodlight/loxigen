@@ -19,23 +19,6 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         return new IPv6AddressWithMask(value, mask);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder res = new StringBuilder();
-        res.append(value.toString());
-        res.append('/');
-
-        BigInteger maskint = new BigInteger(mask.getBytes());
-        if (maskint.not().add(BigInteger.ONE).bitCount() == 1) {
-            // CIDR notation
-            res.append(maskint.bitCount());
-        } else {
-            // Full address mask
-            res.append(mask.toString());
-        }
-
-        return res.toString();
-    }
 
     public static IPv6AddressWithMask of(final String string) {
         int slashPos;

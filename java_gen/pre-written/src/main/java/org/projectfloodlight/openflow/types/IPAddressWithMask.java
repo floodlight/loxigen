@@ -18,4 +18,20 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
             throw new IllegalArgumentException("IP Address not well formed: " + ip);
     }
 
+    public String toString() {
+        StringBuilder res = new StringBuilder();
+        res.append(value.toString());
+
+        res.append('/');
+        if (mask.asCidrMaskLength() != -1) {
+            // CIDR notation
+            res.append(mask.asCidrMaskLength());
+        } else {
+            // Full address mask
+            res.append(mask.toString());
+        }
+
+        return res.toString();
+    }
+
 }

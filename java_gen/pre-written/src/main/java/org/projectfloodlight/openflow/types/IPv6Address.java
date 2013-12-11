@@ -1,5 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
+import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -34,6 +35,21 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     @Override
     public IPVersion getIpVersion() {
         return IPVersion.IPv6;
+    }
+
+
+    @Override
+    public int asCidrMaskLength() {
+        BigInteger maskBigint = new BigInteger(getBytes());
+        if (maskBigint.equals(BigInteger.ZERO))
+            return 0; // Thanks, signed BigInteger
+        else if (maskBigint.not().add(BigInteger.ONE).bitCount() == 1) {
+            // Need to get a positive BigInteger before we can count
+            return new BigInteger(1, getBytes()).bitCount();
+        } else {
+            // IP is not a true prefix.
+            return -1;
+        }
     }
 
     public static IPv6Address of(final byte[] address) {

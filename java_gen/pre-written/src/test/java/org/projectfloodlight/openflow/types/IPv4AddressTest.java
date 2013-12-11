@@ -38,6 +38,7 @@ public class IPv4AddressTest {
             "1.2..3.4",
             "1.2.3.4.",
             "257.11.225.1",
+            "256.11.225.1",
             "-1.2.3.4",
             "1.2.3.4.5",
             "1.x.3.4",
@@ -49,7 +50,10 @@ public class IPv4AddressTest {
                             "192.168.130.140/255.255.192.0",
                             "127.0.0.1/8",
                             "8.8.8.8",
-                            "0.0.0.0/0"
+                            "8.8.8.8/32",
+                            "0.0.0.0/0",
+                            "192.168.130.140/255.0.255.0",
+                            "1.2.3.4/0.127.0.255"
     };
 
     boolean[] hasMask = {
@@ -57,6 +61,9 @@ public class IPv4AddressTest {
                          true,
                          true,
                          false,
+                         false,
+                         true,
+                         true,
                          true
     };
 
@@ -64,8 +71,32 @@ public class IPv4AddressTest {
                              new byte[][] { new byte[] { (byte)0x01, (byte)0x02, (byte)0x03, (byte)0x04 }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0x00 } },
                              new byte[][] { new byte[] { (byte)0xC0, (byte)0xA8, (byte)0x82, (byte)0x8C }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xC0, (byte)0x00 } },
                              new byte[][] { new byte[] { (byte)0x7F, (byte)0x00, (byte)0x00, (byte)0x01 }, new byte[] { (byte)0xFF, (byte)0x00, (byte)0x00, (byte)0x00 } },
-                             new byte[][] { new byte[] { (byte)0x08, (byte)0x08, (byte)0x08, (byte)0x08 }, null },
-                             new byte[][] { new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 }, new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 } }
+                             new byte[][] { new byte[] { (byte)0x08, (byte)0x08, (byte)0x08, (byte)0x08 }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF } },
+                             new byte[][] { new byte[] { (byte)0x08, (byte)0x08, (byte)0x08, (byte)0x08 }, new byte[] { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF } },
+                             new byte[][] { new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 }, new byte[] { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 } },
+                             new byte[][] { new byte[] { (byte)0xC0, (byte)0xA8, (byte)0x82, (byte)0x8C }, new byte[] { (byte)0xFF, (byte)0x00, (byte)0xFF, (byte)0x00 } },
+                             new byte[][] { new byte[] { (byte)0x01, (byte)0x02, (byte)0x03, (byte)0x04 }, new byte[] { (byte)0x00, (byte)0x7F, (byte)0x00, (byte)0xFF } }
+    };
+
+    int[] ipsWithMaskLengths = {
+                                24,
+                                18,
+                                8,
+                                32,
+                                32,
+                                0,
+                                -1,
+                                -1
+    };
+
+    String[] invalidIpsWithMask = {
+                                   "asdf",
+                                   "1.2.3.4/33",
+                                   "1.2.3.4/34",
+                                   "1.2.3.4/-1",
+                                   "1.2.3.4/256.0.0.0",
+                                   "1.256.3.4/255.255.0.0",
+                                   "1.2.3.4/255.255.0.0.0",
     };
 
 
@@ -119,18 +150,47 @@ public class IPv4AddressTest {
             if (!hasMask[i]) {
                 IPv4Address ip = value.getValue();
                 assertArrayEquals(ipsWithMaskValues[i][0], ip.getBytes());
-            } else if (hasMask[i]) {
-                byte[] ipBytes = new byte[4];
-                System.arraycopy(ipsWithMaskValues[i][0], 0, ipBytes, 0, 4);
-                assertEquals(ipBytes.length, value.getValue().getBytes().length);
-                for (int j = 0; j < ipBytes.length; j++) {
-                    ipBytes[j] &= ipsWithMaskValues[i][1][j];
-                }
-
-                assertArrayEquals(ipBytes, value.getValue().getBytes());
-                assertThat(String.format("Byte comparison for mask of %s (%s)", ipsWithMask[i], value),
-                        value.getMask().getBytes(), CoreMatchers.equalTo(ipsWithMaskValues[i][1]));
             }
+            IPv4Address mask = value.getMask();
+            assertEquals(ipsWithMaskLengths[i], value.getMask().asCidrMaskLength());
+            assertArrayEquals(ipsWithMaskValues[i][1], mask.getBytes());
+            byte[] ipBytes = new byte[4];
+            System.arraycopy(ipsWithMaskValues[i][0], 0, ipBytes, 0, 4);
+            assertEquals(ipBytes.length, value.getValue().getBytes().length);
+            for (int j = 0; j < ipBytes.length; j++) {
+                ipBytes[j] &= ipsWithMaskValues[i][1][j];
+            }
+
+            assertArrayEquals(ipBytes, value.getValue().getBytes());
+            assertThat(String.format("Byte comparison for mask of %s (%s)", ipsWithMask[i], value),
+                    value.getMask().getBytes(), CoreMatchers.equalTo(ipsWithMaskValues[i][1]));
+        }
+    }
+
+    @Test
+    public void testOfMaskedInvalid() throws Exception {
+        for(String invalid : invalidIpsWithMask) {
+            try {
+                IPv4Address.of(invalid);
+                fail("Invalid IP "+invalid+ " should have raised IllegalArgumentException");
+            } catch(IllegalArgumentException e) {
+                // ok
+            }
+        }
+    }
+
+    @Test
+    public void testSuperclass() throws Exception {
+        for(String ipString: testStrings) {
+            IPAddress<?> superIp = IPAddress.of(ipString);
+            assertEquals(IPVersion.IPv4, superIp.getIpVersion());
+            assertEquals(IPv4Address.of(ipString), superIp);
+        }
+
+        for(String ipMaskedString: ipsWithMask) {
+            IPAddressWithMask<?> superIp = IPAddressWithMask.of(ipMaskedString);
+            assertEquals(IPVersion.IPv4, superIp.getIpVersion());
+            assertEquals(IPv4AddressWithMask.of(ipMaskedString), superIp);
         }
     }
 }

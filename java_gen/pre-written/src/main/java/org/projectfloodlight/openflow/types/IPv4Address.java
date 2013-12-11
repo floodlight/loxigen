@@ -33,6 +33,21 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPVersion.IPv4;
     }
 
+
+    @Override
+    public int asCidrMaskLength() {
+        int maskint = getInt();
+        if (maskint == 0)
+            return 0;
+        else if (Integer.bitCount((~maskint) + 1) == 1) {
+            // IP represents a true CIDR prefix length
+            return Integer.bitCount(maskint);
+        } else {
+            // IP is not a true prefix.
+            return -1;
+        }
+    }
+
     public static IPv4Address of(final byte[] address) {
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(

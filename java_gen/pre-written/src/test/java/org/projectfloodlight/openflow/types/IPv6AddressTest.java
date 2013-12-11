@@ -31,6 +31,7 @@ public class IPv6AddressTest {
     private class WithMaskTaskCase {
         final String input;
         boolean hasMask;
+        int expectedMaskLength = 128;
         byte[] expectedMask = hex.decode("ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff".replaceAll(" ", ""));
 
         public WithMaskTaskCase(String input) {
@@ -45,19 +46,27 @@ public class IPv6AddressTest {
             return this;
         }
 
+        public WithMaskTaskCase expectedMaskLength(int expectedLength) {
+            this.expectedMaskLength = expectedLength;
+            return this;
+        }
+
     }
 
     WithMaskTaskCase[] withMasks = new WithMaskTaskCase[] {
             new WithMaskTaskCase("1::1/80")
-                .maskHex("ff ff ff ff ff ff ff ff ff ff 00 00 00 00 00 00"),
+                .maskHex("ff ff ff ff ff ff ff ff ff ff 00 00 00 00 00 00")
+                .expectedMaskLength(80),
 
             new WithMaskTaskCase("ffff:ffee:1::/ff00:ff00:ff00:ff00::")
-                .maskHex("ff 00 ff 00 ff 00 ff 00 00 00 00 00 00 00 00 00"),
+                .maskHex("ff 00 ff 00 ff 00 ff 00 00 00 00 00 00 00 00 00")
+                .expectedMaskLength(-1),
             new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
             new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
             new WithMaskTaskCase("1:2:3:4:5:6:7:8/128"),
             new WithMaskTaskCase("::/0")
                 .maskHex("00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00")
+                .expectedMaskLength(0),
     };
 
     @Test
@@ -70,19 +79,25 @@ public class IPv6AddressTest {
 
                 assertArrayEquals(ip.getBytes(), inetAddress.getAddress());
                 assertEquals(w.input.split("/")[0], ip.toString());
-            } else {
-                InetAddress inetAddress = InetAddress.getByName(w.input.substring(0, w.input.indexOf('/')));
-
-                byte[] address = inetAddress.getAddress();
-                assertEquals(address.length, value.getValue().getBytes().length);
-
-                for (int j = 0; j < address.length; j++) {
-                    address[j] &= w.expectedMask[j];
-                }
-
-                assertThat("Address bytes for input " + w.input + ", value=" + value, value.getValue().getBytes(), CoreMatchers.equalTo(address));
-                assertThat("mask check for input " + w.input + ", value=" + value, value.getMask().getBytes(), CoreMatchers.equalTo(w.expectedMask));
             }
+            InetAddress inetAddress = InetAddress.getByName(w.input.split("/")[0]);
+
+            assertEquals("Input " + w.input, w.expectedMaskLength, value.getMask().asCidrMaskLength());
+
+            byte[] address = inetAddress.getAddress();
+            assertEquals(address.length, value.getValue().getBytes().length);
+
+            for (int j = 0; j < address.length; j++) {
+                address[j] &= w.expectedMask[j];
+            }
+
+            assertThat("Address bytes for input " + w.input + ", value=" + value, value.getValue().getBytes(), CoreMatchers.equalTo(address));
+            assertThat("mask check for input " + w.input + ", value=" + value, value.getMask().getBytes(), CoreMatchers.equalTo(w.expectedMask));
+        }
+        for (int i = 0; i <= 128; i++) {
+            String ipString = String.format("8001:2::1/%d", i);
+            IPv6AddressWithMask value = IPv6AddressWithMask.of(ipString);
+            assertEquals("Input " + ipString, i, value.getMask().asCidrMaskLength());
         }
     }
 
@@ -149,5 +164,21 @@ public class IPv6AddressTest {
         assertEquals("0000:0000:0000:0000:0000:0000:0000:0000", IPv6Address.of("::").toString(false, true));
         assertEquals("1::4:5:6:0:8", IPv6Address.of("1:0:0:4:5:6:0:8").toString(true, false));
         assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8").toString(true, false));
+    }
+
+    @Test
+    public void testSuperclass() throws Exception {
+        for(String ipString: testStrings) {
+            IPAddress<?> superIp = IPAddress.of(ipString);
+            assertEquals(IPVersion.IPv6, superIp.getIpVersion());
+            assertEquals(IPv6Address.of(ipString), superIp);
+        }
+
+        for(WithMaskTaskCase w: withMasks) {
+            String ipMaskedString = w.input;
+            IPAddressWithMask<?> superIp = IPAddressWithMask.of(ipMaskedString);
+            assertEquals(IPVersion.IPv6, superIp.getIpVersion());
+            assertEquals(IPv6AddressWithMask.of(ipMaskedString), superIp);
+        }
     }
 }

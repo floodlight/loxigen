@@ -25,24 +25,6 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
         return new IPv4AddressWithMask(value, mask);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder res = new StringBuilder();
-        res.append(value.toString());
-
-        int maskint = mask.getInt();
-        res.append('/');
-        if (Integer.bitCount((~maskint) + 1) == 1) {
-            // CIDR notation
-            res.append(Integer.bitCount(maskint));
-        } else {
-            // Full address mask
-            res.append(mask.toString());
-        }
-
-        return res.toString();
-    }
-
     public static IPv4AddressWithMask of(final String string) {
         int slashPos;
         String ip = string;
