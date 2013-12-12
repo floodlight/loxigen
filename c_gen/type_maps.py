@@ -38,6 +38,7 @@ import sys
 from generic_utils import *
 import loxi_utils.loxi_utils as loxi_utils
 import c_gen.loxi_utils_legacy as loxi_utils
+import loxi_globals
 
 invalid_type = "invalid_type"
 invalid_value = "0xeeee"  # Note, as a string
@@ -154,16 +155,11 @@ def class_is_virtual(cls):
     """
     Returns True if cls is a virtual class
     """
-    if cls in inheritance_map:
-        return True
     if cls.find("header") > 0:
         return True
     if loxi_utils.class_is_list(cls):
         return True
-    # TODO get this from the input file when we have virtual class syntax
-    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira", "of_bsn_stats_request", "of_bsn_stats_reply", "of_experimenter_stats_request", "of_experimenter_stats_reply", "of_instruction_experimenter", "of_instruction_bsn", "of_group_mod"]:
-        return True
-    return False
+    return loxi_globals.unified.class_by_name(cls).virtual
 
 ################################################################
 #

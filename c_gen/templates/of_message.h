@@ -105,11 +105,6 @@ of_message_version_get(of_message_t msg) {
     return (of_version_t)msg[OF_MESSAGE_VERSION_OFFSET];
 }
 
-static inline void
-of_message_version_set(of_message_t msg, of_version_t version) {
-    buf_u8_set(msg, (uint8_t)version);
-}
-
 /**
  * @brief Get/set OpenFlow type of a message
  * @param msg Pointer to the message buffer of sufficient length
@@ -120,11 +115,6 @@ of_message_version_set(of_message_t msg, of_version_t version) {
 static inline uint8_t
 of_message_type_get(of_message_t msg) {
     return msg[OF_MESSAGE_TYPE_OFFSET];
-}
-
-static inline void
-of_message_type_set(of_message_t msg, uint8_t value) {
-    buf_u8_set(msg + OF_MESSAGE_TYPE_OFFSET, value);
 }
 
 /**
@@ -161,11 +151,6 @@ of_message_xid_get(of_message_t msg) {
     return val;
 }
 
-static inline void
-of_message_xid_set(of_message_t msg, uint32_t xid) {
-    buf_u32_set(msg + OF_MESSAGE_XID_OFFSET, xid);
-}
-
 /**
  * @brief Get/set stats type of a message
  * @param msg Pointer to the message buffer of sufficient length
@@ -180,11 +165,6 @@ of_message_stats_type_get(of_message_t msg) {
     return val;
 }
 
-static inline void
-of_message_stats_type_set(of_message_t msg, uint16_t type) {
-    buf_u16_set(msg + OF_MESSAGE_STATS_TYPE_OFFSET, type);
-}
-
 /**
  * @brief Get/set error type of a message
  * @param msg Pointer to the message buffer of sufficient length
@@ -197,11 +177,6 @@ of_message_error_type_get(of_message_t msg) {
     uint16_t val;
     buf_u16_get(msg + OF_MESSAGE_ERROR_TYPE_OFFSET, &val);
     return val;
-}
-
-static inline void
-of_message_error_type_set(of_message_t msg, uint16_t type) {
-    buf_u16_set(msg + OF_MESSAGE_ERROR_TYPE_OFFSET, type);
 }
 
 
@@ -219,11 +194,6 @@ of_message_experimenter_id_get(of_message_t msg) {
     return val;
 }
 
-static inline void
-of_message_experimenter_id_set(of_message_t msg, uint32_t experimenter_id) {
-    buf_u32_set(msg + OF_MESSAGE_EXPERIMENTER_ID_OFFSET, experimenter_id);
-}
-
 
 /**
  * @brief Get/set experimenter message type (subtype) of a message
@@ -237,13 +207,6 @@ of_message_experimenter_subtype_get(of_message_t msg) {
     uint32_t val;
     buf_u32_get(msg + OF_MESSAGE_EXPERIMENTER_SUBTYPE_OFFSET, &val);
     return val;
-}
-
-static inline void
-of_message_experimenter_subtype_set(of_message_t msg,
-                                    uint32_t subtype) {
-    buf_u32_set(msg + OF_MESSAGE_EXPERIMENTER_SUBTYPE_OFFSET,
-                subtype);
 }
 
 /**
@@ -263,19 +226,6 @@ of_message_flow_mod_command_get(of_message_t msg, of_version_t version) {
     return val8;
 }
 
-static inline void
-of_message_flow_mod_command_set(of_message_t msg, of_version_t version, 
-                                uint8_t command) {
-    uint16_t val16;
-
-    if (version == OF_VERSION_1_0) {
-        val16 = command;
-        buf_u16_set(msg + OF_MESSAGE_FLOW_MOD_COMMAND_OFFSET(version), val16);
-    } else {
-        buf_u8_set(msg + OF_MESSAGE_FLOW_MOD_COMMAND_OFFSET(version), command);
-    }
-}
-
 /**
  * @brief Get/set stats request/reply experimenter ID of a message
  * @param msg Pointer to the message buffer of sufficient length
@@ -288,11 +238,6 @@ of_message_stats_experimenter_id_get(of_message_t msg) {
     uint32_t val;
     buf_u32_get(msg + OF_MESSAGE_STATS_EXPERIMENTER_ID_OFFSET, &val);
     return val;
-}
-
-static inline void
-of_message_stats_experimenter_id_set(of_message_t msg, uint32_t experimenter_id) {
-    buf_u32_set(msg + OF_MESSAGE_STATS_EXPERIMENTER_ID_OFFSET, experimenter_id);
 }
 
 /**
@@ -309,11 +254,6 @@ of_message_stats_experimenter_subtype_get(of_message_t msg) {
     return val;
 }
 
-static inline void
-of_message_stats_experimenter_subtype_set(of_message_t msg, uint32_t subtype) {
-    buf_u32_set(msg + OF_MESSAGE_STATS_EXPERIMENTER_SUBTYPE_OFFSET, subtype);
-}
-
 /**
  * @brief Get/set group mod command of a message
  * @param msg Pointer to the message buffer of sufficient length
@@ -326,11 +266,6 @@ of_message_group_mod_command_get(of_message_t msg) {
     uint16_t val;
     buf_u16_get(msg + OF_MESSAGE_GROUP_MOD_COMMAND_OFFSET, &val);
     return val;
-}
-
-static inline void
-of_message_group_mod_command_set(of_message_t msg, uint16_t command) {
-    buf_u16_set(msg + OF_MESSAGE_GROUP_MOD_COMMAND_OFFSET, command);
 }
 
 #endif /* _OF_MESSAGE_H_ */

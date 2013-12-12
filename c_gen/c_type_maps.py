@@ -1094,92 +1094,6 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
 
 """)
 
-    # Generate the function that sets the object type fields
-    out.write("""
-
-/**
- * Map a message in a wire buffer object to its OF object id.
- * @param wbuf Pointer to a wire buffer object, populated with an OF message
- * @returns The object ID of the message
- * @returns OF_OBJECT_INVALID if unable to parse the message type
- *
- * Version must be set in the buffer prior to calling this routine
- */
-
-static inline int
-of_wire_message_object_id_set(of_wire_buffer_t *wbuf, of_object_id_t id)
-{
-    int type;
-    of_version_t ver;
-    of_message_t msg;
-
-    msg = (of_message_t)WBUF_BUF(wbuf);
-
-    ver = of_message_version_get(msg);
-
-    /* ASSERT(id is a message object) */
-
-    if ((type = of_object_to_wire_type(id, ver)) < 0) {
-        return OF_ERROR_PARAM;
-    }
-    of_message_type_set(msg, type);
-
-    if ((type = of_object_to_stats_type(id, ver)) >= 0) {
-        /* It's a stats obj */
-        of_message_stats_type_set(msg, type);
-        if (type == OF_STATS_TYPE_EXPERIMENTER) {
-            switch (id) {
-            case OF_BSN_LACP_STATS_REQUEST:
-            case OF_BSN_LACP_STATS_REPLY:
-                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
-                of_message_stats_experimenter_subtype_set(msg, 1);
-                break;
-            case OF_BSN_SWITCH_PIPELINE_STATS_REQUEST:
-            case OF_BSN_SWITCH_PIPELINE_STATS_REPLY:
-                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
-                of_message_stats_experimenter_subtype_set(msg, 6);
-                break;
-            case OF_BSN_PORT_COUNTER_STATS_REQUEST:
-            case OF_BSN_PORT_COUNTER_STATS_REPLY:
-                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
-                of_message_stats_experimenter_subtype_set(msg, 8);
-                break;
-            case OF_BSN_VLAN_COUNTER_STATS_REQUEST:
-            case OF_BSN_VLAN_COUNTER_STATS_REPLY:
-                of_message_stats_experimenter_id_set(msg, OF_EXPERIMENTER_ID_BSN);
-                of_message_stats_experimenter_subtype_set(msg, 9);
-                break;
-            default:
-                break;
-            }
-        }
-    }
-    if ((type = of_object_to_error_type(id, ver)) >= 0) {
-        /* It's an error obj */
-        of_message_error_type_set(msg, type);
-    }
-    if ((type = of_object_to_flow_mod_command(id, ver)) >= 0) {
-        /* It's a flow mod obj */
-        of_message_flow_mod_command_set(msg, ver, type);
-    }
-    if ((type = of_object_to_group_mod_command(id, ver)) >= 0) {
-        /* It's a group mod obj */
-        of_message_group_mod_command_set(msg, type);
-    }
-    if (of_object_id_is_extension(id, ver)) {
-        uint32_t val32;
-
-        /* Set the experimenter and subtype codes */
-        val32 = of_extension_to_experimenter_id(id, ver);
-        of_message_experimenter_id_set(msg, val32);
-        val32 = of_extension_to_experimenter_subtype(id, ver);
-        of_message_experimenter_subtype_set(msg, val32);
-    }
-
-    return OF_ERROR_NONE;
-}
-""")
-
 def gen_type_data_header(out):
 
     out.write("""
@@ -1249,14 +1163,10 @@ extern void of_object_message_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_object_message_wire_length_set(of_object_t *obj, int bytes);
 
 extern void of_oxm_wire_length_get(of_object_t *obj, int *bytes);
-extern void of_oxm_wire_length_set(of_object_t *obj, int bytes);
 extern void of_oxm_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
-extern void of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id);
 
 extern void of_tlv16_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_tlv16_wire_length_set(of_object_t *obj, int bytes);
-
-extern void of_tlv16_wire_object_id_set(of_object_t *obj, of_object_id_t id);
 
 /* Wire length is uint16 at front of structure */
 extern void of_u16_len_wire_length_get(of_object_t *obj, int *bytes);
