@@ -201,7 +201,7 @@ class JavaModel(object):
 
         factories = OrderedDict()
 
-        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp")
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp", "OFErrorMsg", "OFActionId", "OFInstructionId")
         for base_class in sub_factory_classes:
             package = base_class[2:].lower()
             remove_prefix = base_class[2].lower() + base_class[3:]
@@ -210,7 +210,7 @@ class JavaModel(object):
             annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
 
             factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
-                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator=False)
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator= (base_class == "OFErrorMsg"))
 
         factories[""] = OFFactory(
                     package=prefix,
@@ -446,7 +446,7 @@ class JavaOFInterface(object):
             else:
                 return ("", "OFStatsReply", None)
         elif self.ir_class.is_subclassof('of_error_msg'):
-            return ("", "OFErrorMsg", None)
+            return ("errormsg", "OFErrorMsg", None)
         elif self.ir_class.is_subclassof('of_flow_mod'):
             return ("", "OFFlowMod", None)
         elif self.ir_class.is_subclassof('of_group_mod'):
