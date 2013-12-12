@@ -18,8 +18,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 
-    private static int NOT_A_CIDR_MASK = -1;
-    private static int CIDR_MASK_CACHE_UNSET = -2;
+    private static final int NOT_A_CIDR_MASK = -1;
+    private static final int CIDR_MASK_CACHE_UNSET = -2;
     // Must appear before the static IPv4Address constant assignments
     private volatile int cidrMaskLengthCache = CIDR_MASK_CACHE_UNSET;
 

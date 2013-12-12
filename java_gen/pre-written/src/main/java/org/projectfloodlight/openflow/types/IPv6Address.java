@@ -18,8 +18,8 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private final long raw1;
     private final long raw2;
 
-    private static int NOT_A_CIDR_MASK = -1;
-    private static int CIDR_MASK_CACHE_UNSET = -2;
+    private static final int NOT_A_CIDR_MASK = -1;
+    private static final int CIDR_MASK_CACHE_UNSET = -2;
     // Must appear before the static IPv4Address constant assignments
     private volatile int cidrMaskLengthCache = CIDR_MASK_CACHE_UNSET;
 
@@ -46,7 +46,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         long mask = raw;
         if (raw == 0)
             return 0;
-        else if (Long.bitCount((~mask) + 1L) == 1L) {
+        else if (Long.bitCount((~mask) + 1) == 1) {
             // represent a true CIDR prefix length
             return Long.bitCount(mask);
         }
@@ -58,19 +58,19 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
     private int asCidrMaskLengthInternal() {
         if (cidrMaskLengthCache == CIDR_MASK_CACHE_UNSET) {
-            synchronized (this) {
-                if (raw1 == 0 && raw2 == 0) {
-                    cidrMaskLengthCache = 0;
-                } else if (raw1 == -1) {
-                    // top half is all 1 bits
-                    cidrMaskLengthCache = computeCidrMask64(raw2);
-                    if (cidrMaskLengthCache != NOT_A_CIDR_MASK)
-                        cidrMaskLengthCache += 64;
-                } else if (raw2 == 0) {
-                    cidrMaskLengthCache = computeCidrMask64(raw1);
-                } else {
-                    cidrMaskLengthCache = NOT_A_CIDR_MASK;
-                }
+            // No synchronization needed. Writing cidrMaskLengthCache only once
+            if (raw1 == 0 && raw2 == 0) {
+                cidrMaskLengthCache = 0;
+            } else if (raw1 == -1L) {
+                // top half is all 1 bits
+                int tmpLength = computeCidrMask64(raw2);
+                if (tmpLength != NOT_A_CIDR_MASK)
+                    tmpLength += 64;
+                cidrMaskLengthCache = tmpLength;
+            } else if (raw2 == 0) {
+                cidrMaskLengthCache = computeCidrMask64(raw1);
+            } else {
+                cidrMaskLengthCache = NOT_A_CIDR_MASK;
             }
         }
         return cidrMaskLengthCache;
