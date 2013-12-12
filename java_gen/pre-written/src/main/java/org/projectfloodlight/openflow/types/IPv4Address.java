@@ -18,6 +18,11 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 
+    private static int NOT_A_CIDR_MASK = -1;
+    private static int CIDR_MASK_CACHE_UNSET = -2;
+    // Must appear before the static IPv4Address constant assignments
+    private volatile int cidrMaskLengthCache = CIDR_MASK_CACHE_UNSET;
+
     private final static int NONE_VAL = 0x0;
     public final static IPv4Address NONE = new IPv4Address(NONE_VAL);
 
@@ -33,18 +38,34 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPVersion.IPv4;
     }
 
+    private int asCidrMaskLengthInternal() {
+        if (cidrMaskLengthCache == CIDR_MASK_CACHE_UNSET) {
+            // No lock required. We only write cidrMaskLengthCache once
+            int maskint = getInt();
+            if (maskint == 0) {
+                cidrMaskLengthCache = 0;
+            } else if (Integer.bitCount((~maskint) + 1) == 1) {
+                // IP represents a true CIDR prefix length
+                cidrMaskLengthCache = Integer.bitCount(maskint);
+            } else {
+                cidrMaskLengthCache = NOT_A_CIDR_MASK;
+            }
+        }
+        return cidrMaskLengthCache;
+    }
+
+    @Override
+    public boolean isCidrMask() {
+        return asCidrMaskLengthInternal() != NOT_A_CIDR_MASK;
+    }
 
     @Override
     public int asCidrMaskLength() {
-        int maskint = getInt();
-        if (maskint == 0)
-            return 0;
-        else if (Integer.bitCount((~maskint) + 1) == 1) {
-            // IP represents a true CIDR prefix length
-            return Integer.bitCount(maskint);
+        if (!isCidrMask()) {
+            throw new IllegalStateException("IP is not a valid CIDR prefix " +
+                    "mask " + toString());
         } else {
-            // IP is not a true prefix.
-            return -1;
+            return asCidrMaskLengthInternal();
         }
     }
 

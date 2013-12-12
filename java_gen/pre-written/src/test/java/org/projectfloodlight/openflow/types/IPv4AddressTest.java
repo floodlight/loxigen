@@ -1,10 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import org.hamcrest.CoreMatchers;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -102,6 +98,35 @@ public class IPv4AddressTest {
 
 
     @Test
+    public void testConstants() {
+        byte[] zeros = { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 };
+        byte[] ones =  { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF };
+        // Make sure class initializtation and static assignment don't get
+        // messed up. Test everything twice for cached values
+        assertTrue(IPv4Address.NONE.isCidrMask());
+        assertEquals(0, IPv4Address.NONE.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv4Address.NONE.getBytes());
+        assertTrue(IPv4Address.NONE.isCidrMask());
+        assertEquals(0, IPv4Address.NONE.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv4Address.NONE.getBytes());
+
+        assertTrue(IPv4Address.NO_MASK.isCidrMask());
+        assertEquals(32, IPv4Address.NO_MASK.asCidrMaskLength());
+        assertArrayEquals(ones, IPv4Address.NO_MASK.getBytes());
+        assertTrue(IPv4Address.NO_MASK.isCidrMask());
+        assertEquals(32, IPv4Address.NO_MASK.asCidrMaskLength());
+        assertArrayEquals(ones, IPv4Address.NO_MASK.getBytes());
+
+        assertTrue(IPv4Address.FULL_MASK.isCidrMask());
+        assertEquals(0, IPv4Address.FULL_MASK.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv4Address.FULL_MASK.getBytes());
+        assertTrue(IPv4Address.FULL_MASK.isCidrMask());
+        assertEquals(0, IPv4Address.FULL_MASK.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv4Address.FULL_MASK.getBytes());
+    }
+
+
+    @Test
     public void testOfString() {
         for(int i=0; i < testAddresses.length; i++ ) {
             IPv4Address ip = IPv4Address.of(testStrings[i]);
@@ -153,7 +178,18 @@ public class IPv4AddressTest {
                 assertArrayEquals(ipsWithMaskValues[i][0], ip.getBytes());
             }
             IPv4Address mask = value.getMask();
-            assertEquals(ipsWithMaskLengths[i], value.getMask().asCidrMaskLength());
+            if (ipsWithMaskLengths[i] == -1) {
+                assertFalse(mask.isCidrMask());
+                try {
+                    mask.asCidrMaskLength();
+                    fail("Expected IllegalStateException not thrown");
+                } catch(IllegalStateException e) {
+                    //expected
+                }
+            } else {
+                assertTrue(mask.isCidrMask());
+                assertEquals(ipsWithMaskLengths[i], mask.asCidrMaskLength());
+            }
             assertArrayEquals(ipsWithMaskValues[i][1], mask.getBytes());
             byte[] ipBytes = new byte[4];
             System.arraycopy(ipsWithMaskValues[i][0], 0, ipBytes, 0, 4);

@@ -1,10 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -71,6 +67,40 @@ public class IPv6AddressTest {
     };
 
     @Test
+    public void testConstants() {
+        byte[] zeros = { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                         (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                         (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
+                         (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00 };
+        byte[] ones = { (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+                        (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+                        (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF,
+                        (byte)0xFF, (byte)0xFF, (byte)0xFF, (byte)0xFF };
+        // Make sure class initializtation and static assignment don't get
+        // messed up. Test everything twice for cached values
+        assertTrue(IPv6Address.NONE.isCidrMask());
+        assertEquals(0, IPv6Address.NONE.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv6Address.NONE.getBytes());
+        assertTrue(IPv6Address.NONE.isCidrMask());
+        assertEquals(0, IPv6Address.NONE.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv6Address.NONE.getBytes());
+
+        assertTrue(IPv6Address.NO_MASK.isCidrMask());
+        assertEquals(128, IPv6Address.NO_MASK.asCidrMaskLength());
+        assertArrayEquals(ones, IPv6Address.NO_MASK.getBytes());
+        assertTrue(IPv6Address.NO_MASK.isCidrMask());
+        assertEquals(128, IPv6Address.NO_MASK.asCidrMaskLength());
+        assertArrayEquals(ones, IPv6Address.NO_MASK.getBytes());
+
+        assertTrue(IPv6Address.FULL_MASK.isCidrMask());
+        assertEquals(0, IPv6Address.FULL_MASK.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv6Address.FULL_MASK.getBytes());
+        assertTrue(IPv6Address.FULL_MASK.isCidrMask());
+        assertEquals(0, IPv6Address.FULL_MASK.asCidrMaskLength());
+        assertArrayEquals(zeros, IPv6Address.FULL_MASK.getBytes());
+    }
+
+    @Test
     public void testMasked() throws UnknownHostException {
         for(WithMaskTaskCase w: withMasks) {
             IPv6AddressWithMask value = IPv6AddressWithMask.of(w.input);
@@ -83,7 +113,19 @@ public class IPv6AddressTest {
             }
             InetAddress inetAddress = InetAddress.getByName(w.input.split("/")[0]);
 
-            assertEquals("Input " + w.input, w.expectedMaskLength, value.getMask().asCidrMaskLength());
+            if (w.expectedMaskLength == -1) {
+                assertFalse(value.getMask().isCidrMask());
+                try {
+                    value.getMask().asCidrMaskLength();
+                    fail("Expected IllegalStateException not thrown");
+                } catch(IllegalStateException e) {
+                    //expected
+                }
+            } else {
+                assertTrue(value.getMask().isCidrMask());
+                assertEquals("Input " + w.input, w.expectedMaskLength,
+                             value.getMask().asCidrMaskLength());
+            }
 
             byte[] address = inetAddress.getAddress();
             assertEquals(address.length, value.getValue().getBytes().length);

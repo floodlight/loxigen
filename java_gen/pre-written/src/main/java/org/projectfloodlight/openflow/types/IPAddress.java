@@ -10,14 +10,13 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @return true if this represents a valid CIDR style netmask, false
      * otherwise
      */
-    public boolean isCidrMask() {
-        return asCidrMaskLength() != -1;
-    }
+    public abstract boolean isCidrMask();
 
     /**
      * If this IPAddress represents a valid CIDR style netmask (see
      * isCidrMask()) returns the length of the prefix (the number of "1" bits).
-     * @return length of CIDR mask or -1 if this is not a CIDR netmask
+     * @return length of CIDR mask if this represents a valid CIDR mask
+     * @throws IllegalStateException if isCidrMask() == false
      */
     public abstract int asCidrMaskLength();
 

@@ -27,7 +27,7 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
         res.append(value.toString());
 
         res.append('/');
-        if (mask.asCidrMaskLength() != -1) {
+        if (mask.isCidrMask()) {
             // CIDR notation
             res.append(mask.asCidrMaskLength());
         } else {

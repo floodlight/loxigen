@@ -1,11 +1,9 @@
 package org.projectfloodlight.openflow.types;
 
-import java.math.BigInteger;
 import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -20,9 +18,15 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private final long raw1;
     private final long raw2;
 
+    private static int NOT_A_CIDR_MASK = -1;
+    private static int CIDR_MASK_CACHE_UNSET = -2;
+    // Must appear before the static IPv4Address constant assignments
+    private volatile int cidrMaskLengthCache = CIDR_MASK_CACHE_UNSET;
+
     private final static long NONE_VAL1 = 0x0L;
     private final static long NONE_VAL2 = 0x0L;
     public static final IPv6Address NONE = new IPv6Address(NONE_VAL1, NONE_VAL2);
+
 
     public static final IPv6Address NO_MASK = IPv6Address.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
     public static final IPv6Address FULL_MASK = IPv6Address.of(0x0, 0x0);
@@ -38,17 +42,52 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
 
+    private int computeCidrMask64(long raw) {
+        long mask = raw;
+        if (raw == 0)
+            return 0;
+        else if (Long.bitCount((~mask) + 1L) == 1L) {
+            // represent a true CIDR prefix length
+            return Long.bitCount(mask);
+        }
+        else {
+            // Not a true prefix
+            return NOT_A_CIDR_MASK;
+        }
+    }
+
+    private int asCidrMaskLengthInternal() {
+        if (cidrMaskLengthCache == CIDR_MASK_CACHE_UNSET) {
+            synchronized (this) {
+                if (raw1 == 0 && raw2 == 0) {
+                    cidrMaskLengthCache = 0;
+                } else if (raw1 == -1) {
+                    // top half is all 1 bits
+                    cidrMaskLengthCache = computeCidrMask64(raw2);
+                    if (cidrMaskLengthCache != NOT_A_CIDR_MASK)
+                        cidrMaskLengthCache += 64;
+                } else if (raw2 == 0) {
+                    cidrMaskLengthCache = computeCidrMask64(raw1);
+                } else {
+                    cidrMaskLengthCache = NOT_A_CIDR_MASK;
+                }
+            }
+        }
+        return cidrMaskLengthCache;
+    }
+
+    @Override
+    public boolean isCidrMask() {
+        return asCidrMaskLengthInternal() != NOT_A_CIDR_MASK;
+    }
+
     @Override
     public int asCidrMaskLength() {
-        BigInteger maskBigint = new BigInteger(getBytes());
-        if (maskBigint.equals(BigInteger.ZERO))
-            return 0; // Thanks, signed BigInteger
-        else if (maskBigint.not().add(BigInteger.ONE).bitCount() == 1) {
-            // Need to get a positive BigInteger before we can count
-            return new BigInteger(1, getBytes()).bitCount();
+        if (!isCidrMask()) {
+            throw new IllegalStateException("IP is not a valid CIDR prefix " +
+                    "mask " + toString());
         } else {
-            // IP is not a true prefix.
-            return -1;
+            return asCidrMaskLengthInternal();
         }
     }
 
