@@ -58,6 +58,15 @@ public class IPv6AddressTest {
             new WithMaskTaskCase("ffff:ffee:1::/ff00:ff00:ff00:ff00::")
                 .maskHex("ff 00 ff 00 ff 00 ff 00 00 00 00 00 00 00 00 00")
                 .expectedMaskLength(-1),
+            new WithMaskTaskCase("1:2:3:4:5:6:7:8/1::ff00:ff00")
+                .maskHex("00 01 00 00 00 00 00 00 00 00 00 00 ff 00 ff 00")
+                .expectedMaskLength(-1),
+            new WithMaskTaskCase("1:2:3:4:5:6:7:8/::ff00:ff00")
+                .maskHex("00 00 00 00 00 00 00 00 00 00 00 00 ff 00 ff 00")
+                .expectedMaskLength(-1),
+            new WithMaskTaskCase("1:2:3:4:5:6:7:8/ffff:ffff:ffff:ffff:ffff::ff00:ff00")
+                .maskHex("ff ff ff ff ff ff ff ff ff ff 00 00 ff 00 ff 00")
+                .expectedMaskLength(-1),
             new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
             new WithMaskTaskCase("8:8:8:8:8:8:8:8"),
             new WithMaskTaskCase("1:2:3:4:5:6:7:8/128"),
