@@ -180,3 +180,4 @@ def generate(install_dir):
     c_gen.codegen.generate_header_classes(install_dir)
     c_gen.codegen.generate_lists(install_dir)
     c_gen.codegen.generate_strings(install_dir)
+    c_gen.codegen.generate_init_map(install_dir)

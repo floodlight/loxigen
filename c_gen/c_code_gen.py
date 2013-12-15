@@ -514,7 +514,6 @@ def top_c_gen(out, name):
 #include "loci_int.h"
 
 """)
-    gen_init_map(out)
 
 def type_data_c_gen(out, name):
     common_top_matter(out, name)
@@ -2752,32 +2751,6 @@ def gen_new_function_definitions(out, cls):
     gen_init_fn_body(cls, out)
     if loxi_utils.class_is_message(cls):
         gen_from_message_fn_body(cls, out)
-
-def gen_init_map(out):
-    """
-    Generate map from object ID to type coerce function
-    """
-    out.write("""
-/**
- * Map from object ID to type coerce function
- */
-const of_object_init_f of_object_init_map[] = {
-    (of_object_init_f)NULL,
-""")
-    count = 1
-    for i, cls in enumerate(of_g.standard_class_order):
-        if count != of_g.unified[cls]["object_id"]:
-            print "Error in class mapping: object IDs not sequential"
-            print cls, count, of_g.unified[cls]["object_id"]
-            sys.exit(1)
-        s = "(of_object_init_f)%s_init" % cls
-        if cls in type_maps.inheritance_map:
-            s = "(of_object_init_f)%s_header_init" % cls
-        if i < len(of_g.standard_class_order) - 1:
-            s += ","
-        out.write("    %-65s /* %d */\n" % (s, count))
-        count += 1
-    out.write("};\n")
 
 """
 Document generation functions

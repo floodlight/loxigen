@@ -39,6 +39,7 @@ import loxi_ir.ir as ir
 import util
 import c_code_gen
 import c_gen.of_g_legacy as of_g
+import c_gen.type_maps as type_maps
 
 PushWireTypesFn = namedtuple('PushWireTypesFn',
     ['class_name', 'versioned_type_members'])
@@ -118,3 +119,7 @@ def generate_strings(install_dir):
 
     with template_utils.open_output(install_dir, "loci/src/loci_strings.c") as out:
         util.render_template(out, "loci_strings.c", object_id_strs=object_id_strs)
+
+def generate_init_map(install_dir):
+    with template_utils.open_output(install_dir, "loci/src/loci_init_map.c") as out:
+        util.render_template(out, "loci_init_map.c", classes=of_g.standard_class_order)
