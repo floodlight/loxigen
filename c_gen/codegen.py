@@ -85,6 +85,7 @@ def generate_classes(install_dir):
         with template_utils.open_output(install_dir, "loci/src/%s.c" % uclass.name) as out:
             util.render_template(out, "class.c")
             # Append legacy generated code
+            c_code_gen.gen_new_function_definitions(out, uclass.name)
             c_code_gen.gen_accessor_definitions(out, uclass.name)
 
 def generate_lists(install_dir):
@@ -92,4 +93,5 @@ def generate_lists(install_dir):
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
             util.render_template(out, "class.c")
             # Append legacy generated code
+            c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_list_accessors(out, cls)

@@ -542,7 +542,6 @@ def top_c_gen(out, name):
 
 """)
     gen_object_enum_str(out)
-    gen_new_function_definitions(out)
     gen_init_map(out)
     out.write("\n/* This code should be broken out to a different file */\n")
     gen_setup_from_add_fns(out)
@@ -2829,20 +2828,17 @@ def gen_coerce_ops(out, cls):
         else:
             instantiate_fn_ptrs(cls, 4, out)
 
-def gen_new_function_definitions(out):
+def gen_new_function_definitions(out, cls):
     """
     Generate the new operator for all classes
 
     @param out The file to which to write the functions
     """
 
-    out.write("\n/* New operators for each message class */\n")
-    for cls in of_g.standard_class_order:
-        out.write("\n/* New operators for %s */\n" % cls)
-        gen_new_fn_body(cls, out)
-        gen_init_fn_body(cls, out)
-        if loxi_utils.class_is_message(cls):
-            gen_from_message_fn_body(cls, out)
+    gen_new_fn_body(cls, out)
+    gen_init_fn_body(cls, out)
+    if loxi_utils.class_is_message(cls):
+        gen_from_message_fn_body(cls, out)
 
 def gen_init_map(out):
     """
