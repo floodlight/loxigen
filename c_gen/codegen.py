@@ -88,6 +88,17 @@ def generate_classes(install_dir):
             c_code_gen.gen_new_function_definitions(out, uclass.name)
             c_code_gen.gen_accessor_definitions(out, uclass.name)
 
+# TODO remove header classes and use the corresponding class instead
+def generate_header_classes(install_dir):
+    for cls in of_g.standard_class_order:
+        if cls.find("_header") < 0:
+            continue
+        with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
+            util.render_template(out, "class.c")
+            # Append legacy generated code
+            c_code_gen.gen_new_function_definitions(out, cls)
+            c_code_gen.gen_accessor_definitions(out, cls)
+
 def generate_lists(install_dir):
     for cls in of_g.ordered_list_objects:
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:

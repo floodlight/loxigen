@@ -176,4 +176,5 @@ def generate(install_dir):
             fn(outfile, os.path.basename(name))
     c_gen.codegen.gen_push_wire_types(install_dir)
     c_gen.codegen.generate_classes(install_dir)
+    c_gen.codegen.generate_header_classes(install_dir)
     c_gen.codegen.generate_lists(install_dir)
