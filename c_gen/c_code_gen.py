@@ -543,7 +543,7 @@ def top_c_gen(out, name):
 """)
     gen_object_enum_str(out)
     if config_check("gen_unified_fns"):
-        gen_all_accessor_definitions(out)
+        gen_list_accessor_definitions(out)
     gen_new_function_definitions(out)
     gen_init_map(out)
     out.write("\n/* This code should be broken out to a different file */\n")
@@ -2160,9 +2160,9 @@ def gen_get_accessor(out, cls, m_name, m_type, ver_type_map):
     out.write("%s\n%s_%s_get(\n    %s)\n" % (ret_type, cls, m_name, params))
     gen_unified_acc_body(out, cls, m_name, ver_type_map, "get", m_type)
 
-def gen_all_accessor_definitions(out):
+def gen_list_accessor_definitions(out):
     """
-    Generate the body of each version independent accessor
+    Generate the body of each list accessor
 
     @param out The file to which to write the decs
     """
@@ -2170,20 +2170,17 @@ def gen_all_accessor_definitions(out):
     out.write("""
 /****************************************************************
  *
- * Unified accessor function definitions
+ * List accessor function definitions
  *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
         if cls in type_maps.inheritance_map:
             continue
-        out.write("\n/* Unified accessor functions for %s */\n" % cls)
-        if loxi_utils.class_is_list(cls):
-            gen_list_accessors(out, cls)
+        if not loxi_utils.class_is_list(cls):
             continue
-        out.write("/** \\ingroup %s \n * @{ */\n" % cls)
-        #gen_accessor_definitions(out, cls)
-        out.write("\n/** @} */\n")
+        out.write("\n/* Unified accessor functions for %s */\n" % cls)
+        gen_list_accessors(out, cls)
 
 def gen_accessor_definitions(out, cls):
         for m_name in of_g.ordered_members[cls]:
