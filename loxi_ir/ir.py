@@ -176,6 +176,20 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
             raise Exception("Not a fixed length class: {}".format(self.name))
 
     @property
+    def message_length(self):
+        if self.is_fixed_length:
+            return self.base_length
+        else:
+            return find(lambda m: type(m) == OFLengthMember, self.members)
+
+    @property
+    def field_length(self):
+        if self.is_fixed_length:
+            return self.base_length
+        else:
+            return find(lambda m: type(m) == OFFieldLengthMember, self.members)
+
+    @property
     def has_internal_alignment(self):
         return self.params.get('length_includes_align') == 'True'
 
