@@ -485,36 +485,6 @@ def match_c_gen(out, name):
     c_match.gen_serialize(out)
     c_match.gen_deserialize(out)
 
-def top_c_gen(out, name):
-    """
-    Generate code for
-    @param out The file handle to write to
-    @param name The name of the file
-    """
-    common_top_matter(out, name)
-    # Generic C code that needs to go into loci.c can go here.
-    out.write("""
-/****************************************************************
- *
- * This file is divided into the following sections.
- *
- * Instantiate strings such as object names
- * Special case macros for low level object access
- * Per-class, per-member accessor definitions
- * Per-class new/init function definitions
- * Per-class new/init pointer instantiations
- * Instantiate "set map" for pointer set fns
- *
- ****************************************************************/
-
-#include <loci/loci.h>
-#include <loci/of_object.h>
-#include "loci_log.h"
-#include "loci_push_wire_types.h"
-#include "loci_int.h"
-
-""")
-
 def type_data_c_gen(out, name):
     common_top_matter(out, name)
     c_type_maps.gen_type_maps(out)

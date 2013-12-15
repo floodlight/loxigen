@@ -72,7 +72,6 @@ targets = {
     'loci/inc/loci/of_wire_buf.h': static,
 
     # LOCI code
-    'loci/src/loci.c': c_code_gen.top_c_gen,
     'loci/src/of_type_data.c': c_code_gen.type_data_c_gen,
     'loci/src/of_match.c': c_code_gen.match_c_gen,
     'loci/src/loci_obj_dump.c': c_dump_gen.gen_obj_dump_c,
