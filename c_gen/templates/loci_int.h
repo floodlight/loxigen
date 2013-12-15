@@ -44,6 +44,8 @@
 #ifndef __LOCI_INT_H__
 #define __LOCI_INT_H__
 
+#include <loci/loci.h>
+
 /****************************************************************
  * Special case macros for calculating variable lengths and offsets
  ****************************************************************/
@@ -269,5 +271,4 @@ ${packet_in} : ${packet_in_1_3}) + 2)
      ((object_id) == OF_FLOW_DELETE_STRICT) ||         \
      ((object_id) == OF_FLOW_ADD))
 
-#include <loci/loci.h> 
 #endif /* __LOCI_INT_H__ */

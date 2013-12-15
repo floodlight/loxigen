@@ -28,8 +28,6 @@
 :: include('_copyright.c')
 :: include('_pragmas.c')
 
-#include <loci/loci.h>
-#include <loci/of_object.h>
 #include "loci_log.h"
 #include "loci_push_wire_types.h"
 #include "loci_int.h"
