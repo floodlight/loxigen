@@ -430,18 +430,9 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
 
     # gen_base_types(out)
 
-    gen_struct_typedefs(out)
-    gen_acc_pointer_typedefs(out)
-    gen_new_function_declarations(out)
-    if config_check("gen_unified_fns"):
-        gen_accessor_declarations(out)
-
-    gen_common_struct_definitions(out)
     gen_flow_add_setup_function_declarations(out)
     if config_check("gen_fn_ptrs"): # Otherwise, all classes are from generic cls
         gen_struct_definitions(out)
-    gen_generic_union(out)
-    gen_generics(out)
     gen_top_static_functions(out)
     out.write("""
 /****************************************************************
@@ -789,7 +780,7 @@ def external_h_top_matter(out, name):
 #include <loci/of_message.h>
 #include <loci/of_match.h>
 #include <loci/of_object.h>
-#include <loci/of_wire_buf.h>
+#include <loci/loci_classes.h>
 
 /****************************************************************
  *
@@ -1223,20 +1214,6 @@ union of_generic_u {
     for cls in of_g.ordered_list_objects:
         out.write("    %s_t %s;\n" % (cls, cls))
     out.write("};\n")
-
-def gen_common_struct_definitions(out):
-    out.write("""
-/****************************************************************
- *
- * Unified structure definitions
- *
- ****************************************************************/
-
-struct of_object_s {
-    /* Common members */
-%(common)s
-};
-""" % dict(common=of_g.base_object_members))
 
 def gen_flow_add_setup_function_declarations(out):
     """
@@ -2079,94 +2056,6 @@ def gen_accessor_definitions(out, cls):
             ret_type = accessor_return_type("set", m_type)
             out.write("%s\n%s_%s_set(\n    %s)\n" % (ret_type, cls, m_name, params))
             gen_unified_acc_body(out, cls, m_name, ver_type_map, "set", m_type)
-
-def gen_acc_pointer_typedefs(out):
-    """
-    Generate the function pointer typedefs for in-struct accessors
-    @param out The file to which to write the typedefs
-    """
-
-    out.write("""
-/****************************************************************
- *
- * Accessor function pointer typedefs
- *
- ****************************************************************/
-
-/*
- * Generic accessors:
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * FIXME: TBD if wire_length_set and wire_type_set are required.
- */
-typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
-typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
-typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj);
-""")
-    # If not using function pointers in classes, don't gen typedefs below
-    if not config_check("gen_fn_ptrs"):
-        return
-
-    # For each class, for each type it uses, generate a typedef
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
-        out.write("\n/* Accessor function pointer typedefs for %s */\n" % cls)
-        types_done = list()
-        for m_name in of_g.ordered_members[cls]:
-            (m_type, get_rv) = get_acc_rv(cls, m_name)
-            if (m_type, get_rv) in types_done:
-                continue
-            types_done.append((m_type, get_rv))
-            fn = "%s_%s" % (cls, m_type)
-            params = ", ".join(param_list(cls, m_name, "get"))
-            out.write("typedef int (*%s_get_f)(\n    %s);\n" %
-                      (fn, params))
-
-            params = ", ".join(param_list(cls, m_name, "set"))
-            out.write("typedef int (*%s_set_f)(\n    %s);\n" %
-                      (fn, params))
-        if loxi_utils.class_is_list(cls):
-            obj_type = loxi_utils.list_to_entry_type(cls)
-            out.write("""typedef int (*%(cls)s_first_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_next_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_append_bind_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_append_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-""" % {"cls":cls, "obj_type":obj_type})
-
-#             out.write("""
-# typedef int (*%(cls)s_get_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_set_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_append_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_insert_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_remove_f)(
-#     %(cls)s_t *list,
-#     int index);
-# """ % {"cls":cls, "obj_type":obj_type})
 
 ################################################################
 #

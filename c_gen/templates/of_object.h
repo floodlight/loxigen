@@ -46,6 +46,7 @@
 #include <loci/of_match.h>
 #include <loci/loci_base.h>
 #include <loci/of_message.h>
+#include <loci/of_wire_buf.h>
 
 #if defined(OF_OBJECT_TRACKING)
 #include <BigList/biglist.h>
@@ -56,6 +57,24 @@
  * of_object_t instance.
  */
 #define OF_OBJECT_METADATA_BYTES 32
+
+/*
+ * Generic accessors:
+ *
+ * Many objects have a length represented in the wire buffer
+ * wire_length_get and wire_length_set access these values directly on the
+ * wire.
+ *
+ * Many objects have a length represented in the wire buffer
+ * wire_length_get and wire_length_set access these values directly on the
+ * wire.
+ *
+ * FIXME: TBD if wire_length_set and wire_type_set are required.
+ */
+typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
+typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
+typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
+typedef void (*of_wire_type_set_f)(of_object_t *obj);
 
 /****************************************************************
  * General list operations: first, next, append_setup, append_advance
@@ -172,5 +191,45 @@ extern of_object_t *of_object_new_from_message(of_message_t msg, int len);
 extern void of_object_delete(of_object_t *obj);
 
 int of_object_can_grow(of_object_t *obj, int new_len);
+
+struct of_object_s {
+    /* The control block for the underlying data buffer */
+    of_wire_object_t wire_object;
+    /* The LOCI type enum value of the object */
+    of_object_id_t object_id;
+
+    /*
+     * Objects need to track their "parent" so that updates to the
+     * object that affect its length can be pushed to the parent.
+     * Treat as private.
+     */
+    of_object_t *parent;
+
+    /*
+     * Not all objects have length and version on the wire so we keep
+     * them here.  NOTE: Infrastructure manages length and version.
+     * Treat length as private and version as read only.
+     */
+    int length;
+    of_version_t version;
+
+    /*
+     * Many objects have a length and/or type represented in the wire buffer
+     * These accessors get and set those value when present.  Treat as private.
+     */
+    of_wire_length_get_f wire_length_get;
+    of_wire_length_set_f wire_length_set;
+    of_wire_type_get_f wire_type_get;
+    of_wire_type_set_f wire_type_set;
+
+    of_object_track_info_t track_info;
+
+    /*
+     * Metadata available for applications.  Ensure 8-byte alignment, but
+     * that buffer is at least as large as requested.  This data is not used
+     * or inspected by LOCI.
+     */
+    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
+};
 
 #endif /* _OF_OBJECT_H_ */

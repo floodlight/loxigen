@@ -236,46 +236,6 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                    "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t"]
 
-base_object_members = """\
-    /* The control block for the underlying data buffer */
-    of_wire_object_t wire_object;
-    /* The LOCI type enum value of the object */
-    of_object_id_t object_id;
-
-    /*
-     * Objects need to track their "parent" so that updates to the
-     * object that affect its length can be pushed to the parent.
-     * Treat as private.
-     */
-    of_object_t *parent;
-
-    /*
-     * Not all objects have length and version on the wire so we keep
-     * them here.  NOTE: Infrastructure manages length and version.
-     * Treat length as private and version as read only.
-     */
-    int length;
-    of_version_t version;
-
-    /*
-     * Many objects have a length and/or type represented in the wire buffer
-     * These accessors get and set those value when present.  Treat as private.
-     */
-    of_wire_length_get_f wire_length_get;
-    of_wire_length_set_f wire_length_set;
-    of_wire_type_get_f wire_type_get;
-    of_wire_type_set_f wire_type_set;
-
-    of_object_track_info_t track_info;
-
-    /*
-     * Metadata available for applications.  Ensure 8-byte alignment, but
-     * that buffer is at least as large as requested.  This data is not used
-     * or inspected by LOCI.
-     */
-    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
-"""
-
 ##
 # LOXI identifiers
 #

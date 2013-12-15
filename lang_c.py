@@ -176,6 +176,7 @@ def generate(install_dir):
             fn(outfile, os.path.basename(name))
     c_gen.codegen.generate_classes(install_dir)
     c_gen.codegen.generate_header_classes(install_dir)
+    c_gen.codegen.generate_classes_header(install_dir)
     c_gen.codegen.generate_lists(install_dir)
     c_gen.codegen.generate_strings(install_dir)
     c_gen.codegen.generate_init_map(install_dir)

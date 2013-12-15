@@ -33,6 +33,7 @@ These functions extract data from the IR and render templates with it.
 
 from collections import namedtuple
 from itertools import groupby
+from StringIO import StringIO
 import template_utils
 import loxi_globals
 import loxi_ir.ir as ir
@@ -93,6 +94,19 @@ def generate_header_classes(install_dir):
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_accessor_definitions(out, cls)
+
+def generate_classes_header(install_dir):
+    # Collect legacy code
+    tmp = StringIO()
+    c_code_gen.gen_struct_typedefs(tmp)
+    c_code_gen.gen_new_function_declarations(tmp)
+    c_code_gen.gen_accessor_declarations(tmp)
+    c_code_gen.gen_generic_union(tmp)
+    c_code_gen.gen_generics(tmp)
+
+    with template_utils.open_output(install_dir, "loci/inc/loci/loci_classes.h") as out:
+        util.render_template(out, "loci_classes.h",
+            legacy_code=tmp.getvalue())
 
 def generate_lists(install_dir):
     for cls in of_g.ordered_list_objects:
