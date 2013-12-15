@@ -1,6 +1,13 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.hamcrest.CoreMatchers;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -95,6 +102,53 @@ public class IPv4AddressTest {
                                    "1.256.3.4/255.255.0.0",
                                    "1.2.3.4/255.255.0.0.0",
     };
+
+    @Test
+    public void testMaskedMatchesCidr() {
+        IPv4AddressWithMask slash28 = IPv4AddressWithMask.of("10.0.42.16/28");
+
+        String[] notContained = {"0.0.0.0", "11.0.42.16", "10.0.41.1", "10.0.42.0", "10.0.42.15",
+                                 "10.0.42.32", "255.255.255.255" };
+
+        for(String n: notContained) {
+            assertThat(String.format("slash 28 %s should not contain address %s",
+                                     slash28, n),
+                    slash28.matches(IPv4Address.of(n)), equalTo(false));
+        }
+        for(int i=16; i < 32; i++) {
+            IPv4Address c = IPv4Address.of(String.format("10.0.42.%d", i));
+            assertThat(String.format("slash 28 %s should contain address %s",
+                                     slash28, c),
+                       slash28.matches(c), equalTo(true));
+        }
+    }
+
+    @Test
+    public void testMaskedMatchesArbitrary() {
+        // irregular octect on the 3rd bitmask requires '1'bit to be set
+        // 4 bit unset, all others arbitrary
+        IPv4AddressWithMask slash28 = IPv4AddressWithMask.of("1.2.1.4/255.255.5.255");
+
+        String[] notContained = {"0.0.0.0", "1.2.3.5", "1.2.3.3",
+                                 "1.2.0.4", "1.2.2.4", "1.2.4.4", "1.2.5.4", "1.2.6.4", "1.2.7.4",
+                                 "1.2.8.4", "1.2.12.4", "1.2.13.4"
+                                 };
+        String[] contained = {"1.2.1.4", "1.2.3.4", "1.2.9.4", "1.2.11.4", "1.2.251.4",
+                };
+
+        for(String n: notContained) {
+            assertThat(String.format("slash 28 %s should not contain address %s",
+                                     slash28, n),
+                    slash28.matches(IPv4Address.of(n)), equalTo(false));
+        }
+        for(String c: contained) {
+            IPv4Address addr = IPv4Address.of(c);
+            assertThat(String.format("slash 28 %s should contain address %s",
+                                     slash28, addr),
+                       slash28.matches(addr), equalTo(true));
+        }
+
+    }
 
 
     @Test
