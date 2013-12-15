@@ -485,25 +485,6 @@ def match_c_gen(out, name):
     c_match.gen_serialize(out)
     c_match.gen_deserialize(out)
 
-def gen_obj_id_macros(out):
-    """
-    Flow modify (add, delete) messages (and maybe others) use ID checks allowing
-    inheritance to use common accessor functions.
-    """
-    out.write("""
-/**
- * Macro to detect if an object ID falls in the "flow mod" family of objects
- * This includes add, modify, modify_strict, delete and delete_strict
- */
-#define IS_FLOW_MOD_SUBTYPE(object_id)                 \\
-    (((object_id) == OF_FLOW_MODIFY) ||                \\
-     ((object_id) == OF_FLOW_MODIFY_STRICT) ||         \\
-     ((object_id) == OF_FLOW_DELETE) ||                \\
-     ((object_id) == OF_FLOW_DELETE_STRICT) ||         \\
-     ((object_id) == OF_FLOW_ADD))
-""")
-
-
 def top_c_gen(out, name):
     """
     Generate code for
@@ -561,7 +542,6 @@ def top_c_gen(out, name):
 
 """)
     gen_object_enum_str(out)
-    gen_obj_id_macros(out)
     if config_check("gen_unified_fns"):
         gen_accessor_definitions(out)
     gen_new_function_definitions(out)

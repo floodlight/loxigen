@@ -258,7 +258,16 @@ ${packet_in} : ${packet_in_1_3}) + 2)
 #define OF_PORT_NO_VALUE_CHECK(port, ver) \
     if (((ver) == OF_VERSION_1_0) && ((port) > 0xff00)) (port) += 0xffff0000
 
-
+/**
+ * Macro to detect if an object ID falls in the "flow mod" family of objects
+ * This includes add, modify, modify_strict, delete and delete_strict
+ */
+#define IS_FLOW_MOD_SUBTYPE(object_id)                 \
+    (((object_id) == OF_FLOW_MODIFY) ||                \
+     ((object_id) == OF_FLOW_MODIFY_STRICT) ||         \
+     ((object_id) == OF_FLOW_DELETE) ||                \
+     ((object_id) == OF_FLOW_DELETE_STRICT) ||         \
+     ((object_id) == OF_FLOW_ADD))
 
 #include <loci/loci.h> 
 #endif /* __LOCI_INT_H__ */
