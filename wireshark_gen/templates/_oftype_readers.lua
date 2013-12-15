@@ -57,11 +57,11 @@ end
 
 function read_of_match_t(reader, version, subtree, field_name)
     if version == 1 then
-        dissect_of_match_v1_v1(reader, subtree:add(fields[field_name]))
+        dissect_of_match_v1_v1(reader, subtree:add("of_match"))
     elseif version == 2 then
-        dissect_of_match_v2_v2(reader, subtree:add(fields[field_name]))
+        dissect_of_match_v2_v2(reader, subtree:add("of_match"))
     elseif version >= 3 then
-        dissect_of_match_v3_v3(reader, subtree:add(fields[field_name]))
+        dissect_of_match_v3_v3(reader, subtree:add("of_match"))
     end
 end
 
