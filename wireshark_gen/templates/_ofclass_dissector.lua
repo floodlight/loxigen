@@ -42,14 +42,41 @@ function ${name}(reader, subtree)
 :: if ofclass.virtual:
     return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
 :: else:
+:: r_name = "reader"
+:: if not ofclass.is_fixed_length:
+    local packet_length = ${r_name}.peek(${ofclass.message_length.offset}, ${ofclass.message_length.base_length}):uint()
+    local packet_reader = ${r_name}.slice(packet_length)
+:: r_name = "packet_reader"
+:: #endif
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
-    reader.skip(${m.length})
+    ${r_name}.skip(${m.length})
 :: continue
 :: #endif
+:: if isinstance(m, OFFieldLengthMember):
+    local field_length = ${r_name}.peek(0, ${m.base_length}):uint()
+    local field_reader = ${r_name}.slice(field_length)
+:: r_name = "field_reader"
+:: continue
+:: #endif
+:: if m.oftype.startswith("list"):
+:: class_name = m.oftype.replace('_t)', '').replace('(', '').replace('list', '')
+    if not ${r_name}.is_empty() then
+        local field_subtree = subtree:add("${class_name} list", ${r_name}.peek_all(0))
+        while not ${r_name}.is_empty() do
+            local atom_subtree = field_subtree:add("${class_name}", ${r_name}.peek_all(0))
+            local info = dissect_${class_name}_v${version.wire_version}(${r_name}, atom_subtree)
+            atom_subtree:set_text(info)
+        end
+    end
+:: if ofclass.has_external_alignment:
+    reader.skip_align()
+:: #endif
+:: else:
 :: field_name = make_field_name(version, ofclass.name, m.name)
 :: reader_name = get_reader(version, ofclass, m)
-    ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
+    ${reader_name}(${r_name}, ${version.wire_version}, subtree, '${field_name}')
+:: #endif
 :: #endfor
     return '${ofclass.name}'
 :: #endif
