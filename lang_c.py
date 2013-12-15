@@ -87,6 +87,7 @@ targets = {
     'loci/src/of_type_maps.c': static,
     'loci/src/of_utils.c': static,
     'loci/src/of_wire_buf.c': static,
+    'loci/src/loci_setup_from_add_fns.c': static,
 
     # Static LOCI documentation
     'loci/README': static,
