@@ -175,3 +175,4 @@ def generate(install_dir):
         with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))
     c_gen.codegen.gen_push_wire_types(install_dir)
+    c_gen.codegen.generate_classes(install_dir)

@@ -543,7 +543,7 @@ def top_c_gen(out, name):
 """)
     gen_object_enum_str(out)
     if config_check("gen_unified_fns"):
-        gen_accessor_definitions(out)
+        gen_all_accessor_definitions(out)
     gen_new_function_definitions(out)
     gen_init_map(out)
     out.write("\n/* This code should be broken out to a different file */\n")
@@ -2160,7 +2160,7 @@ def gen_get_accessor(out, cls, m_name, m_type, ver_type_map):
     out.write("%s\n%s_%s_get(\n    %s)\n" % (ret_type, cls, m_name, params))
     gen_unified_acc_body(out, cls, m_name, ver_type_map, "get", m_type)
 
-def gen_accessor_definitions(out):
+def gen_all_accessor_definitions(out):
     """
     Generate the body of each version independent accessor
 
@@ -2182,6 +2182,10 @@ def gen_accessor_definitions(out):
             gen_list_accessors(out, cls)
             continue
         out.write("/** \\ingroup %s \n * @{ */\n" % cls)
+        #gen_accessor_definitions(out, cls)
+        out.write("\n/** @} */\n")
+
+def gen_accessor_definitions(out, cls):
         for m_name in of_g.ordered_members[cls]:
             if m_name in of_g.skip_members:
                 continue
@@ -2221,8 +2225,6 @@ def gen_accessor_definitions(out):
             ret_type = accessor_return_type("set", m_type)
             out.write("%s\n%s_%s_set(\n    %s)\n" % (ret_type, cls, m_name, params))
             gen_unified_acc_body(out, cls, m_name, ver_type_map, "set", m_type)
-
-        out.write("\n/** @} */\n")
 
 def gen_acc_pointer_typedefs(out):
     """

@@ -37,6 +37,7 @@ import template_utils
 import loxi_globals
 import loxi_ir.ir as ir
 import util
+import c_code_gen
 
 PushWireTypesFn = namedtuple('PushWireTypesFn',
     ['class_name', 'versioned_type_members'])
@@ -77,3 +78,10 @@ def gen_push_wire_types(install_dir):
 
     with template_utils.open_output(install_dir, "loci/src/loci_push_wire_types.h") as out:
         util.render_template(out, "loci_push_wire_types.h", fns=fns)
+
+def generate_classes(install_dir):
+    for uclass in loxi_globals.unified.classes:
+        with template_utils.open_output(install_dir, "loci/src/%s.c" % uclass.name) as out:
+            util.render_template(out, "class.c")
+            # Append legacy generated code
+            c_code_gen.gen_accessor_definitions(out, uclass.name)
