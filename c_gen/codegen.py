@@ -41,50 +41,43 @@ import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 
-PushWireTypesFn = namedtuple('PushWireTypesFn',
+PushWireTypesData = namedtuple('PushWireTypesData',
     ['class_name', 'versioned_type_members'])
 PushWireTypesMember = namedtuple('PushWireTypesMember',
     ['name', 'offset', 'length', 'value'])
 
-def gen_push_wire_types(install_dir):
-    fns = []
-    for uclass in loxi_globals.unified.classes:
-        if uclass.virtual or not uclass.has_type_members:
-            continue
+def push_wire_types_data(uclass):
+    if uclass.virtual or not uclass.has_type_members:
+        return None
 
-        # Generate a dict of version -> list of PushWireTypesMember
-        type_members_by_version = {}
-        for version, ofclass in sorted(uclass.version_classes.items()):
-            pwtms = []
-            for m in ofclass.members:
-                if isinstance(m, ir.OFTypeMember):
-                    if m.name == "version" and m.value == version.wire_version:
-                        # Special case for version
-                        pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, "obj->version"))
-                    else:
-                        pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, m.value))
-            type_members_by_version[version] = pwtms
+    # Generate a dict of version -> list of PushWireTypesMember
+    type_members_by_version = {}
+    for version, ofclass in sorted(uclass.version_classes.items()):
+        pwtms = []
+        for m in ofclass.members:
+            if isinstance(m, ir.OFTypeMember):
+                if m.name == "version" and m.value == version.wire_version:
+                    # Special case for version
+                    pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, "obj->version"))
+                else:
+                    pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, m.value))
+        type_members_by_version[version] = pwtms
 
-        # Merge versions with identical type members
-        all_versions = sorted(type_members_by_version.keys())
-        versioned_type_members = []
-        for pwtms, versions in groupby(all_versions, type_members_by_version.get):
-            versioned_type_members.append((pwtms, list(versions)))
+    # Merge versions with identical type members
+    all_versions = sorted(type_members_by_version.keys())
+    versioned_type_members = []
+    for pwtms, versions in groupby(all_versions, type_members_by_version.get):
+        versioned_type_members.append((pwtms, list(versions)))
 
-        fns.append(PushWireTypesFn(
-            class_name=uclass.name,
-            versioned_type_members=versioned_type_members))
-
-    with template_utils.open_output(install_dir, "loci/src/loci_push_wire_types.c") as out:
-        util.render_template(out, "loci_push_wire_types.c", fns=fns)
-
-    with template_utils.open_output(install_dir, "loci/src/loci_push_wire_types.h") as out:
-        util.render_template(out, "loci_push_wire_types.h", fns=fns)
+    return PushWireTypesData(
+        class_name=uclass.name,
+        versioned_type_members=versioned_type_members)
 
 def generate_classes(install_dir):
     for uclass in loxi_globals.unified.classes:
         with template_utils.open_output(install_dir, "loci/src/%s.c" % uclass.name) as out:
-            util.render_template(out, "class.c")
+            util.render_template(out, "class.c",
+                push_wire_types_data=push_wire_types_data(uclass))
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, uclass.name)
             c_code_gen.gen_accessor_definitions(out, uclass.name)
@@ -95,7 +88,8 @@ def generate_header_classes(install_dir):
         if cls.find("_header") < 0:
             continue
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            util.render_template(out, "class.c")
+            util.render_template(out, "class.c",
+                push_wire_types_data=None)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_accessor_definitions(out, cls)
@@ -103,7 +97,8 @@ def generate_header_classes(install_dir):
 def generate_lists(install_dir):
     for cls in of_g.ordered_list_objects:
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            util.render_template(out, "class.c")
+            util.render_template(out, "class.c",
+                push_wire_types_data=None)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_list_accessors(out, cls)

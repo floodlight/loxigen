@@ -29,5 +29,9 @@
 :: include('_pragmas.c')
 
 #include "loci_log.h"
-#include "loci_push_wire_types.h"
 #include "loci_int.h"
+
+:: if push_wire_types_data:
+:: include("_push_wire_types.c", data=push_wire_types_data)
+
+:: #endif

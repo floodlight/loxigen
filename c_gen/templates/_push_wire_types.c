@@ -25,41 +25,12 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: include('_copyright.c')
-
-/****************************************************************
- *
- * Functions for each concrete class that set the type fields
- *
- ****************************************************************/
-
-#include <loci/loci.h>
-#include <loci/of_message.h>
-#include <endian.h>
-
-#ifdef __GNUC__
-#define UNREACHABLE() __builtin_unreachable()
-#else
-#define UNREACHABLE()
-#endif
-
-/*
- * In a separate function to give the compiler the choice of whether to inline.
- */
-static unsigned char *
-loci_object_to_buffer(of_object_t *obj)
+static void
+${data.class_name}_push_wire_types(of_object_t *obj)
 {
-    return OF_OBJECT_BUFFER_INDEX(obj, 0);
-}
-
-:: for fn in fns:
-
-void
-${fn.class_name}_push_wire_types(of_object_t *obj)
-{
-    unsigned char *buf = loci_object_to_buffer(obj);
+    unsigned char *buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
     switch (obj->version) {
-:: for ms, versions in fn.versioned_type_members:
+:: for ms, versions in data.versioned_type_members:
 :: for version in versions:
     case ${version.constant_version(prefix='OF_VERSION_')}:
 :: #endfor
@@ -80,4 +51,3 @@ ${fn.class_name}_push_wire_types(of_object_t *obj)
         UNREACHABLE();
     }
 }
-:: #endfor

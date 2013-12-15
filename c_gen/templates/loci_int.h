@@ -46,6 +46,12 @@
 
 #include <loci/loci.h>
 
+#ifdef __GNUC__
+#define UNREACHABLE() __builtin_unreachable()
+#else
+#define UNREACHABLE()
+#endif
+
 /****************************************************************
  * Special case macros for calculating variable lengths and offsets
  ****************************************************************/
