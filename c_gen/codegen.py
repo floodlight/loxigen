@@ -106,3 +106,15 @@ def generate_lists(install_dir):
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_list_accessors(out, cls)
+
+def generate_strings(install_dir):
+    object_id_strs = []
+    object_id_strs.append("of_object")
+    object_id_strs.extend(of_g.ordered_messages)
+    object_id_strs.extend(of_g.ordered_non_messages)
+    object_id_strs.extend(of_g.ordered_list_objects)
+    object_id_strs.extend(of_g.ordered_pseudo_objects)
+    object_id_strs.append("of_unknown_object")
+
+    with template_utils.open_output(install_dir, "loci/src/loci_strings.c") as out:
+        util.render_template(out, "loci_strings.c", object_id_strs=object_id_strs)

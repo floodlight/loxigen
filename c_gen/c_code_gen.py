@@ -514,7 +514,6 @@ def top_c_gen(out, name):
 #include "loci_int.h"
 
 """)
-    gen_object_enum_str(out)
     gen_init_map(out)
 
 def type_data_c_gen(out, name):
@@ -1040,63 +1039,6 @@ of_wire_id_valid(int object_id, int base_object_id) {
     }
     return 1;
 }
-""")
-
-def gen_object_enum_str(out):
-    out.write("\nconst char *const of_object_id_str[] = {\n")
-    out.write("    \"of_object\",\n")
-    for cls in of_g.ordered_messages:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* Non-message objects */\n")
-    for cls in of_g.ordered_non_messages:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* List objects */\n")
-    for cls in of_g.ordered_list_objects:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* Generic stats request/reply types; pseudo objects */\n")
-    for cls in of_g.ordered_pseudo_objects:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    \"of_unknown_object\"\n};\n")
-
-    # We'll do version strings while we're at it
-    out.write("""
- const char *const of_version_str[] = {
-    "Unknown OpenFlow Version",
-    "OpenFlow-1.0",
-    "OpenFlow-1.1",
-    "OpenFlow-1.2"
-};
-
-const of_mac_addr_t of_mac_addr_all_ones = {
-    {
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-    }
-};
-/* Just to be explicit; static duration vars are init'd to 0 */
-const of_mac_addr_t of_mac_addr_all_zeros = {
-    {
-        0, 0, 0, 0, 0, 0
-    }
-};
-
-const of_ipv6_t of_ipv6_all_ones = {
-    {
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-    }
-};
-/* Just to be explicit; static duration vars are init'd to 0 */
-const of_ipv6_t of_ipv6_all_zeros = {
-    {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0
-    }
-};
-
-/** @var of_error_strings
- * The error string map; use abs value to index
- */
-const char *const of_error_strings[] = { OF_ERROR_STRINGS };
 """)
 
 ################################################################
