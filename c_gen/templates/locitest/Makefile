@@ -4,7 +4,7 @@ LOCI_SRCS := $(wildcard ../loci/src/*.c)
 LOCITEST_OBJS := $(LOCITEST_SRCS:.c=.o)
 LOCI_OBJS := $(LOCI_SRCS:.c=.o)
 
-CFLAGS := -Wall -Werror -g
+CFLAGS := -Wall -Werror -g -Os
 CFLAGS += -Iinc -I../loci/inc -I ../loci/src
 
 all: locitest

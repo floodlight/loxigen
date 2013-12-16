@@ -43,10 +43,6 @@
 #define __GNUC_PREREQ(maj, min) 0
 #endif
 
-#if __GNUC_PREREQ(4,4)
-#pragma GCC optimize ("s")
-#endif
-
 #if __GNUC_PREREQ(4,6)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #endif
