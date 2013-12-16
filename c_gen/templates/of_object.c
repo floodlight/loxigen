@@ -55,10 +55,10 @@ of_object_new(int bytes)
 {
     of_object_t *obj;
 
-    if ((obj = (of_object_t *)MALLOC(sizeof(of_generic_t))) == NULL) {
+    if ((obj = (of_object_t *)MALLOC(sizeof(*obj))) == NULL) {
         return NULL;
     }
-    MEMSET(obj, 0, sizeof(of_generic_t));
+    MEMSET(obj, 0, sizeof(*obj));
 
     if (bytes > 0) {
         if ((obj->wire_object.wbuf = of_wire_buffer_new(bytes)) == NULL) {
@@ -114,7 +114,7 @@ of_object_dup(of_object_t *src)
     of_object_t *dst;
     of_object_init_f init_fn;
 
-    if ((dst = (of_object_t *)MALLOC(sizeof(of_generic_t))) == NULL) {
+    if ((dst = (of_object_t *)MALLOC(sizeof(*dst))) == NULL) {
         return NULL;
     }
 

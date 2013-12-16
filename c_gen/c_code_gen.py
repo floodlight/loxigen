@@ -1122,33 +1122,6 @@ extern void of_object_delete(of_object_t *obj);
 
 """)
 
-def gen_generic_union(out):
-    """
-    Generate the generic union object composing all LOCI objects
-
-    @param out The file to which to write the decs
-    """
-    out.write("""
-/**
- * The common LOCI object is a union of all possible objects.
- */
-union of_generic_u {
-    of_object_t object;  /* Common base class with fundamental accessors */
-
-    /* Message objects */
-""")
-    for cls in of_g.ordered_messages:
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("\n    /* Non-message composite objects */\n")
-    for cls in of_g.ordered_non_messages:
-        if cls in type_maps.inheritance_map:
-            continue
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("\n    /* List objects */\n")
-    for cls in of_g.ordered_list_objects:
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("};\n")
-
 def gen_flow_add_setup_function_declarations(out):
     """
     Add the declarations for functions that can be initialized
