@@ -433,7 +433,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
     gen_flow_add_setup_function_declarations(out)
     if config_check("gen_fn_ptrs"): # Otherwise, all classes are from generic cls
         gen_struct_definitions(out)
-    gen_top_static_functions(out)
     out.write("""
 /****************************************************************
  *
@@ -798,51 +797,6 @@ def external_h_top_matter(out, name):
  * Some special case macros
  *
  ****************************************************************/
-""")
-
-def gen_top_static_functions(out):
-    out.write("""
-
-#define _MAX_PARENT_ITERATIONS 4
-/**
- * Iteratively update parent lengths thru hierarchy
- * @param obj The object whose length is being updated
- * @param delta The difference between the current and new lengths
- *
- * Note that this includes updating the object itself.  It will
- * iterate thru parents.
- *
- * Assumes delta > 0.
- */
-static inline void
-of_object_parent_length_update(of_object_t *obj, int delta)
-{
-#ifndef NDEBUG
-    int count = 0;
-    of_wire_buffer_t *wbuf;  /* For debug asserts only */
-#endif
-
-    while (obj != NULL) {
-        ASSERT(count++ < _MAX_PARENT_ITERATIONS);
-        obj->length += delta;
-        if (obj->wire_length_set != NULL) {
-            obj->wire_length_set(obj, obj->length);
-        }
-#ifndef NDEBUG
-        wbuf = obj->wire_object.wbuf;
-#endif
-
-        /* Asserts for wire length checking */
-        ASSERT(obj->length + obj->wire_object.obj_offset <=
-               WBUF_CURRENT_BYTES(wbuf));
-        if (obj->parent == NULL) {
-            ASSERT(obj->length + obj->wire_object.obj_offset ==
-                   WBUF_CURRENT_BYTES(wbuf));
-        }
-
-        obj = obj->parent;
-    }
-}
 """)
 
 ################################################################
