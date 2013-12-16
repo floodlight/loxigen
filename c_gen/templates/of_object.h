@@ -48,10 +48,6 @@
 #include <loci/of_message.h>
 #include <loci/of_wire_buf.h>
 
-#if defined(OF_OBJECT_TRACKING)
-#include <BigList/biglist.h>
-#endif
-
 /**
  * This is the number of bytes reserved for metadata in each
  * of_object_t instance.
@@ -93,78 +89,17 @@ extern int of_list_append_bind(of_object_t *parent, of_object_t *child);
 extern int of_list_append(of_object_t *list, of_object_t *item);
 
 extern of_object_t *of_object_new(int bytes);
-extern of_object_t * of_object_dup_(of_object_t *src);
+extern of_object_t *of_object_dup(of_object_t *src);
 
 /**
  * Callback function prototype for deleting an object
  */
 typedef void (*of_object_delete_callback_f)(of_object_t *obj);
 
-#if defined(OF_OBJECT_TRACKING)
-/**
- * When tracking is enabled, the location of each new or dup
- * call of an OF object is recorded and a list is kept of all
- * outstanding objects.
- *
- * This dovetails with using objects to track outstanding operations
- * for barrier processing.
- */
-
-/**
- * Global tracking stats
- */
-typedef struct loci_object_track_s {
-    biglist_t *objects;
-    int count_current;
-    uint32_t count_max;
-    uint32_t allocs;
-    uint32_t deletes;
-} loci_object_track_t;
-
-extern loci_object_track_t loci_global_tracking;
-
-/* Remap dup call to tracking */
-extern of_object_t * of_object_dup_tracking(of_object_t *src,
-                                            const char *file, int line);
-#define of_object_dup(src) of_object_dup_tracking(src, __FILE__, __LINE__)
-extern void of_object_track(of_object_t *obj, const char *file, int line);
-
-extern void of_object_track_output(of_object_t *obj, loci_writer_f writer, void* cookie); 
-extern void of_object_track_report(loci_writer_f writer, void* cookie); 
-
-/**
- * The data stored in each object related to tracking and
- * The LOCI client may install a delete callback function to allow
- * the notification of an object's destruction.
- */
-
-typedef struct of_object_track_info_s {
-    of_object_delete_callback_f delete_cb;  /* To be implemented */
-    void *delete_cookie;
-
-    /* Track file and line where allocated */
-    const char *file;
-    int line;
-    biglist_t *bl_entry; /* Pointer to self */
-    uint32_t magic; /* validation value */
-} of_object_track_info_t;
-
-#define OF_OBJECT_TRACKING_MAGIC 0x11235813
-#else
-
-/* Use native dup call */
-#define of_object_dup of_object_dup_
-
-/**
- * When tracking is not enabled, we still support a delete callback
- */
-
 typedef struct of_object_track_info_s {
     of_object_delete_callback_f delete_cb;  /* To be implemented */
     void *delete_cookie;
 } of_object_track_info_t;
-
-#endif
 
 extern int of_object_xid_set(of_object_t *obj, uint32_t xid);
 extern int of_object_xid_get(of_object_t *obj, uint32_t *xid);

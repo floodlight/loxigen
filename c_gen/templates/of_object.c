@@ -39,17 +39,6 @@
 #include <loci/loci.h>
 #include <loci/loci_validator.h>
 
-#if defined(OF_OBJECT_TRACKING)
-#include <BigList/biglist.h>
-
-loci_object_track_t loci_global_tracking;
-
-#define TRACK (&loci_global_tracking)
-#define TRACK_OBJS (TRACK->objects)
-#define CHECK_MAX(val, max) if ((val) > (max)) (max) = (val)
-
-#endif
-
 /**
  * Create a generic new object and possibly underlying wire buffer
  * @param bytes The number of bytes to allocate in the underlying buffer
@@ -98,20 +87,6 @@ of_object_delete(of_object_t *obj)
         return;
     }
 
-#if defined(OF_OBJECT_TRACKING)
-    ASSERT(obj->track_info.magic == OF_OBJECT_TRACKING_MAGIC &&
-           "of_object double free?");
-    LOCI_LOG_TRACE("OF obj delete %p.  Wire buf %p.\n", obj,
-                   obj->wire_object.wbuf);
-    ASSERT(TRACK->count_current > 0);
-    TRACK->count_current -= 1;
-    TRACK->deletes += 1;
-
-    TRACK_OBJS = biglist_remove_link_free(TRACK_OBJS,
-                                          obj->track_info.bl_entry);
-    obj->track_info.magic = 0;
-#endif
-
     /*
      * Make callback if present
      */
@@ -134,7 +109,7 @@ of_object_delete(of_object_t *obj)
  */
 
 of_object_t *
-of_object_dup_(of_object_t *src)
+of_object_dup(of_object_t *src)
 {
     of_object_t *dst;
     of_object_init_f init_fn;
@@ -162,107 +137,6 @@ of_object_dup_(of_object_t *src)
 
     return dst;
 }
-
-#if defined(OF_OBJECT_TRACKING)
-
-/**
- * Record an object for tracking
- *
- * @param obj The object being tracked
- * @param file The file name where the allocation is happening
- * @param line The line number in the file where the alloc is happening
- */
-
-void
-of_object_track(of_object_t *obj, const char *file, int line)
-{
-    if (obj != NULL) {
-        LOCI_LOG_TRACE("OF obj track %p, wire buf %p\n%s:%d\\n",
-                      obj, obj->wire_object.wbuf, file, line);
-        obj->track_info.file = file;
-        obj->track_info.line = line;
-        TRACK_OBJS = biglist_prepend(TRACK_OBJS, (void *)obj);
-        obj->track_info.bl_entry = TRACK_OBJS;
-        obj->track_info.magic = OF_OBJECT_TRACKING_MAGIC;
-
-        TRACK->allocs += 1;
-        TRACK->count_current += 1;
-        CHECK_MAX(TRACK->count_current, TRACK->count_max);
-    }
-}
-
-/**
- * The dup function when tracking is enabled
- */
-
-of_object_t *
-of_object_dup_tracking(of_object_t *src, const char *file, int line)
-{
-    of_object_t *obj;
-
-    obj = of_object_dup_(src);
-    of_object_track(obj, file, line);
-
-    return obj;
-}
-
-/**
- * Display track info for one object
- */
-
-void
-of_object_track_output(of_object_t *obj, loci_writer_f writer, void* cookie)
-{
-    const char *offset;
-    static const char *unknown = "Unknown file";
-
-    if (obj->track_info.file) {
-        offset = strstr(obj->track_info.file, "Modules/");
-        if (offset == NULL) {
-            offset = obj->track_info.file;
-        } else {
-            offset += 8; /* Jump over Modules/ too */
-        }
-    } else {
-        offset = unknown;
-    }
-    writer(cookie, "obj %p. type %s.\n%s:%d\n",
-               obj, of_object_id_str[obj->object_id],
-               offset, obj->track_info.line);
-}
-
-/**
- * Dump out the current object list from LOCI
- *
- * @param log_fn The output printf vector
- *
- */
-
-void
-of_object_track_report(loci_writer_f writer, void* cookie)
-{
-    biglist_t *elt;
-    of_object_t *obj;
-    int count = 0;
-
-    writer(cookie, "\nLOCI Outstanding object list.\n");
-    writer(cookie, "Objs: Current %d. Max %d. Created %d. Deleted %d\n",
-               TRACK->count_current, TRACK->count_max, TRACK->allocs,
-               TRACK->deletes);
-    if (TRACK_OBJS) {
-        BIGLIST_FOREACH_DATA(elt, TRACK_OBJS, of_object_t *, obj) {
-            of_object_track_output(obj, writer, cookie);
-            ++count;
-        }
-    }
-    if (count != TRACK->count_current) {
-        writer(cookie, "\nERROR:  List has %d, but track count is %d\n",
-                   count, TRACK->count_current);
-    }
-    writer(cookie, "\nEnd of outstanding object list\n");
-}
-
-#endif
 
 /**
  * Generic new from message call
@@ -301,11 +175,6 @@ of_object_new_from_message(of_message_t msg, int len)
     }
     obj->length = len;
     obj->version = version;
-
-#if defined(OF_OBJECT_TRACKING)
-    /* @FIXME Would be nice to get caller; for now only in cxn_instance */
-    of_object_track(obj, __FILE__, __LINE__);
-#endif
 
     return obj;
 }

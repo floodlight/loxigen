@@ -2130,7 +2130,7 @@ def gen_new_fn_body(cls, out):
  */
 
 %(cls)s_t *
-%(cls)s_new_(of_version_t version)
+%(cls)s_new(of_version_t version)
 {
     %(cls)s_t *obj;
     int bytes;
@@ -2165,25 +2165,6 @@ def gen_new_fn_body(cls, out):
     out.write("""
     return obj;
 }
-
-#if defined(OF_OBJECT_TRACKING)
-
-/*
- * Tracking objects.  Call the new function and then record location
- */
-
-%(cls)s_t *
-%(cls)s_new_tracking(of_version_t version,
-     const char *file, int line)
-{
-    %(cls)s_t *obj;
-
-    obj = %(cls)s_new_(version);
-    of_object_track((of_object_t *)obj, file, line);
-
-    return obj;
-}
-#endif
 """ % dict(cls=cls))
 
 
@@ -2204,7 +2185,7 @@ def gen_from_message_fn_body(cls, out):
  */
 
 %(cls)s_t *
-%(cls)s_new_from_message_(of_message_t msg)
+%(cls)s_new_from_message(of_message_t msg)
 {
     %(cls)s_t *obj = NULL;
     of_version_t version;
@@ -2233,25 +2214,6 @@ def gen_from_message_fn_body(cls, out):
 
     return obj;
 }
-
-#if defined(OF_OBJECT_TRACKING)
-
-/*
- * Tracking objects.  Call the new function and then record location
- */
-
-%(cls)s_t *
-%(cls)s_new_from_message_tracking(of_message_t msg,
-    const char *file, int line)
-{
-    %(cls)s_t *obj;
-
-    obj = %(cls)s_new_from_message_(msg);
-    of_object_track((of_object_t *)obj, file, line);
-
-    return obj;
-}
-#endif
 """ % dict(cls=cls))
 
 
@@ -2281,58 +2243,15 @@ def gen_new_function_declarations(out):
  *
  ****************************************************************/
 """)
-    out.write("""
-/*
- * If object tracking is enabled, map "new" and "new from msg"
- * calls to tracking versions; otherwise, directly to internal
- * versions of fns which have the same name but end in _.
- */
-
-#if defined(OF_OBJECT_TRACKING)
-""")
-    for cls in of_g.standard_class_order:
-        out.write("""
-extern %(cls)s_t *
-    %(cls)s_new_tracking(of_version_t version,
-        const char *file, int line);
-#define %(cls)s_new(version) \\
-    %(cls)s_new_tracking(version, \\
-        __FILE__, __LINE__)
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message_tracking(of_message_t msg,
-        const char *file, int line);
-#define %(cls)s_new_from_message(msg) \\
-    %(cls)s_new_from_message_tracking(msg, \\
-        __FILE__, __LINE__)
-""" % dict(cls=cls))
-
-    out.write("""
-#else /* No object tracking */
-""")
-    for cls in of_g.standard_class_order:
-        out.write("""
-#define %(cls)s_new(version) \\
-    %(cls)s_new_(version)
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""#define %(cls)s_new_from_message(msg) \\
-    %(cls)s_new_from_message_(msg)
-""" % dict(cls=cls))
-
-    out.write("""
-#endif /* Object tracking */
-""")
 
     for cls in of_g.standard_class_order:
         out.write("""
 extern %(cls)s_t *
-    %(cls)s_new_(of_version_t version);
+    %(cls)s_new(of_version_t version);
 """ % dict(cls=cls))
         if loxi_utils.class_is_message(cls):
             out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message_(of_message_t msg);
+    %(cls)s_new_from_message(of_message_t msg);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
     %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
