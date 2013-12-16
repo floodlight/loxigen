@@ -36,7 +36,6 @@ import c_match
 from generic_utils import *
 from c_gen import flags, type_maps, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
-from c_gen.loxi_utils_legacy import config_check
 import loxi_globals
 
 import c_gen.identifiers as identifiers
@@ -63,18 +62,6 @@ def enum_name(cls):
     @param cls The class name
     """
     return loxi_utils.enum_name(cls)
-
-def member_returns_val(cls, m_name):
-    """
-    Should get accessor return a value rather than void
-    @param cls The class name
-    @param m_name The member name
-    @return True if of_g config and the specific member allow a
-    return value.  Otherwise False
-    """
-    m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and
-            m_type in of_g.of_scalar_types)
 
 # TODO serialize match outside accessor?
 def accessor_return_type(a_type, m_type):
@@ -984,8 +971,6 @@ def get_acc_rv(cls, m_name):
     member = of_g.unified[cls]["union"][m_name]
     m_type = member["m_type"]
     rv = "int"
-    if member_returns_val(cls, m_name):
-        rv = m_type
     if m_type[-2:] == "_t":
         m_type = m_type[:-2]
 

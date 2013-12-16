@@ -74,16 +74,6 @@ target_version_list = []
 # and use a call-by-variable parameter
 #
 
-# @fixme These are still very C specific and should probably either
-# go into lang_c.py or be swallowed by command line option parsing
-code_gen_config = dict(
-    use_obj_id=False,
-    use_static_inlines=False,
-    copy_semantics="read",  # Only read implemented: read, write, grow
-    encoded_typedefs=False,
-    get_returns="error",   # Only error implemented; error, value, void
-)
-
 ## These members do not get normal accessors
 
 skip_members = ["version", "type", "length", "err_type", "stats_type", "len",

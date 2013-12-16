@@ -116,46 +116,6 @@ targets = {
     'locitest/Makefile': static,
 }
 
-################################################################
-#
-# Configuration related
-#
-################################################################
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
-
-def config_sanity_check():
-    """
-    Check the configuration for basic consistency
-
-    @fixme Needs update for generic language support
-    """
-
-    rv = True
-    # For now, only "error" supported for get returns
-    if config_check("copy_semantics") != "read":
-        debug("Only 'read' is supported for copy_semantics");
-        rv = False
-    if config_check("get_returns") != "error":
-        debug("Only 'error' is supported for get-accessor return types\m");
-        rv = False
-    if config_check("use_obj_id"):
-        debug("use_obj_id is set but not yet supported (change \
-config_sanity_check if it is)")
-        rv = False
-
-    return rv
-
 def generate(install_dir):
     build_of_g.initialize_versions()
     build_of_g.build_ordered_classes()

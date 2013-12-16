@@ -96,30 +96,6 @@ def member_base_type(cls, m_name):
 def member_type_is_octets(cls, m_name):
     return member_base_type(cls, m_name) == "of_octets_t"
 
-def member_returns_val(cls, m_name):
-    """
-    Should get accessor return a value rather than void
-    @param cls The class name
-    @param m_name The member name
-    @return True if of_g config and the specific member allow a
-    return value.  Otherwise False
-    """
-    m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and
-            m_type in of_g.of_scalar_types)
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
-
 def h_file_to_define(name):
     """
     Convert a .h file name to the define used for the header
