@@ -551,6 +551,49 @@ of_object_parent_length_update(of_object_t *obj, int delta)
     }
 }
 
+/**
+ * Use the type/length from the wire buffer and init the object
+ * @param obj The object being initialized
+ * @param base_object_id If > 0, this indicates the base object
+ * @param max_len If > 0, the max length to expect for the obj
+ * type for inheritance checking
+ * @return OF_ERROR_
+ *
+ * Used for inheritance type objects such as actions and OXMs
+ * The type is checked and if valid, the object is initialized.
+ * Then the length is taken from the buffer.
+ *
+ * Note that the object version must already be properly set.
+ */
+int
+of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
+                    int max_len)
+{
+    if (obj->wire_type_get != NULL) {
+        of_object_id_t id;
+        obj->wire_type_get(obj, &id);
+        if (!of_wire_id_valid(id, base_object_id)) {
+            return OF_ERROR_PARSE;
+        }
+        obj->object_id = id;
+        /* Call the init function for this object type; do not push to wire */
+        of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);
+    }
+    if (obj->wire_length_get != NULL) {
+        int length;
+        obj->wire_length_get(obj, &length);
+        if (length < 0 || (max_len > 0 && length > max_len)) {
+            return OF_ERROR_PARSE;
+        }
+        obj->length = length;
+    } else {
+        /* @fixme Does this cover everything else? */
+        obj->length = of_object_fixed_len[obj->version][base_object_id];
+    }
+
+    return OF_ERROR_NONE;
+}
+
 /*
  * Set member:
  *    get_wbuf_extent

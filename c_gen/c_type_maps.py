@@ -105,8 +105,6 @@ def gen_type_maps(out):
     @param out The file handle to write to
     """
 
-    out.write("#include <loci/loci.h>\n\n")
-
     # Generate maps from wire type values to object IDs
     gen_type_to_object_id(out, "error_msg_type_to_id", "OF_ERROR_MSG",
                           "OF_%s_ERROR_MSG", type_maps.error_types,
@@ -155,7 +153,7 @@ def gen_type_maps(out):
 
 def gen_type_to_obj_map_functions(out):
     """
-    Generate the templated static inline type map functions
+    Generate the templated type map functions
     @param out The file handle to write to
     """
 
@@ -180,7 +178,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -211,7 +209,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -246,7 +244,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -281,7 +279,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_error_msg_to_object_id(uint16_t %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -315,7 +313,7 @@ of_error_msg_to_object_id(uint16_t %(name)s, of_version_t version)
  * @todo put OF_EXPERIMENTER_<name> in loci_base.h
  */
 
-static inline of_object_id_t
+of_object_id_t
 of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
     uint32_t experimenter_id;
     uint32_t subtype;
@@ -365,7 +363,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @returns object ID or OF_OBJECT_INVALID if parse error
  */
 
-static inline of_object_id_t
+of_object_id_t
 of_message_to_object_id(of_message_t msg, int length) {
     uint8_t type;
     of_version_t ver;
@@ -471,7 +469,7 @@ extern const of_object_id_t *const of_oxm_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_oxm_to_object_id(uint32_t type_len, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -589,89 +587,6 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     ar_len = type_maps.type_array_len(type_maps.message_types, max_type_value)
     out.write(msg_template %
               dict(name="message", u_name="MESSAGE", ar_len=ar_len))
-
-def gen_type_maps_header(out):
-    """
-    Generate various header file declarations for type maps
-    @param out The file handle to write to
-    """
-
-    out.write("""
-/**
- * Generic experimenter type value.  Applies to all except
- * top level message: Action, instruction, error, stats, queue_props, oxm
- */
-#define OF_EXPERIMENTER_TYPE 0xffff
-
-int of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-""")
-    gen_type_to_obj_map_functions(out)
-
-    out.write("extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];\n")
-    out.write("extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];\n")
-
-    out.write("""
-/**
- * Map a message in a wire buffer object to its OF object id.
- * @param wbuf Pointer to a wire buffer object, populated with an OF message
- * @returns The object ID of the message
- * @returns OF_OBJECT_INVALID if unable to parse the message type
- */
-
-static inline of_object_id_t
-of_wire_object_id_get(of_wire_buffer_t *wbuf)
-{
-    of_message_t msg;
-
-    msg = (of_message_t)WBUF_BUF(wbuf);
-    return of_message_to_object_id(msg, WBUF_CURRENT_BYTES(wbuf));
-}
-
-/**
- * Use the type/length from the wire buffer and init the object
- * @param obj The object being initialized
- * @param base_object_id If > 0, this indicates the base object
- * @param max_len If > 0, the max length to expect for the obj
- * type for inheritance checking
- * @return OF_ERROR_
- *
- * Used for inheritance type objects such as actions and OXMs
- * The type is checked and if valid, the object is initialized.
- * Then the length is taken from the buffer.
- *
- * Note that the object version must already be properly set.
- */
-static inline int
-of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
-                    int max_len)
-{
-    if (obj->wire_type_get != NULL) {
-        of_object_id_t id;
-        obj->wire_type_get(obj, &id);
-        if (!of_wire_id_valid(id, base_object_id)) {
-            return OF_ERROR_PARSE;
-        }
-        obj->object_id = id;
-        /* Call the init function for this object type; do not push to wire */
-        of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);
-    }
-    if (obj->wire_length_get != NULL) {
-        int length;
-        obj->wire_length_get(obj, &length);
-        if (length < 0 || (max_len > 0 && length > max_len)) {
-            return OF_ERROR_PARSE;
-        }
-        obj->length = length;
-    } else {
-        /* @fixme Does this cover everything else? */
-        obj->length = of_object_fixed_len[obj->version][base_object_id];
-    }
-
-    return OF_ERROR_NONE;
-}
-
-""")
 
 def gen_type_data_header(out):
 

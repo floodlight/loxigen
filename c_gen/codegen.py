@@ -41,6 +41,7 @@ import util
 import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
+import c_gen.c_type_maps as c_type_maps
 
 PushWireTypesData = namedtuple('PushWireTypesData',
     ['class_name', 'versioned_type_members'])
@@ -131,3 +132,14 @@ def generate_strings(install_dir):
 def generate_init_map(install_dir):
     with template_utils.open_output(install_dir, "loci/src/loci_init_map.c") as out:
         util.render_template(out, "loci_init_map.c", classes=of_g.standard_class_order)
+
+def generate_type_maps(install_dir):
+    # Collect legacy code
+    tmp = StringIO()
+    c_type_maps.gen_type_to_obj_map_functions(tmp)
+    c_type_maps.gen_type_maps(tmp)
+    c_type_maps.gen_length_array(tmp)
+    c_type_maps.gen_extra_length_array(tmp)
+
+    with template_utils.open_output(install_dir, "loci/src/of_type_maps.c") as out:
+        util.render_template(out, "of_type_maps.c", legacy_code=tmp.getvalue())

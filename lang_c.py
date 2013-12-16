@@ -72,7 +72,6 @@ targets = {
     'loci/inc/loci/of_wire_buf.h': static,
 
     # LOCI code
-    'loci/src/of_type_data.c': c_code_gen.type_data_c_gen,
     'loci/src/of_match.c': c_code_gen.match_c_gen,
     'loci/src/loci_obj_dump.c': c_dump_gen.gen_obj_dump_c,
     'loci/src/loci_obj_show.c': c_show_gen.gen_obj_show_c,
@@ -83,7 +82,6 @@ targets = {
     'loci/src/loci_log.c': static,
     'loci/src/loci_log.h': static,
     'loci/src/of_object.c': static,
-    'loci/src/of_type_maps.c': static,
     'loci/src/of_utils.c': static,
     'loci/src/of_wire_buf.c': static,
     'loci/src/loci_setup_from_add_fns.c': static,
@@ -132,3 +130,4 @@ def generate(install_dir):
     c_gen.codegen.generate_lists(install_dir)
     c_gen.codegen.generate_strings(install_dir)
     c_gen.codegen.generate_init_map(install_dir)
+    c_gen.codegen.generate_type_maps(install_dir)
