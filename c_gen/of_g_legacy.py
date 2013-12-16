@@ -53,15 +53,6 @@ target_version_list = []
 ##
 # The dictionary of config variables related to code
 #
-# @param gen_unified_fns  Boolean; Generate top level function definitions for
-# accessors which are independent of the version; the alternative is to only
-# use the function pointers in the class definitions.  These functions support
-# better inlining optimizations.
-#
-# @param gen_fn_ptrs Boolean; Generate the functions pointed to by pointer
-# in the class (struct) definitions; the alternative is to only use the
-# unified (use_) functions
-#
 # @param use_obj_id  Use object IDs in struct defns   CURRENTLY NOT SUPPORTED
 #
 # @param return_base_types For 'get' accessors, return values when possible.
@@ -86,9 +77,6 @@ target_version_list = []
 # @fixme These are still very C specific and should probably either
 # go into lang_c.py or be swallowed by command line option parsing
 code_gen_config = dict(
-    gen_unified_fns=True,
-#    gen_fn_ptrs=True,  # WARNING: Haven't tested with this in a while
-    gen_fn_ptrs=False,
     use_obj_id=False,
     use_static_inlines=False,
     copy_semantics="read",  # Only read implemented: read, write, grow

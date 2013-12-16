@@ -431,8 +431,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
     # gen_base_types(out)
 
     gen_flow_add_setup_function_declarations(out)
-    if config_check("gen_fn_ptrs"): # Otherwise, all classes are from generic cls
-        gen_struct_definitions(out)
     out.write("""
 /****************************************************************
  *
@@ -1123,11 +1121,8 @@ def gen_struct_typedefs(out):
     for cls in of_g.standard_class_order:
         if cls in type_maps.inheritance_map:
             continue
-        if config_check("gen_fn_ptrs"):
-            out.write("typedef struct %(cls)s_s %(cls)s_t;\n" % dict(cls=cls))
-        else:
-            template = "typedef of_object_t %(cls)s_t;\n"
-            out.write(template % dict(cls=cls))
+        template = "typedef of_object_t %(cls)s_t;\n"
+        out.write(template % dict(cls=cls))
 
     out.write("""
 /****************************************************************
@@ -1248,51 +1243,6 @@ of_flow_stats_entry_setup_from_flow_add(of_flow_stats_entry_t *obj,
                                         of_flow_add_t *flow_add,
                                         of_object_t *effects);
 """)
-
-def gen_struct_definitions(out):
-    """
-    Generate the declaration of all of_ C structures
-
-    @param out The file to which to write the decs
-    """
-
-    # This should only get called if gen_fn_ptr is true in code_gen_config
-    if not config_check("gen_fn_ptrs"):
-        debug("Error: gen_struct_defs called, but no fn ptrs set")
-        return
-
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue # These are generated elsewhere
-        note = ""
-        if loxi_utils.class_is_message(cls):
-            note = " /* Class is message */"
-        out.write("struct %s_s {%s\n" % (cls, note))
-        out.write("""    /* Common members */
-%s
-    /* Class specific members */
-""" % of_g.base_object_members)
-        if loxi_utils.class_is_list(cls):
-            out.write("""
-    %(cls)s_first_f first;
-    %(cls)s_next_f next;
-    %(cls)s_append_bind_f append_bind;
-    %(cls)s_append_f append;
-};
-
-""" % {"cls": cls})
-            continue   # All done with list object
-
-        # Else, not a list instance; add accessors for all data members
-        for m_name in of_g.ordered_members[cls]:
-            if m_name in of_g.skip_members:
-                # These members (length, etc) are handled internally
-                continue
-            f_name = acc_name(cls, m_name)
-            out.write("    %s_get_f %s;\n" % (f_name, m_name + "_get"))
-            out.write("    %s_set_f %s;\n" % (f_name, m_name + "_set"))
-        out.write("};\n\n")
-
 
 ################################################################
 #
@@ -2031,21 +1981,6 @@ def del_function_proto(cls):
     return fn
 
 
-def instantiate_fn_ptrs(cls, ilvl, out):
-    """
-    Generate the C code to instantiate function pointers for a class
-    @param cls The class name
-    @param ilvl The base indentation level
-    @param out The file to which to write the functions
-    """
-    for m_name in of_g.ordered_members[cls]:
-        if m_name in of_g.skip_members:
-            continue
-        out.write(" " * ilvl + "obj->%s_get = %s_%s_get;\n" %
-                  (m_name, cls, m_name))
-        out.write(" " * ilvl + "obj->%s_set = %s_%s_set;\n" %
-                  (m_name, cls, m_name))
-
 ################################################################
 # Routines to generate the body of new/delete functions
 ################################################################
@@ -2541,17 +2476,6 @@ def gen_coerce_ops(out, cls):
     obj->wire_length_get = of_meter_stats_wire_length_get;
     obj->wire_length_set = of_meter_stats_wire_length_set;
 """)
-
-    if config_check("gen_fn_ptrs"):
-        if loxi_utils.class_is_list(cls):
-            out.write("""
-    obj->first = %(cls)s_first;
-    obj->next = %(cls)s_next;
-    obj->append = %(cls)s_append;
-    obj->append_bind = %(cls)s_append_bind;
-""" % dict(cls=cls))
-        else:
-            instantiate_fn_ptrs(cls, 4, out)
 
 def gen_new_function_definitions(out, cls):
     """

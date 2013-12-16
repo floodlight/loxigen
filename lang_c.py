@@ -149,17 +149,9 @@ def config_sanity_check():
     if config_check("get_returns") != "error":
         debug("Only 'error' is supported for get-accessor return types\m");
         rv = False
-    if not config_check("use_fn_ptrs") and not config_check("gen_unified_fns"):
-        debug("Must have gen_fn_ptrs and/or gen_unified_fns set in config")
-        rv = False
     if config_check("use_obj_id"):
         debug("use_obj_id is set but not yet supported (change \
 config_sanity_check if it is)")
-        rv = False
-    if config_check("gen_unified_macros") and config_check("gen_unified_fns") \
-            and config_check("gen_unified_macro_lower"):
-        debug("Conflict: Cannot generate unified functions and lower case \
-unified macros")
         rv = False
 
     return rv
