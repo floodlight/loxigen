@@ -59,7 +59,7 @@ def gen_push_wire_types(install_dir):
                         # Special case for version
                         pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, "obj->version"))
                     else:
-                        pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, m.value))
+                        pwtms.append(PushWireTypesMember(m.name, m.offset, m.length, hex(m.value)))
             type_members_by_version[version] = pwtms
 
         # Merge versions with identical type members
