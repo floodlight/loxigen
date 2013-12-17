@@ -112,66 +112,6 @@ local of_oxm_dissectors = {
 :: #endfor
 }
 
-local of_action_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_action_v${version.wire_version},
-:: #endfor
-}
-
-local of_instruction_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_instruction_v${version.wire_version},
-:: #endfor
-}
-
-local of_bucket_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_bucket_v${version.wire_version},
-:: #endfor
-}
-
-local of_port_desc_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_port_desc_v${version.wire_version},
-:: #endfor
-}
-
-local of_stats_reply_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_stats_reply_v${version.wire_version},
-:: #endfor
-}
-
-local of_stats_request_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_stats_request_v${version.wire_version},
-:: #endfor
-}
-
-local of_flow_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_flow_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_port_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_port_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_table_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_table_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_queue_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_queue_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
 :: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
