@@ -121,3 +121,16 @@ function read_of_oxm_t(reader, version, subtree, field_name)
     local info = of_oxm_dissectors[version](reader, child_subtree)
     child_subtree:set_text(info)
 end
+
+function read_list(reader, dissector, subtree, field_name)
+    if not reader.is_empty() then
+        local list_subtree = subtree:add(field_name .. " list", reader.peek_all(0))
+        while not reader.is_empty() do
+            local atom_subtree = list_subtree:add(field_name, reader.peek_all(0))
+            local info = dissector(reader, atom_subtree)
+            atom_subtree:set_text(info)
+        end
+    else
+        return
+    end
+end
