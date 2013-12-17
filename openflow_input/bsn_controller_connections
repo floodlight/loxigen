@@ -28,16 +28,22 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-// Backport the OpenFlow 1.4 role status message
+// Retrieve a list of configured controller connections and their status.
+// When auxiliary connections are used there may be multiple connections
+// to the same controller. All connections to a given controller will
+// share the same role (so there may be multiple master connections in
+// the list).
+
+// The URIs are of the form tcp://1.2.3.4:6553
 
 #version 4
 
-enum ofp_bsn_connection_state(wire_type=uint8_t) {
-    OFP_BSN_CONNECTION_STATE_DISCONNECTED = 0,
-    OFP_BSN_CONNECTION_STATE_CONNECTED = 1,
+enum ofp_bsn_controller_connection_state(wire_type=uint8_t) {
+    OFP_BSN_CONTROLLER_CONNECTION_STATE_DISCONNECTED = 0,
+    OFP_BSN_CONTROLLER_CONNECTION_STATE_CONNECTED = 1,
 };
 
-struct of_bsn_connections_request : of_bsn_header {
+struct of_bsn_controller_connections_request : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
@@ -46,20 +52,20 @@ struct of_bsn_connections_request : of_bsn_header {
     uint32_t subtype == 56;
 };
 
-struct of_bsn_connection {
-    enum ofp_bsn_connection_state state;
+struct of_bsn_controller_connection {
+    enum ofp_bsn_controller_connection_state state;
     uint8_t auxiliary_id;
     pad(2);
     enum ofp_controller_role role;
     of_desc_str_t uri;
 };
 
-struct of_bsn_connections_reply : of_bsn_header {
+struct of_bsn_controller_connections_reply : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 57;
-    list(of_bsn_connection_t) connections;
+    list(of_bsn_controller_connection_t) connections;
 };
