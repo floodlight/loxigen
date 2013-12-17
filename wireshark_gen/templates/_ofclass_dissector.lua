@@ -39,7 +39,7 @@
 -- Discriminator is ${ofclass.discriminator.name}
 :: #endif
 function ${name}(reader, subtree)
-:: field = "false"
+:: field_length_members = []
 :: if ofclass.virtual:
     return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
 :: else:
@@ -54,15 +54,15 @@ function ${name}(reader, subtree)
 :: continue
 :: #endif
 :: if isinstance(m, OFFieldLengthMember):
-    local _list_length = reader.peek(0, ${m.base_length}):uint()
-:: field = "true"
+    local _${m.field_name}_length = reader.peek(0, ${m.base_length}):uint()
+:: field_length_members.append(m.field_name)
 :: #endif
 :: if m.oftype.startswith("list"):
 :: class_name = m.oftype.replace('_t)', '').replace('(', '').replace('list', '')
-:: if field == "true" :
-    read_list(reader.slice(_list_length), dissect_${class_name}_v${version.wire_version}, subtree, "${class_name}")
+:: if m.name in field_length_members:
+    read_list(reader.slice(_${m.name}_length), dissect_${class_name}_v${version.wire_version}, subtree, '${class_name}')
 :: else:
-    read_list(reader, dissect_${class_name}_v${version.wire_version}, subtree, "${class_name}")
+    read_list(reader, dissect_${class_name}_v${version.wire_version}, subtree, '${class_name}')
 :: #endif
 :: if ofclass.has_external_alignment:
     orig_reader.skip_align()
