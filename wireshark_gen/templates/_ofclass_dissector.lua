@@ -43,44 +43,34 @@ function ${name}(reader, subtree)
 :: if ofclass.virtual:
     return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
 :: else:
-:: r_name = "reader"
 :: if not ofclass.is_fixed_length:
-    local packet_length = ${r_name}.peek(${ofclass.message_length.offset}, ${ofclass.message_length.base_length}):uint()
-    local packet_reader = ${r_name}.slice(packet_length)
-:: r_name = "packet_reader"
+    local _length = reader.peek(${ofclass.length_member.offset}, ${ofclass.length_member.base_length}):uint()
+    local orig_reader = reader
+    reader = orig_reader.slice(_length)
 :: #endif
 :: for m in ofclass.members:
 :: if isinstance(m, OFPadMember):
-    ${r_name}.skip(${m.length})
+    reader.skip(${m.length})
 :: continue
 :: #endif
 :: if isinstance(m, OFFieldLengthMember):
-    local field_length = ${r_name}.read(${m.base_length}):uint()
-    local field_reader = ${r_name}.slice(field_length)
+    local _list_length = reader.peek(0, ${m.base_length}):uint()
 :: field = "true"
-:: continue
 :: #endif
 :: if m.oftype.startswith("list"):
 :: class_name = m.oftype.replace('_t)', '').replace('(', '').replace('list', '')
-:: if field == "true":
-:: r_name = "field_reader"
+:: if field == "true" :
+    read_list(reader.slice(_list_length), dissect_${class_name}_v${version.wire_version}, subtree, "${class_name}")
+:: else:
+    read_list(reader, dissect_${class_name}_v${version.wire_version}, subtree, "${class_name}")
 :: #endif
-    if not ${r_name}.is_empty() then
-        local field_subtree = subtree:add("${class_name} list", ${r_name}.peek_all(0))
-        while not ${r_name}.is_empty() do
-            local atom_subtree = field_subtree:add("${class_name}", ${r_name}.peek_all(0))
-            local info = dissect_${class_name}_v${version.wire_version}(${r_name}, atom_subtree)
-            atom_subtree:set_text(info)
-        end
-    end
-:: r_name = "packet_reader"
 :: if ofclass.has_external_alignment:
-    reader.skip_align()
+    orig_reader.skip_align()
 :: #endif
 :: else:
 :: field_name = make_field_name(version, ofclass.name, m.name)
 :: reader_name = get_reader(version, ofclass, m)
-    ${reader_name}(${r_name}, ${version.wire_version}, subtree, '${field_name}')
+    ${reader_name}(reader, ${version.wire_version}, subtree, '${field_name}')
 :: #endif
 :: #endfor
     return '${ofclass.name}'
