@@ -113,6 +113,15 @@ function read_of_serial_num_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 32)
 end
 
+function read_of_port_desc_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    local info = of_port_desc_dissectors[version](reader, child_subtree)
+    child_subtree:set_text(info)
+end
+
 function read_of_oxm_t(reader, version, subtree, field_name)
     if reader.is_empty() then
         return
