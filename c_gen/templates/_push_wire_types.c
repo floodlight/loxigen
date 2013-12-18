@@ -25,29 +25,29 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: include('_copyright.c')
-
-#if !defined(_LOCI_LOG_H_)
-#define _LOCI_LOG_H_
-
-/* g++ requires this to pick up PRI, etc.
- * See  http://gcc.gnu.org/ml/gcc-help/2006-10/msg00223.html
- */
-#if !defined(__STDC_FORMAT_MACROS)
-#define __STDC_FORMAT_MACROS
-#endif
-#include <inttypes.h>
-
-/**
- * Per level log macros.  printf semantics
- */
-
-#define LOCI_LOG_COMMON(level, ...) loci_logger(level, __func__, __FILE__, __LINE__, __VA_ARGS__)
-#define LOCI_LOG_TRACE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define LOCI_LOG_VERBOSE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_VERBOSE, __VA_ARGS__)
-#define LOCI_LOG_INFO(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_INFO, __VA_ARGS__)
-#define LOCI_LOG_WARN(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_WARN, __VA_ARGS__)
-#define LOCI_LOG_ERROR(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define LOCI_LOG_MSG(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_MSG, __VA_ARGS__)
-
-#endif /* _LOCI_LOG_H_ */
+static void
+${data.class_name}_push_wire_types(of_object_t *obj)
+{
+    unsigned char *buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+    switch (obj->version) {
+:: for ms, versions in data.versioned_type_members:
+:: for version in versions:
+    case ${version.constant_version(prefix='OF_VERSION_')}:
+:: #endfor
+:: for m in ms:
+:: if m.length == 1:
+        *(uint8_t *)(buf + ${m.offset}) = ${m.value}; /* ${m.name} */
+:: elif m.length == 2:
+        *(uint16_t *)(buf + ${m.offset}) = htobe16(${m.value}); /* ${m.name} */
+:: elif m.length == 4:
+        *(uint32_t *)(buf + ${m.offset}) = htobe32(${m.value}); /* ${m.name} */
+:: else:
+:: raise("unsupported push_wire_types length %d" % m.length)
+:: #endif
+:: #endfor
+        break;
+:: #endfor
+    default:
+        UNREACHABLE();
+    }
+}

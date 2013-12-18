@@ -40,6 +40,8 @@
 #define OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET 4
 #define OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET 8
 
+${legacy_code}
+
 /****************************************************************
  * Top level OpenFlow message length functions
  ****************************************************************/
