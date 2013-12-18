@@ -26,58 +26,12 @@
 :: # under the EPL.
 ::
 :: include('_copyright.c')
+:: include('_pragmas.c')
 
-/****************************************************************
- *
- * Functions for each concrete class that set the type fields
- *
- ****************************************************************/
+#include "loci_log.h"
+#include "loci_int.h"
 
-#include <loci/loci.h>
-#include <loci/of_message.h>
-#include <endian.h>
+:: if push_wire_types_data:
+:: include("_push_wire_types.c", data=push_wire_types_data)
 
-#ifdef __GNUC__
-#define UNREACHABLE() __builtin_unreachable()
-#else
-#define UNREACHABLE()
-#endif
-
-/*
- * In a separate function to give the compiler the choice of whether to inline.
- */
-static unsigned char *
-loci_object_to_buffer(of_object_t *obj)
-{
-    return OF_OBJECT_BUFFER_INDEX(obj, 0);
-}
-
-:: for fn in fns:
-
-void
-${fn.class_name}_push_wire_types(of_object_t *obj)
-{
-    unsigned char *buf = loci_object_to_buffer(obj);
-    switch (obj->version) {
-:: for ms, versions in fn.versioned_type_members:
-:: for version in versions:
-    case ${version.constant_version(prefix='OF_VERSION_')}:
-:: #endfor
-:: for m in ms:
-:: if m.length == 1:
-        *(uint8_t *)(buf + ${m.offset}) = ${m.value}; /* ${m.name} */
-:: elif m.length == 2:
-        *(uint16_t *)(buf + ${m.offset}) = htobe16(${m.value}); /* ${m.name} */
-:: elif m.length == 4:
-        *(uint32_t *)(buf + ${m.offset}) = htobe32(${m.value}); /* ${m.name} */
-:: else:
-:: raise("unsupported push_wire_types length %d" % m.length)
 :: #endif
-:: #endfor
-        break;
-:: #endfor
-    default:
-        UNREACHABLE();
-    }
-}
-:: #endfor

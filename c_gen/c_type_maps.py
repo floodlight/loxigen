@@ -39,137 +39,6 @@ import c_gen.type_maps as type_maps
 # reserved values like 0xffff
 max_type_value = 1000
 
-def gen_object_id_to_type(out):
-    out.write("""
-/**
- * Map from object ID to primary wire type
- *
- * For messages, this is the header type; in particular for stats, this is
- * the common stats request/response type.  For per-stats types, use the
- * stats type map.  For things like actions, instructions or queue-props,
- * this gives the "sub type".
- */
-""")
-    for version in of_g.of_version_range:
-        out.write("static const int\nof_object_to_type_map_v%d[OF_OBJECT_COUNT] = {\n"
-                  %version)
-        out.write("    -1, /* of_object, not a valid specific type */\n")
-        for j, cls in enumerate(of_g.all_class_order):
-            comma = ""
-            if j < len(of_g.all_class_order) - 1: # Avoid ultimate comma
-                comma = ","
-
-            if cls in type_maps.stats_reply_list:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_stats_reply", version)],
-                           comma, cls))
-            elif cls in type_maps.stats_request_list:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_stats_request", version)],
-                           comma, cls))
-            elif cls in type_maps.error_msg_list:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_error_msg", version)],
-                           comma, cls))
-            elif cls in type_maps.flow_mod_list:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_flow_mod", version)],
-                           comma, cls))
-            elif cls in type_maps.group_mod_list and version > 1:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_group_mod", version)],
-                           comma, cls))
-            elif (cls, version) in type_maps.type_val and \
-                    type_maps.type_val[(cls, version)] != type_maps.invalid_type:
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[(cls, version)], comma, cls))
-            elif type_maps.message_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_experimenter", version)],
-                           comma, cls))
-            elif type_maps.action_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_action_experimenter",
-                                               version)],
-                           comma, cls))
-            elif type_maps.action_id_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_action_id_experimenter",
-                                               version)],
-                           comma, cls))
-            elif type_maps.instruction_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_instruction_experimenter",
-                                               version)],
-                           comma, cls))
-            elif type_maps.queue_prop_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                          (type_maps.type_val[("of_queue_prop_experimenter",
-                                               version)],
-                           comma, cls))
-            elif type_maps.table_feature_prop_is_extension(cls, version):
-                out.write("    %d%s /* %s */\n" %
-                    (type_maps.type_val[("of_table_feature_prop_experimenter",
-                                         version)],
-                     comma, cls))
-            else:
-                out.write("    -1%s /* %s (invalid) */\n" % (comma, cls))
-        out.write("};\n\n")
-
-    out.write("""
-/**
- * Unified map, indexed by wire version which is 1-based.
- */
-const int *const of_object_to_type_map[OF_VERSION_ARRAY_MAX] = {
-    NULL,
-""")
-    for version in of_g.of_version_range:
-        out.write("    of_object_to_type_map_v%d,\n" % version)
-    out.write("""
-};
-""")
-
-def gen_object_id_to_extension_data(out):
-    out.write("""
-/**
- * Extension data.
- * @fixme There must be a better way to represent this data
- */
-""")
-    for version in of_g.of_version_range:
-        out.write("""
-static const of_experimenter_data_t
-of_object_to_extension_data_v%d[OF_OBJECT_COUNT] = {
-""" % version)
-        out.write("    {0, 0, 0}, /* of_object, not a valid specific type */\n")
-        for j, cls in enumerate(of_g.all_class_order):
-            comma = ""
-            if j < len(of_g.all_class_order) - 1: # Avoid ultimate comma
-                comma = ","
-
-            if type_maps.class_is_extension(cls, version):
-                exp_name = type_maps.extension_to_experimenter_macro_name(cls)
-                subtype = type_maps.extension_to_subtype(cls, version)
-                out.write("    {1, %s, %d}%s /* %s */\n" %
-                          (exp_name, subtype, comma, cls))
-            else:
-                out.write("    {0, 0, 0}%s /* %s (non-extension) */\n" %
-                          (comma, cls))
-        out.write("};\n\n")
-
-    out.write("""
-/**
- * Unified map, indexed by wire version which is 1-based.
- */
-const of_experimenter_data_t *const of_object_to_extension_data[OF_VERSION_ARRAY_MAX] = {
-    NULL,
-""")
-    for version in of_g.of_version_range:
-        out.write("    of_object_to_extension_data_v%d,\n" % version)
-    out.write("""
-};
-""")
-
 def gen_type_to_object_id(out, type_str, prefix, template,
                           value_array, max_val):
     """
@@ -236,8 +105,6 @@ def gen_type_maps(out):
     @param out The file handle to write to
     """
 
-    out.write("#include <loci/loci.h>\n\n")
-
     # Generate maps from wire type values to object IDs
     gen_type_to_object_id(out, "error_msg_type_to_id", "OF_ERROR_MSG",
                           "OF_%s_ERROR_MSG", type_maps.error_types,
@@ -284,15 +151,9 @@ def gen_type_maps(out):
     gen_type_to_object_id(out, "message_type_to_id", "OF_MESSAGE",
                           "OF_%s", type_maps.message_types, max_type_value)
 
-    gen_object_id_to_type(out)
-    gen_object_id_to_extension_data(out)
-    # Don't need array mapping ID to stats types right now; handled directly
-    # gen_object_id_to_stats_type(out)
-
-
 def gen_type_to_obj_map_functions(out):
     """
-    Generate the templated static inline type map functions
+    Generate the templated type map functions
     @param out The file handle to write to
     """
 
@@ -317,7 +178,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -348,7 +209,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -383,7 +244,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_%(name)s_to_object_id(int %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -418,7 +279,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_error_msg_to_object_id(uint16_t %(name)s, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -452,7 +313,7 @@ of_error_msg_to_object_id(uint16_t %(name)s, of_version_t version)
  * @todo put OF_EXPERIMENTER_<name> in loci_base.h
  */
 
-static inline of_object_id_t
+of_object_id_t
 of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
     uint32_t experimenter_id;
     uint32_t subtype;
@@ -502,7 +363,7 @@ extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
  * @returns object ID or OF_OBJECT_INVALID if parse error
  */
 
-static inline of_object_id_t
+of_object_id_t
 of_message_to_object_id(of_message_t msg, int length) {
     uint8_t type;
     of_version_t ver;
@@ -608,7 +469,7 @@ extern const of_object_id_t *const of_oxm_type_to_id[OF_VERSION_ARRAY_MAX];
  * @return OF_OBJECT_INVALID if type does not map to an object
  *
  */
-static inline of_object_id_t
+of_object_id_t
 of_oxm_to_object_id(uint32_t type_len, of_version_t version)
 {
     if (!OF_VERSION_OKAY(version)) {
@@ -726,373 +587,6 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     ar_len = type_maps.type_array_len(type_maps.message_types, max_type_value)
     out.write(msg_template %
               dict(name="message", u_name="MESSAGE", ar_len=ar_len))
-
-def gen_obj_to_type_map_functions(out):
-    """
-    Generate the static line maps from object IDs to types
-    @param out The file handle to write to
-    """
-
-    ################################################################
-    # Generate object ID to primary type map
-    ################################################################
-
-    out.write("""
-extern const int *const of_object_to_type_map[OF_VERSION_ARRAY_MAX];
-
-/**
- * Map an object ID to its primary wire type value
- * @param id An object ID
- * @return For message objects, the type value in the OpenFlow header
- * @return For non-message objects such as actions, instructions, OXMs
- * returns the type value that appears in the respective sub-header
- * @return -1 For improper version or out of bounds input
- *
- * NOTE that for stats request/reply, returns the header type, not the
- * sub-type
- *
- * Also, note that the value is returned as a signed integer.  So -1 is
- * an error code, while 0xffff is the usual "experimenter" code.
- */
-static inline int
-of_object_to_wire_type(of_object_id_t id, of_version_t version)
-{
-    if (!OF_VERSION_OKAY(version)) {
-        return -1;
-    }
-    if (id < 0 || id >= OF_OBJECT_COUNT) {
-        return -1;
-    }
-    return of_object_to_type_map[version][id];
-}
-
-""")
-
-    # Now for experimenter ids
-    out.write("""
-/**
- * Map from object ID to a triple, (is_extension, experimenter id, subtype)
- */
-""")
-    out.write("""
-typedef struct of_experimenter_data_s {
-    int is_extension;  /* Boolean indication that this is an extension */
-    uint32_t experimenter_id;
-    uint32_t subtype;
-} of_experimenter_data_t;
-
-""")
-
-    out.write("""
-extern const of_experimenter_data_t *const of_object_to_extension_data[OF_VERSION_ARRAY_MAX];
-
-/**
- * Map from the object ID of an extension to the experimenter ID
- */
-static inline uint32_t
-of_extension_to_experimenter_id(of_object_id_t obj_id, of_version_t ver)
-{
-    if (obj_id < 0 || obj_id > OF_OBJECT_COUNT) {
-        return (uint32_t) -1;
-    }
-    /* @fixme: Verify ver? */
-    return of_object_to_extension_data[ver][obj_id].experimenter_id;
-}
-
-/**
- * Map from the object ID of an extension to the experimenter subtype
- */
-static inline uint32_t
-of_extension_to_experimenter_subtype(of_object_id_t obj_id, of_version_t ver)
-{
-    if (obj_id < 0 || obj_id > OF_OBJECT_COUNT) {
-        return (uint32_t) -1;
-    }
-    /* @fixme: Verify ver? */
-    return of_object_to_extension_data[ver][obj_id].subtype;
-}
-
-/**
- * Boolean function indicating the the given object ID/version
- * is recognized as a supported (decode-able) extension.
- */
-static inline int
-of_object_id_is_extension(of_object_id_t obj_id, of_version_t ver)
-{
-    if (obj_id < 0 || obj_id > OF_OBJECT_COUNT) {
-        return (uint32_t) -1;
-    }
-    /* @fixme: Verify ver? */
-    return of_object_to_extension_data[ver][obj_id].is_extension;
-}
-""")
-
-    ################################################################
-    # Generate object ID to the stats sub-type map
-    ################################################################
-
-    out.write("""
-/**
- * Map an object ID to a stats type
- * @param id An object ID
- * @return The wire value for the stats type
- * @return -1 if not supported for this version
- * @return -1 if id is not a specific stats type ID
- *
- * Note that the value is returned as a signed integer.  So -1 is
- * an error code, while 0xffff is the usual "experimenter" code.
- */
-
-static inline int
-of_object_to_stats_type(of_object_id_t id, of_version_t version)
-{
-    if (!OF_VERSION_OKAY(version)) {
-        return -1;
-    }
-    switch (id) {
-""")
-    # Assumes 1.2 contains all stats types and type values are
-    # the same across all versions
-    stats_names = dict()
-    for ver in of_g.of_version_range:
-        for name, value in type_maps.stats_types[ver].items():
-            if name in stats_names and (not value == stats_names[name]):
-                print "ERROR stats type differ violating assumption"
-                sys.exit(1)
-            stats_names[name] = value
-
-    for name, value in stats_names.items():
-        out.write("    case OF_%s_STATS_REPLY:\n" % name.upper())
-        out.write("    case OF_%s_STATS_REQUEST:\n" % name.upper())
-        for version in of_g.of_version_range:
-            if not name in type_maps.stats_types[version]:
-                out.write("        if (version == %s) break;\n" %
-                          of_g.of_version_wire2name[version])
-        out.write("        return %d;\n" % value)
-    out.write("""
-    default:
-        break;
-    }
-    return -1; /* Not recognized as stats type object for this version */
-}
-""")
-
-    ################################################################
-    # Generate object ID to the error sub-type map
-    ################################################################
-    out.write("""
-/**
- * Map an object ID to an error type
- * @param id An object ID
- * @return The wire value for the error type
- * @return -1 if not supported for this version
- * @return -1 if id is not a specific error type ID
- *
- * Note that the value is returned as a signed integer.  So -1 is
- * an error code, while 0xffff is the usual "experimenter" code.
- */
-
-static inline int
-of_object_to_error_type(of_object_id_t id, of_version_t version)
-{
-    if (!OF_VERSION_OKAY(version)) {
-        return -1;
-    }
-    switch (id) {""")
-    error_names = set()
-    for ver in of_g.of_version_range:
-        for name in type_maps.error_types[ver]:
-            error_names.add(name)
-    for name in error_names:
-        out.write("""
-    case OF_%(name)s_ERROR_MSG:
-        if (OF_ERROR_TYPE_%(name)s_SUPPORTED(version))
-            return OF_ERROR_TYPE_%(name)s_BY_VERSION(version);
-        break;""" % {"name": name.upper()})
-    out.write("""
-    default:
-        break;
-    }
-    return -1; /* Not recognized as error type object for this version */
-}
-""")
-
-    ################################################################
-    # Generate object ID to the flow mod sub-type map
-    ################################################################
-
-    out.write("""
-/**
- * Map an object ID to a flow-mod command value
- * @param id An object ID
- * @return The wire value for the flow-mod command
- * @return -1 if not supported for this version
- * @return -1 if id is not a specific stats type ID
- *
- * Note that the value is returned as a signed integer.  So -1 is
- * an error code, while 0xffff is the usual "experimenter" code.
- */
-
-static inline int
-of_object_to_flow_mod_command(of_object_id_t id, of_version_t version)
-{
-    if (!OF_VERSION_OKAY(version)) {
-        return -1;
-    }
-    switch (id) {
-""")
-    # Assumes 1.2 contains all stats types and type values are
-    # the same across all versions
-    flow_mod_names = dict()
-    for ver in of_g.of_version_range:
-        for name, value in type_maps.flow_mod_types[ver].items():
-            if name in flow_mod_names and \
-                    (not value == flow_mod_names[name]):
-                print "ERROR flow mod command differ violating assumption"
-                sys.exit(1)
-            flow_mod_names[name] = value
-
-    for name, value in flow_mod_names.items():
-        out.write("    case OF_FLOW_%s:\n" % name.upper())
-        for version in of_g.of_version_range:
-            if not name in type_maps.flow_mod_types[version]:
-                out.write("        if (version == %s) break;\n" %
-                          of_g.of_version_wire2name[version])
-        out.write("        return %d;\n" % value)
-    out.write("""
-    default:
-        break;
-    }
-    return -1; /* Not recognized as flow mod type object for this version */
-}
-
-""")
-
-    ################################################################
-    # Generate object ID to the group mod sub-type map
-    ################################################################
-
-    out.write("""
-/**
- * Map an object ID to a group-mod command value
- * @param id An object ID
- * @return The wire value for the group-mod command
- * @return -1 if not supported for this version
- * @return -1 if id is not a specific stats type ID
- *
- * Note that the value is returned as a signed integer.  So -1 is
- * an error code, while 0xffff is the usual "experimenter" code.
- */
-
-static inline int
-of_object_to_group_mod_command(of_object_id_t id, of_version_t version)
-{
-    if (!OF_VERSION_OKAY(version)) {
-        return -1;
-    }
-    switch (id) {""")
-    group_mod_names = set()
-    for ver in of_g.of_version_range:
-        for name in type_maps.group_mod_types[ver]:
-            group_mod_names.add(name)
-    for name in group_mod_names:
-        out.write("""
-    case OF_GROUP_%(name)s:
-        if (OF_GROUP_MOD_COMMAND_%(name)s_SUPPORTED(version))
-            return OF_GROUP_MOD_COMMAND_%(name)s_BY_VERSION(version);
-        break;""" % {"name": name.upper()})
-    out.write("""
-    default:
-        break;
-    }
-    return -1; /* Not recognized as group mod type object for this version */
-}
-
-""")
-
-def gen_type_maps_header(out):
-    """
-    Generate various header file declarations for type maps
-    @param out The file handle to write to
-    """
-
-    out.write("""
-/**
- * Generic experimenter type value.  Applies to all except
- * top level message: Action, instruction, error, stats, queue_props, oxm
- */
-#define OF_EXPERIMENTER_TYPE 0xffff
-
-int of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-""")
-    gen_type_to_obj_map_functions(out)
-    gen_obj_to_type_map_functions(out)
-
-    out.write("extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];\n")
-    out.write("extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];\n")
-
-    out.write("""
-/**
- * Map a message in a wire buffer object to its OF object id.
- * @param wbuf Pointer to a wire buffer object, populated with an OF message
- * @returns The object ID of the message
- * @returns OF_OBJECT_INVALID if unable to parse the message type
- */
-
-static inline of_object_id_t
-of_wire_object_id_get(of_wire_buffer_t *wbuf)
-{
-    of_message_t msg;
-
-    msg = (of_message_t)WBUF_BUF(wbuf);
-    return of_message_to_object_id(msg, WBUF_CURRENT_BYTES(wbuf));
-}
-
-/**
- * Use the type/length from the wire buffer and init the object
- * @param obj The object being initialized
- * @param base_object_id If > 0, this indicates the base object
- * @param max_len If > 0, the max length to expect for the obj
- * type for inheritance checking
- * @return OF_ERROR_
- *
- * Used for inheritance type objects such as actions and OXMs
- * The type is checked and if valid, the object is initialized.
- * Then the length is taken from the buffer.
- *
- * Note that the object version must already be properly set.
- */
-static inline int
-of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
-                    int max_len)
-{
-    if (obj->wire_type_get != NULL) {
-        of_object_id_t id;
-        obj->wire_type_get(obj, &id);
-        if (!of_wire_id_valid(id, base_object_id)) {
-            return OF_ERROR_PARSE;
-        }
-        obj->object_id = id;
-        /* Call the init function for this object type; do not push to wire */
-        of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);
-    }
-    if (obj->wire_length_get != NULL) {
-        int length;
-        obj->wire_length_get(obj, &length);
-        if (length < 0 || (max_len > 0 && length > max_len)) {
-            return OF_ERROR_PARSE;
-        }
-        obj->length = length;
-    } else {
-        /* @fixme Does this cover everything else? */
-        obj->length = of_object_fixed_len[obj->version][base_object_id];
-    }
-
-    return OF_ERROR_NONE;
-}
-
-""")
 
 def gen_type_data_header(out):
 
@@ -1281,45 +775,3 @@ const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX] = {
     out.write("""
 };
 """)
-
-
-################################################################
-################################################################
-
-# THIS IS PROBABLY NOT NEEDED AND MAY NOT BE CALLED CURRENTLY
-def gen_object_id_to_stats_type(out):
-    out.write("""
-/**
- * Map from message object ID to stats type
- *
- * All message object IDs are mapped for simplicity
- */
-""")
-    for version in of_g.of_version_range:
-        out.write("const int *of_object_to_stats_type_map_v%d = {\n" % (i+1))
-        out.write("    -1, /* of_object (invalid) */\n");
-        for cls in of_g.ordered_messages:
-            name = cls[3:]
-            name = name[:name.find("_stats")]
-            if (((cls in type_maps.stats_reply_list) or
-                 (cls in type_maps.stats_request_list)) and
-                name in type_maps.stats_types[i]):
-                out.write("    %d, /* %s */\n" %
-                          (type_maps.stats_types[i][name], cls))
-            else:
-                out.write("    -1, /* %s (invalid) */\n" % cls)
-        out.write("};\n\n")
-
-    out.write("""
-/**
- * Unified map, indexed by wire version which is 1-based.
- */
-const int *of_object_to_stats_type_map[OF_VERSION_ARRAY_MAX] = {
-    NULL,
-""")
-    for version in of_g.of_version_range:
-        out.write("    of_object_to_stats_type_map_v%d,\n" % version)
-    out.write("""
-};
-""")
-

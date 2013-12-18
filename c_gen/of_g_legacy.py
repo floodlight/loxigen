@@ -53,15 +53,6 @@ target_version_list = []
 ##
 # The dictionary of config variables related to code
 #
-# @param gen_unified_fns  Boolean; Generate top level function definitions for
-# accessors which are independent of the version; the alternative is to only
-# use the function pointers in the class definitions.  These functions support
-# better inlining optimizations.
-#
-# @param gen_fn_ptrs Boolean; Generate the functions pointed to by pointer
-# in the class (struct) definitions; the alternative is to only use the
-# unified (use_) functions
-#
 # @param use_obj_id  Use object IDs in struct defns   CURRENTLY NOT SUPPORTED
 #
 # @param return_base_types For 'get' accessors, return values when possible.
@@ -82,19 +73,6 @@ target_version_list = []
 # value when possible or void if not.  "void" means always return void
 # and use a call-by-variable parameter
 #
-
-# @fixme These are still very C specific and should probably either
-# go into lang_c.py or be swallowed by command line option parsing
-code_gen_config = dict(
-    gen_unified_fns=True,
-#    gen_fn_ptrs=True,  # WARNING: Haven't tested with this in a while
-    gen_fn_ptrs=False,
-    use_obj_id=False,
-    use_static_inlines=False,
-    copy_semantics="read",  # Only read implemented: read, write, grow
-    encoded_typedefs=False,
-    get_returns="error",   # Only error implemented; error, value, void
-)
 
 ## These members do not get normal accessors
 
@@ -235,46 +213,6 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                    "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t"]
-
-base_object_members = """\
-    /* The control block for the underlying data buffer */
-    of_wire_object_t wire_object;
-    /* The LOCI type enum value of the object */
-    of_object_id_t object_id;
-
-    /*
-     * Objects need to track their "parent" so that updates to the
-     * object that affect its length can be pushed to the parent.
-     * Treat as private.
-     */
-    of_object_t *parent;
-
-    /*
-     * Not all objects have length and version on the wire so we keep
-     * them here.  NOTE: Infrastructure manages length and version.
-     * Treat length as private and version as read only.
-     */
-    int length;
-    of_version_t version;
-
-    /*
-     * Many objects have a length and/or type represented in the wire buffer
-     * These accessors get and set those value when present.  Treat as private.
-     */
-    of_wire_length_get_f wire_length_get;
-    of_wire_length_set_f wire_length_set;
-    of_wire_type_get_f wire_type_get;
-    of_wire_type_set_f wire_type_set;
-
-    of_object_track_info_t track_info;
-
-    /*
-     * Metadata available for applications.  Ensure 8-byte alignment, but
-     * that buffer is at least as large as requested.  This data is not used
-     * or inspected by LOCI.
-     */
-    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
-"""
 
 ##
 # LOXI identifiers

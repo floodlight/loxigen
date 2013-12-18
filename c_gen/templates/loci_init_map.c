@@ -24,30 +24,18 @@
 :: # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
-::
 :: include('_copyright.c')
-
-#if !defined(_LOCI_LOG_H_)
-#define _LOCI_LOG_H_
-
-/* g++ requires this to pick up PRI, etc.
- * See  http://gcc.gnu.org/ml/gcc-help/2006-10/msg00223.html
- */
-#if !defined(__STDC_FORMAT_MACROS)
-#define __STDC_FORMAT_MACROS
-#endif
-#include <inttypes.h>
+#include <loci/loci.h>
+#include <loci/of_object.h>
+#include "loci_log.h"
+#include "loci_int.h"
 
 /**
- * Per level log macros.  printf semantics
+ * Map from object ID to type coerce function
  */
-
-#define LOCI_LOG_COMMON(level, ...) loci_logger(level, __func__, __FILE__, __LINE__, __VA_ARGS__)
-#define LOCI_LOG_TRACE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define LOCI_LOG_VERBOSE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_VERBOSE, __VA_ARGS__)
-#define LOCI_LOG_INFO(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_INFO, __VA_ARGS__)
-#define LOCI_LOG_WARN(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_WARN, __VA_ARGS__)
-#define LOCI_LOG_ERROR(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define LOCI_LOG_MSG(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_MSG, __VA_ARGS__)
-
-#endif /* _LOCI_LOG_H_ */
+const of_object_init_f of_object_init_map[] = {
+    (of_object_init_f)NULL,
+:: for cls in classes:
+    (of_object_init_f)${cls}_init,
+:: #endfor
+};

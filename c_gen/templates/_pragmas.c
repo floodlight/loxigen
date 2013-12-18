@@ -25,29 +25,26 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: include('_copyright.c')
+#ifdef __GNUC__
 
-#if !defined(_LOCI_LOG_H_)
-#define _LOCI_LOG_H_
-
-/* g++ requires this to pick up PRI, etc.
- * See  http://gcc.gnu.org/ml/gcc-help/2006-10/msg00223.html
- */
-#if !defined(__STDC_FORMAT_MACROS)
-#define __STDC_FORMAT_MACROS
+#ifdef __linux__
+/* glibc */
+#include <features.h>
+#else
+/* NetBSD etc */
+#include <sys/cdefs.h>
+#ifdef __GNUC_PREREQ__
+#define __GNUC_PREREQ __GNUC_PREREQ__
 #endif
-#include <inttypes.h>
+#endif
 
-/**
- * Per level log macros.  printf semantics
- */
+#ifndef __GNUC_PREREQ
+/* fallback */
+#define __GNUC_PREREQ(maj, min) 0
+#endif
 
-#define LOCI_LOG_COMMON(level, ...) loci_logger(level, __func__, __FILE__, __LINE__, __VA_ARGS__)
-#define LOCI_LOG_TRACE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_TRACE, __VA_ARGS__)
-#define LOCI_LOG_VERBOSE(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_VERBOSE, __VA_ARGS__)
-#define LOCI_LOG_INFO(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_INFO, __VA_ARGS__)
-#define LOCI_LOG_WARN(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_WARN, __VA_ARGS__)
-#define LOCI_LOG_ERROR(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_ERROR, __VA_ARGS__)
-#define LOCI_LOG_MSG(...) LOCI_LOG_COMMON(LOCI_LOG_LEVEL_MSG, __VA_ARGS__)
+#if __GNUC_PREREQ(4,6)
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
-#endif /* _LOCI_LOG_H_ */
+#endif

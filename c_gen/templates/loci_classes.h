@@ -26,15 +26,10 @@
 :: # under the EPL.
 ::
 :: include('_copyright.c')
-#ifndef LOCI_PUSH_WIRE_TYPES_H
-#define LOCI_PUSH_WIRE_TYPES_H
+::
+#ifndef __LOCI_CLASSES_H__
+#define __LOCI_CLASSES_H__
 
-#include <loci/loci.h>
-
-/* Declarations of public functions from loci_push_wire_types.c */
-
-:: for fn in fns:
-void ${fn.class_name}_push_wire_types(of_object_t *obj);
-:: #endfor
+${legacy_code}
 
 #endif
