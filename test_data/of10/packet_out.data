@@ -25,7 +25,7 @@ ofp.message.packet_out(
     data='abc')
 -- c
 obj = of_packet_out_new(OF_VERSION_1_0);
-of_packet_out_buffer_id_set(obj, 2882400001);
+of_packet_out_buffer_id_set(obj, 0xabcdef01);
 of_packet_out_in_port_set(obj, 65534);
 of_packet_out_xid_set(obj, 305419896);
 {
