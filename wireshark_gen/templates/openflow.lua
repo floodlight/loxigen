@@ -106,6 +106,12 @@ local of_message_dissectors = {
 :: #endfor
 }
 
+local of_port_desc_dissectors = {
+:: for version in ir:
+    [${version.wire_version}] = dissect_of_port_desc_v${version.wire_version},
+:: #endfor
+}
+
 local of_oxm_dissectors = {
 :: for version in ir:
     [${version.wire_version}] = dissect_of_oxm_v${version.wire_version},
