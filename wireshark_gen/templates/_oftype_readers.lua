@@ -45,6 +45,10 @@ function read_uint64_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 8)
 end
 
+function read_of_bitmap_128_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 16)
+end
+
 function read_of_octets_t(reader, version, subtree, field_name)
     if not reader.is_empty() then
         subtree:add(fields[field_name], reader.read_all())
