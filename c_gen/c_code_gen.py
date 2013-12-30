@@ -449,6 +449,7 @@ of_object_id_t of_group_mod_to_object_id(int group_mod, of_version_t version);
 of_object_id_t of_oxm_to_object_id(uint32_t type_len, of_version_t version);
 of_object_id_t of_message_experimenter_to_object_id(of_message_t msg, of_version_t version);
 of_object_id_t of_message_to_object_id(of_message_t msg, int length);
+of_object_id_t of_bsn_tlv_to_object_id(int tlv_type, of_version_t version);
 
 int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
 
@@ -1549,7 +1550,7 @@ def wire_accessor(m_type, a_type):
         m_type = "octets_data"
     return "of_wire_buffer_%s_%s" % (m_type, a_type)
 
-def get_len_macro(cls, m_type, version):
+def get_len_macro(cls, m_name, m_type, version):
     """
     Get the length macro for m_type in cls
     """
@@ -1561,6 +1562,12 @@ def get_len_macro(cls, m_type, version):
         return "_TLV16_LEN(obj, offset)"
     if cls == "of_packet_out" and m_type == "of_list_action_t":
         return "_PACKET_OUT_ACTION_LEN(obj)"
+    if cls == "of_bsn_gentable_entry_add" and m_name == "key":
+        return "of_object_u16_get(obj, 18)"
+    if cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "key":
+        return "of_object_u16_get(obj, 2)"
+    if cls == "of_bsn_gentable_entry_stats_entry" and m_name == "key":
+        return "of_object_u16_get(obj, 2)"
     # Default is everything to the end of the object
     return "_END_LEN(obj, offset)"
 
@@ -1587,6 +1594,12 @@ def gen_accessor_offsets(out, cls, m_name, version, a_type, m_type, offset):
             pass
         elif (cls == "of_packet_out" and m_name == "data"):
             pass
+        elif (cls == "of_bsn_gentable_entry_add" and m_name == "value"):
+            pass
+        elif (cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "value"):
+            pass
+        elif (cls == "of_bsn_gentable_entry_stats_entry" and m_name == "stats"):
+            pass
         else:
             debug("Error: Unknown member with offset == -1")
             debug("  cls %s, m_name %s, version %d" % (cls, m_name, version))
@@ -1601,7 +1614,7 @@ def gen_accessor_offsets(out, cls, m_name, version, a_type, m_type, offset):
     if not loxi_utils.type_is_scalar(m_type):
         if loxi_utils.class_is_var_len(m_type[:-2], version) or \
                 m_type == "of_match_t":
-            len_macro = get_len_macro(cls, m_type, version)
+            len_macro = get_len_macro(cls, m_name, m_type, version)
         else:
             len_macro = "%d" % of_g.base_length[(m_type[:-2], version)]
         out.write("        cur_len = %s;\n" % len_macro)
@@ -1716,6 +1729,16 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
             out.write("""
     /* Special case for setting action lengths */
     _PACKET_OUT_ACTION_LEN_SET(obj, %(m_name)s->length);
+""" % dict(m_name=m_name))
+        elif cls == "of_bsn_gentable_entry_add" and m_name == "key":
+            out.write("""
+    /* Special case for setting key length */
+    of_object_u16_set(obj, 18, %(m_name)s->length);
+""" % dict(m_name=m_name))
+        elif cls in ["of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry"] and m_name == "key":
+            out.write("""
+    /* Special case for setting key length */
+    of_object_u16_set(obj, 2, %(m_name)s->length);
 """ % dict(m_name=m_name))
         elif m_type not in ["of_match_t", "of_octets_t"]:
             out.write("""
@@ -2356,6 +2379,10 @@ def gen_coerce_ops(out, cls):
             if loxi_utils.class_is_hello_elem(cls):
                     out.write("""
     obj->wire_type_get = of_hello_elem_wire_object_id_get;
+""")
+            if loxi_utils.class_is_bsn_tlv(cls):
+                    out.write("""
+    obj->wire_type_get = of_bsn_tlv_wire_object_id_get;
 """)
         if loxi_utils.class_is_oxm(cls):
             out.write("""

@@ -77,7 +77,7 @@ target_version_list = []
 ## These members do not get normal accessors
 
 skip_members = ["version", "type", "length", "err_type", "stats_type", "len",
-                "type_len", "actions_len", "_command", "command"]
+                "type_len", "actions_len", "_command", "command", "key_length"]
 
 ## Some OpenFlow string length constants
 #

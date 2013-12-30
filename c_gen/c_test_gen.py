@@ -137,7 +137,17 @@ def ignore_member(cls, version, m_name, m_type):
                "of_bsn_port_counter_stats_request",
                "of_bsn_port_counter_stats_reply",
                "of_bsn_vlan_counter_stats_request",
-               "of_bsn_vlan_counter_stats_reply"]
+               "of_bsn_vlan_counter_stats_reply",
+               "of_bsn_gentable_entry_desc_stats_request",
+               "of_bsn_gentable_entry_desc_stats_reply",
+               "of_bsn_gentable_entry_stats_request",
+               "of_bsn_gentable_entry_stats_reply",
+               "of_bsn_gentable_desc_stats_request",
+               "of_bsn_gentable_desc_stats_reply",
+               "of_bsn_gentable_stats_request",
+               "of_bsn_gentable_stats_reply",
+               "of_bsn_gentable_bucket_stats_request",
+               "of_bsn_gentable_bucket_stats_reply"]
 
     if (cls in classes and (
             m_name == "experimenter" or

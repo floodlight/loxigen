@@ -277,4 +277,21 @@ ${packet_in} : ${packet_in_1_3}) + 2)
      ((object_id) == OF_FLOW_DELETE_STRICT) ||         \
      ((object_id) == OF_FLOW_ADD))
 
+/**
+ * Macro to calculate variable offset of value member in of_bsn_gentable_entry_add
+ * @param obj An object of type of_bsn_gentable_entry_add_t
+ */
+
+#define _BSN_GENTABLE_ENTRY_ADD_VALUE_OFFSET(obj) \
+    (of_object_u16_get(obj, 18) + \
+        of_object_fixed_len[(obj)->version][OF_BSN_GENTABLE_ENTRY_ADD])
+
+#define _BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY_VALUE_OFFSET(obj) \
+    (of_object_u16_get(obj, 2) + \
+        of_object_fixed_len[(obj)->version][OF_BSN_GENTABLE_ENTRY_DESC_STATS_ENTRY])
+
+#define _BSN_GENTABLE_ENTRY_STATS_ENTRY_STATS_OFFSET(obj) \
+    (of_object_u16_get(obj, 2) + \
+        of_object_fixed_len[(obj)->version][OF_BSN_GENTABLE_ENTRY_STATS_ENTRY])
+
 #endif /* __LOCI_INT_H__ */

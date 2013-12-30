@@ -375,5 +375,12 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u64_time_ms(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_desc_str_uri(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_u8_state(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_table_id(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u32_deleted_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_error_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum_mask(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_u32_buckets_size(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_entry_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */
