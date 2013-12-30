@@ -99,6 +99,7 @@ def var_name_map(m_type):
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
+        of_checksum_128_t="checksum_128",
         )
 
     if m_type.find("of_list_") == 0:
@@ -112,7 +113,7 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_match_bmap_t", "of_ipv4_t"]
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                "of_ipv6_t", "of_bitmap_128_t"]
+                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)

@@ -96,6 +96,8 @@ int loci_dump_match(loci_writer_f writer, void* cookie, of_match_t *match);
 
 #define LOCI_DUMP_bitmap_128(writer, cookie, val) writer(cookie, "%" PRIx64 "%" PRIx64, (val).hi, (val).lo)
 
+#define LOCI_DUMP_checksum_128(writer, cookie, val) writer(cookie, "%016" PRIx64 "%016" PRIx64, (val).hi, (val).lo)
+
 /**
  * Generic version for any object
  */

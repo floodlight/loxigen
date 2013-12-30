@@ -697,6 +697,11 @@ typedef struct of_bitmap_128_s {
     uint64_t lo;
 } of_bitmap_128_t;
 
+typedef struct of_checksum_128_s {
+    uint64_t hi;
+    uint64_t lo;
+} of_checksum_128_t;
+
 /* These are types which change across versions.  */
 typedef uint32_t of_port_no_t;
 typedef uint16_t of_fm_cmd_t;
