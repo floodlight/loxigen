@@ -259,6 +259,8 @@ struct of_bsn_gentable_desc_stats_entry {
     uint16_t table_id;
     of_table_name_t name;
     uint32_t buckets_size;
+    uint32_t max_entries;
+    pad(4);
     /* TODO properties */
 };
 
