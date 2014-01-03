@@ -328,7 +328,7 @@
                 return srcCidrLen > 0 && srcCidrLen < 32;
             case ARP_TPA:
             case IPV4_DST:
-                int dstCidrLen = getIpv4SrcCidrMaskLen();
+                int dstCidrLen = getIpv4DstCidrMaskLen();
                 return dstCidrLen > 0 && dstCidrLen < 32;
             default:
                 throw new UnsupportedOperationException("OFMatch does not support masked matching on field " + field.getName());
