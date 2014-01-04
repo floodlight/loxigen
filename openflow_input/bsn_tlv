@@ -53,3 +53,26 @@ struct of_bsn_tlv_tx_packets : of_bsn_tlv {
     uint16_t length;
     uint64_t value;
 };
+
+struct of_bsn_tlv_ipv4 : of_bsn_tlv {
+    uint16_t type == 4;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_idle_time : of_bsn_tlv {
+    uint16_t type == 5;
+    uint16_t length;
+    uint64_t value; /* Milliseconds */
+};
+
+struct of_bsn_tlv_vlan_vid : of_bsn_tlv {
+    uint16_t type == 6;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_idle_notification : of_bsn_tlv {
+    uint16_t type == 7;
+    uint16_t length;
+};
