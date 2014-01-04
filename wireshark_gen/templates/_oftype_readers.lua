@@ -45,8 +45,49 @@ function read_uint64_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 8)
 end
 
+local hex2bin_tab = {
+        ["0"] = "0000",
+        ["1"] = "0001",
+        ["2"] = "0010",
+        ["3"] = "0011",
+        ["4"] = "0100",
+        ["5"] = "0101",
+        ["6"] = "0110",
+        ["7"] = "0111",
+        ["8"] = "1000",
+        ["9"] = "1001",
+        ["a"] = "1010",
+        ["b"] = "1011",
+        ["c"] = "1100",
+        ["d"] = "1101",
+        ["e"] = "1110",
+        ["f"] = "1111"
+        }
+
+function hex2bin(str)
+    local bin = ''
+    for byte in string.gmatch(tostring(str), '%x') do
+        bin = bin .. hex2bin_tab[byte]
+    end
+    return bin
+end
+
 function read_of_bitmap_128_t(reader, version, subtree, field_name)
-    read_scalar(reader, subtree, field_name, 16)
+    if string.match(field_name, 'value_mask') then
+        local masked_ports = ''
+        local bitmap_string = hex2bin(reader.read(16))
+        local len = string.len(bitmap_string)
+        i = len
+        while i > 0 do
+            if string.sub(bitmap_string, i, i)  == '0' then
+                 masked_ports = masked_ports .. tostring(len - i) .. ' '
+             end
+             i = i - 1
+        end
+        subtree:add("masked_ports:", masked_ports)
+    else
+        subtree:add(fields[field_name], reader.read(16))
+    end
 end
 
 function read_of_octets_t(reader, version, subtree, field_name)
