@@ -145,6 +145,12 @@ def class_is_stats_message(cls):
     u = _unified_by_name(cls)
     return u.is_instanceof("of_stats_request") or u.ir_instanceof("of_stats_reply")
 
+def class_is_bsn_tlv(cls):
+    """
+    Return True if cls_name is a bsn_tlv object
+    """
+    return _unified_by_name(cls).is_instanceof("of_bsn_tlv")
+
 def class_is_list(cls):
     """
     Return True if cls_name is a list object

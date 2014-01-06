@@ -111,6 +111,11 @@ type_data_map = {
         init='None',
         pack='%s.pack()',
         unpack='oxm.oxm.unpack(%s)'),
+
+    'of_checksum_128_t': OFTypeData(
+        init='0',
+        pack='util.pack_checksum_128(%s)',
+        unpack="util.unpack_checksum_128(%s)"),
 }
 
 ## Fixed length strings

@@ -136,6 +136,13 @@ meter_band_types = {
     of_g.VERSION_1_3:dict(),
     }
 
+bsn_tlv_types = {
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(),
+    }
+
 # All inheritance data for non-messages
 inheritance_data = dict(
     of_instruction = instruction_types,
@@ -148,7 +155,8 @@ inheritance_data = dict(
     of_table_feature_prop = table_feature_prop_types,
     of_meter_band = meter_band_types,
     # BSN specific inheritance extensions
-    of_bsn_vport = bsn_vport_types
+    of_bsn_vport = bsn_vport_types,
+    of_bsn_tlv = bsn_tlv_types,
     )
 
 def class_is_virtual(cls):

@@ -77,7 +77,7 @@ target_version_list = []
 ## These members do not get normal accessors
 
 skip_members = ["version", "type", "length", "err_type", "stats_type", "len",
-                "type_len", "actions_len", "_command", "command"]
+                "type_len", "actions_len", "_command", "command", "key_length"]
 
 ## Some OpenFlow string length constants
 #
@@ -206,13 +206,14 @@ of_base_types = dict(
 #                         short_name="match_v4"),
     of_octets_t = dict(bytes=-1, short_name="octets"),
     of_bitmap_128_t = dict(bytes=16, short_name="bitmap_128"),
+    of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
 )
 
 of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                   "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t"]
+                   "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t", "of_checksum_128_t"]
 
 ##
 # LOXI identifiers

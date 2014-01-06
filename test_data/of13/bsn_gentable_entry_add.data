@@ -1,0 +1,98 @@
+-- binary
+04 04 # version, type
+00 48 # length
+12 34 56 78 # xid
+00 5c 16 c7 # experimenter
+00 00 00 2e # subtype
+00 14 # table_id
+00 12 # key_length
+fe dc ba 98 76 54 32 10 ff ee cc bb aa 99 88 77 # checksum
+
+00 00 # key[0].type
+00 08 # key[0].length
+00 00 00 05 # key[0].value
+
+00 01 # key[1].type
+00 0a # key[1].length
+01 23 45 67 89 ab # key[1].value
+
+00 00 # value[0].type
+00 08 # value[0].length
+00 00 00 06 # value[0].value
+
+00 01 # value[1].type
+00 0a # value[1].length
+ff ee dd cc bb aa # value[1].value
+-- python
+ofp.message.bsn_gentable_entry_add(
+    xid=0x12345678,
+    checksum=0xFEDCBA9876543210FFEECCBBAA998877,
+    table_id=20,
+    key=[
+        ofp.bsn_tlv.port(5),
+        ofp.bsn_tlv.mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xab]),
+    ],
+    value=[
+        ofp.bsn_tlv.port(6),
+        ofp.bsn_tlv.mac([0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa]),
+    ])
+-- java
+builder.setXid(0x12345678)
+    .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA998877L))
+    .setTableId(20)
+    .setKey(
+        ImmutableList.<OFBsnTlv>of(
+            factory.bsnTlvPort(OFPort.of(5)),
+            factory.bsnTlvMac(MacAddress.of("01:23:45:67:89:ab"))
+        )
+    )
+    .setValue(
+        ImmutableList.<OFBsnTlv>of(
+            factory.bsnTlvPort(OFPort.of(6)),
+            factory.bsnTlvMac(MacAddress.of("ff:ee:dd:cc:bb:aa"))
+        )
+    )
+-- c
+obj = of_bsn_gentable_entry_add_new(OF_VERSION_1_3);
+of_bsn_gentable_entry_add_xid_set(obj, 0x12345678);
+of_bsn_gentable_entry_add_table_id_set(obj, 20);
+{
+    of_checksum_128_t checksum = { 0xFEDCBA9876543210L, 0xFFEECCBBAA998877L };
+    of_bsn_gentable_entry_add_checksum_set(obj, checksum);
+}
+{
+    of_object_t *list = of_list_bsn_tlv_new(OF_VERSION_1_3);
+    {
+        of_object_t *tlv = of_bsn_tlv_port_new(OF_VERSION_1_3);
+        of_bsn_tlv_port_value_set(tlv, 5);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    {
+        of_mac_addr_t mac = { { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab } };
+        of_object_t *tlv = of_bsn_tlv_mac_new(OF_VERSION_1_3);
+        of_bsn_tlv_mac_value_set(tlv, mac);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    of_bsn_gentable_entry_add_key_set(obj, list);
+    of_object_delete(list);
+}
+{
+    of_object_t *list = of_list_bsn_tlv_new(OF_VERSION_1_3);
+    {
+        of_object_t *tlv = of_bsn_tlv_port_new(OF_VERSION_1_3);
+        of_bsn_tlv_port_value_set(tlv, 6);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    {
+        of_mac_addr_t mac = { { 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0xaa } };
+        of_object_t *tlv = of_bsn_tlv_mac_new(OF_VERSION_1_3);
+        of_bsn_tlv_mac_value_set(tlv, mac);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    of_bsn_gentable_entry_add_value_set(obj, list);
+    of_object_delete(list);
+}
