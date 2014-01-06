@@ -96,6 +96,7 @@ struct of_bsn_gentable_entry_add : of_bsn_header {
 //
 // If the switch cannot process the message then it should reply with an error
 // message. The contents of the table must not be changed in case of an error.
+// If the key does not exist in the table an error message will be generated.
 struct of_bsn_gentable_entry_delete : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
@@ -142,7 +143,7 @@ struct of_bsn_gentable_clear_reply : of_bsn_header {
 
 
 // This message sets the size of the buckets array. The switch may reject this
-// message if the table has entries.
+// message if the table has entries. buckets_size must be a power of 2.
 struct of_bsn_gentable_set_buckets_size : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
