@@ -45,6 +45,7 @@ roots = {
     'of_instruction': 'instruction',
     'of_instruction_id': 'instruction_id',
     'of_meter_band': 'meter_band',
+    'of_bsn_tlv': 'bsn_tlv',
 }
 
 # Return the module and class names for the generated Python class
@@ -122,6 +123,11 @@ def generate_pp(out, name, version):
 
 def generate_util(out, name, version):
     util.render_template(out, 'util.py', version=version)
+
+def generate_bsn_tlv(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['bsn_tlv'],
+                         version=version)
 
 def init():
     for version in loxi_globals.OFVersions.target_versions:

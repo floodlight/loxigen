@@ -118,6 +118,8 @@ def class_is_tlv16(cls):
         return True
     if cls == "of_match_v4":
         return True
+    if cls.find("of_bsn_tlv") == 0:
+        return True
     return False
 
 def class_is_u16_len(cls):
@@ -126,7 +128,9 @@ def class_is_u16_len(cls):
     """
     return cls in ["of_group_desc_stats_entry", "of_group_stats_entry",
                    "of_flow_stats_entry", "of_bucket", "of_table_features",
-                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry"]
+                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
+                   "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
+                   "of_bsn_gentable_desc_stats_entry"]
 
 def class_is_oxm(cls):
     """
@@ -245,6 +249,14 @@ def class_is_list(cls):
     Return True if cls_name is a list object
     """
     return (cls.find("of_list_") == 0)
+
+def class_is_bsn_tlv(cls):
+    """
+    Return True if cls_name is a BSN TLV object
+    """
+    if cls.find("of_bsn_tlv") == 0:
+        return True
+    return False
 
 def type_is_of_object(m_type):
     """

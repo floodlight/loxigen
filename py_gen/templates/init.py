@@ -38,6 +38,7 @@ import oxm
 :: #endif
 :: if version >= 4:
 import meter_band
+import bsn_tlv
 :: #endif
 from const import *
 from common import *

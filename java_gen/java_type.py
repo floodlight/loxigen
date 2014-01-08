@@ -480,6 +480,10 @@ class_id = JType("ClassId") \
          .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
 boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
         .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
+checksum = JType("OFChecksum128") \
+        .op(read='OFChecksum128.read16Bytes(bb)',
+            write='$name.write16Bytes(bb)',
+            default='OFChecksum128.ZERO')
 
 generic_t = JType("T")
 
@@ -513,7 +517,8 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap
+        'of_bitmap_128_t': port_bitmap,
+        'of_checksum_128_t': checksum,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme

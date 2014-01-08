@@ -1,0 +1,54 @@
+-- binary
+04 13 # version, type
+00 38 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 05 # subtype
+88 77 66 55 44 33 22 11 FF EE DD CC BB AA 99 88 # entries[0].checksum
+12 34 23 45 34 56 45 67 56 78 67 89 78 9A 89 AB # entries[1].checksum
+-- python
+ofp.message.bsn_gentable_bucket_stats_reply(
+    xid=0x12345678,
+    entries=[
+        ofp.bsn_gentable_bucket_stats_entry(
+            checksum=0x8877665544332211FFEEDDCCBBAA9988),
+        ofp.bsn_gentable_bucket_stats_entry(
+            checksum=0x123423453456456756786789789A89AB),
+    ])
+-- java
+builder.setXid(0x12345678)
+    .setEntries(
+        ImmutableList.<OFBsnGentableBucketStatsEntry>of(
+            factory.bsnGentableBucketStatsEntry(OFChecksum128.of(0x8877665544332211L, 0xFFEEDDCCBBAA9988L)),
+            factory.bsnGentableBucketStatsEntry(OFChecksum128.of(0x1234234534564567L, 0x56786789789A89ABL))
+        )
+    )
+-- c
+obj = of_bsn_gentable_bucket_stats_reply_new(OF_VERSION_1_3);
+of_bsn_gentable_bucket_stats_reply_xid_set(obj, 0x12345678);
+{
+    of_object_t *list = of_list_bsn_gentable_bucket_stats_entry_new(OF_VERSION_1_3);
+    {
+        of_object_t *entry = of_bsn_gentable_bucket_stats_entry_new(OF_VERSION_1_3);
+        {
+            of_checksum_128_t checksum = { 0x8877665544332211L, 0xFFEEDDCCBBAA9988L };
+            of_bsn_gentable_bucket_stats_entry_checksum_set(entry, checksum);
+        }
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    {
+        of_object_t *entry = of_bsn_gentable_bucket_stats_entry_new(OF_VERSION_1_3);
+        {
+            of_checksum_128_t checksum = { 0x1234234534564567L, 0x56786789789A89ABL };
+            of_bsn_gentable_bucket_stats_entry_checksum_set(entry, checksum);
+        }
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    of_bsn_gentable_bucket_stats_reply_entries_set(obj, list);
+    of_object_delete(list);
+}

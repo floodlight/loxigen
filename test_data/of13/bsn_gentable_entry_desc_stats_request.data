@@ -1,0 +1,19 @@
+-- binary
+04 12 # version, type
+00 3c # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 2 # subtype
+00 14 # table_id
+00 00 # pad
+fe dc ba 98 76 54 32 10 ff ee cc bb aa 99 00 00 # checksum
+ff ff ff ff ff ff ff ff ff ff ff ff ff ff 00 00 # checksum_mask
+-- python
+ofp.message.bsn_gentable_entry_desc_stats_request(
+    xid=0x12345678,
+    table_id=20,
+    checksum=     0xFEDCBA9876543210FFEECCBBAA990000,
+    checksum_mask=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000)

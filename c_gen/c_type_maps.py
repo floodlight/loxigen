@@ -151,6 +151,10 @@ def gen_type_maps(out):
     gen_type_to_object_id(out, "message_type_to_id", "OF_MESSAGE",
                           "OF_%s", type_maps.message_types, max_type_value)
 
+    gen_type_to_object_id(out, "bsn_tlv_type_to_id", "OF_BSN_TLV",
+                          "OF_BSN_TLV_%s", type_maps.bsn_tlv_types,
+                          max_type_value)
+
 def gen_type_to_obj_map_functions(out):
     """
     Generate the templated type map functions
@@ -588,6 +592,12 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     out.write(msg_template %
               dict(name="message", u_name="MESSAGE", ar_len=ar_len))
 
+    # BSN TLV elem types array gen
+    ar_len = type_maps.type_array_len(type_maps.bsn_tlv_types,
+                                      max_type_value)
+    out.write(map_template %
+              dict(name="bsn_tlv", u_name="BSN_TLV", ar_len=ar_len))
+
 def gen_type_data_header(out):
 
     out.write("""
@@ -677,6 +687,8 @@ extern void of_table_feature_prop_wire_object_id_get(of_object_t *obj,
 extern void of_meter_band_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
+    of_object_id_t *id);
+extern void of_bsn_tlv_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 
 #define OF_OXM_LENGTH_GET(hdr) (((hdr) & 0xff) + 4)

@@ -446,6 +446,23 @@ of_hello_elem_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     ASSERT(*id != OF_OBJECT_INVALID);
 }
 
+/**
+ * Get the object ID based on the wire buffer for a bsn_tlv object
+ * @param obj The object being referenced
+ * @param id Where to store the object ID
+ */
+
+void
+of_bsn_tlv_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
+{
+    int wire_type;
+
+    of_tlv16_wire_type_get(obj, &wire_type);
+    ASSERT(wire_type >= 0 && wire_type < OF_BSN_TLV_ITEM_COUNT);
+    *id = of_bsn_tlv_type_to_id[obj->version][wire_type];
+    ASSERT(*id != OF_OBJECT_INVALID);
+}
+
 /****************************************************************
  * OXM type/length functions.
  ****************************************************************/
@@ -715,7 +732,12 @@ of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subty
     case OF_EXPERIMENTER_ID_BSN:
         switch (subtype) {
         case 1: return OF_BSN_LACP_STATS_REQUEST;
+        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REQUEST;
+        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REQUEST;
+        case 4: return OF_BSN_GENTABLE_DESC_STATS_REQUEST;
+        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REQUEST;
         case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REQUEST;
+        case 7: return OF_BSN_GENTABLE_STATS_REQUEST;
         case 8: return OF_BSN_PORT_COUNTER_STATS_REQUEST;
         case 9: return OF_BSN_VLAN_COUNTER_STATS_REQUEST;
         }
@@ -730,7 +752,12 @@ of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype
     case OF_EXPERIMENTER_ID_BSN:
         switch (subtype) {
         case 1: return OF_BSN_LACP_STATS_REPLY;
+        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REPLY;
+        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REPLY;
+        case 4: return OF_BSN_GENTABLE_DESC_STATS_REPLY;
+        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REPLY;
         case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REPLY;
+        case 7: return OF_BSN_GENTABLE_STATS_REPLY;
         case 8: return OF_BSN_PORT_COUNTER_STATS_REPLY;
         case 9: return OF_BSN_VLAN_COUNTER_STATS_REPLY;
         }
