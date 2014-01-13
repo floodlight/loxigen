@@ -300,6 +300,7 @@ extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
         buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, &subtype);
         switch (subtype) {
         case 0: *id = OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK; break;
+        case 1: *id = OF_INSTRUCTION_BSN_ARP_OFFLOAD; break;
         }
         break;
     }
