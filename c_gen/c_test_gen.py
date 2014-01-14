@@ -99,6 +99,7 @@ def var_name_map(m_type):
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
+        of_checksum_128_t="checksum_128",
         )
 
     if m_type.find("of_list_") == 0:
@@ -112,7 +113,7 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_match_bmap_t", "of_ipv4_t"]
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                "of_ipv6_t", "of_bitmap_128_t"]
+                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
@@ -129,7 +130,26 @@ def ignore_member(cls, version, m_name, m_type):
             m_name == "subtype")):
         return True
 
-    if (cls in ["of_bsn_lacp_stats_request", "of_bsn_lacp_stats_reply"] and (
+    classes = ["of_bsn_lacp_stats_request",
+               "of_bsn_lacp_stats_reply",
+               "of_bsn_switch_pipeline_stats_request",
+               "of_bsn_switch_pipeline_stats_reply",
+               "of_bsn_port_counter_stats_request",
+               "of_bsn_port_counter_stats_reply",
+               "of_bsn_vlan_counter_stats_request",
+               "of_bsn_vlan_counter_stats_reply",
+               "of_bsn_gentable_entry_desc_stats_request",
+               "of_bsn_gentable_entry_desc_stats_reply",
+               "of_bsn_gentable_entry_stats_request",
+               "of_bsn_gentable_entry_stats_reply",
+               "of_bsn_gentable_desc_stats_request",
+               "of_bsn_gentable_desc_stats_reply",
+               "of_bsn_gentable_stats_request",
+               "of_bsn_gentable_stats_reply",
+               "of_bsn_gentable_bucket_stats_request",
+               "of_bsn_gentable_bucket_stats_reply"]
+
+    if (cls in classes and (
             m_name == "experimenter" or
             m_name == "subtype")):
         return True

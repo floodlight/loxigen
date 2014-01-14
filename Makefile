@@ -132,7 +132,7 @@ check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of13.py
 
 check-c: c
-	make -C ${LOXI_OUTPUT_DIR}/locitest
+	make -j4 -C ${LOXI_OUTPUT_DIR}/locitest
 	${LOXI_OUTPUT_DIR}/locitest/locitest
 
 pylint:

@@ -29,9 +29,22 @@
 :: from loxi_globals import OFVersions
 :: include('_autogen.py')
 
+import struct
 import loxi
 import const
-import struct
+import common
+import action
+:: if version >= OFVersions.VERSION_1_1:
+import instruction
+:: #endif
+:: if version >= OFVersions.VERSION_1_2:
+import oxm
+:: #endif
+:: if version >= OFVersions.VERSION_1_3:
+import action_id
+import instruction_id
+import meter_band
+:: #endif
 
 def pretty_mac(mac):
     return ':'.join(["%02x" % x for x in mac])
@@ -140,9 +153,6 @@ def unpack_match_bmap(reader):
     return reader.read("!Q")[0]
 :: #endif
 
-def pack_list(values):
-    return "".join([x.pack() for x in values])
-
 MASK64 = (1 << 64) - 1
 
 def pack_bitmap_128(value):
@@ -162,3 +172,20 @@ def unpack_bitmap_128(reader):
         i += 1
         x >>= 1
     return value
+
+def unpack_list_hello_elem(reader):
+    def deserializer(reader):
+        typ, length, = reader.peek('!HH')
+        reader = reader.slice(length)
+        try:
+            return common.hello_elem.unpack(reader)
+        except loxi.ProtocolError:
+            return None
+    return [x for x in loxi.generic_util.unpack_list(reader, deserializer) if x != None]
+
+def pack_checksum_128(value):
+    return struct.pack("!QQ", (value >> 64) & MASK64, value & MASK64)
+
+def unpack_checksum_128(reader):
+    hi, lo = reader.read("!QQ")
+    return (hi << 64) | lo

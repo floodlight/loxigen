@@ -38,6 +38,7 @@ import sys
 from generic_utils import *
 import loxi_utils.loxi_utils as loxi_utils
 import c_gen.loxi_utils_legacy as loxi_utils
+import loxi_globals
 
 invalid_type = "invalid_type"
 invalid_value = "0xeeee"  # Note, as a string
@@ -60,21 +61,25 @@ instruction_types = {
     of_g.VERSION_1_3:dict()
     }
 
-# HACK shared between actions and action_ids
-of_1_3_action_types = dict()
+instruction_id_types = {
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict()
+    }
 
 action_types = {
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
     of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:of_1_3_action_types
+    of_g.VERSION_1_3:dict(),
     }
 
 action_id_types = {
     of_g.VERSION_1_0:dict(),
     of_g.VERSION_1_1:dict(),
     of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:of_1_3_action_types
+    of_g.VERSION_1_3:dict(),
     }
 
 queue_prop_types = {
@@ -131,9 +136,17 @@ meter_band_types = {
     of_g.VERSION_1_3:dict(),
     }
 
+bsn_tlv_types = {
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(),
+    }
+
 # All inheritance data for non-messages
 inheritance_data = dict(
     of_instruction = instruction_types,
+    of_instruction_id = instruction_id_types,
     of_action = action_types,
     of_action_id = action_id_types,
     of_oxm = oxm_types,
@@ -142,23 +155,19 @@ inheritance_data = dict(
     of_table_feature_prop = table_feature_prop_types,
     of_meter_band = meter_band_types,
     # BSN specific inheritance extensions
-    of_bsn_vport = bsn_vport_types
+    of_bsn_vport = bsn_vport_types,
+    of_bsn_tlv = bsn_tlv_types,
     )
 
 def class_is_virtual(cls):
     """
     Returns True if cls is a virtual class
     """
-    if cls in inheritance_map:
-        return True
     if cls.find("header") > 0:
         return True
     if loxi_utils.class_is_list(cls):
         return True
-    # TODO get this from the input file when we have virtual class syntax
-    if cls in ["of_flow_mod", "of_stats_request", "of_stats_reply", "of_error_msg", "of_bsn_header", "of_nicira_header", "of_action_bsn", "of_action_nicira", "of_action_id_bsn", "of_action_id_nicira", "of_bsn_stats_request", "of_bsn_stats_reply", "of_experimenter_stats_request", "of_experimenter_stats_reply", "of_instruction_experimenter", "of_instruction_bsn"]:
-        return True
-    return False
+    return loxi_globals.unified.class_by_name(cls).virtual
 
 ################################################################
 #
@@ -182,6 +191,7 @@ message_types = {
         error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
+        group_mod               = 15,
         stats_request           = 18,
         stats_reply             = 19,
         ),
@@ -191,6 +201,7 @@ message_types = {
         error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
+        group_mod               = 15,
         stats_request           = 18,
         stats_reply             = 19,
         ),
@@ -200,6 +211,7 @@ message_types = {
         error_msg               = 1,
         experimenter            = 4,
         flow_mod                = 14,
+        group_mod               = 15,
         stats_request           = 18,  # FIXME Multipart
         stats_reply             = 19,
         )
@@ -268,7 +280,10 @@ stats_types = {
         table_features = 12,
         port_desc = 13,
         experimenter = 0xffff,
-        bsn_lacp = 0xffff
+        bsn_lacp = 0xffff,
+        bsn_switch_pipeline = 0xffff,
+        bsn_port_counter = 0xffff,
+        bsn_vlan_counter = 0xffff
         )
     }
 
@@ -349,6 +364,32 @@ error_types = {
         meter_mod_failed     = 12,
         table_features_failed= 13,
         experimenter = 0xffff
+        )
+    }
+
+group_mod_types = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(),
+
+    # version 1.1
+    of_g.VERSION_1_1:dict(
+        add = 0,
+        modify = 1,
+        delete = 2
+        ),
+
+    # version 1.2
+    of_g.VERSION_1_2:dict(
+        add = 0,
+        modify = 1,
+        delete = 2
+        ),
+
+    # version 1.3
+    of_g.VERSION_1_3:dict(
+        add = 0,
+        modify = 1,
+        delete = 2
         )
     }
 
@@ -456,6 +497,9 @@ stats_reply_list = [
     "of_table_features_stats_reply",
     "of_bsn_stats_reply",
     "of_bsn_lacp_stats_reply",
+    "of_bsn_switch_pipeline_stats_reply",
+    "of_bsn_port_counter_stats_reply",
+    "of_bsn_vlan_counter_stats_reply",
 ]
 
 stats_request_list = [
@@ -476,6 +520,9 @@ stats_request_list = [
     "of_table_features_stats_request",
     "of_bsn_stats_request",
     "of_bsn_lacp_stats_request",
+    "of_bsn_switch_pipeline_stats_request",
+    "of_bsn_port_counter_stats_request",
+    "of_bsn_vlan_counter_stats_request",
 ]
 
 flow_mod_list = [
@@ -502,6 +549,12 @@ error_msg_list = [
     "of_meter_mod_failed_error_msg",
     "of_table_features_failed_error_msg",
     "of_experimenter_error_msg"
+]
+
+group_mod_list = [
+    "of_group_add",
+    "of_group_modify",
+    "of_group_delete",
 ]
 
 def sub_class_map(base_type, version):

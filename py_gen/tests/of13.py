@@ -30,6 +30,7 @@ from testutil import test_serialization
 from testutil import add_datafiles_tests
 
 try:
+    import loxi
     import loxi.of13 as ofp
     from loxi.generic_util import OFReader
 except ImportError:
@@ -66,7 +67,7 @@ class TestCommon(unittest.TestCase):
             '\x00\x00\x00\x04', # unknown type
             '\x00\x01\x00\x04', # versionbitmap
         ])
-        l = ofp.unpack_list_hello_elem(OFReader(buf))
+        l = ofp.util.unpack_list_hello_elem(OFReader(buf))
         self.assertEquals(len(l), 2)
         self.assertTrue(isinstance(l[0], ofp.hello_elem_versionbitmap))
         self.assertTrue(isinstance(l[1], ofp.hello_elem_versionbitmap))
@@ -88,26 +89,21 @@ class TestAllOF13(unittest.TestCase):
         mods = [ofp.action,ofp.message,ofp.common,ofp.oxm]
         self.klasses = [klass for mod in mods
                               for klass in mod.__dict__.values()
-                              if hasattr(klass, 'show')]
+                              if isinstance(klass, type) and
+                                 issubclass(klass, loxi.OFObject) and
+                                 hasattr(klass, 'pack')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
         expected_failures = [
             ofp.action.set_field, # field defaults to None
-            ofp.common.table_feature_prop_apply_actions,
-            ofp.common.table_feature_prop_apply_actions_miss,
-            ofp.common.table_feature_prop_write_actions,
-            ofp.common.table_feature_prop_write_actions_miss,
-            ofp.common.table_features,
-            ofp.message.table_features_stats_reply,
-            ofp.message.table_features_stats_request,
         ]
         for klass in self.klasses:
             def fn():
                 obj = klass()
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
-                obj2 = klass.unpack(buf)
+                obj2 = klass.unpack(OFReader(buf))
                 self.assertEquals(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
@@ -116,11 +112,9 @@ class TestAllOF13(unittest.TestCase):
 
     def test_parse_message(self):
         expected_failures = [
-            ofp.message.table_features_stats_reply,
-            ofp.message.table_features_stats_request,
         ]
         for klass in self.klasses:
-            if not issubclass(klass, ofp.message.Message):
+            if not issubclass(klass, ofp.message.message):
                 continue
             def fn():
                 obj = klass(xid=42)

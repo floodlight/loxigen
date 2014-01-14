@@ -41,6 +41,7 @@ import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
 import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
+import c_gen.codegen
 import loxi_utils.loxi_utils as loxi_utils
 import template_utils
 
@@ -71,8 +72,6 @@ targets = {
     'loci/inc/loci/of_wire_buf.h': static,
 
     # LOCI code
-    'loci/src/loci.c': c_code_gen.top_c_gen,
-    'loci/src/of_type_data.c': c_code_gen.type_data_c_gen,
     'loci/src/of_match.c': c_code_gen.match_c_gen,
     'loci/src/loci_obj_dump.c': c_dump_gen.gen_obj_dump_c,
     'loci/src/loci_obj_show.c': c_show_gen.gen_obj_show_c,
@@ -83,9 +82,9 @@ targets = {
     'loci/src/loci_log.c': static,
     'loci/src/loci_log.h': static,
     'loci/src/of_object.c': static,
-    'loci/src/of_type_maps.c': static,
     'loci/src/of_utils.c': static,
     'loci/src/of_wire_buf.c': static,
+    'loci/src/loci_setup_from_add_fns.c': static,
 
     # Static LOCI documentation
     'loci/README': static,
@@ -115,54 +114,6 @@ targets = {
     'locitest/Makefile': static,
 }
 
-################################################################
-#
-# Configuration related
-#
-################################################################
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
-
-def config_sanity_check():
-    """
-    Check the configuration for basic consistency
-
-    @fixme Needs update for generic language support
-    """
-
-    rv = True
-    # For now, only "error" supported for get returns
-    if config_check("copy_semantics") != "read":
-        debug("Only 'read' is supported for copy_semantics");
-        rv = False
-    if config_check("get_returns") != "error":
-        debug("Only 'error' is supported for get-accessor return types\m");
-        rv = False
-    if not config_check("use_fn_ptrs") and not config_check("gen_unified_fns"):
-        debug("Must have gen_fn_ptrs and/or gen_unified_fns set in config")
-        rv = False
-    if config_check("use_obj_id"):
-        debug("use_obj_id is set but not yet supported (change \
-config_sanity_check if it is)")
-        rv = False
-    if config_check("gen_unified_macros") and config_check("gen_unified_fns") \
-            and config_check("gen_unified_macro_lower"):
-        debug("Conflict: Cannot generate unified functions and lower case \
-unified macros")
-        rv = False
-
-    return rv
-
 def generate(install_dir):
     build_of_g.initialize_versions()
     build_of_g.build_ordered_classes()
@@ -173,3 +124,10 @@ def generate(install_dir):
     for (name, fn) in targets.items():
         with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))
+    c_gen.codegen.generate_classes(install_dir)
+    c_gen.codegen.generate_header_classes(install_dir)
+    c_gen.codegen.generate_classes_header(install_dir)
+    c_gen.codegen.generate_lists(install_dir)
+    c_gen.codegen.generate_strings(install_dir)
+    c_gen.codegen.generate_init_map(install_dir)
+    c_gen.codegen.generate_type_maps(install_dir)

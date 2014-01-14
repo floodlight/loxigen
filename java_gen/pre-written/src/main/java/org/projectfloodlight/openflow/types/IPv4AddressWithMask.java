@@ -22,28 +22,19 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     }
 
     public static IPv4AddressWithMask of(IPv4Address value, IPv4Address mask) {
+        if (value == null) {
+            throw new NullPointerException("Value must not be null");
+        }
+        if (mask == null) {
+            throw new NullPointerException("Mask must not be null");
+        }
         return new IPv4AddressWithMask(value, mask);
     }
 
-    @Override
-    public String toString() {
-        StringBuilder res = new StringBuilder();
-        res.append(value.toString());
-
-        int maskint = mask.getInt();
-        res.append('/');
-        if (Integer.bitCount((~maskint) + 1) == 1) {
-            // CIDR notation
-            res.append(Integer.bitCount(maskint));
-        } else {
-            // Full address mask
-            res.append(mask.toString());
-        }
-
-        return res.toString();
-    }
-
     public static IPv4AddressWithMask of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         int slashPos;
         String ip = string;
         int maskBits = 32;

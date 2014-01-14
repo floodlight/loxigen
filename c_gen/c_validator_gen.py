@@ -222,6 +222,12 @@ static inline int
         %(m_name)s_offset = %(match_offset)s + OF_MATCH_BYTES(match_len);
         %(m_name)s_len = len - %(m_name)s_offset;
 """ % dict(m_name=m_name, cls=cls, match_offset=match_offset))
+        elif cls == "of_bsn_gentable_entry_add" and m_name == "value":
+            continue;
+        elif cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "value":
+            continue;
+        elif cls == "of_bsn_gentable_entry_stats_entry" and m_name == "stats":
+            continue;
         else:
             out.write("""
 

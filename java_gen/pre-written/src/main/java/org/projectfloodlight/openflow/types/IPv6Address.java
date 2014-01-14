@@ -4,7 +4,6 @@ import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -19,9 +18,15 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private final long raw1;
     private final long raw2;
 
+    private static final int NOT_A_CIDR_MASK = -1;
+    private static final int CIDR_MASK_CACHE_UNSET = -2;
+    // Must appear before the static IPv4Address constant assignments
+    private volatile int cidrMaskLengthCache = CIDR_MASK_CACHE_UNSET;
+
     private final static long NONE_VAL1 = 0x0L;
     private final static long NONE_VAL2 = 0x0L;
     public static final IPv6Address NONE = new IPv6Address(NONE_VAL1, NONE_VAL2);
+
 
     public static final IPv6Address NO_MASK = IPv6Address.of(0xFFFFFFFFFFFFFFFFl, 0xFFFFFFFFFFFFFFFFl);
     public static final IPv6Address FULL_MASK = IPv6Address.of(0x0, 0x0);
@@ -36,7 +41,60 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         return IPVersion.IPv6;
     }
 
+
+    private int computeCidrMask64(long raw) {
+        long mask = raw;
+        if (raw == 0)
+            return 0;
+        else if (Long.bitCount((~mask) + 1) == 1) {
+            // represent a true CIDR prefix length
+            return Long.bitCount(mask);
+        }
+        else {
+            // Not a true prefix
+            return NOT_A_CIDR_MASK;
+        }
+    }
+
+    private int asCidrMaskLengthInternal() {
+        if (cidrMaskLengthCache == CIDR_MASK_CACHE_UNSET) {
+            // No synchronization needed. Writing cidrMaskLengthCache only once
+            if (raw1 == 0 && raw2 == 0) {
+                cidrMaskLengthCache = 0;
+            } else if (raw1 == -1L) {
+                // top half is all 1 bits
+                int tmpLength = computeCidrMask64(raw2);
+                if (tmpLength != NOT_A_CIDR_MASK)
+                    tmpLength += 64;
+                cidrMaskLengthCache = tmpLength;
+            } else if (raw2 == 0) {
+                cidrMaskLengthCache = computeCidrMask64(raw1);
+            } else {
+                cidrMaskLengthCache = NOT_A_CIDR_MASK;
+            }
+        }
+        return cidrMaskLengthCache;
+    }
+
+    @Override
+    public boolean isCidrMask() {
+        return asCidrMaskLengthInternal() != NOT_A_CIDR_MASK;
+    }
+
+    @Override
+    public int asCidrMaskLength() {
+        if (!isCidrMask()) {
+            throw new IllegalStateException("IP is not a valid CIDR prefix " +
+                    "mask " + toString());
+        } else {
+            return asCidrMaskLengthInternal();
+        }
+    }
+
     public static IPv6Address of(final byte[] address) {
+        if (address == null) {
+            throw new NullPointerException("Address must not be null");
+        }
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv6 address: " + address.length);
@@ -82,6 +140,9 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private final static Pattern colonPattern = Pattern.compile(":");
 
     public static IPv6Address of(final String string) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
         IPv6Builder builder = new IPv6Builder();
         String[] parts = colonPattern.split(string, -1);
 
