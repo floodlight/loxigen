@@ -18,7 +18,7 @@ ofp.message.bsn_gentable_clear_request(
 builder.setXid(0x12345678)
     .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA990000L))
     .setChecksumMask(OFChecksum128.of(0xFFFFFFFFFFFFFFFFL, 0xFFFFFFFFFFFF0000L))
-    .setTableId(20)
+    .setTableId(GenTableId.of(20))
 -- c
 obj = of_bsn_gentable_clear_request_new(OF_VERSION_1_3);
 of_bsn_gentable_clear_request_xid_set(obj, 0x12345678);

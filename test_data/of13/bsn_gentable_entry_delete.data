@@ -23,11 +23,11 @@ ofp.message.bsn_gentable_entry_delete(
     ])
 -- java
 builder.setXid(0x12345678)
-    .setTableId(20)
+    .setTableId(GenTableId.of(20))
     .setKey(
         ImmutableList.<OFBsnTlv>of(
-            factory.bsnTlvPort(OFPort.of(5)),
-            factory.bsnTlvMac(MacAddress.of("01:23:45:67:89:ab"))
+            factory.bsnTlvs().port(OFPort.of(5)),
+            factory.bsnTlvs().mac(MacAddress.of("01:23:45:67:89:ab"))
         )
     )
 -- c

@@ -484,6 +484,10 @@ checksum = JType("OFChecksum128") \
         .op(read='OFChecksum128.read16Bytes(bb)',
             write='$name.write16Bytes(bb)',
             default='OFChecksum128.ZERO')
+gen_table_id = JType("GenTableId") \
+        .op(read='GenTableId.read2Bytes(bb)',
+            write='$name.write2Bytes(bb)',
+           )
 
 generic_t = JType("T")
 
@@ -624,6 +628,9 @@ exceptions = {
         'of_group_delete' : { 'command' : group_mod_cmd },
 
         'of_bucket' : { 'watch_group': of_group },
+
+        'of_bsn_tlv_vlan_vid' : { 'value' : vlan_vid },
+        'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
 }
 
 
@@ -682,6 +689,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return datapath_id
     elif field_name == 'actions' and obj_name == 'of_features_reply':
         return action_type_set
+    elif field_name == "table_id" and re.match(r'of_bsn_gentable.*', obj_name):
+        return gen_table_id
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

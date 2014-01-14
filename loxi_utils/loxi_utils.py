@@ -157,6 +157,9 @@ def class_is_list(cls):
     """
     return (cls.find("of_list_") == 0)
 
+def class_is(cls, cand_name):
+    return _unified_by_name(cls).is_instanceof(cand_name)
+
 def type_is_of_object(m_type):
     """
     Return True if m_type is an OF object type
