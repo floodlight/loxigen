@@ -68,7 +68,15 @@ class JavaModel(object):
         OFExperimenterStatsReply=set(('data','subtype')),
         OFInstructionExperimenter=set(('data',)))
     # map: $java_type -> set(java_name_property)
-    write_blacklist = defaultdict(lambda: set(), OFOxm=set(('typeLen',)), OFAction=set(('type',)), OFInstruction=set(('type',)), OFFlowMod=set(('command', )), OFExperimenter=set(('data','subtype')), OFActionExperimenter=set(('data',)))
+    write_blacklist = defaultdict(
+        lambda: set(),
+        OFOxm=set(('typeLen',)),
+        OFAction=set(('type',)),
+        OFInstruction=set(('type',)),
+        OFFlowMod=set(('command', )),
+        OFExperimenter=set(('data','subtype')),
+        OFActionExperimenter=set(('data',)),
+        OFBsnTlv=set(('type',)))
     # interfaces that are virtual
     virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
 
@@ -161,7 +169,8 @@ class JavaModel(object):
             if loxi_utils.class_is_meter_band(ir_interface.name) or \
                loxi_utils.class_is_queue_prop(ir_interface.name) or \
                loxi_utils.class_is_table_feature_prop(ir_interface.name) or \
-               loxi_utils.class_is_hello_elem(ir_interface.name):
+               loxi_utils.class_is_hello_elem(ir_interface.name) or \
+               loxi_utils.class_is_action_id(ir_interface.name):
                 continue
             if (loxi_utils.class_is_message(ir_interface.name) and \
                ir_interface.name not in \
@@ -169,8 +178,16 @@ class JavaModel(object):
                    "of_flow_modify", "of_flow_modify_strict",
                    "of_flow_delete", "of_flow_delete_strict",
                    "of_stats_request", "of_flow_stats_request",
-                   "of_stats_reply", "of_flow_stats_reply") and not
-                re.match(r'of_.*error_msg', ir_interface.name)):
+                   "of_stats_reply", "of_flow_stats_reply",
+                   "of_experimenter", "of_bsn_header",
+                   "of_experimenter_stats_request", "of_experimenter_stats_reply",
+                   "of_bsn_stats_request", "of_bsn_stats_reply") and not
+                re.match(r'of_.*error_msg', ir_interface.name) and not
+                re.match(r'of_bsn_.*switch_pipeline.*', ir_interface.name)):
+               continue
+            if re.match(r'of_.*stats_entry', ir_interface.name) and  \
+                    ir_interface.name not in \
+                    ( "of_flow_stats_entry", "of_bsn_switch_pipeline_stats_entry"):
                continue
             if ir_interface.name.startswith("of_meter") or ir_interface.name.startswith("of_bucket")\
                     or ir_interface.name in \
@@ -244,7 +261,7 @@ class JavaModel(object):
             annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
 
             factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
-                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator=False)
+                    name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator= (base_class == "OFErrorMsg"))
 
         factories[""] = OFFactory(
                     package=prefix,
@@ -511,6 +528,15 @@ class JavaOFInterface(object):
                 return ("action", "OFActionExperimenter", None)
             else:
                 return ("action", "OFAction", None)
+        elif self.ir_class.is_instanceof("of_action_id"):
+            if self.ir_class.is_subclassof('of_action_id_bsn'):
+                return ("actionid", "OFActionIdBsn", None)
+            elif self.ir_class.is_subclassof('of_action_id_nicira'):
+                return ("actionid", "OFActionIdNicira", None)
+            elif self.ir_class.is_subclassof('of_action_id_experimenter'):
+                return ("actionid", "OFActionIdExperimenter", None)
+            else:
+                return ("actionid", "OFActionId", None)
         elif self.ir_class.is_instruction:
             if self.ir_class.is_subclassof('of_instruction_bsn'):
                 return ("instruction", "OFInstructionBsn", None)
@@ -518,6 +544,13 @@ class JavaOFInterface(object):
                 return ("instruction", "OFInstructionExperimenter", None)
             else:
                 return ("instruction", "OFInstruction", None)
+        elif self.ir_class.is_instanceof('of_instruction_id'):
+            if self.ir_class.is_subclassof('of_instruction_id_bsn'):
+                return ("instructionid", "OFInstructionIdBsn", None)
+            elif self.ir_class.is_subclassof('of_instruction_id_experimenter'):
+                return ("instructionid", "OFInstructionIdExperimenter", None)
+            else:
+                return ("instructionid", "OFInstructionId", None)
         elif re.match(r'OFBsnVport.+$', self.name):
             return ("", "OFBsnVport", None)
         elif self.name == "OFOxm":
@@ -537,6 +570,8 @@ class JavaOFInterface(object):
             return ("", "OFHelloElem", None)
         elif loxi_utils.class_is_table_feature_prop(self.c_name):
             return ("", "OFTableFeatureProp", None)
+        elif loxi_utils.class_is_bsn_tlv(self.c_name):
+            return ("", "OFBsnTlv", None)
         else:
             return ("", None, None)
 

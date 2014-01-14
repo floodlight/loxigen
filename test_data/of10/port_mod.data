@@ -18,12 +18,12 @@ ofp.message.port_mod(
     advertise=0xCAFE6789)
 -- c
 obj = of_port_mod_new(OF_VERSION_1_0);
-of_port_mod_advertise_set(obj, 3405670281);
-of_port_mod_config_set(obj, 2427178479);
+of_port_mod_advertise_set(obj, 0xCAFE6789);
+of_port_mod_config_set(obj, 0x90ABCDEF);
 {
     of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
     of_port_mod_hw_addr_set(obj, hw_addr);
 }
-of_port_mod_mask_set(obj, 4279369489);
+of_port_mod_mask_set(obj, 0xFF11FF11);
 of_port_mod_port_no_set(obj, 65533);
 of_port_mod_xid_set(obj, 2);

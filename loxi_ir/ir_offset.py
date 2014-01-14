@@ -100,6 +100,7 @@ of_base_lengths = dict(
     of_match_v3_t = (8, False),
     of_octets_t = (0, False),
     of_bitmap_128_t = (16, True),
+    of_checksum_128_t = (16, True),
 )
 
 def type_dec_to_count_base(m_type):

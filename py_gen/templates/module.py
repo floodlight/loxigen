@@ -25,44 +25,41 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import itertools
-:: import py_gen.util as util
+:: from loxi_globals import OFVersions
+:: import py_gen.oftype
 :: include('_copyright.py')
 
 :: include('_autogen.py')
 
 import struct
+import loxi
 import const
+import common
+import action
+:: if version >= OFVersions.VERSION_1_1:
+import instruction
+:: #endif
+:: if version >= OFVersions.VERSION_1_2:
+import oxm
+:: #endif
+:: if version >= OFVersions.VERSION_1_3:
+import action_id
+import instruction_id
+import meter_band
+import bsn_tlv
+:: #endif
 import util
 import loxi.generic_util
-import loxi
-
-def unpack_list(reader):
-    def deserializer(reader, typ):
-        parser = parsers.get(typ)
-        if not parser: raise loxi.ProtocolError("unknown meter band type %d" % typ)
-        return parser(reader)
-    return loxi.generic_util.unpack_list_tlv16(reader, deserializer)
-
-class MeterBand(object):
-    type = None # override in subclass
-    pass
 
 :: for ofclass in ofclasses:
-:: include('_ofclass.py', ofclass=ofclass, superclass="MeterBand")
-
-:: #endfor
-
-parsers = {
-:: sort_key = lambda x: x.type_members[0].value
-:: msgtype_groups = itertools.groupby(sorted(ofclasses, key=sort_key), sort_key)
-:: for (k, v) in msgtype_groups:
-:: k = util.constant_for_value(version, "ofp_meter_band_type", k)
-:: v = list(v)
-:: if len(v) == 1:
-    ${k} : ${v[0].pyname}.unpack,
+:: if ofclass.virtual:
+:: include('_virtual_ofclass.py', ofclass=ofclass)
 :: else:
-    ${k} : parse_${k[12:].lower()},
+:: include('_ofclass.py', ofclass=ofclass)
 :: #endif
+
 :: #endfor
-}
+
+:: if 'extra_template' in locals():
+:: include(extra_template)
+:: #endif

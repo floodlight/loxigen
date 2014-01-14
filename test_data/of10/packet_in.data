@@ -18,7 +18,7 @@ ofp.message.packet_in(
     data='abc')
 -- c
 obj = of_packet_in_new(OF_VERSION_1_0);
-of_packet_in_buffer_id_set(obj, 2882400001);
+of_packet_in_buffer_id_set(obj, 0xabcdef01);
 {
     of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
     of_packet_in_data_set(obj, &data);

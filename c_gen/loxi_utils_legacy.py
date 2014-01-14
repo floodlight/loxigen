@@ -118,6 +118,8 @@ def class_is_tlv16(cls):
         return True
     if cls == "of_match_v4":
         return True
+    if cls.find("of_bsn_tlv") == 0:
+        return True
     return False
 
 def class_is_u16_len(cls):
@@ -125,7 +127,10 @@ def class_is_u16_len(cls):
     Return True if cls_name is an object which uses initial uint16 length
     """
     return cls in ["of_group_desc_stats_entry", "of_group_stats_entry",
-                   "of_flow_stats_entry", "of_bucket", "of_table_features"]
+                   "of_flow_stats_entry", "of_bucket", "of_table_features",
+                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
+                   "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
+                   "of_bsn_gentable_desc_stats_entry"]
 
 def class_is_oxm(cls):
     """
@@ -179,6 +184,8 @@ def class_is_instruction(cls):
     """
     Return True if cls_name is an instruction object
     """
+    if cls.find("of_instruction_id") == 0:
+        return False
     if cls.find("of_instruction") == 0:
         return True
 
@@ -242,6 +249,14 @@ def class_is_list(cls):
     Return True if cls_name is a list object
     """
     return (cls.find("of_list_") == 0)
+
+def class_is_bsn_tlv(cls):
+    """
+    Return True if cls_name is a BSN TLV object
+    """
+    if cls.find("of_bsn_tlv") == 0:
+        return True
+    return False
 
 def type_is_of_object(m_type):
     """
@@ -318,30 +333,6 @@ def member_base_type(cls, m_name):
 
 def member_type_is_octets(cls, m_name):
     return member_base_type(cls, m_name) == "of_octets_t"
-
-def member_returns_val(cls, m_name):
-    """
-    Should get accessor return a value rather than void
-    @param cls The class name
-    @param m_name The member name
-    @return True if of_g config and the specific member allow a
-    return value.  Otherwise False
-    """
-    m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and
-            m_type in of_g.of_scalar_types)
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
 
 def h_file_to_define(name):
     """

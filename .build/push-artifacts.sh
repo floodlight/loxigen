@@ -54,6 +54,7 @@ fi
     ) | git commit --file=-
 
     git tag -a -f "loxi/${loxi_head}" -m "Tag Loxigen Revision ${loxi_head}"
+    git push --tags
     git push
 )
 

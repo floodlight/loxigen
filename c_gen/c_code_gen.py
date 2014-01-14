@@ -36,7 +36,7 @@ import c_match
 from generic_utils import *
 from c_gen import flags, type_maps, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
-from c_gen.loxi_utils_legacy import config_check
+import loxi_globals
 
 import c_gen.identifiers as identifiers
 
@@ -62,18 +62,6 @@ def enum_name(cls):
     @param cls The class name
     """
     return loxi_utils.enum_name(cls)
-
-def member_returns_val(cls, m_name):
-    """
-    Should get accessor return a value rather than void
-    @param cls The class name
-    @param m_name The member name
-    @return True if of_g config and the specific member allow a
-    return value.  Otherwise False
-    """
-    m_type = of_g.unified[cls]["union"][m_name]["m_type"]
-    return (config_check("get_returns") =="value" and
-            m_type in of_g.of_scalar_types)
 
 # TODO serialize match outside accessor?
 def accessor_return_type(a_type, m_type):
@@ -425,32 +413,49 @@ extern int of_wire_buffer_of_match_get(of_object_t *obj, int offset,
                                     of_match_t *match);
 extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
                                     of_match_t *match, int cur_len);
-extern void of_extension_object_id_set(of_object_t *obj, of_object_id_t id);
 """)
 
     # gen_base_types(out)
 
-    gen_struct_typedefs(out)
-    gen_acc_pointer_typedefs(out)
-    gen_new_function_declarations(out)
-    if config_check("gen_unified_fns"):
-        gen_accessor_declarations(out)
-
-    gen_common_struct_definitions(out)
     gen_flow_add_setup_function_declarations(out)
-    if config_check("gen_fn_ptrs"): # Otherwise, all classes are from generic cls
-        gen_struct_definitions(out)
-    gen_generic_union(out)
-    gen_generics(out)
-    gen_top_static_functions(out)
     out.write("""
 /****************************************************************
  *
  * Declarations of maps between on-the-wire type values and LOCI identifiers
  *
  ****************************************************************/
+
+/**
+ * Generic experimenter type value.  Applies to all except
+ * top level message: Action, instruction, error, stats, queue_props, oxm
+ */
+#define OF_EXPERIMENTER_TYPE 0xffff
+
+int of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
+int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
+
+of_object_id_t of_action_to_object_id(int action, of_version_t version);
+of_object_id_t of_action_id_to_object_id(int action_id, of_version_t version);
+of_object_id_t of_instruction_to_object_id(int instruction, of_version_t version);
+of_object_id_t of_queue_prop_to_object_id(int queue_prop, of_version_t version);
+of_object_id_t of_table_feature_prop_to_object_id(int table_feature_prop, of_version_t version);
+of_object_id_t of_meter_band_to_object_id(int meter_band, of_version_t version);
+of_object_id_t of_hello_elem_to_object_id(int hello_elem, of_version_t version);
+of_object_id_t of_stats_reply_to_object_id(int stats_reply, of_version_t version);
+of_object_id_t of_stats_request_to_object_id(int stats_request, of_version_t version);
+of_object_id_t of_error_msg_to_object_id(uint16_t error_msg, of_version_t version);
+of_object_id_t of_flow_mod_to_object_id(int flow_mod, of_version_t version);
+of_object_id_t of_group_mod_to_object_id(int group_mod, of_version_t version);
+of_object_id_t of_oxm_to_object_id(uint32_t type_len, of_version_t version);
+of_object_id_t of_message_experimenter_to_object_id(of_message_t msg, of_version_t version);
+of_object_id_t of_message_to_object_id(of_message_t msg, int length);
+of_object_id_t of_bsn_tlv_to_object_id(int tlv_type, of_version_t version);
+
+int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
+
+extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];
+extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
 """)
-    c_type_maps.gen_type_maps_header(out)
     c_type_maps.gen_type_data_header(out)
     c_match.gen_declarations(out)
     # @fixme Move debug stuff to own fn
@@ -484,324 +489,6 @@ def match_c_gen(out, name):
     c_match.gen_match_conversions(out)
     c_match.gen_serialize(out)
     c_match.gen_deserialize(out)
-
-def gen_len_offset_macros(out):
-    """
-    Special case length and offset calculations put directly into
-    loci.c as they are private.
-    """
-
-    out.write("""
-/****************************************************************
- * Special case macros for calculating variable lengths and offsets
- ****************************************************************/
-
-/**
- * Get a u16 directly from an offset in an object's wire buffer
- * @param obj An of_object_t object
- * @param offset Base offset of the uint16 relative to the object
- *
- */
-
-static inline int
-of_object_u16_get(of_object_t *obj, int offset) {
-    uint16_t val16;
-
-    of_wire_buffer_u16_get(obj->wire_object.wbuf,
-        obj->wire_object.obj_offset + offset, &val16);
-
-    return (int)val16;
-}
-
-/**
- * Set a u16 directly at an offset in an object's wire buffer
- * @param obj An of_object_t object
- * @param offset Base offset of the uint16 relative to the object
- * @param val The value to store
- *
- */
-
-static inline void
-of_object_u16_set(of_object_t *obj, int offset, int value) {
-    uint16_t val16;
-
-    val16 = (uint16_t)value;
-    of_wire_buffer_u16_set(obj->wire_object.wbuf,
-        obj->wire_object.obj_offset + offset, val16);
-}
-
-/**
- * Get length of an object with a TLV header with uint16_t
- * @param obj An object with a match member
- * @param offset The wire offset of the start of the object
- *
- * The length field follows the type field.
- */
-
-#define _TLV16_LEN(obj, offset) \\
-    (of_object_u16_get((of_object_t *)(obj), (offset) + 2))
-
-/**
- * Get length of an object that is the "rest" of the object
- * @param obj An object with a match member
- * @param offset The wire offset of the start of the object
- *
- */
-
-#define _END_LEN(obj, offset) ((obj)->length - (offset))
-
-/**
- * Offset of the action_len member in a packet-out object
- */
-
-#define _PACKET_OUT_ACTION_LEN_OFFSET(obj) \\
-    (((obj)->version == OF_VERSION_1_0) ? 14 : 16)
-
-/**
- * Get length of the action list object in a packet_out object
- * @param obj An object of type of_packet_out
- */
-
-#define _PACKET_OUT_ACTION_LEN(obj) \\
-    (of_object_u16_get((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj)))
-
-/**
- * Set length of the action list object in a packet_out object
- * @param obj An object of type of_packet_out
- */
-
-#define _PACKET_OUT_ACTION_LEN_SET(obj, len) \\
-    (of_object_u16_set((of_object_t *)(obj), _PACKET_OUT_ACTION_LEN_OFFSET(obj), len))
-
-/*
- * Match structs in 1.2 come at the end of the fixed length part
- * of structures.  They add 8 bytes to the minimal length of the
- * message, but are also variable length.  This means that the
- * type/length offsets are 8 bytes back from the end of the fixed
- * length part of the object.  The right way to handle this is to
- * expose the offset of the match member more explicitly.  For now,
- * we make the calculation as described here.
- */
-
-/* 1.2 min length of match is 8 bytes */
-#define _MATCH_MIN_LENGTH_V3 8
-
-/**
- * The offset of a 1.2 match object relative to fixed length of obj
- */
-#define _MATCH_OFFSET_V3(fixed_obj_len) \\
-    ((fixed_obj_len) - _MATCH_MIN_LENGTH_V3)
-
-/**
- * The "extra" length beyond the minimal 8 bytes of a match struct
- * in an object
- */
-#define _MATCH_EXTRA_LENGTH_V3(obj, fixed_obj_len) \\
-    (OF_MATCH_BYTES(_TLV16_LEN(obj, _MATCH_OFFSET_V3(fixed_obj_len))) - \\
-     _MATCH_MIN_LENGTH_V3)
-
-/**
- * The offset of an object following a match object for 1.2
- */
-#define _OFFSET_FOLLOWING_MATCH_V3(obj, fixed_obj_len) \\
-    ((fixed_obj_len) + _MATCH_EXTRA_LENGTH_V3(obj, fixed_obj_len))
-
-/**
- * Get length of a match object from its wire representation
- * @param obj An object with a match member
- * @param match_offset The wire offset of the match object.
- *
- * See above; for 1.2,
- * The match length is raw bytes but the actual space it takes
- * up is padded for alignment to 64-bits
- */
-#define _WIRE_MATCH_LEN(obj, match_offset) \\
-    (((obj)->version == OF_VERSION_1_0) ? %(match1)d : \\
-     (((obj)->version == OF_VERSION_1_1) ? %(match2)d : \\
-      _TLV16_LEN(obj, match_offset)))
-
-#define _WIRE_LEN_MIN 4
-
-/*
- * Wrapper function for match len.  There are cases where the wire buffer
- * has not been set with the proper minimum length.  In this case, the
- * wire match len is interpretted as its minimum length, 4 bytes.
- */
-
-static inline int
-wire_match_len(of_object_t *obj, int match_offset) {
-    int len;
-
-    len = _WIRE_MATCH_LEN(obj, match_offset);
-
-    return (len == 0) ? _WIRE_LEN_MIN : len;
-}
-
-#define _WIRE_MATCH_PADDED_LEN(obj, match_offset) \\
-    OF_MATCH_BYTES(wire_match_len((of_object_t *)(obj), (match_offset)))
-
-/**
- * Macro to calculate variable offset of instructions member in flow mod
- * @param obj An object of some type of flow modify/add/delete
- *
- * Get length of preceding match object and add to fixed length
- * Applies only to version 1.2
- */
-
-#define _FLOW_MOD_INSTRUCTIONS_OFFSET(obj) \\
-    _OFFSET_FOLLOWING_MATCH_V3(obj, %(flow_mod)d)
-
-/* The different flavors of flow mod all use the above */
-#define _FLOW_ADD_INSTRUCTIONS_OFFSET(obj) \\
-    _FLOW_MOD_INSTRUCTIONS_OFFSET(obj)
-#define _FLOW_MODIFY_INSTRUCTIONS_OFFSET(obj) \\
-    _FLOW_MOD_INSTRUCTIONS_OFFSET(obj)
-#define _FLOW_MODIFY_STRICT_INSTRUCTIONS_OFFSET(obj) \\
-    _FLOW_MOD_INSTRUCTIONS_OFFSET(obj)
-#define _FLOW_DELETE_INSTRUCTIONS_OFFSET(obj) \\
-    _FLOW_MOD_INSTRUCTIONS_OFFSET(obj)
-#define _FLOW_DELETE_STRICT_INSTRUCTIONS_OFFSET(obj) \\
-    _FLOW_MOD_INSTRUCTIONS_OFFSET(obj)
-
-/**
- * Macro to calculate variable offset of instructions member in flow stats
- * @param obj An object of type of_flow_mod_t
- *
- * Get length of preceding match object and add to fixed length
- * Applies only to version 1.2 and 1.3
- */
-
-#define _FLOW_STATS_ENTRY_INSTRUCTIONS_OFFSET(obj) \\
-    _OFFSET_FOLLOWING_MATCH_V3(obj, %(flow_stats)d)
-
-/**
- * Macro to calculate variable offset of data (packet) member in packet_in
- * @param obj An object of type of_packet_in_t
- *
- * Get length of preceding match object and add to fixed length
- * Applies only to version 1.2 and 1.3
- * The +2 comes from the 2 bytes of padding between the match and packet data.
- */
-
-#define _PACKET_IN_DATA_OFFSET(obj) \\
-    (_OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
-%(packet_in)d : %(packet_in_1_3)d) + 2)
-
-/**
- * Macro to calculate variable offset of data (packet) member in packet_out
- * @param obj An object of type of_packet_out_t
- *
- * Find the length in the actions_len variable and add to the fixed len
- * Applies only to version 1.2 and 1.3
- */
-
-#define _PACKET_OUT_DATA_OFFSET(obj) (_PACKET_OUT_ACTION_LEN(obj) + \\
-     of_object_fixed_len[(obj)->version][OF_PACKET_OUT])
-
-/**
- * Macro to map port numbers that changed across versions
- * @param port The port_no_t variable holding the value
- * @param ver The OpenFlow version from which the value was extracted
- */
-#define OF_PORT_NO_VALUE_CHECK(port, ver) \\
-    if (((ver) == OF_VERSION_1_0) && ((port) > 0xff00)) (port) += 0xffff0000
-
-""" % dict(flow_mod=of_g.base_length[("of_flow_modify",of_g.VERSION_1_2)],
-           packet_in=of_g.base_length[("of_packet_in",of_g.VERSION_1_2)],
-           packet_in_1_3=of_g.base_length[("of_packet_in",of_g.VERSION_1_3)],
-           flow_stats=of_g.base_length[("of_flow_stats_entry",
-                                        of_g.VERSION_1_2)],
-           match1=of_g.base_length[("of_match_v1",of_g.VERSION_1_0)],
-           match2=of_g.base_length[("of_match_v2",of_g.VERSION_1_1)]))
-
-def gen_obj_id_macros(out):
-    """
-    Flow modify (add, delete) messages (and maybe others) use ID checks allowing
-    inheritance to use common accessor functions.
-    """
-    out.write("""
-/**
- * Macro to detect if an object ID falls in the "flow mod" family of objects
- * This includes add, modify, modify_strict, delete and delete_strict
- */
-#define IS_FLOW_MOD_SUBTYPE(object_id)                 \\
-    (((object_id) == OF_FLOW_MODIFY) ||                \\
-     ((object_id) == OF_FLOW_MODIFY_STRICT) ||         \\
-     ((object_id) == OF_FLOW_DELETE) ||                \\
-     ((object_id) == OF_FLOW_DELETE_STRICT) ||         \\
-     ((object_id) == OF_FLOW_ADD))
-""")
-
-
-def top_c_gen(out, name):
-    """
-    Generate code for
-    @param out The file handle to write to
-    @param name The name of the file
-    """
-    common_top_matter(out, name)
-    # Generic C code that needs to go into loci.c can go here.
-    out.write("""
-/****************************************************************
- *
- * This file is divided into the following sections.
- *
- * Instantiate strings such as object names
- * Special case macros for low level object access
- * Per-class, per-member accessor definitions
- * Per-class new/init function definitions
- * Per-class new/init pointer instantiations
- * Instantiate "set map" for pointer set fns
- *
- ****************************************************************/
-
-#ifdef __GNUC__
-#ifdef __linux__
-/* glibc */
-#include <features.h>
-#else
-/* NetBSD etc */
-#include <sys/cdefs.h>
-#ifdef __GNUC_PREREQ__
-#define __GNUC_PREREQ __GNUC_PREREQ__
-#endif
-#endif
-
-#ifndef __GNUC_PREREQ
-/* fallback */
-#define __GNUC_PREREQ(maj, min) 0
-#endif
-
-#if __GNUC_PREREQ(4,4)
-#pragma GCC optimize ("s")
-#endif
-
-#if __GNUC_PREREQ(4,6)
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-#endif
-
-#endif
-
-#include <loci/loci.h>
-#include <loci/of_object.h>
-#include "loci_log.h"
-
-""")
-    gen_object_enum_str(out)
-    gen_len_offset_macros(out)
-    gen_obj_id_macros(out)
-    if config_check("gen_unified_fns"):
-        gen_accessor_definitions(out)
-    gen_new_function_definitions(out)
-    gen_init_map(out)
-    out.write("\n/* This code should be broken out to a different file */\n")
-    gen_setup_from_add_fns(out)
-
-def type_data_c_gen(out, name):
-    common_top_matter(out, name)
-    c_type_maps.gen_type_maps(out)
-    c_type_maps.gen_length_array(out)
-    c_type_maps.gen_extra_length_array(out)
 
 ################################################################
 # Top Matter
@@ -1011,6 +698,11 @@ typedef struct of_bitmap_128_s {
     uint64_t lo;
 } of_bitmap_128_t;
 
+typedef struct of_checksum_128_s {
+    uint64_t hi;
+    uint64_t lo;
+} of_checksum_128_t;
+
 /* These are types which change across versions.  */
 typedef uint32_t of_port_no_t;
 typedef uint16_t of_fm_cmd_t;
@@ -1101,7 +793,7 @@ def external_h_top_matter(out, name):
 #include <loci/of_message.h>
 #include <loci/of_match.h>
 #include <loci/of_object.h>
-#include <loci/of_wire_buf.h>
+#include <loci/loci_classes.h>
 
 /****************************************************************
  *
@@ -1119,51 +811,6 @@ def external_h_top_matter(out, name):
  * Some special case macros
  *
  ****************************************************************/
-""")
-
-def gen_top_static_functions(out):
-    out.write("""
-
-#define _MAX_PARENT_ITERATIONS 4
-/**
- * Iteratively update parent lengths thru hierarchy
- * @param obj The object whose length is being updated
- * @param delta The difference between the current and new lengths
- *
- * Note that this includes updating the object itself.  It will
- * iterate thru parents.
- *
- * Assumes delta > 0.
- */
-static inline void
-of_object_parent_length_update(of_object_t *obj, int delta)
-{
-#ifndef NDEBUG
-    int count = 0;
-    of_wire_buffer_t *wbuf;  /* For debug asserts only */
-#endif
-
-    while (obj != NULL) {
-        ASSERT(count++ < _MAX_PARENT_ITERATIONS);
-        obj->length += delta;
-        if (obj->wire_length_set != NULL) {
-            obj->wire_length_set(obj, obj->length);
-        }
-#ifndef NDEBUG
-        wbuf = obj->wire_object.wbuf;
-#endif
-
-        /* Asserts for wire length checking */
-        ASSERT(obj->length + obj->wire_object.obj_offset <=
-               WBUF_CURRENT_BYTES(wbuf));
-        if (obj->parent == NULL) {
-            ASSERT(obj->length + obj->wire_object.obj_offset ==
-                   WBUF_CURRENT_BYTES(wbuf));
-        }
-
-        obj = obj->parent;
-    }
-}
 """)
 
 ################################################################
@@ -1322,63 +969,6 @@ of_wire_id_valid(int object_id, int base_object_id) {
 }
 """)
 
-def gen_object_enum_str(out):
-    out.write("\nconst char *const of_object_id_str[] = {\n")
-    out.write("    \"of_object\",\n")
-    for cls in of_g.ordered_messages:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* Non-message objects */\n")
-    for cls in of_g.ordered_non_messages:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* List objects */\n")
-    for cls in of_g.ordered_list_objects:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    /* Generic stats request/reply types; pseudo objects */\n")
-    for cls in of_g.ordered_pseudo_objects:
-        out.write("    \"%s\",\n" % cls)
-    out.write("\n    \"of_unknown_object\"\n};\n")
-
-    # We'll do version strings while we're at it
-    out.write("""
- const char *const of_version_str[] = {
-    "Unknown OpenFlow Version",
-    "OpenFlow-1.0",
-    "OpenFlow-1.1",
-    "OpenFlow-1.2"
-};
-
-const of_mac_addr_t of_mac_addr_all_ones = {
-    {
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-    }
-};
-/* Just to be explicit; static duration vars are init'd to 0 */
-const of_mac_addr_t of_mac_addr_all_zeros = {
-    {
-        0, 0, 0, 0, 0, 0
-    }
-};
-
-const of_ipv6_t of_ipv6_all_ones = {
-    {
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-        0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-    }
-};
-/* Just to be explicit; static duration vars are init'd to 0 */
-const of_ipv6_t of_ipv6_all_zeros = {
-    {
-        0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0
-    }
-};
-
-/** @var of_error_strings
- * The error string map; use abs value to index
- */
-const char *const of_error_strings[] = { OF_ERROR_STRINGS };
-""")
-
 ################################################################
 #
 # Internal Utility Functions
@@ -1410,8 +1000,6 @@ def get_acc_rv(cls, m_name):
     member = of_g.unified[cls]["union"][m_name]
     m_type = member["m_type"]
     rv = "int"
-    if member_returns_val(cls, m_name):
-        rv = m_type
     if m_type[-2:] == "_t":
         m_type = m_type[:-2]
 
@@ -1547,11 +1135,8 @@ def gen_struct_typedefs(out):
     for cls in of_g.standard_class_order:
         if cls in type_maps.inheritance_map:
             continue
-        if config_check("gen_fn_ptrs"):
-            out.write("typedef struct %(cls)s_s %(cls)s_t;\n" % dict(cls=cls))
-        else:
-            template = "typedef of_object_t %(cls)s_t;\n"
-            out.write(template % dict(cls=cls))
+        template = "typedef of_object_t %(cls)s_t;\n"
+        out.write(template % dict(cls=cls))
 
     out.write("""
 /****************************************************************
@@ -1565,47 +1150,6 @@ def gen_struct_typedefs(out):
 extern void of_object_delete(of_object_t *obj);
 
 """)
-
-def gen_generic_union(out):
-    """
-    Generate the generic union object composing all LOCI objects
-
-    @param out The file to which to write the decs
-    """
-    out.write("""
-/**
- * The common LOCI object is a union of all possible objects.
- */
-union of_generic_u {
-    of_object_t object;  /* Common base class with fundamental accessors */
-
-    /* Message objects */
-""")
-    for cls in of_g.ordered_messages:
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("\n    /* Non-message composite objects */\n")
-    for cls in of_g.ordered_non_messages:
-        if cls in type_maps.inheritance_map:
-            continue
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("\n    /* List objects */\n")
-    for cls in of_g.ordered_list_objects:
-        out.write("    %s_t %s;\n" % (cls, cls))
-    out.write("};\n")
-
-def gen_common_struct_definitions(out):
-    out.write("""
-/****************************************************************
- *
- * Unified structure definitions
- *
- ****************************************************************/
-
-struct of_object_s {
-    /* Common members */
-%(common)s
-};
-""" % dict(common=of_g.base_object_members))
 
 def gen_flow_add_setup_function_declarations(out):
     """
@@ -1686,51 +1230,6 @@ of_flow_stats_entry_setup_from_flow_add(of_flow_stats_entry_t *obj,
                                         of_flow_add_t *flow_add,
                                         of_object_t *effects);
 """)
-
-def gen_struct_definitions(out):
-    """
-    Generate the declaration of all of_ C structures
-
-    @param out The file to which to write the decs
-    """
-
-    # This should only get called if gen_fn_ptr is true in code_gen_config
-    if not config_check("gen_fn_ptrs"):
-        debug("Error: gen_struct_defs called, but no fn ptrs set")
-        return
-
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue # These are generated elsewhere
-        note = ""
-        if loxi_utils.class_is_message(cls):
-            note = " /* Class is message */"
-        out.write("struct %s_s {%s\n" % (cls, note))
-        out.write("""    /* Common members */
-%s
-    /* Class specific members */
-""" % of_g.base_object_members)
-        if loxi_utils.class_is_list(cls):
-            out.write("""
-    %(cls)s_first_f first;
-    %(cls)s_next_f next;
-    %(cls)s_append_bind_f append_bind;
-    %(cls)s_append_f append;
-};
-
-""" % {"cls": cls})
-            continue   # All done with list object
-
-        # Else, not a list instance; add accessors for all data members
-        for m_name in of_g.ordered_members[cls]:
-            if m_name in of_g.skip_members:
-                # These members (length, etc) are handled internally
-                continue
-            f_name = acc_name(cls, m_name)
-            out.write("    %s_get_f %s;\n" % (f_name, m_name + "_get"))
-            out.write("    %s_set_f %s;\n" % (f_name, m_name + "_set"))
-        out.write("};\n\n")
-
 
 ################################################################
 #
@@ -2051,7 +1550,7 @@ def wire_accessor(m_type, a_type):
         m_type = "octets_data"
     return "of_wire_buffer_%s_%s" % (m_type, a_type)
 
-def get_len_macro(cls, m_type, version):
+def get_len_macro(cls, m_name, m_type, version):
     """
     Get the length macro for m_type in cls
     """
@@ -2063,6 +1562,12 @@ def get_len_macro(cls, m_type, version):
         return "_TLV16_LEN(obj, offset)"
     if cls == "of_packet_out" and m_type == "of_list_action_t":
         return "_PACKET_OUT_ACTION_LEN(obj)"
+    if cls == "of_bsn_gentable_entry_add" and m_name == "key":
+        return "of_object_u16_get(obj, 18)"
+    if cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "key":
+        return "of_object_u16_get(obj, 2)"
+    if cls == "of_bsn_gentable_entry_stats_entry" and m_name == "key":
+        return "of_object_u16_get(obj, 2)"
     # Default is everything to the end of the object
     return "_END_LEN(obj, offset)"
 
@@ -2089,6 +1594,12 @@ def gen_accessor_offsets(out, cls, m_name, version, a_type, m_type, offset):
             pass
         elif (cls == "of_packet_out" and m_name == "data"):
             pass
+        elif (cls == "of_bsn_gentable_entry_add" and m_name == "value"):
+            pass
+        elif (cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "value"):
+            pass
+        elif (cls == "of_bsn_gentable_entry_stats_entry" and m_name == "stats"):
+            pass
         else:
             debug("Error: Unknown member with offset == -1")
             debug("  cls %s, m_name %s, version %d" % (cls, m_name, version))
@@ -2103,7 +1614,7 @@ def gen_accessor_offsets(out, cls, m_name, version, a_type, m_type, offset):
     if not loxi_utils.type_is_scalar(m_type):
         if loxi_utils.class_is_var_len(m_type[:-2], version) or \
                 m_type == "of_match_t":
-            len_macro = get_len_macro(cls, m_type, version)
+            len_macro = get_len_macro(cls, m_name, m_type, version)
         else:
             len_macro = "%d" % of_g.base_length[(m_type[:-2], version)]
         out.write("        cur_len = %s;\n" % len_macro)
@@ -2218,6 +1729,16 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
             out.write("""
     /* Special case for setting action lengths */
     _PACKET_OUT_ACTION_LEN_SET(obj, %(m_name)s->length);
+""" % dict(m_name=m_name))
+        elif cls == "of_bsn_gentable_entry_add" and m_name == "key":
+            out.write("""
+    /* Special case for setting key length */
+    of_object_u16_set(obj, 18, %(m_name)s->length);
+""" % dict(m_name=m_name))
+        elif cls in ["of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry"] and m_name == "key":
+            out.write("""
+    /* Special case for setting key length */
+    of_object_u16_set(obj, 2, %(m_name)s->length);
 """ % dict(m_name=m_name))
         elif m_type not in ["of_match_t", "of_octets_t"]:
             out.write("""
@@ -2408,28 +1929,7 @@ def gen_get_accessor(out, cls, m_name, m_type, ver_type_map):
     out.write("%s\n%s_%s_get(\n    %s)\n" % (ret_type, cls, m_name, params))
     gen_unified_acc_body(out, cls, m_name, ver_type_map, "get", m_type)
 
-def gen_accessor_definitions(out):
-    """
-    Generate the body of each version independent accessor
-
-    @param out The file to which to write the decs
-    """
-
-    out.write("""
-/****************************************************************
- *
- * Unified accessor function definitions
- *
- ****************************************************************/
-""")
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
-        out.write("\n/* Unified accessor functions for %s */\n" % cls)
-        if loxi_utils.class_is_list(cls):
-            gen_list_accessors(out, cls)
-            continue
-        out.write("/** \\ingroup %s \n * @{ */\n" % cls)
+def gen_accessor_definitions(out, cls):
         for m_name in of_g.ordered_members[cls]:
             if m_name in of_g.skip_members:
                 continue
@@ -2470,96 +1970,6 @@ def gen_accessor_definitions(out):
             out.write("%s\n%s_%s_set(\n    %s)\n" % (ret_type, cls, m_name, params))
             gen_unified_acc_body(out, cls, m_name, ver_type_map, "set", m_type)
 
-        out.write("\n/** @} */\n")
-
-def gen_acc_pointer_typedefs(out):
-    """
-    Generate the function pointer typedefs for in-struct accessors
-    @param out The file to which to write the typedefs
-    """
-
-    out.write("""
-/****************************************************************
- *
- * Accessor function pointer typedefs
- *
- ****************************************************************/
-
-/*
- * Generic accessors:
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * FIXME: TBD if wire_length_set and wire_type_set are required.
- */
-typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
-typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
-typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj, of_object_id_t id);
-""")
-    # If not using function pointers in classes, don't gen typedefs below
-    if not config_check("gen_fn_ptrs"):
-        return
-
-    # For each class, for each type it uses, generate a typedef
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
-        out.write("\n/* Accessor function pointer typedefs for %s */\n" % cls)
-        types_done = list()
-        for m_name in of_g.ordered_members[cls]:
-            (m_type, get_rv) = get_acc_rv(cls, m_name)
-            if (m_type, get_rv) in types_done:
-                continue
-            types_done.append((m_type, get_rv))
-            fn = "%s_%s" % (cls, m_type)
-            params = ", ".join(param_list(cls, m_name, "get"))
-            out.write("typedef int (*%s_get_f)(\n    %s);\n" %
-                      (fn, params))
-
-            params = ", ".join(param_list(cls, m_name, "set"))
-            out.write("typedef int (*%s_set_f)(\n    %s);\n" %
-                      (fn, params))
-        if loxi_utils.class_is_list(cls):
-            obj_type = loxi_utils.list_to_entry_type(cls)
-            out.write("""typedef int (*%(cls)s_first_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_next_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_append_bind_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-typedef int (*%(cls)s_append_f)(
-    %(cls)s_t *list,
-    %(obj_type)s_t *obj);
-""" % {"cls":cls, "obj_type":obj_type})
-
-#             out.write("""
-# typedef int (*%(cls)s_get_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_set_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_append_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_insert_f)(
-#     %(cls)s_t *list,
-#     %(obj_type)s_t *obj, int index);
-# typedef int (*%(cls)s_remove_f)(
-#     %(cls)s_t *list,
-#     int index);
-# """ % {"cls":cls, "obj_type":obj_type})
-
 ################################################################
 #
 # New/Delete Function Definitions
@@ -2579,21 +1989,6 @@ def del_function_proto(cls):
     fn = "void\n"
     return fn
 
-
-def instantiate_fn_ptrs(cls, ilvl, out):
-    """
-    Generate the C code to instantiate function pointers for a class
-    @param cls The class name
-    @param ilvl The base indentation level
-    @param out The file to which to write the functions
-    """
-    for m_name in of_g.ordered_members[cls]:
-        if m_name in of_g.skip_members:
-            continue
-        out.write(" " * ilvl + "obj->%s_get = %s_%s_get;\n" %
-                  (m_name, cls, m_name))
-        out.write(" " * ilvl + "obj->%s_set = %s_%s_set;\n" %
-                  (m_name, cls, m_name))
 
 ################################################################
 # Routines to generate the body of new/delete functions
@@ -2687,62 +2082,30 @@ static inline int
 {
 """ % dict(cls=cls))
 
+    import loxi_globals
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if uclass and not uclass.virtual and uclass.has_type_members:
+        out.write("""
+    %(cls)s_push_wire_types(obj);
+""" % dict(cls=cls))
+
     if loxi_utils.class_is_message(cls):
         out.write("""
-    /* Message obj; push version, length and type to wire */
+    /* Message obj; set length */
     of_message_t msg;
 
     if ((msg = OF_OBJECT_TO_MESSAGE(obj)) != NULL) {
-        of_message_version_set(msg, obj->version);
         of_message_length_set(msg, obj->length);
-        OF_TRY(of_wire_message_object_id_set(OF_OBJECT_TO_WBUF(obj),
-                 %(name)s));
     }
 """ % dict(name = enum_name(cls)))
-
-        for version in of_g.of_version_range:
-            if type_maps.class_is_extension(cls, version):
-                exp_name = type_maps.extension_to_experimenter_macro_name(cls)
-                subtype = type_maps.extension_message_to_subtype(cls, version)
-                if subtype is None or exp_name is None:
-                    print "Error in mapping extension message"
-                    print cls, version
-                    sys.exit(1)
-                out.write("""
-    if (obj->version == %(version)s) {
-        of_message_experimenter_id_set(OF_OBJECT_TO_MESSAGE(obj),
-                                       %(exp_name)s);
-        of_message_experimenter_subtype_set(OF_OBJECT_TO_MESSAGE(obj),
-                                            %(subtype)s);
-    }
-""" % dict(exp_name=exp_name, version=of_g.wire_ver_map[version],
-           subtype=str(subtype)))
 
     else: # Not a message
         if loxi_utils.class_is_tlv16(cls):
             out.write("""
-    /* TLV obj; set length and type */
+    /* TLV obj; set length */
     of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-    of_tlv16_wire_object_id_set((of_object_t *)obj,
-           %(enum)s);
 """ % dict(enum=enum_name(cls)))
-            # Some tlv16 types may be extensions requiring more work
-            if cls in ["of_action_bsn_mirror", "of_action_id_bsn_mirror",
-                       "of_action_bsn_set_tunnel_dst", "of_action_id_bsn_set_tunnel_dst",
-                       "of_action_nicira_dec_ttl", "of_action_id_nicira_dec_ttl",
-                       "of_instruction_bsn_disable_src_mac_check"]:
-                out.write("""
-    /* Extended TLV obj; Call specific accessor */
-    of_extension_object_id_set(obj, %(enum)s);
-""" % dict(cls=cls, enum=enum_name(cls)))
 
-
-        if loxi_utils.class_is_oxm(cls):
-            out.write("""\
-    /* OXM obj; set length and type */
-    of_oxm_wire_length_set((of_object_t *)obj, obj->length);
-    of_oxm_wire_object_id_set((of_object_t *)obj, %(enum)s);
-""" % dict(enum=enum_name(cls)))
         if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
             out.write("""
     obj->wire_length_set((of_object_t *)obj, obj->length);
@@ -2791,7 +2154,7 @@ def gen_new_fn_body(cls, out):
  */
 
 %(cls)s_t *
-%(cls)s_new_(of_version_t version)
+%(cls)s_new(of_version_t version)
 {
     %(cls)s_t *obj;
     int bytes;
@@ -2826,25 +2189,6 @@ def gen_new_fn_body(cls, out):
     out.write("""
     return obj;
 }
-
-#if defined(OF_OBJECT_TRACKING)
-
-/*
- * Tracking objects.  Call the new function and then record location
- */
-
-%(cls)s_t *
-%(cls)s_new_tracking(of_version_t version,
-     const char *file, int line)
-{
-    %(cls)s_t *obj;
-
-    obj = %(cls)s_new_(version);
-    of_object_track((of_object_t *)obj, file, line);
-
-    return obj;
-}
-#endif
 """ % dict(cls=cls))
 
 
@@ -2865,7 +2209,7 @@ def gen_from_message_fn_body(cls, out):
  */
 
 %(cls)s_t *
-%(cls)s_new_from_message_(of_message_t msg)
+%(cls)s_new_from_message(of_message_t msg)
 {
     %(cls)s_t *obj = NULL;
     of_version_t version;
@@ -2894,25 +2238,6 @@ def gen_from_message_fn_body(cls, out):
 
     return obj;
 }
-
-#if defined(OF_OBJECT_TRACKING)
-
-/*
- * Tracking objects.  Call the new function and then record location
- */
-
-%(cls)s_t *
-%(cls)s_new_from_message_tracking(of_message_t msg,
-    const char *file, int line)
-{
-    %(cls)s_t *obj;
-
-    obj = %(cls)s_new_from_message_(msg);
-    of_object_track((of_object_t *)obj, file, line);
-
-    return obj;
-}
-#endif
 """ % dict(cls=cls))
 
 
@@ -2942,58 +2267,15 @@ def gen_new_function_declarations(out):
  *
  ****************************************************************/
 """)
-    out.write("""
-/*
- * If object tracking is enabled, map "new" and "new from msg"
- * calls to tracking versions; otherwise, directly to internal
- * versions of fns which have the same name but end in _.
- */
-
-#if defined(OF_OBJECT_TRACKING)
-""")
-    for cls in of_g.standard_class_order:
-        out.write("""
-extern %(cls)s_t *
-    %(cls)s_new_tracking(of_version_t version,
-        const char *file, int line);
-#define %(cls)s_new(version) \\
-    %(cls)s_new_tracking(version, \\
-        __FILE__, __LINE__)
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message_tracking(of_message_t msg,
-        const char *file, int line);
-#define %(cls)s_new_from_message(msg) \\
-    %(cls)s_new_from_message_tracking(msg, \\
-        __FILE__, __LINE__)
-""" % dict(cls=cls))
-
-    out.write("""
-#else /* No object tracking */
-""")
-    for cls in of_g.standard_class_order:
-        out.write("""
-#define %(cls)s_new(version) \\
-    %(cls)s_new_(version)
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""#define %(cls)s_new_from_message(msg) \\
-    %(cls)s_new_from_message_(msg)
-""" % dict(cls=cls))
-
-    out.write("""
-#endif /* Object tracking */
-""")
 
     for cls in of_g.standard_class_order:
         out.write("""
 extern %(cls)s_t *
-    %(cls)s_new_(of_version_t version);
+    %(cls)s_new(of_version_t version);
 """ % dict(cls=cls))
         if loxi_utils.class_is_message(cls):
             out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message_(of_message_t msg);
+    %(cls)s_new_from_message(of_message_t msg);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
     %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
@@ -3050,6 +2332,12 @@ def gen_coerce_ops(out, cls):
     /* Set up the object's function pointers */
 """)
 
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if uclass and not uclass.virtual and uclass.has_type_members:
+        out.write("""
+    obj->wire_type_set = %(cls)s_push_wire_types;
+""" % dict(cls=cls))
+
     if loxi_utils.class_is_message(cls):
         out.write("""
     obj->wire_length_get = of_object_message_wire_length_get;
@@ -3060,7 +2348,6 @@ def gen_coerce_ops(out, cls):
             if not (cls in type_maps.inheritance_map): # Don't set for super
                 out.write("""
     obj->wire_length_set = of_tlv16_wire_length_set;
-    obj->wire_type_set = of_tlv16_wire_object_id_set;\
 """)
             out.write("""
     obj->wire_length_get = of_tlv16_wire_length_get;
@@ -3093,12 +2380,14 @@ def gen_coerce_ops(out, cls):
                     out.write("""
     obj->wire_type_get = of_hello_elem_wire_object_id_get;
 """)
+            if loxi_utils.class_is_bsn_tlv(cls):
+                    out.write("""
+    obj->wire_type_get = of_bsn_tlv_wire_object_id_get;
+""")
         if loxi_utils.class_is_oxm(cls):
             out.write("""
     obj->wire_length_get = of_oxm_wire_length_get;
-    obj->wire_length_set = of_oxm_wire_length_set;
     obj->wire_type_get = of_oxm_wire_object_id_get;
-    obj->wire_type_set = of_oxm_wire_object_id_set;
 """)
         if loxi_utils.class_is_u16_len(cls):
             out.write("""
@@ -3120,57 +2409,17 @@ def gen_coerce_ops(out, cls):
     obj->wire_length_set = of_meter_stats_wire_length_set;
 """)
 
-    if config_check("gen_fn_ptrs"):
-        if loxi_utils.class_is_list(cls):
-            out.write("""
-    obj->first = %(cls)s_first;
-    obj->next = %(cls)s_next;
-    obj->append = %(cls)s_append;
-    obj->append_bind = %(cls)s_append_bind;
-""" % dict(cls=cls))
-        else:
-            instantiate_fn_ptrs(cls, 4, out)
-
-def gen_new_function_definitions(out):
+def gen_new_function_definitions(out, cls):
     """
     Generate the new operator for all classes
 
     @param out The file to which to write the functions
     """
 
-    out.write("\n/* New operators for each message class */\n")
-    for cls in of_g.standard_class_order:
-        out.write("\n/* New operators for %s */\n" % cls)
-        gen_new_fn_body(cls, out)
-        gen_init_fn_body(cls, out)
-        if loxi_utils.class_is_message(cls):
-            gen_from_message_fn_body(cls, out)
-
-def gen_init_map(out):
-    """
-    Generate map from object ID to type coerce function
-    """
-    out.write("""
-/**
- * Map from object ID to type coerce function
- */
-const of_object_init_f of_object_init_map[] = {
-    (of_object_init_f)NULL,
-""")
-    count = 1
-    for i, cls in enumerate(of_g.standard_class_order):
-        if count != of_g.unified[cls]["object_id"]:
-            print "Error in class mapping: object IDs not sequential"
-            print cls, count, of_g.unified[cls]["object_id"]
-            sys.exit(1)
-        s = "(of_object_init_f)%s_init" % cls
-        if cls in type_maps.inheritance_map:
-            s = "(of_object_init_f)%s_header_init" % cls
-        if i < len(of_g.standard_class_order) - 1:
-            s += ","
-        out.write("    %-65s /* %d */\n" % (s, count))
-        count += 1
-    out.write("};\n")
+    gen_new_fn_body(cls, out)
+    gen_init_fn_body(cls, out)
+    if loxi_utils.class_is_message(cls):
+        gen_from_message_fn_body(cls, out)
 
 """
 Document generation functions
@@ -3438,232 +2687,3 @@ static int
 }
 """ % dict(s_cls=cls[3:], cls=cls, cxn_type=cxn_type))
     gen_message_switch_stmt_tmeplate(out, False, cxn_type)
-
-def gen_setup_from_add_fns(out):
-    """
-    Generate functions that setup up objects based on an add
-
-    Okay, this is getting out of hand.  We need to refactor the code
-    so that this can be done without so much pain.
-    """
-    out.write("""
-
-/* Flow stats entry setup for all versions */
-
-static int
-flow_stats_entry_setup_from_flow_add_common(of_flow_stats_entry_t *obj,
-                                            of_flow_add_t *flow_add,
-                                            of_object_t *effects,
-                                            int entry_match_offset,
-                                            int add_match_offset)
-{
-    int entry_len, add_len;
-    of_wire_buffer_t *wbuf;
-    int abs_offset;
-    int delta;
-    uint16_t val16;
-    uint64_t cookie;
-    of_octets_t match_octets;
-
-    /* Transfer the match underlying object from add to stats entry */
-    wbuf = OF_OBJECT_TO_WBUF(obj);
-    entry_len = _WIRE_MATCH_PADDED_LEN(obj, entry_match_offset);
-    add_len = _WIRE_MATCH_PADDED_LEN(flow_add, add_match_offset);
-
-    match_octets.bytes = add_len;
-    match_octets.data = OF_OBJECT_BUFFER_INDEX(flow_add, add_match_offset);
-
-    /* Copy data into flow entry */
-    abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, entry_match_offset);
-    of_wire_buffer_replace_data(wbuf, abs_offset, entry_len,
-                                match_octets.data, add_len);
-
-    /* Not scalar, update lengths if needed */
-    delta = add_len - entry_len;
-    if (delta != 0) {
-        /* Update parent(s) */
-        of_object_parent_length_update((of_object_t *)obj, delta);
-    }
-
-    of_flow_add_cookie_get(flow_add, &cookie);
-    of_flow_stats_entry_cookie_set(obj, cookie);
-
-    of_flow_add_priority_get(flow_add, &val16);
-    of_flow_stats_entry_priority_set(obj, val16);
-
-    of_flow_add_idle_timeout_get(flow_add, &val16);
-    of_flow_stats_entry_idle_timeout_set(obj, val16);
-
-    of_flow_add_hard_timeout_get(flow_add, &val16);
-    of_flow_stats_entry_hard_timeout_set(obj, val16);
-
-    /* Effects may come from different places */
-    if (effects != NULL) {
-        if (obj->version == OF_VERSION_1_0) {
-            OF_TRY(of_flow_stats_entry_actions_set(obj,
-                (of_list_action_t *)effects));
-        } else {
-            OF_TRY(of_flow_stats_entry_instructions_set(obj,
-                (of_list_instruction_t *)effects));
-        }
-    } else {
-        if (obj->version == OF_VERSION_1_0) {
-            of_list_action_t actions;
-            of_flow_add_actions_bind(flow_add, &actions);
-            OF_TRY(of_flow_stats_entry_actions_set(obj, &actions));
-        } else {
-            of_list_instruction_t instructions;
-            of_flow_add_instructions_bind(flow_add, &instructions);
-            OF_TRY(of_flow_stats_entry_instructions_set(obj, &instructions));
-        }
-    }
-
-    return OF_ERROR_NONE;
-}
-
-/* Flow removed setup for all versions */
-
-static int
-flow_removed_setup_from_flow_add_common(of_flow_removed_t *obj,
-                                        of_flow_add_t *flow_add,
-                                        int removed_match_offset,
-                                        int add_match_offset)
-{
-    int add_len, removed_len;
-    of_wire_buffer_t *wbuf;
-    int abs_offset;
-    int delta;
-    uint16_t val16;
-    uint64_t cookie;
-    of_octets_t match_octets;
-
-    /* Transfer the match underlying object from add to removed obj */
-    wbuf = OF_OBJECT_TO_WBUF(obj);
-    removed_len = _WIRE_MATCH_PADDED_LEN(obj, removed_match_offset);
-    add_len = _WIRE_MATCH_PADDED_LEN(flow_add, add_match_offset);
-
-    match_octets.bytes = add_len;
-    match_octets.data = OF_OBJECT_BUFFER_INDEX(flow_add, add_match_offset);
-
-    /* Copy data into flow removed */
-    abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, removed_match_offset);
-    of_wire_buffer_replace_data(wbuf, abs_offset, removed_len,
-                                match_octets.data, add_len);
-
-    /* Not scalar, update lengths if needed */
-    delta = add_len - removed_len;
-    if (delta != 0) {
-        /* Update parent(s) */
-        of_object_parent_length_update((of_object_t *)obj, delta);
-    }
-
-    of_flow_add_cookie_get(flow_add, &cookie);
-    of_flow_removed_cookie_set(obj, cookie);
-
-    of_flow_add_priority_get(flow_add, &val16);
-    of_flow_removed_priority_set(obj, val16);
-
-    of_flow_add_idle_timeout_get(flow_add, &val16);
-    of_flow_removed_idle_timeout_set(obj, val16);
-
-    if (obj->version >= OF_VERSION_1_2) {
-        of_flow_add_hard_timeout_get(flow_add, &val16);
-        of_flow_removed_hard_timeout_set(obj, val16);
-    }
-
-    return OF_ERROR_NONE;
-}
-
-/* Set up a flow removed message from the original add */
-
-int
-of_flow_removed_setup_from_flow_add(of_flow_removed_t *obj,
-                                    of_flow_add_t *flow_add)
-{
-    switch (obj->version) {
-    case OF_VERSION_1_0:
-        return flow_removed_setup_from_flow_add_common(obj, flow_add,
-                                                       8, 8);
-        break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
-        return flow_removed_setup_from_flow_add_common(obj, flow_add,
-                                                       48, 48);
-        break;
-    default:
-        return OF_ERROR_VERSION;
-        break;
-    }
-
-    return OF_ERROR_NONE;
-}
-
-
-/* Set up a packet in message from the original add */
-
-int
-of_packet_in_setup_from_flow_add(of_packet_in_t *obj,
-                                 of_flow_add_t *flow_add)
-{
-    int add_len, pkt_in_len;
-    of_wire_buffer_t *wbuf;
-    int abs_offset;
-    int delta;
-    const int pkt_in_match_offset = 16;
-    const int add_match_offset = 48;
-    of_octets_t match_octets;
-
-    if (obj->version < OF_VERSION_1_2) {
-        /* Nothing to be done before OF 1.2 */
-        return OF_ERROR_NONE;
-    }
-
-    /* Transfer match struct from flow add to packet in object */
-    wbuf = OF_OBJECT_TO_WBUF(obj);
-    pkt_in_len = _WIRE_MATCH_PADDED_LEN(obj, pkt_in_match_offset);
-    add_len = _WIRE_MATCH_PADDED_LEN(flow_add, add_match_offset);
-
-    match_octets.bytes = add_len;
-    match_octets.data = OF_OBJECT_BUFFER_INDEX(flow_add, add_match_offset);
-
-    /* Copy data into pkt_in msg */
-    abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, pkt_in_match_offset);
-    of_wire_buffer_replace_data(wbuf, abs_offset, pkt_in_len,
-                                match_octets.data, add_len);
-
-    /* Not scalar, update lengths if needed */
-    delta = add_len - pkt_in_len;
-    if (delta != 0) {
-        /* Update parent(s) */
-        of_object_parent_length_update((of_object_t *)obj, delta);
-    }
-
-    return OF_ERROR_NONE;
-}
-
-/* Set up a stats entry from the original add */
-
-int
-of_flow_stats_entry_setup_from_flow_add(of_flow_stats_entry_t *obj,
-                                        of_flow_add_t *flow_add,
-                                        of_object_t *effects)
-{
-    switch (obj->version) {
-    case OF_VERSION_1_0:
-        return flow_stats_entry_setup_from_flow_add_common(obj, flow_add,
-                                                           effects, 4, 8);
-        break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
-        return flow_stats_entry_setup_from_flow_add_common(obj, flow_add,
-                                                           effects, 48, 48);
-        break;
-    default:
-        return OF_ERROR_VERSION;
-    }
-
-    return OF_ERROR_NONE;
-}
-""")

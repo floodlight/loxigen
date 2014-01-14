@@ -164,6 +164,8 @@ int loci_show_match(loci_writer_f writer, void *cookie, of_match_t *match);
 
 #define LOCI_SHOW_bitmap_128(writer, cookie, val) writer(cookie, "%" PRIx64 "%" PRIx64, (val).hi, (val).lo)
 
+#define LOCI_SHOW_checksum_128(writer, cookie, val) writer(cookie, "%016" PRIx64 "%016" PRIx64, (val).hi, (val).lo)
+
 /**
  * Generic version for any object
  */
@@ -194,6 +196,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_desc_str_sw_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_ser_num_serial_num(writer, cookie, val) LOCI_SHOW_ser_num(writer, cookie, val)
 #define LOCI_SHOW_desc_str_dp_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_desc_str_pipeline(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_octets_data(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
 #define LOCI_SHOW_u16_err_type(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u16_code(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
@@ -235,7 +238,14 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_supported(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u32_peer(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_packets(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_broadcast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_uint64_value(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_packets(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_broadcast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_bytes(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_bytes(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_dropped(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
@@ -363,5 +373,14 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u16_partner_port_num(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u16_partner_key(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u64_time_ms(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_desc_str_uri(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_u8_state(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_table_id(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u32_deleted_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_error_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum_mask(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_u32_buckets_size(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_entry_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */

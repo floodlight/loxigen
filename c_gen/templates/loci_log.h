@@ -30,10 +30,6 @@
 #if !defined(_LOCI_LOG_H_)
 #define _LOCI_LOG_H_
 
-#include <loci/loci_base.h>
-#include <loci/of_match.h>
-#include <stdio.h>
-
 /* g++ requires this to pick up PRI, etc.
  * See  http://gcc.gnu.org/ml/gcc-help/2006-10/msg00223.html
  */

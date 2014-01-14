@@ -284,6 +284,7 @@ enum ofp_packet_in_reason(wire_type=uint8_t) {
     OFPR_BSN_STATION_MOVE = 129,
     OFPR_BSN_BAD_VLAN = 130,
     OFPR_BSN_DESTINATION_LOOKUP_FAILURE = 131,
+    OFPR_BSN_NO_ROUTE = 132,
 };
 
 enum ofp_flow_removed_reason(wire_type=uint8_t) {
@@ -565,6 +566,10 @@ struct of_header {
     uint8_t type == ?;
     uint16_t length;
     uint32_t xid;
+};
+
+struct of_uint64 {
+    uint64_t value;
 };
 
 // Special structures used for managing scalar list elements

@@ -271,7 +271,7 @@ def gen_fixed_length_string_jtype(length):
               read='ChannelUtils.readFixedLengthString(bb, {})'.format(length),
               write='ChannelUtils.writeFixedLengthString(bb, $name, {})'.format(length),
               default='""',
-              funnel='sink.putUnencodedChars($name)'
+              funnel='sink.putString($name)'  # NOTE: master uses putUnencodedChars which is only available in guava >15
             )
 
 ##### Predefined JType mappings
@@ -297,6 +297,12 @@ u32_list = JType('List<U32>', 'int[]') \
                 read='ChannelUtils.readList(bb, $length, U32.READER)',
                 write='ChannelUtils.writeList(bb, $name)',
                 default="ImmutableList.<U32>of()",
+                funnel="FunnelUtils.putList($name, sink)")
+u64_list = JType('List<U64>', 'int[]') \
+        .op(
+                read='ChannelUtils.readList(bb, $length, U64.READER)',
+                write='ChannelUtils.writeList(bb, $name)',
+                default="ImmutableList.<U64>of()",
                 funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
@@ -474,6 +480,10 @@ class_id = JType("ClassId") \
          .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
 boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
         .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
+checksum = JType("OFChecksum128") \
+        .op(read='OFChecksum128.read16Bytes(bb)',
+            write='$name.write16Bytes(bb)',
+            default='OFChecksum128.ZERO')
 
 generic_t = JType("T")
 
@@ -489,6 +499,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_bucket_t)': buckets_list,
         'list(of_port_desc_t)' : port_desc_list,
         'list(of_packet_queue_t)' : packet_queue_list,
+        'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
@@ -506,7 +517,8 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap
+        'of_bitmap_128_t': port_bitmap,
+        'of_checksum_128_t': checksum,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme

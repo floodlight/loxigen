@@ -39,8 +39,6 @@
 
 :: include('_ofreader.lua')
 
-:: include('_oftype_readers.lua')
-
 p_of = Proto ("of", "OpenFlow")
 
 local openflow_versions = {
@@ -89,7 +87,6 @@ ${ofclass.name}_v${version.wire_version}_dissectors = {}
 :: #endfor
 
 --- Dissectors for each class
-
 :: for version, ofproto in ir.items():
 :: for ofclass in ofproto.classes:
 :: name = 'dissect_%s_v%d' % (ofclass.name, version.wire_version)
@@ -105,31 +102,7 @@ ${ofclass.superclass.name}_v${version.wire_version}_dissectors[${discriminator_v
 
 local of_message_dissectors = {
 :: for version in ir:
-    [${version.wire_version}] = of_header_v${version.wire_version}_dissectors,
-:: #endfor
-}
-
-local of_oxm_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = of_oxm_v${version.wire_version}_dissectors,
-:: #endfor
-}
-
-local of_action_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = of_action_v${version.wire_version}_dissectors,
-:: #endfor
-}
-
-local of_instruction_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = of_instruction_v${version.wire_version}_dissectors,
-:: #endfor
-}
-
-local of_bucket_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_bucket_v${version.wire_version},
+    [${version.wire_version}] = dissect_of_header_v${version.wire_version},
 :: #endfor
 }
 
@@ -139,41 +112,13 @@ local of_port_desc_dissectors = {
 :: #endfor
 }
 
-local of_stats_reply_dissectors = {
+local of_oxm_dissectors = {
 :: for version in ir:
-    [${version.wire_version}] = of_stats_reply_v${version.wire_version}_dissectors,
+    [${version.wire_version}] = dissect_of_oxm_v${version.wire_version},
 :: #endfor
 }
 
-local of_stats_request_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = of_stats_request_v${version.wire_version}_dissectors,
-:: #endfor
-}
-
-local of_flow_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_flow_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_port_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_port_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_table_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_table_stats_entry_v${version.wire_version},
-:: #endfor
-}
-
-local of_queue_stats_entry_dissectors = {
-:: for version in ir:
-    [${version.wire_version}] = dissect_of_queue_stats_entry_v${version.wire_version},
-:: #endfor
-}
+:: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
     local reader = OFReader.new(buf)
@@ -187,101 +132,9 @@ function dissect_of_message(buf, root)
     end
 
     local info = "unknown"
-    if type_val == 19 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_reply_dissectors[version_val][stats_type](reader,subtree)
-    elseif type_val == 18 then
-        local stats_type = buf(8,2):uint()
-        info = of_stats_request_dissectors[version_val][stats_type](reader,subtree)
-    elseif of_message_dissectors[version_val] and of_message_dissectors[version_val][type_val] then
-        info = of_message_dissectors[version_val][type_val](reader, subtree)
-    end
+    info = of_message_dissectors[version_val](reader, subtree)
 
     return protocol, info
-end
-
-function dissect_of_oxm(reader, subtree, version_val)
-    local type_val = reader.peek(0,4):uint()
-    local info = "unknown"
-    if of_oxm_dissectors[version_val] and of_oxm_dissectors[version_val][type_val] then
-        info = of_oxm_dissectors[version_val][type_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_action(reader, subtree, version_val)
-    local type_val = reader.peek(0,2):uint()
-    local info = "unknown"
-    if of_action_dissectors[version_val] and of_action_dissectors[version_val][type_val] then
-        info = of_action_dissectors[version_val][type_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_instruction(reader, subtree, version_val)
-    local type_val = reader.peek(0,2):uint()
-    local info = "unknown"
-    if of_instruction_dissectors[version_val] and of_instruction_dissectors[version_val][type_val] then
-        info = of_instruction_dissectors[version_val][type_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_bucket(reader, subtree, version_val)
-    local info = "unknown"
-    if of_bucket_dissectors[version_val] then
-        info = of_bucket_dissectors[version_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_port_desc(reader, subtree, version_val)
-    local info = "unknown"
-    if of_port_desc_dissectors[version_val] then
-        info = of_port_desc_dissectors[version_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_flow_stats_entry(reader, subtree, version_val)
-    local info = "unknown"
-    if of_flow_stats_entry_dissectors[version_val] then
-        info = of_flow_stats_entry_dissectors[version_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_port_stats_entry(reader, subtree, version_val)
-    local info = "unknown"
-    if of_port_stats_entry_dissectors[version_val] then
-        info = of_port_stats_entry_dissectors[version_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_table_stats_entry(reader, subtree, version_val)
-    local info = "unknown"
-    if of_table_stats_entry_dissectors[version_val] then
-        info = of_table_stats_entry_dissectors[version_val](reader, subtree)
-    end
-
-    return info
-end
-
-function dissect_of_queue_stats_entry(reader, subtree, version_val)
-    local info = "unknown"
-    if of_queue_stats_entry_dissectors[version_val] then
-        info = of_queue_stats_entry_dissectors[version_val](reader, subtree)
-    end
-
-    return info
 end
 
 -- of dissector function
