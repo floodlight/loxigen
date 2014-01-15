@@ -47,6 +47,10 @@ from java_gen.java_type import erase_type_annotation
 
 logger = logging.getLogger(__name__)
 
+
+def java_class_name(c_name):
+    return java_type.name_c_to_caps_camel(c_name) if c_name != "of_header" else "OFMessage"
+
 class JavaModel(object):
     # registry for enums that should not be generated
     # set(${java_enum_name})
@@ -54,7 +58,6 @@ class JavaModel(object):
     # registry for enum *entry* that should not be generated
     # map: ${java_enum_name} -> set(${java_entry_entry_name})
     enum_entry_blacklist = defaultdict(lambda: set(), OFFlowWildcards=set([ "NW_DST_BITS", "NW_SRC_BITS", "NW_SRC_SHIFT", "NW_DST_SHIFT" ]))
-
     # registry of interfaces that should not be generated
     # set(java_names)
     # OFUint structs are there for god-knows what in loci. We certainly don't need them.
@@ -370,7 +373,7 @@ class JavaOFInterface(object):
         self.c_name = ir_class.name
         self.version_map = { JavaOFVersion(v): c for v,c in ir_class.version_classes.items() }
         # name: the Java Type name, e.g., OFFlowAdd
-        self.name = java_type.name_c_to_caps_camel(self.c_name) if self.c_name != "of_header" else "OFMessage"
+        self.name = java_class_name(self.c_name)
         # variable_name name to use for variables of this type. i.e., flowAdd
         self.variable_name = self.name[2].lower() + self.name[3:]
         self.title_name = self.variable_name[0].upper() + self.variable_name[1:]
@@ -434,99 +437,66 @@ class JavaOFInterface(object):
 
     def class_info(self):
         """ return tuple of (package_prefix, parent_class) for the current JavaOFInterface"""
-        # FIXME: This duplicates inheritance information that is now available in the loxi_ir
-        # model (note, that the loxi model is on versioned classes). Should check/infer the
-        # inheritance information from the versioned lox_ir classes.
-        if re.match(r'OFStatsRequest$', self.name):
-            return ("", "OFMessage", "T extends OFStatsReply")
+        # FIXME: This code could be cleaned up further. Maybe some of the exceptions
+        # here could be folded into ir, or the type arithmetic specified in a more general
+        # fashion
+        def calc_package(i):
+            if i.is_subclassof("of_error_msg"):
+                return "errormsg"
+            elif i.is_instanceof("of_action"):
+                return "action"
+            elif i.is_instanceof("of_action_id"):
+                return "actionid"
+            elif i.is_instanceof("of_instruction"):
+                return "instruction"
+            elif i.is_instanceof("of_instruction_id"):
+                return "instructionid"
+            elif i.is_instanceof("of_oxm"):
+                return "oxm"
+            elif i.is_instanceof("of_meter_band"):
+                return "meterband"
+            elif i.is_instanceof("of_queue_prop"):
+                return "queueprop"
+            elif i.is_instanceof("of_bsn_tlv"):
+                return "bsntlv"
+            else:
+                return ""
+
+        def calc_super_name(i):
+            if re.match('of_match_.*', i.name):
+                return "Match"
+            else:
+                ir_super_class = self.ir_class.superclass
+                return java_class_name(ir_super_class.name) if ir_super_class else ""
+
+        package = calc_package(self.ir_class)
+        super_name = calc_super_name(self.ir_class)
+
+        if self.name == "OFStatsRequest":
+            # stats_requests are special because of their type annotation
+            return (package, "OFMessage", "T extends OFStatsReply")
         elif self.ir_class.is_subclassof('of_stats_request'):
-            if self.ir_class.is_subclassof('of_bsn_stats_request'):
-                return ("", "OFBsnStatsRequest", None)
-            elif self.ir_class.is_subclassof('of_experimenter_stats_request'):
-                return ("", "OFExperimenterStatsRequest", None)
-            else:
-                return ("", "OFStatsRequest<{}>".format(re.sub(r'Request$', 'Reply', self.name)), None)
-        elif self.ir_class.is_subclassof('of_stats_reply'):
-            if self.ir_class.is_subclassof('of_bsn_stats_reply'):
-                return ("", "OFBsnStatsReply", None)
-            elif self.ir_class.is_subclassof('of_experimenter_stats_reply'):
-                return ("", "OFExperimenterStatsReply", None)
-            else:
-                return ("", "OFStatsReply", None)
-        elif self.ir_class.is_subclassof('of_error_msg'):
-            return ("errormsg", "OFErrorMsg", None)
-        elif self.ir_class.is_subclassof('of_flow_mod'):
-            return ("", "OFFlowMod", None)
-        elif self.ir_class.is_subclassof('of_group_mod'):
-            return ("", "OFGroupMod", None)
-        elif self.ir_class.is_subclassof('of_bsn_header'):
-            return ("", "OFBsnHeader", None)
-        elif self.ir_class.is_subclassof('of_nicira_header'):
-            return ("", "OFNiciraHeader", None)
-        elif self.ir_class.is_subclassof('of_experimenter'):
-            return ("", "OFExperimenter", None)
-        elif re.match(r'OFMatch.*', self.name):
-            return ("", "Match", None)
-        elif self.ir_class.is_message:
-            return ("", "OFMessage", None)
-        elif self.ir_class.is_action:
-            if self.ir_class.is_subclassof('of_action_bsn'):
-                return ("action", "OFActionBsn", None)
-            elif self.ir_class.is_subclassof('of_action_nicira'):
-                return ("action", "OFActionNicira", None)
-            elif self.ir_class.is_subclassof('of_action_experimenter'):
-                return ("action", "OFActionExperimenter", None)
-            else:
-                return ("action", "OFAction", None)
-        elif self.ir_class.is_instanceof("of_action_id"):
-            if self.ir_class.is_subclassof('of_action_id_bsn'):
-                return ("actionid", "OFActionIdBsn", None)
-            elif self.ir_class.is_subclassof('of_action_id_nicira'):
-                return ("actionid", "OFActionIdNicira", None)
-            elif self.ir_class.is_subclassof('of_action_id_experimenter'):
-                return ("actionid", "OFActionIdExperimenter", None)
-            else:
-                return ("actionid", "OFActionId", None)
-        elif self.ir_class.is_instruction:
-            if self.ir_class.is_subclassof('of_instruction_bsn'):
-                return ("instruction", "OFInstructionBsn", None)
-            elif self.ir_class.is_subclassof('of_instruction_experimenter'):
-                return ("instruction", "OFInstructionExperimenter", None)
-            else:
-                return ("instruction", "OFInstruction", None)
-        elif self.ir_class.is_instanceof('of_instruction_id'):
-            if self.ir_class.is_subclassof('of_instruction_id_bsn'):
-                return ("instructionid", "OFInstructionIdBsn", None)
-            elif self.ir_class.is_subclassof('of_instruction_id_experimenter'):
-                return ("instructionid", "OFInstructionIdExperimenter", None)
-            else:
-                return ("instructionid", "OFInstructionId", None)
-        elif re.match(r'OFBsnVport.+$', self.name):
-            return ("", "OFBsnVport", None)
+            # stats_request subclasses  are special because of their type annotation
+            reply_name = re.sub(r'Request$', 'Reply', self.name)
+            super_type_annotation = "T" if self.ir_class.virtual else reply_name
+
+            type_annotation = "T extends {}".format(reply_name) if self.ir_class.virtual \
+                    else ""
+
+            return (package, "{}<{}>".format(super_name, super_type_annotation),
+                    type_annotation)
         elif self.name == "OFOxm":
-            return ("oxm", None, "T extends OFValueType<T>")
+            return (package, None, "T extends OFValueType<T>")
         elif loxi_utils.class_is_oxm(self.c_name):
+            # look up type from member value for OFValueType type annotation
             if self.member_by_name("value") is not None:
-                return ("oxm", "OFOxm<%s>" % self.member_by_name("value").java_type.public_type, None)
+                return (package, "OFOxm<%s>" % self.member_by_name("value").java_type.public_type, None)
             else:
-                return ("oxm", "OFOxm", None)
-        elif loxi_utils.class_is_instruction(self.c_name):
-            return ("instruction", "OFInstruction", None)
-        elif loxi_utils.class_is_meter_band(self.c_name):
-            return ("meterband", "OFMeterBand", None)
-        elif loxi_utils.class_is_queue_prop(self.c_name):
-            return ("queueprop", "OFQueueProp", None)
-        elif loxi_utils.class_is_hello_elem(self.c_name):
-            return ("", "OFHelloElem", None)
-        elif loxi_utils.class_is_table_feature_prop(self.c_name):
-            return ("", "OFTableFeatureProp", None)
-        elif loxi_utils.class_is_bsn_tlv(self.c_name):
-            return ("bsntlv", "OFBsnTlv", None)
+                return (package, "OFOxm", None)
         else:
-            return ("", None, None)
+            return (package, super_name, None)
 
     @property
-
     @memoize
     def writeable_members(self):
         return [ m for m in self.members if m.is_writeable ]
