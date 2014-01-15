@@ -209,7 +209,7 @@ class JavaModel(object):
 
         factories = OrderedDict()
 
-        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp", "OFErrorMsg", "OFActionId", "OFInstructionId")
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp", "OFErrorMsg", "OFActionId", "OFInstructionId", "OFBsnTlv")
         for base_class in sub_factory_classes:
             package = base_class[2:].lower()
             remove_prefix = base_class[2].lower() + base_class[3:]
@@ -521,7 +521,7 @@ class JavaOFInterface(object):
         elif loxi_utils.class_is_table_feature_prop(self.c_name):
             return ("", "OFTableFeatureProp", None)
         elif loxi_utils.class_is_bsn_tlv(self.c_name):
-            return ("", "OFBsnTlv", None)
+            return ("bsntlv", "OFBsnTlv", None)
         else:
             return ("", None, None)
 
