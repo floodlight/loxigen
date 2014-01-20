@@ -298,6 +298,12 @@ u32_list = JType('List<U32>', 'int[]') \
                 write='ChannelUtils.writeList(bb, $name)',
                 default="ImmutableList.<U32>of()",
                 funnel="FunnelUtils.putList($name, sink)")
+u64_list = JType('List<U64>', 'int[]') \
+        .op(
+                read='ChannelUtils.readList(bb, $length, U64.READER)',
+                write='ChannelUtils.writeList(bb, $name)',
+                default="ImmutableList.<U64>of()",
+                funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
 u32obj = JType('U32', 'U32') \
@@ -412,6 +418,9 @@ oxm_list = JType("OFOxmList") \
 meter_features = JType("OFMeterFeatures")\
         .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)",
             write="$name.writeTo(bb)")
+bsn_vport_q_in_q = JType("OFBsnVportQInQ")\
+        .op(read="OFBsnVportQInQVer$version.READER.readFrom(bb)",
+            write="$name.writeTo(bb)")
 flow_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)',
@@ -461,6 +470,8 @@ action_type_set = JType("Set<OFActionType>") \
             funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
 of_group = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
+of_group_default_any = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
 # the outgroup field of of_flow_stats_request has a special default value
 of_group_default_any = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
@@ -474,6 +485,14 @@ class_id = JType("ClassId") \
          .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
 boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
         .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
+checksum = JType("OFChecksum128") \
+        .op(read='OFChecksum128.read16Bytes(bb)',
+            write='$name.write16Bytes(bb)',
+            default='OFChecksum128.ZERO')
+gen_table_id = JType("GenTableId") \
+        .op(read='GenTableId.read2Bytes(bb)',
+            write='$name.write2Bytes(bb)',
+           )
 
 generic_t = JType("T")
 
@@ -489,6 +508,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_bucket_t)': buckets_list,
         'list(of_port_desc_t)' : port_desc_list,
         'list(of_packet_queue_t)' : packet_queue_list,
+        'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
@@ -506,7 +526,9 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap
+        'of_bitmap_128_t': port_bitmap,
+        'of_checksum_128_t': checksum,
+        'of_bsn_vport_q_in_q_t': bsn_vport_q_in_q,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -612,6 +634,9 @@ exceptions = {
         'of_group_delete' : { 'command' : group_mod_cmd },
 
         'of_bucket' : { 'watch_group': of_group },
+
+        'of_bsn_tlv_vlan_vid' : { 'value' : vlan_vid },
+        'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
 }
 
 
@@ -656,8 +681,10 @@ def convert_to_jtype(obj_name, field_name, c_type):
             .op(read='bb.readShort()', write='bb.writeShort($name)')
     elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
         return instruction_type
-    elif obj_name in ("of_flow_add", "of_flow_modify", "of_flow_modify_strict", "of_delete_strict") and  field_name == "table_id" and c_type == "uint8_t":
+    elif loxi_utils.class_is(obj_name, "of_flow_mod") and field_name == "table_id" and c_type == "uint8_t":
         return table_id_default_zero
+    elif loxi_utils.class_is(obj_name, "of_flow_mod") and field_name == "out_group" and c_type == "uint32_t":
+        return of_group_default_any
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
@@ -670,6 +697,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return datapath_id
     elif field_name == 'actions' and obj_name == 'of_features_reply':
         return action_type_set
+    elif field_name == "table_id" and re.match(r'of_bsn_gentable.*', obj_name):
+        return gen_table_id
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

@@ -41,6 +41,8 @@ import instruction
 import oxm
 :: #endif
 :: if version >= OFVersions.VERSION_1_3:
+import action_id
+import instruction_id
 import meter_band
 :: #endif
 
@@ -180,3 +182,10 @@ def unpack_list_hello_elem(reader):
         except loxi.ProtocolError:
             return None
     return [x for x in loxi.generic_util.unpack_list(reader, deserializer) if x != None]
+
+def pack_checksum_128(value):
+    return struct.pack("!QQ", (value >> 64) & MASK64, value & MASK64)
+
+def unpack_checksum_128(reader):
+    hi, lo = reader.read("!QQ")
+    return (hi << 64) | lo

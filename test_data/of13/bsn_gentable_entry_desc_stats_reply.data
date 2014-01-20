@@ -1,0 +1,148 @@
+-- binary
+04 13 # version, type
+00 64 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 2 # subtype
+
+# entries[0]
+00 26 # length
+00 08 # key_length
+fe dc ba 98 76 54 32 10 ff ee cc bb aa 99 88 00 # checksum
+00 00 # key[0].type
+00 08 # key[0].length
+00 00 00 05 # key[0].value
+00 01 # value[0].type
+00 0a # value[0].length
+ff ee dd cc bb 00 # value[0].value
+
+# entries[1]
+00 26 # length
+00 08 # key_length
+fe dc ba 98 76 54 32 10 ff ee cc bb aa 99 88 01 # checksum
+00 00 # key[0].type
+00 08 # key[0].length
+00 00 00 06 # key[0].value
+00 01 # value[0].type
+00 0a # value[0].length
+ff ee dd cc bb 01 # value[0].value
+-- python
+ofp.message.bsn_gentable_entry_desc_stats_reply(
+    xid=0x12345678,
+    entries=[
+        ofp.bsn_gentable_entry_desc_stats_entry(
+            checksum=0xFEDCBA9876543210FFEECCBBAA998800,
+            key=[
+                ofp.bsn_tlv.port(5),
+            ],
+            value=[
+                ofp.bsn_tlv.mac([0xff, 0xee, 0xdd, 0xcc, 0xbb, 0x00]),
+            ]),
+        ofp.bsn_gentable_entry_desc_stats_entry(
+            checksum=0xFEDCBA9876543210FFEECCBBAA998801,
+            key=[
+                ofp.bsn_tlv.port(6),
+            ],
+            value=[
+                ofp.bsn_tlv.mac([0xff, 0xee, 0xdd, 0xcc, 0xbb, 0x01]),
+            ]),
+    ])
+-- java
+builder.setXid(0x12345678)
+    .setEntries(
+        ImmutableList.<OFBsnGentableEntryDescStatsEntry>of(
+            factory.buildBsnGentableEntryDescStatsEntry()
+                .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA998800L))
+                .setKey(ImmutableList.<OFBsnTlv>of(
+                    factory.bsnTlvs().port(OFPort.of(5))
+                ))
+                .setValue(ImmutableList.<OFBsnTlv>of(
+                    factory.bsnTlvs().mac(MacAddress.of("ff:ee:dd:cc:bb:00"))
+                ))
+                .build(),
+            factory.buildBsnGentableEntryDescStatsEntry()
+                .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA998801L))
+                .setKey(ImmutableList.<OFBsnTlv>of(
+                    factory.bsnTlvs().port(OFPort.of(6))
+                ))
+                .setValue(ImmutableList.<OFBsnTlv>of(
+                    factory.bsnTlvs().mac(MacAddress.of("ff:ee:dd:cc:bb:01"))
+                ))
+                .build()
+        )
+    )
+-- c
+obj = of_bsn_gentable_entry_desc_stats_reply_new(OF_VERSION_1_3);
+of_bsn_gentable_entry_desc_stats_reply_xid_set(obj, 0x12345678);
+{
+    of_object_t *list = of_list_bsn_gentable_entry_desc_stats_entry_new(OF_VERSION_1_3);
+    {
+        of_object_t *entry = of_bsn_gentable_entry_desc_stats_entry_new(OF_VERSION_1_3);
+        {
+            of_checksum_128_t checksum = { 0xFEDCBA9876543210L, 0xFFEECCBBAA998800L };
+            of_bsn_gentable_entry_desc_stats_entry_checksum_set(entry, checksum);
+        }
+        {
+            of_object_t *tlvs = of_list_bsn_tlv_new(OF_VERSION_1_3);
+            {
+                of_object_t *tlv = of_bsn_tlv_port_new(OF_VERSION_1_3);
+                of_bsn_tlv_port_value_set(tlv, 5);
+                of_list_append(tlvs, tlv);
+                of_object_delete(tlv);
+            }
+            of_bsn_gentable_entry_desc_stats_entry_key_set(entry, tlvs);
+            of_object_delete(tlvs);
+        }
+        {
+            of_object_t *tlvs = of_list_bsn_tlv_new(OF_VERSION_1_3);
+            {
+                of_object_t *tlv = of_bsn_tlv_mac_new(OF_VERSION_1_3);
+                of_mac_addr_t mac = { { 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0x00 } };
+                of_bsn_tlv_mac_value_set(tlv, mac);
+                of_list_append(tlvs, tlv);
+                of_object_delete(tlv);
+            }
+            of_bsn_gentable_entry_desc_stats_entry_value_set(entry, tlvs);
+            of_object_delete(tlvs);
+        }
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    {
+        of_object_t *entry = of_bsn_gentable_entry_desc_stats_entry_new(OF_VERSION_1_3);
+        {
+            of_checksum_128_t checksum = { 0xFEDCBA9876543210L, 0xFFEECCBBAA998801L };
+            of_bsn_gentable_entry_desc_stats_entry_checksum_set(entry, checksum);
+        }
+        {
+            of_object_t *tlvs = of_list_bsn_tlv_new(OF_VERSION_1_3);
+            {
+                of_object_t *tlv = of_bsn_tlv_port_new(OF_VERSION_1_3);
+                of_bsn_tlv_port_value_set(tlv, 6);
+                of_list_append(tlvs, tlv);
+                of_object_delete(tlv);
+            }
+            of_bsn_gentable_entry_desc_stats_entry_key_set(entry, tlvs);
+            of_object_delete(tlvs);
+        }
+        {
+            of_object_t *tlvs = of_list_bsn_tlv_new(OF_VERSION_1_3);
+            {
+                of_object_t *tlv = of_bsn_tlv_mac_new(OF_VERSION_1_3);
+                of_mac_addr_t mac = { { 0xff, 0xee, 0xdd, 0xcc, 0xbb, 0x01 } };
+                of_bsn_tlv_mac_value_set(tlv, mac);
+                of_list_append(tlvs, tlv);
+                of_object_delete(tlv);
+            }
+            of_bsn_gentable_entry_desc_stats_entry_value_set(entry, tlvs);
+            of_object_delete(tlvs);
+        }
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    of_bsn_gentable_entry_desc_stats_reply_entries_set(obj, list);
+    of_object_delete(list);
+}

@@ -89,7 +89,7 @@ def loxi_name(ident):
         dict(OFPM_ = "OF_METER_"),
         dict(OFPXMC_ = "OF_OXM_CLASS_"),
         dict(OFPVID_ = "OF_VLAN_TAG_"),
-        dict(OFPGC_ = "OF_GROUP_"),
+        dict(OFPGC_ = "OF_GROUP_MOD_COMMAND_"),
         dict(OFPGT_ = "OF_GROUP_TYPE_"),
         dict(OFPG_ = "OF_GROUP_"),
         dict(OFPET_ = "OF_ERROR_TYPE_"),

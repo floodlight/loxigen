@@ -5,8 +5,13 @@ import com.google.common.hash.PrimitiveSink;
 
 
 public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> {
-    protected T value;
-    protected T mask;
+    protected final T value;
+
+    /** bitmask of the value. Note: a set (1) bit in this mask means 'match on this value'.
+     *  This the natural mask represenation as in IPv[46] netmasks. It is the inverse of the
+     *  OpenFlow 1.0 'wildcard' meaning.
+     */
+    protected final T mask;
 
     protected Masked(T value, T mask) {
         this.value = value.applyMask(mask);
@@ -36,6 +41,21 @@ public class Masked<T extends OFValueType<T>> implements OFValueType<Masked<T>> 
         StringBuilder sb = new StringBuilder();
         sb.append(value.toString()).append('/').append(mask.toString());
         return sb.toString();
+    }
+
+    /** Determine whether candidate value is matched by this masked value
+     *  (i.e., does candiate lie in the 'network/range' specified by this masked
+     *  value).
+     *
+     * @param candidate the candidate value to test
+     * @return true iff the candidate lies in the area specified by this masked
+     *         value.
+     */
+    public boolean matches(T candidate) {
+        // candidate lies in the area of this masked value if its
+        // value with the masked bit zero'ed out equals this's value
+        // (e.g., our 'network address' for networks)
+        return candidate.applyMask(this.mask).equals(this.value);
     }
 
     @Override
