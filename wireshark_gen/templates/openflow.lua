@@ -121,6 +121,12 @@ local of_oxm_dissectors = {
 :: #endfor
 }
 
+local of_bsn_vport_q_in_q_dissectors = {
+:: for version in ir:
+    [${version.wire_version}] = dissect_of_bsn_vport_q_in_q_v${version.wire_version},
+:: #endfor
+}
+
 :: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
