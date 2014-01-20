@@ -192,3 +192,12 @@ function read_list(reader, dissector, subtree, field_name)
         return
     end
 end
+
+function read_ethernet(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    child_subtree:set_text("Ethernet packet")
+    ethernet_dissector:call(reader.read_all():tvb(), current_pkt, child_subtree)
+end
