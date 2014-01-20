@@ -120,7 +120,6 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 
 
 
-
 /* @todo Add checks for special port numbers */
 #define LOCI_SHOW_port_no(writer, cookie, val) writer(cookie, "%d", val)
 #define LOCI_SHOW_fm_cmd(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
@@ -170,7 +169,6 @@ int loci_show_match(loci_writer_f writer, void *cookie, of_match_t *match);
  * Generic version for any object
  */
 int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
-
 
 
 
@@ -354,6 +352,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_bitmap_128_bsn_in_ports_128(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
 #define LOCI_SHOW_u32_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_aux_cxn_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u8_slot_num(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u32_bsn_lag_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_bsn_vrf(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
