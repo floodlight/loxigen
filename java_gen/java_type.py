@@ -308,8 +308,9 @@ u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
 u32obj = JType('U32', 'U32') \
         .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())', default="U32.ZERO")
-u64 = JType('U64', 'U64') \
-        .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO")
+u64 = JType('U64', 'long') \
+        .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO", pub_type=True) \
+        .op(read='bb.readLong()', write='bb.writeLong($name)', pub_type=False)
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
