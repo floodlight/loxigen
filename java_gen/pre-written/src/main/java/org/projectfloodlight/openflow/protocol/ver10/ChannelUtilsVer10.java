@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.protocol.ver10;
 
+import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -7,6 +9,9 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.OFBsnVportQInQ;
+import org.projectfloodlight.openflow.protocol.OFFactories;
+import org.projectfloodlight.openflow.protocol.OFFactory;
+import org.projectfloodlight.openflow.protocol.OFVersion;
 import org.projectfloodlight.openflow.protocol.match.Match;
 
 import com.google.common.hash.PrimitiveSink;
@@ -22,15 +27,39 @@ public class ChannelUtilsVer10 {
         return OFMatchV1Ver10.READER.readFrom(bb);
     }
 
-    // TODO these need to be figured out / removed
     public static OFBsnVportQInQ readOFBsnVportQInQ(ChannelBuffer bb) {
-        throw new UnsupportedOperationException("not implemented");
+        OFFactory factory = OFFactories.getFactory(OFVersion.OF_10);
+        OFBsnVportQInQ.Builder builder = factory.buildBsnVportQInQ();
+        builder.setPortNo(bb.readInt())
+            .setIngressTpid(bb.readShort())
+            .setIngressVlanId(bb.readShort())
+            .setEgressTpid(bb.readShort())
+            .setEgressVlanId(bb.readShort());
+        byte[] name = new byte[16];
+        int index = 0;
+        for (byte b : name) {
+            if (0 == b) break;
+            ++index;
+        }
+        builder.setIfName(new String(Arrays.copyOf(name, index),
+                Charset.forName("ascii")));
+        return builder.build();
     }
 
     public static void writeOFBsnVportQInQ(ChannelBuffer bb,
             OFBsnVportQInQ vport) {
-        throw new UnsupportedOperationException("not implemented");
-
+        bb.writeInt((int)vport.getPortNo());
+        bb.writeShort(vport.getIngressTpid());
+        bb.writeShort(vport.getIngressVlanId());
+        bb.writeShort(vport.getEgressTpid());
+        bb.writeShort(vport.getEgressVlanId());
+        String name = vport.getIfName();
+        byte[] nameInBytes = new byte[16];
+        for (int i = 0; i < nameInBytes.length; i++) {
+            nameInBytes[i] = 0;
+        }
+        System.arraycopy(name.getBytes(), 0, nameInBytes, 0, name.length());
+        bb.writeBytes(nameInBytes);
     }
 
     public static Set<OFActionType> readSupportedActions(ChannelBuffer bb) {
