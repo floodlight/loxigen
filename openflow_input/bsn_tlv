@@ -76,3 +76,39 @@ struct of_bsn_tlv_idle_notification : of_bsn_tlv {
     uint16_t type == 7;
     uint16_t length;
 };
+
+struct of_bsn_tlv_idle_timeout : of_bsn_tlv {
+    uint16_t type == 8;
+    uint16_t length;
+    uint32_t value; /* Milliseconds */
+};
+
+struct of_bsn_tlv_unicast_query_timeout : of_bsn_tlv {
+    uint16_t type == 9;
+    uint16_t length;
+    uint32_t value; /* Milliseconds */
+};
+
+struct of_bsn_tlv_broadcast_query_timeout : of_bsn_tlv {
+    uint16_t type == 10;
+    uint16_t length;
+    uint32_t value; /* Milliseconds */
+};
+
+struct of_bsn_tlv_request_packets : of_bsn_tlv {
+    uint16_t type == 11;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_reply_packets : of_bsn_tlv {
+    uint16_t type == 12;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_miss_packets : of_bsn_tlv {
+    uint16_t type == 13;
+    uint16_t length;
+    uint64_t value;
+};
