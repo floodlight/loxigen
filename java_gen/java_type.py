@@ -470,6 +470,8 @@ action_type_set = JType("Set<OFActionType>") \
             funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
 of_group = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
+of_group_default_any = JType("OFGroup") \
+         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
 # the outgroup field of of_flow_stats_request has a special default value
 of_group_default_any = JType("OFGroup") \
          .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
@@ -679,8 +681,10 @@ def convert_to_jtype(obj_name, field_name, c_type):
             .op(read='bb.readShort()', write='bb.writeShort($name)')
     elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
         return instruction_type
-    elif obj_name in ("of_flow_add", "of_flow_modify", "of_flow_modify_strict", "of_delete_strict") and  field_name == "table_id" and c_type == "uint8_t":
+    elif loxi_utils.class_is(obj_name, "of_flow_mod") and field_name == "table_id" and c_type == "uint8_t":
         return table_id_default_zero
+    elif loxi_utils.class_is(obj_name, "of_flow_mod") and field_name == "out_group" and c_type == "uint32_t":
+        return of_group_default_any
     elif field_name == "table_id" and c_type == "uint8_t":
         return table_id
     elif field_name == "version" and c_type == "uint8_t":
