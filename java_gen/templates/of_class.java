@@ -363,6 +363,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         }
     }
 
+    //:: if os.path.exists("%s/custom/%s_toString.java" % (template_dir, msg.name)):
+    //:: include("custom/%s_toString.java" % msg.name, msg=msg, has_parent=False)
+    //:: else:
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder("${msg.name}(");
@@ -375,7 +378,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         b.append(")");
         return b.toString();
     }
-
+    //:: #endif
 
     @Override
     public boolean equals(Object obj) {
