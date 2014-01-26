@@ -52,6 +52,8 @@ def get_reader(version, cls, m):
     enum = ofproto.enum_by_name(m.oftype)
     if enum and 'wire_type' in enum.params:
         return "read_" + enum.params['wire_type']
+    elif (cls.name, m.name) in field_info.reader_overrides:
+        return field_info.reader_overrides[(cls.name, m.name)]
     else:
         return "read_" + m.oftype.replace(')', '').replace('(', '_')
 

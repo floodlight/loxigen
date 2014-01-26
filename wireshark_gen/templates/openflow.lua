@@ -40,6 +40,9 @@
 :: include('_ofreader.lua')
 
 p_of = Proto ("of", "OpenFlow")
+ethernet_dissector = Dissector.get("eth")
+
+current_pkt = nil
 
 local openflow_versions = {
 :: for version in loxi_globals.OFVersions.all_supported:
@@ -118,6 +121,12 @@ local of_oxm_dissectors = {
 :: #endfor
 }
 
+local of_bsn_vport_q_in_q_dissectors = {
+:: for version in ir:
+    [${version.wire_version}] = dissect_of_bsn_vport_q_in_q_v${version.wire_version},
+:: #endfor
+}
+
 :: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
@@ -140,6 +149,7 @@ end
 -- of dissector function
 function p_of.dissector (buf, pkt, root)
     local offset = 0
+    current_pkt = pkt
     repeat
         if buf:len() - offset >= 4 then
             msg_len = buf(offset+2,2):uint()

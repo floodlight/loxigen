@@ -171,3 +171,7 @@ field_to_base = {
     "cookie": "HEX",
     "datapath_id": "HEX",
 }
+
+reader_overrides = {
+    ("of_packet_in", "data"): "read_ethernet",
+}
