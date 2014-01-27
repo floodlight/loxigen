@@ -1,0 +1,20 @@
+-- binary
+04 04 # version, type
+00 18 # length
+12 34 56 78 # xid
+00 5c 16 c7 # experimenter
+00 00 00 3b # subtype
+00 00 00 01 # num_aux
+00 00 00 00 # status
+-- python
+ofp.message.bsn_set_aux_cxns_reply(
+    xid=0x12345678, num_aux=1, status=0)
+-- java
+builder.setXid(0x12345678)
+        .setNumAux(1)
+        .setStatus(0)
+-- c
+obj = of_bsn_set_aux_cxns_reply_new(OF_VERSION_1_3);
+of_bsn_set_aux_cxns_reply_xid_set(obj, 0x12345678);
+of_bsn_set_aux_cxns_reply_num_aux_set(obj, 1);
+of_bsn_set_aux_cxns_reply_status_set(obj, 0);
