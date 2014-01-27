@@ -84,6 +84,7 @@ eclipse-workspace:
 	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_ECLIPSE_WORKSPACE}/pom.xml
 	ln -sf ../java_gen/pre-written/LICENSE.txt ${OPENFLOWJ_ECLIPSE_WORKSPACE}/LICENSE.txt
 	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_ECLIPSE_WORKSPACE}
+	rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/gen-src/ ${OPENFLOWJ_ECLIPSE_WORKSPACE}/gen-src
 	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && mvn eclipse:eclipse
 	# Unfortunately, mvn eclipse:eclipse resolves the symlink, which doesn't work with eclipse
 	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath

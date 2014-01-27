@@ -41,6 +41,8 @@ ${data.class_name}_push_wire_types(of_object_t *obj)
         *(uint16_t *)(buf + ${m.offset}) = htobe16(${m.value}); /* ${m.name} */
 :: elif m.length == 4:
         *(uint32_t *)(buf + ${m.offset}) = htobe32(${m.value}); /* ${m.name} */
+:: elif m.length == 8:
+        *(uint64_t *)(buf + ${m.offset}) = htobe64(${m.value}); /* ${m.name} */
 :: else:
 :: raise("unsupported push_wire_types length %d" % m.length)
 :: #endif
