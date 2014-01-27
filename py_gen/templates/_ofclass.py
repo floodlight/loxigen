@@ -1,9 +1,19 @@
 :: superclass_pyname = ofclass.superclass.pyname if ofclass.superclass else "loxi.OFObject"
 :: from loxi_ir import *
 :: import py_gen.oftype
+:: import py_gen.util as util
 :: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
-:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
+:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember or
+::                                                 type(m) == OFDiscriminatorMember]
+:: if ofclass.virtual:
+:: discriminator_fmts = { 1: "B", 2: "!H", 4: "!L" }
+:: discriminator_fmt = discriminator_fmts[ofclass.discriminator.length]
+:: #endif
 class ${ofclass.pyname}(${superclass_pyname}):
+:: if ofclass.virtual:
+    subtypes = {}
+
+:: #endif
 :: for m in type_members:
     ${m.name} = ${m.value}
 :: #endfor
@@ -29,6 +39,13 @@ class ${ofclass.pyname}(${superclass_pyname}):
 
     @staticmethod
     def unpack(reader):
+:: if ofclass.virtual:
+        subtype, = reader.peek(${repr(discriminator_fmt)}, ${ofclass.discriminator.offset})
+        subclass = ${ofclass.pyname}.subtypes.get(subtype)
+        if subclass:
+            return subclass.unpack(reader)
+
+:: #endif
         obj = ${ofclass.pyname}()
 :: include("_unpack.py", ofclass=ofclass)
         return obj

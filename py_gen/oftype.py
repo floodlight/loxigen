@@ -150,12 +150,6 @@ for (cls, pyclass) in embedded_structs.items():
         pack='%s.pack()',
         unpack='%s.unpack(%%s)' % pyclass)
 
-# Special case for lists of hello_elem, which must ignore unknown types
-type_data_map['list(of_hello_elem_t)'] = OFTypeData(
-    init='[]',
-    pack='loxi.generic_util.pack_list(%s)',
-    unpack='util.unpack_list_hello_elem(%s)')
-
 ## Public interface
 
 def lookup_type_data(oftype, version):

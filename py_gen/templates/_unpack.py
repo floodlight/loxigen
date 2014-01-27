@@ -42,7 +42,7 @@
 ::     elif type(m) == OFTypeMember:
         _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
         assert(_${m.name} == ${m.value})
-::     elif type(m) == OFDataMember:
+::     elif type(m) == OFDataMember or type(m) == OFDiscriminatorMember:
 ::         if m.name in field_length_members:
 ::             reader_expr = 'reader.slice(_%s)' % field_length_members[m.name].name
 ::         else:

@@ -78,7 +78,7 @@ class TestAllOF12(unittest.TestCase):
                               for klass in mod.__dict__.values()
                               if isinstance(klass, type) and
                                  issubclass(klass, loxi.OFObject) and
-                                 hasattr(klass, 'pack')]
+                                 not hasattr(klass, 'subtypes')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):
