@@ -60,18 +60,6 @@ class TestImports(unittest.TestCase):
         self.assertTrue(hasattr(loxi.of13, "message"))
         self.assertTrue(hasattr(loxi.of13, "oxm"))
 
-class TestCommon(unittest.TestCase):
-    def test_list_hello_elem_unpack(self):
-        buf = ''.join([
-            '\x00\x01\x00\x04', # versionbitmap
-            '\x00\x00\x00\x04', # unknown type
-            '\x00\x01\x00\x04', # versionbitmap
-        ])
-        l = ofp.util.unpack_list_hello_elem(OFReader(buf))
-        self.assertEquals(len(l), 2)
-        self.assertTrue(isinstance(l[0], ofp.hello_elem_versionbitmap))
-        self.assertTrue(isinstance(l[1], ofp.hello_elem_versionbitmap))
-
 # The majority of the serialization tests are created here using the files in
 # the test_data directory.
 class TestDataFiles(unittest.TestCase):
@@ -91,7 +79,7 @@ class TestAllOF13(unittest.TestCase):
                               for klass in mod.__dict__.values()
                               if isinstance(klass, type) and
                                  issubclass(klass, loxi.OFObject) and
-                                 hasattr(klass, 'pack')]
+                                 not hasattr(klass, 'subtypes')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):

@@ -112,10 +112,10 @@ class TestActionList(unittest.TestCase):
         with self.assertRaisesRegexp(ofp.ProtocolError, 'Buffer too short'):
             loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
 
-    def test_invalid_action_type(self):
+    def test_unknown_action_type(self):
         buf = '\xff\xfe\x00\x08\x00\x00\x00\x00'
-        with self.assertRaisesRegexp(ofp.ProtocolError, 'unknown action subtype'):
-            loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
+        result = loxi.generic_util.unpack_list(OFReader(buf), ofp.action.action.unpack)
+        self.assertEquals(result, [ofp.action.action(type=0xfffe)])
 
 class TestConstants(unittest.TestCase):
     def test_ports(self):
@@ -200,10 +200,18 @@ class TestParse(unittest.TestCase):
         test_klasses = [x for x in ofp.message.__dict__.values()
                         if type(x) == type
                            and issubclass(x, ofp.message.message)
-                           and hasattr(x, 'pack')]
+                           and not hasattr(x, 'subtypes')]
 
         for klass in test_klasses:
             self.assertIsInstance(ofp.message.parse_message(klass(xid=1).pack()), klass)
+
+    def test_parse_unknown_message(self):
+        import loxi
+        import loxi.of10 as ofp
+
+        buf = "\x01\xfe\x00\x08\x12\x34\x56\x78"
+        msg = ofp.message.parse_message(buf)
+        self.assertIsInstance(msg, ofp.message.message)
 
 class TestUtils(unittest.TestCase):
     def test_pretty_wildcards(self):
@@ -231,7 +239,7 @@ class TestAll(unittest.TestCase):
                               for klass in mod.__dict__.values()
                               if isinstance(klass, type) and
                                  issubclass(klass, loxi.OFObject) and
-                                 hasattr(klass, 'pack')]
+                                 not hasattr(klass, 'subtypes')]
         self.klasses.sort(key=lambda x: str(x))
 
     def test_serialization(self):

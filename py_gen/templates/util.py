@@ -173,16 +173,6 @@ def unpack_bitmap_128(reader):
         x >>= 1
     return value
 
-def unpack_list_hello_elem(reader):
-    def deserializer(reader):
-        typ, length, = reader.peek('!HH')
-        reader = reader.slice(length)
-        try:
-            return common.hello_elem.unpack(reader)
-        except loxi.ProtocolError:
-            return None
-    return [x for x in loxi.generic_util.unpack_list(reader, deserializer) if x != None]
-
 def pack_checksum_128(value):
     return struct.pack("!QQ", (value >> 64) & MASK64, value & MASK64)
 
