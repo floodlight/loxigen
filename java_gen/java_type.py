@@ -441,10 +441,6 @@ table_id_default_zero = JType("TableId") \
 aux_id = JType("AuxId") \
         .op(read='AuxId.readByte(bb)',
             write='$name.writeByte(bb)',
-            default='AuxId.ALL')
-aux_id_default_main = JType("AuxId") \
-        .op(read='AuxId.readByte(bb)',
-            write='$name.writeByte(bb)',
             default='AuxId.MAIN')
 of_version = JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
