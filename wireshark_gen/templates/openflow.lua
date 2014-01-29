@@ -130,9 +130,6 @@ local of_bsn_vport_q_in_q_dissectors = {
 :: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
-    if buf:len() < 2 then
-        return "Unknown OF message", "Dissection error"
-    end
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
     local version_val = buf(0,1):uint()
@@ -157,7 +154,12 @@ function p_of.dissector (buf, pkt, root)
     current_pkt = pkt
     repeat
         if buf:len() - offset >= 4 then
-            msg_len = buf(offset+2,2):uint()
+            local msg_len = buf(offset+2,2):uint()
+
+            if msg_len < 8 then
+                break
+            end
+
             if offset + msg_len > buf:len() then
                 -- we don't have all the data we need yet
                 pkt.desegment_len = offset + msg_len - buf:len()
@@ -176,10 +178,6 @@ function p_of.dissector (buf, pkt, root)
             pkt.cols.protocol:append(protocol)
             pkt.cols.info:append(info)
             offset = offset + msg_len
-            if msg_len == 0 then
-                offset = buf:len()
-                break
-            end
         else
             -- we don't have all of length field yet
             pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
