@@ -130,6 +130,9 @@ local of_bsn_vport_q_in_q_dissectors = {
 :: include('_oftype_readers.lua')
 
 function dissect_of_message(buf, root)
+    if buf:len() < 2 then
+        return "Unknown OF message", "Dissection error"
+    end
     local reader = OFReader.new(buf)
     local subtree = root:add(p_of, buf(0))
     local version_val = buf(0,1):uint()
@@ -138,6 +141,8 @@ function dissect_of_message(buf, root)
     local protocol = "OF ?"
     if openflow_versions[version_val] then
         protocol = "OF " .. openflow_versions[version_val]
+    else
+        return "Unknown protocol", "Dissection error"
     end
 
     local info = "unknown"
@@ -171,6 +176,10 @@ function p_of.dissector (buf, pkt, root)
             pkt.cols.protocol:append(protocol)
             pkt.cols.info:append(info)
             offset = offset + msg_len
+            if msg_len == 0 then
+                offset = buf:len()
+                break
+            end
         else
             -- we don't have all of length field yet
             pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
