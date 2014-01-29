@@ -441,6 +441,10 @@ table_id_default_zero = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
             default='TableId.ZERO')
+of_aux_id = JType("OFAuxId") \
+        .op(read='OFAuxId.readByte(bb)',
+            write='$name.writeByte(bb)',
+            default='OFAuxId.MAIN')
 of_version = JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 
@@ -638,6 +642,8 @@ exceptions = {
 
         'of_bsn_tlv_vlan_vid' : { 'value' : vlan_vid },
         'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
+
+        'of_features_reply' : { 'auxiliary_id' : of_aux_id},
 }
 
 
