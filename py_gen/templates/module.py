@@ -52,11 +52,7 @@ import util
 import loxi.generic_util
 
 :: for ofclass in ofclasses:
-:: if ofclass.virtual:
-:: include('_virtual_ofclass.py', ofclass=ofclass)
-:: else:
 :: include('_ofclass.py', ofclass=ofclass)
-:: #endif
 
 :: #endfor
 
