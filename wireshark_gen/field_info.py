@@ -174,4 +174,7 @@ field_to_base = {
 
 reader_overrides = {
     ("of_packet_in", "data"): "read_ethernet",
+    ("of_packet_out", "data"): "read_ethernet",
+    ("of_bsn_pdu_tx_request", "data"): "read_ethernet",
+    ("of_bsn_pdu_rx_request", "data"): "read_ethernet",
 }

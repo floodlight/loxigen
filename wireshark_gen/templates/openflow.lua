@@ -138,6 +138,8 @@ function dissect_of_message(buf, root)
     local protocol = "OF ?"
     if openflow_versions[version_val] then
         protocol = "OF " .. openflow_versions[version_val]
+    else
+        return "Unknown protocol", "Dissection error"
     end
 
     local info = "unknown"
@@ -152,7 +154,12 @@ function p_of.dissector (buf, pkt, root)
     current_pkt = pkt
     repeat
         if buf:len() - offset >= 4 then
-            msg_len = buf(offset+2,2):uint()
+            local msg_len = buf(offset+2,2):uint()
+
+            if msg_len < 8 then
+                break
+            end
+
             if offset + msg_len > buf:len() then
                 -- we don't have all the data we need yet
                 pkt.desegment_len = offset + msg_len - buf:len()
