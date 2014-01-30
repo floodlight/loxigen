@@ -42,6 +42,24 @@ public class OFAuxId implements Comparable<OFAuxId>, PrimitiveSinkable {
         return "0x" + Integer.toHexString(id);
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + id;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        OFAuxId other = (OFAuxId) obj;
+        if (id != other.id) return false;
+        return true;
+    }
+
     public short getValue() {
         return id;
     }
@@ -54,21 +72,6 @@ public class OFAuxId implements Comparable<OFAuxId>, PrimitiveSinkable {
         return OFAuxId.of(c.readUnsignedByte());
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof TableId))
-            return false;
-        OFAuxId other = (OFAuxId)obj;
-        if (other.id != this.id)
-            return false;
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        int prime = 13873;
-        return this.id * prime;
-    }
 
     @Override
     public int compareTo(OFAuxId other) {
