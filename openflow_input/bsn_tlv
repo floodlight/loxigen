@@ -112,3 +112,9 @@ struct of_bsn_tlv_miss_packets : of_bsn_tlv {
     uint16_t length;
     uint64_t value;
 };
+
+struct of_bsn_tlv_circuit_id : of_bsn_tlv {
+    uint16_t type == 14;
+    uint16_t length;
+    of_octets_t value;
+};
