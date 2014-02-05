@@ -301,6 +301,7 @@ extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
         switch (subtype) {
         case 0: *id = OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK; break;
         case 1: *id = OF_INSTRUCTION_BSN_ARP_OFFLOAD; break;
+        case 2: *id = OF_INSTRUCTION_BSN_DHCP_OFFLOAD; break;
         }
         break;
     }
