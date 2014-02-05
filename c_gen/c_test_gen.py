@@ -147,7 +147,12 @@ def ignore_member(cls, version, m_name, m_type):
                "of_bsn_gentable_stats_request",
                "of_bsn_gentable_stats_reply",
                "of_bsn_gentable_bucket_stats_request",
-               "of_bsn_gentable_bucket_stats_reply"]
+               "of_bsn_gentable_bucket_stats_reply",
+               "of_bsn_flow_checksum_bucket_stats_request",
+               "of_bsn_flow_checksum_bucket_stats_reply",
+               "of_bsn_table_checksum_stats_request",
+               "of_bsn_table_checksum_stats_reply",
+            ]
 
     if (cls in classes and (
             m_name == "experimenter" or
