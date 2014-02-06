@@ -96,7 +96,7 @@ struct of_bsn_gentable_entry_add : of_bsn_header {
 //
 // If the switch cannot process the message then it should reply with an error
 // message. The contents of the table must not be changed in case of an error.
-// If the key does not exist in the table an error message will be generated.
+// If the key does not exist in the table no error will be generated.
 struct of_bsn_gentable_entry_delete : of_bsn_header {
     uint8_t version;
     uint8_t type == 4;
