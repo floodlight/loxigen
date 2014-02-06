@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import java.util.Arrays;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.google.common.hash.PrimitiveSink;
@@ -170,7 +168,6 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Arrays.hashCode(bytesCache);
         result = prime * result + rawValue;
         return result;
     }
@@ -184,8 +181,6 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         if (getClass() != obj.getClass())
             return false;
         IPv4Address other = (IPv4Address) obj;
-        if (!Arrays.equals(bytesCache, other.bytesCache))
-            return false;
         if (rawValue != other.rawValue)
             return false;
         return true;
