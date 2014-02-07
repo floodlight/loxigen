@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -7,15 +9,13 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
-
-import org.projectfloodlight.openflow.protocol.Writeable;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
@@ -50,7 +50,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     private static class Reader implements OFMessageReader<IPv6Address> {
         @Override
-        public IPv6Address readFrom(ChannelBuffer bb) throws OFParseError {
+        public IPv6Address readFrom(ByteBuf bb) throws OFParseError {
             return new IPv6Address(bb.readLong(), bb.readLong());
         }
     }
@@ -116,13 +116,13 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     /**
-     * IPv6 multicast addresses are defined by the prefix ff00::/8 
+     * IPv6 multicast addresses are defined by the prefix ff00::/8
      */
     @Override
     public boolean isMulticast() {
         return (raw1 >>> 56) == 0xFFL;
     }
-    
+
     @Override
     public IPv6Address and(IPv6Address other) {
         Preconditions.checkNotNull(other, "other must not be null");
@@ -394,6 +394,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     private volatile byte[] bytesCache = null;
 
+    @Override
     public byte[] getBytes() {
         if (bytesCache == null) {
             synchronized (this) {
@@ -539,12 +540,12 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return true;
     }
 
-    public void write16Bytes(ChannelBuffer c) {
+    public void write16Bytes(ByteBuf c) {
         c.writeLong(this.raw1);
         c.writeLong(this.raw2);
     }
 
-    public static IPv6Address read16Bytes(ChannelBuffer c) throws OFParseError {
+    public static IPv6Address read16Bytes(ByteBuf c) throws OFParseError {
         return IPv6Address.of(c.readLong(), c.readLong());
     }
 
@@ -569,7 +570,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeLong(raw1);
         bb.writeLong(raw2);
     }

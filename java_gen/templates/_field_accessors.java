@@ -16,7 +16,7 @@
         return ${version_prop.enum_value};
 //::    elif version_prop.is_length_value:
         // FIXME: Hacky and inperformant way to determine a message length. Should be replaced with something better
-        ChannelBuffer c = new LengthCountingPseudoChannelBuffer();
+        ByteBuf c = new LengthCountingPseudoByteBuf();
         WRITER.write(c, ${ "this" if not builder else "({0}) this.getMessage()".format(msg.name) });
         return c.writerIndex();
 //::    else:

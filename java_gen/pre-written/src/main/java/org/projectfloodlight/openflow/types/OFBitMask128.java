@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 import com.google.common.hash.PrimitiveSink;
 
@@ -66,12 +66,12 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
         return (word & ((long)1 << bit)) != 0;
     }
 
-    public void write16Bytes(ChannelBuffer cb) {
+    public void write16Bytes(ByteBuf cb) {
         cb.writeLong(raw1);
         cb.writeLong(raw2);
     }
 
-    public static OFBitMask128 read16Bytes(ChannelBuffer cb) {
+    public static OFBitMask128 read16Bytes(ByteBuf cb) {
         long raw1 = cb.readLong();
         long raw2 = cb.readLong();
         return of(raw1, raw2);

@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -51,11 +51,11 @@ public class GenTableId implements OFValueType<GenTableId>, Comparable<GenTableI
         return LENGTH;
     }
 
-    public void write2Bytes(ChannelBuffer c) {
+    public void write2Bytes(ByteBuf c) {
         c.writeShort(this.id);
     }
 
-    public static GenTableId read2Bytes(ChannelBuffer c) throws OFParseError {
+    public static GenTableId read2Bytes(ByteBuf c) throws OFParseError {
         return GenTableId.of(c.readUnsignedShort());
     }
 

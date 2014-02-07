@@ -4,14 +4,14 @@ import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Wrapper around a 6 byte mac address.
@@ -203,12 +203,12 @@ public class MacAddress implements OFValueType<MacAddress> {
         return rawValue;
     }
 
-    public void write6Bytes(ChannelBuffer c) {
+    public void write6Bytes(ByteBuf c) {
         c.writeInt((int) (this.rawValue >> 16));
         c.writeShort((int) this.rawValue & 0xFFFF);
     }
 
-    public static MacAddress read6Bytes(ChannelBuffer c) throws OFParseError {
+    public static MacAddress read6Bytes(ByteBuf c) throws OFParseError {
         long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
         return MacAddress.of(raw);
     }
@@ -232,7 +232,7 @@ public class MacAddress implements OFValueType<MacAddress> {
     /*
      * Parse an IPv4 Multicast address and return the macAddress
      * corresponding to the multicast IPv4 address.
-     * 
+     *
      * For multicast forwarding, the mac addresses in the range
      * 01-00-5E-00-00-00 to 01-00-5E-7F-FF-FF have been reserved.
      * The most significant 25 bits of the above 48-bit mac address
@@ -250,11 +250,11 @@ public class MacAddress implements OFValueType<MacAddress> {
     @Nonnull
     public static MacAddress forIPv4MulticastAddress(IPv4Address ipv4)
             throws IllegalArgumentException {
- 
+
         if (!ipv4.isMulticast())
             throw new IllegalArgumentException(
                     "Not a Multicast IPAddress\"" + ipv4 + "\"");
-        
+
         long ipLong = ipv4.getInt();
         int ipMask = 0x007FFFFF;
         ipLong = ipLong & ipMask;

@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
@@ -45,11 +45,11 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
         return code;
     }
 
-    public void writeByte(ChannelBuffer c) {
+    public void writeByte(ByteBuf c) {
         c.writeByte(this.code);
     }
 
-    public static ICMPv4Code readByte(ChannelBuffer c) {
+    public static ICMPv4Code readByte(ByteBuf c) {
         return ICMPv4Code.of(c.readUnsignedByte());
     }
 

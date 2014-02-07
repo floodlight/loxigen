@@ -69,7 +69,7 @@ public class ${test.name} {
         //:: else:
         ${var_type} ${var_name} = factory.${factory_method}();
         //:: #endif
-        ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
+        ByteBuf bb = Unpooled.buffer();
         ${var_name}.writeTo(bb);
         byte[] written = new byte[bb.readableBytes()];
         bb.readBytes(written);
@@ -87,7 +87,7 @@ public class ${test.name} {
         ${var_type} ${var_name}Built = factory.${factory_method}();
         //:: #endif
 
-        ChannelBuffer input = ChannelBuffers.copiedBuffer(${msg.constant_name}_SERIALIZED);
+        ByteBuf input = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
         // FIXME should invoke the overall reader once implemented
         ${var_type} ${var_name}Read = ${msg.name}.READER.readFrom(input);
@@ -101,14 +101,14 @@ public class ${test.name} {
 
    @Test
    public void testReadWrite() throws Exception {
-       ChannelBuffer input = ChannelBuffers.copiedBuffer(${msg.constant_name}_SERIALIZED);
+       ByteBuf input = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
        // FIXME should invoke the overall reader once implemented
        ${var_type} ${var_name} = ${msg.name}.READER.readFrom(input);
        assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
        // write message again
-       ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
+       ByteBuf bb = Unpooled.buffer();
        ${var_name}.writeTo(bb);
        byte[] written = new byte[bb.readableBytes()];
        bb.readBytes(written);

@@ -1,12 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
-import java.util.Arrays;
-
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 /** Represents the VXLAN Network Identifier (24 bits).
  *
@@ -74,11 +73,11 @@ public class VxlanNI implements OFValueType<VxlanNI> {
     }
 
 
-    public void write4Bytes(ChannelBuffer c) {
+    public void write4Bytes(ByteBuf c) {
         c.writeInt(this.vni);
     }
 
-    public static VxlanNI read4Bytes(ChannelBuffer c) throws OFParseError {
+    public static VxlanNI read4Bytes(ByteBuf c) throws OFParseError {
         return VxlanNI.ofVni(c.readInt());
     }
 

@@ -21,10 +21,10 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.util.Arrays;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 public class StringByteSerializer {
-    public static String readFrom(final ChannelBuffer data, final int length) {
+    public static String readFrom(final ByteBuf data, final int length) {
         byte[] stringBytes = new byte[length];
         data.readBytes(stringBytes);
         // find the first index of 0
@@ -37,7 +37,7 @@ public class StringByteSerializer {
         return new String(Arrays.copyOf(stringBytes, index), Charset.forName("ascii"));
     }
 
-    public static void writeTo(final ChannelBuffer data, final int length,
+    public static void writeTo(final ByteBuf data, final int length,
             final String value) {
         try {
             byte[] name = value.getBytes("ASCII");
