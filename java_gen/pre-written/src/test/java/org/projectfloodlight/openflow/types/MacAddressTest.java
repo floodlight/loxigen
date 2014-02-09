@@ -140,4 +140,15 @@ public class MacAddressTest {
         assertFalse(MacAddress.of(0x05FFFFFFFFFFFFL).isMulticast());
         assertFalse(MacAddress.of("FF:FF:FF:FF:FF:FF").isMulticast());
     }
+
+    @Test
+    public void testIsLinkLocal() {
+        assertTrue(MacAddress.of("01:80:C2:00:00:00").isLinkLocal());
+        assertTrue(MacAddress.of("01:80:C2:00:00:0f").isLinkLocal());
+        assertFalse(MacAddress.of("01:80:C2:00:00:50").isLinkLocal());
+        assertFalse(MacAddress.of("01:80:C2:00:10:00").isLinkLocal());
+        assertFalse(MacAddress.of("01:80:C2:40:00:01").isLinkLocal());
+        assertFalse(MacAddress.of("00:80:C2:f0:00:00").isLinkLocal());
+        assertFalse(MacAddress.of("FE:80:C2:00:00:00").isLinkLocal());
+    }
 }
