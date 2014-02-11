@@ -26,8 +26,8 @@ public class MacAddress implements OFValueType<MacAddress> {
     public static final MacAddress NO_MASK = MacAddress.of(0xFFFFFFFFFFFFFFFFl);
     public static final MacAddress FULL_MASK = MacAddress.of(0x0);
 
-    private static final long LINK_LOCAL_MASK = 0xfffffffffff0L;
-    private static final long LINK_LOCAL_VALUE = 0x0180c2000000L;
+    private static final long LLDP_MAC_ADDRESS_MASK = 0xfffffffffff0L;
+    private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
 
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
@@ -118,11 +118,11 @@ public class MacAddress implements OFValueType<MacAddress> {
     }
 
     /**
-     * Returns {@code true} if the MAC address is a link local address.
-     * @return {@code true} if the MAC address is a link local address.
+     * Returns {@code true} if the MAC address is an LLDP mac address.
+     * @return {@code true} if the MAC address is an LLDP mac address.
      */
-    public boolean isLinkLocal() {
-        return (rawValue & LINK_LOCAL_MASK) == LINK_LOCAL_VALUE;
+    public boolean isLLDPAddress() {
+        return (rawValue & LLDP_MAC_ADDRESS_MASK) == LLDP_MAC_ADDRESS_VALUE;
     }
 
     @Override
