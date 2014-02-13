@@ -253,8 +253,11 @@ of_%(name)s_to_object_id(int %(name)s, of_version_t version)
     if (!OF_VERSION_OKAY(version)) {
         return OF_OBJECT_INVALID;
     }
-    if (%(name)s == OF_EXPERIMENTER_TYPE) {
+    if (%(name)s == 0xffff) {
         return OF_%(u_name)s_EXPERIMENTER;
+    }
+    if (%(name)s == 0xfffe) {
+        return OF_%(u_name)s_EXPERIMENTER_MISS;
     }
     if (%(name)s < 0 || %(name)s >= OF_%(u_name)s_ITEM_COUNT) {
         return OF_OBJECT_INVALID;
