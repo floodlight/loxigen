@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2013, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 /****************************************************************
  *
@@ -36,6 +36,11 @@
 
 #include <loci/loci.h>
 #include <loci/of_message.h>
+
+#define OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET 4
+#define OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET 8
+
+${legacy_code}
 
 /****************************************************************
  * Top level OpenFlow message length functions
@@ -136,30 +141,6 @@ of_tlv16_wire_type_get(of_object_t *obj, int *wire_type)
 }
 
 /**
- * Set the object ID based on the wire buffer for any TLV object
- * @param obj The object being referenced
- * @param id The ID value representing what should be stored.
- */
-
-void
-of_tlv16_wire_object_id_set(of_object_t *obj, of_object_id_t id)
-{
-    int wire_type;
-    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
-
-    wire_type = of_object_to_type_map[obj->version][id];
-    ASSERT(wire_type >= 0);
-
-    of_wire_buffer_u16_set(wbuf, 
-        OF_OBJECT_ABSOLUTE_OFFSET(obj, TLV16_WIRE_TYPE_OFFSET), wire_type);
-
-    if (wire_type == OF_EXPERIMENTER_TYPE) {
-        of_extension_object_id_set(obj, id);
-    }
-}
-
-/**
  * Get the object ID of an extended action
  * @param obj The object being referenced
  * @param id Where to store the object ID
@@ -202,41 +183,6 @@ extension_action_object_id_get(of_object_t *obj, of_object_id_t *id)
         }
         break;
     }
-    }
-}
-
-/**
- * Set wire data for extension objects, not messages.
- *
- * Currently only handles BSN mirror; ignores all others
- */
-
-void
-of_extension_object_id_set(of_object_t *obj, of_object_id_t id)
-{
-    uint8_t *buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
-    
-    switch (id) {
-    case OF_ACTION_BSN_MIRROR:
-    case OF_ACTION_ID_BSN_MIRROR:
-        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
-                    OF_EXPERIMENTER_ID_BSN);
-        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 1);
-        break;
-    case OF_ACTION_BSN_SET_TUNNEL_DST:
-    case OF_ACTION_ID_BSN_SET_TUNNEL_DST:
-        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
-                    OF_EXPERIMENTER_ID_BSN);
-        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 2);
-        break;
-    case OF_ACTION_NICIRA_DEC_TTL:
-    case OF_ACTION_ID_NICIRA_DEC_TTL:
-        buf_u32_set(buf + OF_ACTION_EXPERIMENTER_ID_OFFSET,
-                    OF_EXPERIMENTER_ID_NICIRA);
-        buf_u16_set(buf + OF_ACTION_EXPERIMENTER_SUBTYPE_OFFSET, 18);
-        break;
-    default:
-        break;
     }
 }
 
@@ -339,9 +285,27 @@ of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 static int
 extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
-    (void)obj;
+    uint32_t exp_id;
+    uint8_t *buf;
 
     *id = OF_INSTRUCTION_EXPERIMENTER;
+
+    buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+
+    buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET, &exp_id);
+
+    switch (exp_id) {
+    case OF_EXPERIMENTER_ID_BSN: {
+        uint32_t subtype;
+        buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, &subtype);
+        switch (subtype) {
+        case 0: *id = OF_INSTRUCTION_BSN_DISABLE_SRC_MAC_CHECK; break;
+        case 1: *id = OF_INSTRUCTION_BSN_ARP_OFFLOAD; break;
+        case 2: *id = OF_INSTRUCTION_BSN_DHCP_OFFLOAD; break;
+        }
+        break;
+    }
+    }
 
     return OF_ERROR_NONE;
 }
@@ -484,6 +448,23 @@ of_hello_elem_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     ASSERT(*id != OF_OBJECT_INVALID);
 }
 
+/**
+ * Get the object ID based on the wire buffer for a bsn_tlv object
+ * @param obj The object being referenced
+ * @param id Where to store the object ID
+ */
+
+void
+of_bsn_tlv_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
+{
+    int wire_type;
+
+    of_tlv16_wire_type_get(obj, &wire_type);
+    ASSERT(wire_type >= 0 && wire_type < OF_BSN_TLV_ITEM_COUNT);
+    *id = of_bsn_tlv_type_to_id[obj->version][wire_type];
+    ASSERT(*id != OF_OBJECT_INVALID);
+}
+
 /****************************************************************
  * OXM type/length functions.
  ****************************************************************/
@@ -529,27 +510,6 @@ of_oxm_wire_length_get(of_object_t *obj, int *bytes)
 }
 
 /**
- * Set the length of an OXM object in the wire buffer
- * @param obj The object whose wire buffer is an OXM type
- * @param bytes Value to store in wire buffer
- */
-
-void
-of_oxm_wire_length_set(of_object_t *obj, int bytes)
-{
-    uint32_t type_len;
-    of_wire_buffer_t *wbuf;
-
-    ASSERT(bytes >= 0 && bytes < 256);
-
-    /* Read-modify-write */
-    _GET_OXM_TYPE_LEN(obj, &type_len, wbuf);
-    OF_OXM_LENGTH_SET(type_len, bytes);
-    of_wire_buffer_u32_set(wbuf, 
-           OF_OBJECT_ABSOLUTE_OFFSET(obj, OXM_HDR_OFFSET), type_len);
-}
-
-/**
  * Get the object ID of an OXM object based on the wire buffer type
  * @param obj The object whose wire buffer is an OXM type
  * @param id (out) Where the ID is stored 
@@ -559,39 +519,11 @@ void
 of_oxm_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
     uint32_t type_len;
-    int wire_type;
     of_wire_buffer_t *wbuf;
 
     _GET_OXM_TYPE_LEN(obj, &type_len, wbuf);
-    wire_type = OF_OXM_MASKED_TYPE_GET(type_len);
-    *id = of_oxm_to_object_id(wire_type, obj->version);
+    *id = of_oxm_to_object_id(type_len, obj->version);
 }
-
-/**
- * Set the wire type of an OXM object based on the object ID passed
- * @param obj The object whose wire buffer is an OXM type
- * @param id The object ID mapped to an OXM wire type which is stored
- */
-
-void
-of_oxm_wire_object_id_set(of_object_t *obj, of_object_id_t id)
-{
-    uint32_t type_len;
-    int wire_type;
-    of_wire_buffer_t *wbuf;
-
-    ASSERT(OF_OXM_VALID_ID(id));
-
-    /* Read-modify-write */
-    _GET_OXM_TYPE_LEN(obj, &type_len, wbuf);
-    wire_type = of_object_to_wire_type(id, obj->version);
-    ASSERT(wire_type >= 0);
-    OF_OXM_MASKED_TYPE_SET(type_len, wire_type);
-    of_wire_buffer_u32_set(wbuf, 
-           OF_OBJECT_ABSOLUTE_OFFSET(obj, OXM_HDR_OFFSET), type_len);
-}
-
-
 
 #define OF_U16_LEN_LENGTH_OFFSET 0
 
@@ -793,4 +725,48 @@ of_extension_object_wire_push(of_object_t *obj)
     }
 
     return OF_ERROR_NONE;
+}
+
+int
+of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REQUEST;
+        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REQUEST;
+        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REQUEST;
+        case 4: return OF_BSN_GENTABLE_DESC_STATS_REQUEST;
+        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REQUEST;
+        case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REQUEST;
+        case 7: return OF_BSN_GENTABLE_STATS_REQUEST;
+        case 8: return OF_BSN_PORT_COUNTER_STATS_REQUEST;
+        case 9: return OF_BSN_VLAN_COUNTER_STATS_REQUEST;
+        case 10: return OF_BSN_FLOW_CHECKSUM_BUCKET_STATS_REQUEST;
+        case 11: return OF_BSN_TABLE_CHECKSUM_STATS_REQUEST;
+        }
+    }
+    return OF_OBJECT_INVALID;
+}
+
+int
+of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
+{
+    switch (experimenter) {
+    case OF_EXPERIMENTER_ID_BSN:
+        switch (subtype) {
+        case 1: return OF_BSN_LACP_STATS_REPLY;
+        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REPLY;
+        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REPLY;
+        case 4: return OF_BSN_GENTABLE_DESC_STATS_REPLY;
+        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REPLY;
+        case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REPLY;
+        case 7: return OF_BSN_GENTABLE_STATS_REPLY;
+        case 8: return OF_BSN_PORT_COUNTER_STATS_REPLY;
+        case 9: return OF_BSN_VLAN_COUNTER_STATS_REPLY;
+        case 10: return OF_BSN_FLOW_CHECKSUM_BUCKET_STATS_REPLY;
+        case 11: return OF_BSN_TABLE_CHECKSUM_STATS_REPLY;
+        }
+    }
+    return OF_OBJECT_INVALID;
 }

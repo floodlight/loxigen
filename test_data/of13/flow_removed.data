@@ -1,0 +1,39 @@
+-- binary
+04 0b # version, type
+00 48 # length
+12 34 56 78 # xid
+fe dc ba 98 76 54 32 10 # cookie
+42 68 # priority
+02 # reason
+14 # table_id
+00 00 00 0a # duration_sec
+00 00 03 e8 # duration_nsec
+00 05 # idle_timeout
+00 1e # hard_timeout
+00 00 00 00 00 00 00 01 # packet_count
+00 00 00 00 00 00 00 02 # byte_count
+00 01 # match.type
+00 16 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+80 00 2A 02 # match.oxm_list[1].type_len - ARP_OP
+00 01 # match.oxm_list[1].value
+00 00 # match.pad
+-- python
+ofp.message.flow_removed(
+    xid=0x12345678,
+    cookie=0xFEDCBA9876543210,
+    priority=17000,
+    reason=ofp.OFPRR_DELETE,
+    table_id=20,
+    duration_sec=10,
+    duration_nsec=1000,
+    idle_timeout=5,
+    hard_timeout=30,
+    packet_count=1,
+    byte_count=2,
+    match=ofp.match(oxm_list=[
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
+        ofp.oxm.arp_op(value=1)
+    ]))

@@ -1,0 +1,11 @@
+-- binary
+00 19 # type
+00 10 # length
+80 00 1a 02 # OXM header
+00 32 # OXM value
+00 00 00 00 00 00 # pad
+-- python
+ofp.action.set_field(field=ofp.oxm.tcp_src(50))
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
+builder.setField(oxms.tcpSrc(TransportPort.of(50)))

@@ -26,41 +26,25 @@
 :: # under the EPL.
 ::
 :: include('_copyright.py')
-
+:: from loxi_globals import OFVersions
 :: include('_autogen.py')
 
+import struct
 import loxi
 import const
-import struct
-
-def unpack_array(deserializer, element_size, buf):
-    """
-    Deserialize an array of fixed length elements.
-    The deserializer function should take a buffer and return the new object.
-    """
-    if len(buf) % element_size != 0: raise loxi.ProtocolError("invalid array length")
-    n = len(buf) / element_size
-    return [deserializer(buffer(buf, i*element_size, element_size)) for i in range(n)]
-
-def unpack_list(deserializer, length_fmt, buf):
-    """
-    Deserialize a list of variable-length entries.
-    'length_fmt' is a struct format string with exactly one non-padding format
-    character that returns the length of the given element.
-    The deserializer function should take a buffer and return the new object.
-    """
-    entries = []
-    offset = 0
-    length_struct = struct.Struct(length_fmt)
-    n = len(buf)
-    while offset < n:
-        if offset + length_struct.size > len(buf): raise loxi.ProtocolError("entry header overruns list length")
-        length, = length_struct.unpack_from(buf, offset)
-        if length < length_struct.size: raise loxi.ProtocolError("entry length is less than the header length")
-        if offset + length > len(buf): raise loxi.ProtocolError("entry length overruns list length")
-        entries.append(deserializer(buffer(buf, offset, length)))
-        offset += length
-    return entries
+import common
+import action
+:: if version >= OFVersions.VERSION_1_1:
+import instruction
+:: #endif
+:: if version >= OFVersions.VERSION_1_2:
+import oxm
+:: #endif
+:: if version >= OFVersions.VERSION_1_3:
+import action_id
+import instruction_id
+import meter_band
+:: #endif
 
 def pretty_mac(mac):
     return ':'.join(["%02x" % x for x in mac])
@@ -81,6 +65,7 @@ def pretty_flags(v, flag_names):
         set_flags.append("%#x" % v)
     return '|'.join(set_flags) or '0'
 
+:: if version in (OFVersions.VERSION_1_0, OFVersions.VERSION_1_1):
 def pretty_wildcards(v):
     if v == const.OFPFW_ALL:
         return 'OFPFW_ALL'
@@ -89,6 +74,7 @@ def pretty_wildcards(v):
                   'OFPFW_NW_SRC_MASK', 'OFPFW_NW_DST_MASK', 'OFPFW_DL_VLAN_PCP',
                   'OFPFW_NW_TOS']
     return pretty_flags(v, flag_names)
+:: #endif
 
 def pretty_port(v):
     named_ports = [(k,v2) for (k,v2) in const.__dict__.iteritems() if k.startswith('OFPP_')]
@@ -96,3 +82,100 @@ def pretty_port(v):
         if v == v2:
             return k
     return v
+
+def pack_port_no(value):
+:: if version == OFVersions.VERSION_1_0:
+    return struct.pack("!H", value)
+:: else:
+    return struct.pack("!L", value)
+:: #endif
+
+def unpack_port_no(reader):
+:: if version == OFVersions.VERSION_1_0:
+    return reader.read("!H")[0]
+:: else:
+    return reader.read("!L")[0]
+:: #endif
+
+def pack_fm_cmd(value):
+:: if version == OFVersions.VERSION_1_0:
+    return struct.pack("!H", value)
+:: else:
+    return struct.pack("!B", value)
+:: #endif
+
+def unpack_fm_cmd(reader):
+:: if version == OFVersions.VERSION_1_0:
+    return reader.read("!H")[0]
+:: else:
+    return reader.read("!B")[0]
+:: #endif
+
+def init_wc_bmap():
+:: if version <= OFVersions.VERSION_1_1:
+    return const.OFPFW_ALL
+:: else:
+    return 0
+:: #endif
+
+def pack_wc_bmap(value):
+:: if version <= OFVersions.VERSION_1_1:
+    return struct.pack("!L", value)
+:: else:
+    return struct.pack("!Q", value)
+:: #endif
+
+def unpack_wc_bmap(reader):
+:: if version <= OFVersions.VERSION_1_1:
+    return reader.read("!L")[0]
+:: else:
+    return reader.read("!Q")[0]
+:: #endif
+
+def init_match_bmap():
+:: if version <= OFVersions.VERSION_1_1:
+    return const.OFPFW_ALL
+:: else:
+    return 0
+:: #endif
+
+def pack_match_bmap(value):
+:: if version <= OFVersions.VERSION_1_1:
+    return struct.pack("!L", value)
+:: else:
+    return struct.pack("!Q", value)
+:: #endif
+
+def unpack_match_bmap(reader):
+:: if version <= OFVersions.VERSION_1_1:
+    return reader.read("!L")[0]
+:: else:
+    return reader.read("!Q")[0]
+:: #endif
+
+MASK64 = (1 << 64) - 1
+
+def pack_bitmap_128(value):
+    x = 0l
+    for y in value:
+        x |= 1 << y
+    return struct.pack("!QQ", (x >> 64) & MASK64, x & MASK64)
+
+def unpack_bitmap_128(reader):
+    hi, lo = reader.read("!QQ")
+    x = (hi << 64) | lo
+    i = 0
+    value = set()
+    while x != 0:
+        if x & 1 == 1:
+            value.add(i)
+        i += 1
+        x >>= 1
+    return value
+
+def pack_checksum_128(value):
+    return struct.pack("!QQ", (value >> 64) & MASK64, value & MASK64)
+
+def unpack_checksum_128(reader):
+    hi, lo = reader.read("!QQ")
+    return (hi << 64) | lo

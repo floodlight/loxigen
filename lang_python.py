@@ -45,8 +45,14 @@ Target directory structure:
                 const.py        # OpenFlow constants
                 message.py      # Message classes
                 util.py         # Utility functions
-            of12: ...
-            of13: ...
+            of11: ...           # (code generation incomplete)
+                instruction.py  # Instruction classes
+            of12: ...           # (code generation incomplete)
+                oxm.py          # OXM classes
+            of13: ...           # (code generation incomplete)
+                action_id.py    # Action ID classes
+                instruction_id.py # Instruction ID classes
+                meter_band.py   # Meter band classes
 
 The user will add the pyloxi directory to PYTHONPATH. Then they can
 "import loxi" or "import loxi.of10". The idiomatic import is
@@ -57,20 +63,30 @@ the const module directly into their namespace so the user can access
 "ofp.OFPP_NONE".
 """
 
+import os
+from loxi_globals import OFVersions
+import loxi_globals
+import loxi_utils.loxi_utils as loxi_utils
 import py_gen
 import py_gen.util
 import py_gen.codegen
+import template_utils
 
 versions = {
     1: "of10",
     2: "of11",
     3: "of12",
-    4: "of13"
+    4: "of13",
 }
 
 prefix = 'pyloxi/loxi'
 
-modules = ["action", "common", "const", "message", "util"]
+modules = {
+    1: ["action", "common", "const", "message", "util"],
+    2: ["action", "common", "const", "instruction", "message", "util"],
+    3: ["action", "common", "const", "instruction", "message", "oxm", "util"],
+    4: ["action", "action_id", "common", "const", "instruction", "instruction_id", "message", "meter_band", "oxm", "bsn_tlv", "util"],
+}
 
 def make_gen(name, version):
     fn = getattr(py_gen.codegen, "generate_" + name)
@@ -82,10 +98,17 @@ def static(template_name):
 targets = {
     prefix+'/__init__.py': static('toplevel_init.py'),
     prefix+'/pp.py': static('pp.py'),
+    prefix+'/generic_util.py': static('generic_util.py'),
 }
 
 for version, subdir in versions.items():
     targets['%s/%s/__init__.py' % (prefix, subdir)] = make_gen('init', version)
-    for module in modules:
+    for module in modules[version]:
         filename = '%s/%s/%s.py' % (prefix, subdir, module)
-        targets[filename] = make_gen(module, version)
+        targets[filename] = make_gen(module, OFVersions.from_wire(version))
+
+def generate(install_dir):
+    py_gen.codegen.init()
+    for (name, fn) in targets.items():
+        with template_utils.open_output(install_dir, name) as outfile:
+            fn(outfile, os.path.basename(name))

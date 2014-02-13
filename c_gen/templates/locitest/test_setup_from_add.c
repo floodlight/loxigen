@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2013, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 /**
  * Test code for setup from flow add routines
@@ -33,10 +33,11 @@
 
 #include <locitest/test_common.h>
 
-#if !defined(__APPLE__)
+/* mcheck is a glibc extension */
+#if defined(__linux__)
 #include <mcheck.h>
 #define MCHECK_INIT mcheck(NULL)
-#else /* mcheck not available under OS X */
+#else
 #define MCHECK_INIT do { } while (0)
 #endif
 

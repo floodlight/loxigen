@@ -30,50 +30,29 @@ Utilities for generating the target Python code
 """
 
 import os
-import of_g
-import loxi_front_end.type_maps as type_maps
+import loxi_globals
+import template_utils
 import loxi_utils.loxi_utils as utils
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
 
 def render_template(out, name, **context):
-    utils.render_template(out, name, [templates_dir], context)
+    template_utils.render_template(out, name, [templates_dir], context)
 
 def render_static(out, name):
-    utils.render_static(out, name, [templates_dir])
-
-def lookup_unified_class(cls, version):
-    unified_class = of_g.unified[cls][version]
-    if "use_version" in unified_class: # deref version ref
-        ref_version = unified_class["use_version"]
-        unified_class = of_g.unified[cls][ref_version]
-    return unified_class
-
-def primary_wire_type(cls, version):
-    if cls in type_maps.stats_reply_list:
-        return type_maps.type_val[("of_stats_reply", version)]
-    elif cls in type_maps.stats_request_list:
-        return type_maps.type_val[("of_stats_request", version)]
-    elif cls in type_maps.flow_mod_list:
-        return type_maps.type_val[("of_flow_mod", version)]
-    elif (cls, version) in type_maps.type_val:
-        return type_maps.type_val[(cls, version)]
-    elif type_maps.message_is_extension(cls, version):
-        return type_maps.type_val[("of_experimenter", version)]
-    elif type_maps.action_is_extension(cls, version):
-        return type_maps.type_val[("of_action_experimenter", version)]
-    elif type_maps.action_id_is_extension(cls, version):
-        return type_maps.type_val[("of_action_id_experimenter", version)]
-    elif type_maps.instruction_is_extension(cls, version):
-        return type_maps.type_val[("of_instruction_experimenter", version)]
-    elif type_maps.queue_prop_is_extension(cls, version):
-        return type_maps.type_val[("of_queue_prop_experimenter", version)]
-    elif type_maps.table_feature_prop_is_extension(cls, version):
-        return type_maps.type_val[("of_table_feature_prop_experimenter", version)]
-    else:
-        raise ValueError
+    template_utils.render_static(out, name, [templates_dir])
 
 def constant_for_value(version, group, value):
-    return (["const." + v["ofp_name"] for k, v in of_g.identifiers.items()
-             if k in of_g.identifiers_by_group[group] and
-                v["values_by_version"].get(version, None) == value] or [value])[0]
+    enums = loxi_globals.ir[version].enums
+    enum = [x for x in enums if x.name == group][0]
+    for name, value2 in enum.values:
+        if value == value2:
+            return "const." + name
+    return repr(value)
+
+def ancestors(ofclass):
+    r = []
+    while ofclass:
+        r.append(ofclass)
+        ofclass = ofclass.superclass
+    return r

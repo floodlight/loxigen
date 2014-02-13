@@ -25,156 +25,180 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-import of_g
-import loxi_utils.loxi_utils as utils
-import unittest
+from collections import namedtuple
 
-class OFType(object):
-    """
-    Encapsulates knowledge about the OpenFlow type system.
-    """
+import loxi_utils.loxi_utils as loxi_utils
+import py_gen.codegen
+import loxi_globals
 
-    version = None
-    base = None
-    is_array = False
-    array_length = None
+OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
 
-    def __init__(self, string, version):
-        self.version = version
-        self.array_length, self.base = utils.type_dec_to_count_base(string)
-        self.is_array = self.array_length != 1
+# Map from LOXI type name to an object with templates for init, pack, and unpack
+# Most types are defined using the convenience code below. This dict should
+# only be used directly for special cases such as primitive types.
+type_data_map = {
+    'char': OFTypeData(
+        init='0',
+        pack='struct.pack("!B", %s)',
+        unpack='%s.read("!B")[0]'),
 
-    def gen_init_expr(self):
-        if utils.class_is_list(self.base):
-            v = "[]"
-        elif self.base.find("uint") == 0 or self.base in ["char", "of_port_no_t"]:
-            v = "0"
-        elif self.base == 'of_mac_addr_t':
-            v = '[0,0,0,0,0,0]'
-        elif self.base == 'of_wc_bmap_t':
-            v = 'const.OFPFW_ALL'
-        elif self.base in ['of_octets_t', 'of_port_name_t', 'of_table_name_t',
-                           'of_desc_str_t', 'of_serial_num_t']:
-            v = '""'
-        elif self.base == 'of_match_t':
-            v = 'common.match()'
-        elif self.base == 'of_port_desc_t':
-            v = 'common.port_desc()'
-        else:
-            v = "None"
+    'uint8_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!B", %s)',
+        unpack='%s.read("!B")[0]'),
 
-        if self.is_array:
-            return "[" + ','.join([v] * self.array_length) + "]"
-        else:
-            return v
+    'uint16_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!H", %s)',
+        unpack='%s.read("!H")[0]'),
 
-    def gen_pack_expr(self, expr_expr):
-        pack_fmt = self._pack_fmt()
-        if pack_fmt and not self.is_array:
-            return 'struct.pack("!%s", %s)' % (pack_fmt, expr_expr)
-        elif pack_fmt and self.is_array:
-            return 'struct.pack("!%s%s", *%s)' % (self.array_length, pack_fmt, expr_expr)
-        elif self.base == 'of_octets_t':
-            return expr_expr
-        elif utils.class_is_list(self.base):
-            return '"".join([x.pack() for x in %s])' % expr_expr
-        elif self.base == 'of_mac_addr_t':
-            return 'struct.pack("!6B", *%s)' % expr_expr
-        elif self.base in ['of_match_t', 'of_port_desc_t']:
-            return '%s.pack()' % expr_expr
-        elif self.base == 'of_port_name_t':
-            return self._gen_string_pack_expr(16, expr_expr)
-        elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
-            return self._gen_string_pack_expr(32, expr_expr)
-        elif self.base == 'of_desc_str_t':
-            return self._gen_string_pack_expr(256, expr_expr)
-        else:
-            return "'TODO pack %s'" % self.base
+    'uint32_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!L", %s)',
+        unpack='%s.read("!L")[0]'),
 
-    def _gen_string_pack_expr(self, length, expr_expr):
-        return 'struct.pack("!%ds", %s)' % (length, expr_expr)
+    'uint64_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!Q", %s)',
+        unpack='%s.read("!Q")[0]'),
 
-    def gen_unpack_expr(self, buf_expr, offset_expr):
-        pack_fmt = self._pack_fmt()
-        if pack_fmt and not self.is_array:
-            return "struct.unpack_from('!%s', %s, %s)[0]" % (pack_fmt, buf_expr, offset_expr)
-        elif pack_fmt and self.is_array:
-            return "list(struct.unpack_from('!%d%s', %s, %s))" % (self.array_length, pack_fmt, buf_expr, offset_expr)
-        elif self.base == 'of_octets_t':
-            return "%s[%s:]" % (buf_expr, offset_expr)
-        elif self.base == 'of_mac_addr_t':
-            return "list(struct.unpack_from('!6B', %s, %s))" % (buf_expr, offset_expr)
-        elif self.base == 'of_match_t':
-            return 'common.match.unpack(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_port_desc_t':
-            return 'common.port_desc.unpack(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_list_action_t':
-            return 'action.unpack_list(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_list_flow_stats_entry_t':
-            return 'common.unpack_list_flow_stats_entry(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_list_queue_prop_t':
-            return 'common.unpack_list_queue_prop(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_list_packet_queue_t':
-            return 'common.unpack_list_packet_queue(buffer(%s, %s))' % (buf_expr, offset_expr)
-        elif self.base == 'of_port_name_t':
-            return self._gen_string_unpack_expr(16, buf_expr, offset_expr)
-        elif self.base == 'of_table_name_t' or self.base == 'of_serial_num_t':
-            return self._gen_string_unpack_expr(32, buf_expr, offset_expr)
-        elif self.base == 'of_desc_str_t':
-            return self._gen_string_unpack_expr(256, buf_expr, offset_expr)
-        elif utils.class_is_list(self.base):
-            element_cls = utils.list_to_entry_type(self.base)[:-2]
-            if ((element_cls, self.version) in of_g.is_fixed_length):
-                klass_name = self.base[8:-2]
-                element_size, = of_g.base_length[(element_cls, self.version)],
-                return 'util.unpack_array(common.%s.unpack, %d, buffer(%s, %s))' % (klass_name, element_size, buf_expr, offset_expr)
-            else:
-                return "None # TODO unpack list %s" % self.base
-        else:
-            return "None # TODO unpack %s" % self.base
+    'of_port_no_t': OFTypeData(
+        init='0',
+        pack='util.pack_port_no(%s)',
+        unpack='util.unpack_port_no(%s)'),
 
-    def _gen_string_unpack_expr(self, length, buf_expr, offset_expr):
-        return 'str(buffer(%s, %s, %d)).rstrip("\\x00")' % (buf_expr, offset_expr, length)
+    'of_fm_cmd_t': OFTypeData(
+        init='0',
+        pack='util.pack_fm_cmd(%s)',
+        unpack='util.unpack_fm_cmd(%s)'),
 
-    def _pack_fmt(self):
-        if self.base == "char":
-            return "B"
-        if self.base == "uint8_t":
-            return "B"
-        if self.base == "uint16_t":
-            return "H"
-        if self.base == "uint32_t":
-            return "L"
-        if self.base == "uint64_t":
-            return "Q"
-        if self.base == "of_port_no_t":
-            if self.version == of_g.VERSION_1_0:
-                return "H"
-            else:
-                return "L"
-        if self.base == "of_fm_cmd_t":
-            if self.version == of_g.VERSION_1_0:
-                return "H"
-            else:
-                return "B"
-        if self.base in ["of_wc_bmap_t", "of_match_bmap_t"]:
-            if self.version in [of_g.VERSION_1_0, of_g.VERSION_1_1]:
-                return "L"
-            else:
-                return "Q"
-        return None
+    'of_wc_bmap_t': OFTypeData(
+        init='util.init_wc_bmap()',
+        pack='util.pack_wc_bmap(%s)',
+        unpack='util.unpack_wc_bmap(%s)'),
 
-class TestOFType(unittest.TestCase):
-    def test_init(self):
-        from oftype import OFType
-        self.assertEquals("None", OFType("of_list_action_t", 1).gen_init_expr())
-        self.assertEquals("[0,0,0]", OFType("uint32_t[3]", 1).gen_init_expr())
+    'of_match_bmap_t': OFTypeData(
+        init='util.init_match_bmap()',
+        pack='util.pack_match_bmap(%s)',
+        unpack='util.unpack_match_bmap(%s)'),
 
-    def test_pack(self):
-        self.assertEquals('struct.pack("!16s", "foo")', OFType("of_port_name_t", 1).gen_pack_expr('"foo"'))
+    'of_ipv4_t': OFTypeData(
+        init='0',
+        pack='struct.pack("!L", %s)',
+        unpack='%s.read("!L")[0]'),
 
-    def test_unpack(self):
-        self.assertEquals('str(buffer(buf, 8, 16)).rstrip("\\x00")', OFType("of_port_name_t", 1).gen_unpack_expr('buf', 8))
+    'of_ipv6_t': OFTypeData(
+        init="'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'",
+        pack='struct.pack("!16s", %s)',
+        unpack="%s.read('!16s')[0]"),
 
-if __name__ == '__main__':
-    unittest.main()
+    'of_mac_addr_t': OFTypeData(
+        init='[0,0,0,0,0,0]',
+        pack='struct.pack("!6B", *%s)',
+        unpack="list(%s.read('!6B'))"),
+
+    'of_octets_t': OFTypeData(
+        init="''",
+        pack='%s',
+        unpack='str(%s.read_all())'),
+
+    'of_bitmap_128_t': OFTypeData(
+        init='set()',
+        pack='util.pack_bitmap_128(%s)',
+        unpack="util.unpack_bitmap_128(%s)"),
+
+    'of_oxm_t': OFTypeData(
+        init='None',
+        pack='%s.pack()',
+        unpack='oxm.oxm.unpack(%s)'),
+
+    'of_checksum_128_t': OFTypeData(
+        init='0',
+        pack='util.pack_checksum_128(%s)',
+        unpack="util.unpack_checksum_128(%s)"),
+}
+
+## Fixed length strings
+
+# Map from class name to length
+fixed_length_strings = {
+    'of_port_name_t': 16,
+    'of_table_name_t': 32,
+    'of_serial_num_t': 32,
+    'of_desc_str_t': 256,
+}
+
+for (cls, length) in fixed_length_strings.items():
+    type_data_map[cls] = OFTypeData(
+        init='""',
+        pack='struct.pack("!%ds", %%s)' % length,
+        unpack='%%s.read("!%ds")[0].rstrip("\\x00")' % length)
+
+## Embedded structs
+
+# Map from class name to Python class name
+embedded_structs = {
+    'of_match_t': 'common.match',
+    'of_port_desc_t': 'common.port_desc',
+    'of_meter_features_t': 'common.meter_features',
+    'of_bsn_vport_q_in_q_t': 'common.bsn_vport_q_in_q',
+}
+
+for (cls, pyclass) in embedded_structs.items():
+    type_data_map[cls] = OFTypeData(
+        init='%s()' % pyclass,
+        pack='%s.pack()',
+        unpack='%s.unpack(%%s)' % pyclass)
+
+## Public interface
+
+def lookup_type_data(oftype, version):
+    return type_data_map.get(loxi_utils.lookup_ir_wiretype(oftype, version))
+
+# Return an initializer expression for the given oftype
+def gen_init_expr(oftype, version):
+    type_data = lookup_type_data(oftype, version)
+    if type_data and type_data.init:
+        return type_data.init
+    elif oftype_is_list(oftype):
+        return "[]"
+    else:
+        return "loxi.unimplemented('init %s')" % oftype
+
+# Return a pack expression for the given oftype
+#
+# 'value_expr' is a string of Python code which will evaluate to
+# the value to be packed.
+def gen_pack_expr(oftype, value_expr, version):
+    type_data = lookup_type_data(oftype, version)
+    if type_data and type_data.pack:
+        return type_data.pack % value_expr
+    elif oftype_is_list(oftype):
+        return "loxi.generic_util.pack_list(%s)" % value_expr
+    else:
+        return "loxi.unimplemented('pack %s')" % oftype
+
+# Return an unpack expression for the given oftype
+#
+# 'reader_expr' is a string of Python code which will evaluate to
+# the OFReader instance used for deserialization.
+def gen_unpack_expr(oftype, reader_expr, version):
+    type_data = lookup_type_data(oftype, version)
+    if type_data and type_data.unpack:
+        return type_data.unpack % reader_expr
+    elif oftype_is_list(oftype):
+        ofproto = loxi_globals.ir[version]
+        ofclass = ofproto.class_by_name(oftype_list_elem(oftype))
+        module_name, class_name = py_gen.codegen.generate_pyname(ofclass)
+        return 'loxi.generic_util.unpack_list(%s, %s.%s.unpack)' % \
+            (reader_expr, module_name, class_name)
+    else:
+        return "loxi.unimplemented('unpack %s')" % oftype
+
+def oftype_is_list(oftype):
+    return (oftype.find("list(") == 0)
+
+# Converts "list(of_flow_stats_entry_t)" to "of_flow_stats_entry"
+def oftype_list_elem(oftype):
+    assert oftype.find("list(") == 0
+    return oftype[5:-3]

@@ -1,0 +1,38 @@
+-- binary
+ff fd # port_no
+01 02 03 04 05 06 # hw_addr
+66 6f 6f 00 00 00 00 00 00 00 00 00 00 00 00 00 # name
+00 00 00 10 # config
+00 00 02 00 # state
+00 00 00 01 # curr
+00 00 00 20 # advertised
+00 00 02 00 # supported
+00 00 08 00 # peer
+-- python
+ofp.port_desc(
+    port_no=ofp.OFPP_CONTROLLER,
+    hw_addr=[1,2,3,4,5,6],
+    name="foo",
+    config=ofp.OFPPC_NO_FLOOD,
+    state=ofp.OFPPS_STP_FORWARD,
+    curr=ofp.OFPPF_10MB_HD,
+    advertised=ofp.OFPPF_1GB_FD,
+    supported=ofp.OFPPF_AUTONEG,
+    peer=ofp.OFPPF_PAUSE_ASYM)
+-- c
+obj = of_port_desc_new(OF_VERSION_1_0);
+of_port_desc_advertised_set(obj, 32);
+of_port_desc_config_set(obj, 16);
+of_port_desc_curr_set(obj, 1);
+{
+    of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
+    of_port_desc_hw_addr_set(obj, hw_addr);
+}
+{
+    of_port_name_t name = "foo";
+    of_port_desc_name_set(obj, name);
+}
+of_port_desc_peer_set(obj, 2048);
+of_port_desc_port_no_set(obj, 65533);
+of_port_desc_state_set(obj, 512);
+of_port_desc_supported_set(obj, 512);

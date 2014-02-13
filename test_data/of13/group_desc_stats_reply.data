@@ -1,0 +1,69 @@
+-- binary
+04 13 # version, type
+00 80 # length
+12 34 56 78 # xid
+00 07 # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 68 # entries[0].length
+03 # entries[0].group_type
+00 # entries[0].pad
+00 00 00 01 # entries[0].group_id
+00 30 # entries[0].buckets[0].len
+00 01 # entries[0].buckets[0].weight
+00 00 00 05 # entries[0].buckets[0].watch_port
+ff ff ff ff # entries[0].buckets[0].watch_group
+00 00 00 00 # entries[0].pad
+00 00 # entries[0].buckets[0].actions[0].type
+00 10 # entries[0].buckets[0].actions[0].len
+00 00 00 05 # entries[0].buckets[0].actions[0].port
+00 00 # entries[0].buckets[0].actions[0].max_len
+00 00 00 00 00 00 # entries[0].pad
+00 00 # entries[0].buckets[0].actions[1].type
+00 10 # entries[0].buckets[0].actions[1].len
+00 00 00 06 # entries[0].buckets[0].actions[1].port
+00 00 # entries[0].buckets[0].actions[1].max_len
+00 00 00 00 00 00 # entries[0].pad
+00 30 # entries[0].buckets[1].len
+00 01 # entries[0].buckets[1].weight
+00 00 00 06 # entries[0].buckets[1].watch_port
+ff ff ff ff # entries[0].buckets[1].watch_group
+00 00 00 00 # entries[0].pad
+00 00 # entries[0].buckets[1].actions[0].type
+00 10 # entries[0].buckets[1].actions[0].len
+00 00 00 05 # entries[0].buckets[1].actions[0].port
+00 00 # entries[0].buckets[1].actions[0].max_len
+00 00 00 00 00 00 # entries[0].pad
+00 00 # entries[0].buckets[1].actions[1].type
+00 10 # entries[0].buckets[1].actions[1].len
+00 00 00 06 # entries[0].buckets[1].actions[1].port
+00 00 # entries[0].buckets[1].actions[1].max_len
+00 00 00 00 00 00 # entries[0].pad
+00 08 # entries[1].length
+03 # entries[1].group_type
+00 # entries[1].pad
+00 00 00 02 # entries[1].group_id
+-- python
+ofp.message.group_desc_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    entries=[
+        ofp.group_desc_stats_entry(
+            group_type=ofp.OFPGT_FF,
+            group_id=1,
+            buckets=[
+                ofp.bucket(
+                    weight=1,
+                    watch_port=5,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)]),
+                ofp.bucket(
+                    weight=1,
+                    watch_port=6,
+                    watch_group=0xffffffff,
+                    actions=[
+                        ofp.action.output(port=5, max_len=0),
+                        ofp.action.output(port=6, max_len=0)])]),
+        ofp.group_desc_stats_entry(group_type=ofp.OFPGT_FF, group_id=2, buckets=[])])

@@ -1,0 +1,54 @@
+-- binary
+04 04 # version, type
+00 24 # length
+12 34 56 78 # xid
+00 5c 16 c7 # experimenter
+00 00 00 2f # subtype
+00 14 # table_id
+
+00 00 # key[0].type
+00 08 # key[0].length
+00 00 00 05 # key[0].value
+
+00 01 # key[1].type
+00 0a # key[1].length
+01 23 45 67 89 ab # key[1].value
+-- python
+ofp.message.bsn_gentable_entry_delete(
+    xid=0x12345678,
+    table_id=20,
+    key=[
+        ofp.bsn_tlv.port(5),
+        ofp.bsn_tlv.mac([0x01, 0x23, 0x45, 0x67, 0x89, 0xab]),
+    ])
+-- java
+builder.setXid(0x12345678)
+    .setTableId(GenTableId.of(20))
+    .setKey(
+        ImmutableList.<OFBsnTlv>of(
+            factory.bsnTlvs().port(OFPort.of(5)),
+            factory.bsnTlvs().mac(MacAddress.of("01:23:45:67:89:ab"))
+        )
+    )
+-- c
+obj = of_bsn_gentable_entry_delete_new(OF_VERSION_1_3);
+of_bsn_gentable_entry_delete_xid_set(obj, 0x12345678);
+of_bsn_gentable_entry_delete_table_id_set(obj, 20);
+{
+    of_object_t *list = of_list_bsn_tlv_new(OF_VERSION_1_3);
+    {
+        of_object_t *tlv = of_bsn_tlv_port_new(OF_VERSION_1_3);
+        of_bsn_tlv_port_value_set(tlv, 5);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    {
+        of_mac_addr_t mac = { { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab } };
+        of_object_t *tlv = of_bsn_tlv_mac_new(OF_VERSION_1_3);
+        of_bsn_tlv_mac_value_set(tlv, mac);
+        of_list_append(list, tlv);
+        of_object_delete(tlv);
+    }
+    of_bsn_gentable_entry_delete_key_set(obj, list);
+    of_object_delete(list);
+}

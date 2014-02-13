@@ -33,12 +33,17 @@ defines the generated files and the functions used to generate them.
 """
 
 import os
+import c_gen.of_g_legacy as of_g
+import c_gen.build_of_g as build_of_g
 import c_gen.c_code_gen as c_code_gen
 import c_gen.c_test_gen as c_test_gen
 import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
 import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
+import c_gen.codegen
+import loxi_utils.loxi_utils as loxi_utils
+import template_utils
 
 def static(out, name):
     c_gen.util.render_template(out, os.path.basename(name))
@@ -67,8 +72,6 @@ targets = {
     'loci/inc/loci/of_wire_buf.h': static,
 
     # LOCI code
-    'loci/src/loci.c': c_code_gen.top_c_gen,
-    'loci/src/of_type_data.c': c_code_gen.type_data_c_gen,
     'loci/src/of_match.c': c_code_gen.match_c_gen,
     'loci/src/loci_obj_dump.c': c_dump_gen.gen_obj_dump_c,
     'loci/src/loci_obj_show.c': c_show_gen.gen_obj_show_c,
@@ -79,9 +82,9 @@ targets = {
     'loci/src/loci_log.c': static,
     'loci/src/loci_log.h': static,
     'loci/src/of_object.c': static,
-    'loci/src/of_type_maps.c': static,
     'loci/src/of_utils.c': static,
     'loci/src/of_wire_buf.c': static,
+    'loci/src/loci_setup_from_add_fns.c': static,
 
     # Static LOCI documentation
     'loci/README': static,
@@ -97,6 +100,7 @@ targets = {
     'locitest/src/test_msg.c': c_test_gen.gen_msg_test,
     'locitest/src/test_scalar_acc.c': c_test_gen.gen_message_scalar_test,
     'locitest/src/test_uni_acc.c': c_test_gen.gen_unified_accessor_tests,
+    'locitest/src/test_data.c': c_test_gen.gen_datafiles_tests,
 
     # Static locitest code
     'locitest/inc/locitest/unittest.h': static,
@@ -106,4 +110,24 @@ targets = {
     'locitest/src/test_setup_from_add.c': static,
     'locitest/src/test_utils.c': static,
     'locitest/src/test_validator.c': static,
+    'locitest/src/main.c': static,
+    'locitest/Makefile': static,
 }
+
+def generate(install_dir):
+    build_of_g.initialize_versions()
+    build_of_g.build_ordered_classes()
+    build_of_g.populate_type_maps()
+    build_of_g.analyze_input()
+    build_of_g.unify_input()
+    build_of_g.order_and_assign_object_ids()
+    for (name, fn) in targets.items():
+        with template_utils.open_output(install_dir, name) as outfile:
+            fn(outfile, os.path.basename(name))
+    c_gen.codegen.generate_classes(install_dir)
+    c_gen.codegen.generate_header_classes(install_dir)
+    c_gen.codegen.generate_classes_header(install_dir)
+    c_gen.codegen.generate_lists(install_dir)
+    c_gen.codegen.generate_strings(install_dir)
+    c_gen.codegen.generate_init_map(install_dir)
+    c_gen.codegen.generate_type_maps(install_dir)

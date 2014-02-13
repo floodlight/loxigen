@@ -1,0 +1,13 @@
+-- binary
+ff ff # type
+00 10 # len
+00 5c 16 c7 # experimenter
+00 00 00 02 # subtype
+12 34 56 78 # dst
+-- python
+ofp.action.bsn_set_tunnel_dst(dst=0x12345678)
+-- python pretty-printer
+bsn_set_tunnel_dst { dst = 0x12345678 }
+-- c
+obj = of_action_bsn_set_tunnel_dst_new(OF_VERSION_1_0);
+of_action_bsn_set_tunnel_dst_dst_set(obj, 0x12345678);

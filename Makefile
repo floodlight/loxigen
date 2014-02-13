@@ -34,31 +34,82 @@
 LOXI_OUTPUT_DIR = loxi_output
 
 # Generated files depend on all Loxi code and input files
-LOXI_PY_FILES=$(shell find \( -name loxi_output -prune \
+LOXI_PY_FILES=$(shell find . \( -name loxi_output -prune \
                              -o -name templates -prune \
-                             -o -true \
+                             -o -name tests -prune \
+                             -o -name '*' \
                            \) -a -name '*.py')
 LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
 INPUT_FILES = $(wildcard openflow_input/*)
+TEST_DATA = $(shell find test_data -name '*.data')
+OPENFLOWJ_OUTPUT_DIR = ${LOXI_OUTPUT_DIR}/openflowj
+OPENFLOWJ_ECLIPSE_WORKSPACE = openflowj-loxi
 
-all: c python
+all: c python java wireshark
 
 c: .loxi_ts.c
 
-.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+.loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c
 	touch $@
 
 python: .loxi_ts.python
 
-.loxi_ts.python: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+.loxi_ts.python: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=python
+	touch $@
+
+python-doc: python
+	rm -rf ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	mkdir -p ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	cp -a py_gen/sphinx ${LOXI_OUTPUT_DIR}/pyloxi-doc/input
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi sphinx-apidoc -o ${LOXI_OUTPUT_DIR}/pyloxi-doc/input ${LOXI_OUTPUT_DIR}/pyloxi
+	sphinx-build ${LOXI_OUTPUT_DIR}/pyloxi-doc/input ${LOXI_OUTPUT_DIR}/pyloxi-doc
+	rm -rf ${LOXI_OUTPUT_DIR}/pyloxi-doc/input
+	@echo "HTML documentation output to ${LOXI_OUTPUT_DIR}/pyloxi-doc"
+
+java: .loxi_ts.java
+	@rsync -rt java_gen/pre-written/ ${LOXI_OUTPUT_DIR}/openflowj/
+	@if [ -e ${OPENFLOWJ_ECLIPSE_WORKSPACE} ]; then \
+		rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/gen-src/ ${OPENFLOWJ_ECLIPSE_WORKSPACE}/gen-src; \
+	fi
+
+.loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
+	touch $@
+
+eclipse-workspace:
+	mkdir -p ${OPENFLOWJ_ECLIPSE_WORKSPACE}
+	ln -sf ../java_gen/pre-written/pom.xml ${OPENFLOWJ_ECLIPSE_WORKSPACE}/pom.xml
+	ln -sf ../java_gen/pre-written/LICENSE.txt ${OPENFLOWJ_ECLIPSE_WORKSPACE}/LICENSE.txt
+	ln -sf ../java_gen/pre-written/src ${OPENFLOWJ_ECLIPSE_WORKSPACE}
+	rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/gen-src/ ${OPENFLOWJ_ECLIPSE_WORKSPACE}/gen-src
+	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && mvn eclipse:eclipse
+	# Unfortunately, mvn eclipse:eclipse resolves the symlink, which doesn't work with eclipse
+	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
+
+check-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn compile test-compile test
+
+package-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn package
+
+deploy-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn deploy
+
+install-java: java
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn install
+
+wireshark: .loxi_ts.wireshark
+
+.loxi_ts.wireshark: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES}
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=wireshark
 	touch $@
 
 clean:
 	rm -rf loxi_output # only delete generated files in the default directory
-	rm -f loxigen.log loxigen-test.log .loxi_ts.c .loxi_ts.python
+	rm -f loxigen.log loxigen-test.log .loxi_ts.*
 
 debug:
 	@echo "LOXI_OUTPUT_DIR=\"${LOXI_OUTPUT_DIR}\""
@@ -69,18 +120,26 @@ debug:
 	@echo
 	@echo "INPUT_FILES=\"${INPUT_FILES}\""
 
+check-all: check check-c check-py check-java
+
 check:
-	PYTHONPATH=. ./utest/test_parser.py
+	nosetests
+
+check-py: python
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/generic_util.py
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of10.py
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of11.py
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of12.py
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of13.py
+
+check-c: c
+	make -j4 -C ${LOXI_OUTPUT_DIR}/locitest
+	${LOXI_OUTPUT_DIR}/locitest/locitest
 
 pylint:
 	pylint -E ${LOXI_PY_FILES}
 
-.PHONY: all clean debug check pylint c python
+ctags:
+	ctags ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 
-ifdef BIGCODE
-# Internal build system compatibility
-MODULE := LoxiGen
-LOXI_OUTPUT_DIR = ${BIGCODE}/Modules
-modulemake:
-.PHONY: modulemake
-endif
+.PHONY: all clean debug check pylint c python

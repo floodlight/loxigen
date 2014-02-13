@@ -44,22 +44,44 @@ integer = (
 identifier = word.copy().setName("identifier")
 
 # Type names
-scalar_type = word
-array_type = P.Combine(word + lit('[') - P.Word(P.alphanums + '_') - lit(']'))
-list_type = P.Combine(kw('list') - lit('(') - identifier - lit(')'))
-any_type = (array_type | list_type | scalar_type).setName("type name")
+enum_type = kw("enum") - word
+scalar_type = tag("scalar") + word
+array_type = tag("array") + P.Combine(word + lit('[') - P.Word(P.alphanums + '_') - lit(']'))
+list_type = tag("list") + P.Combine(kw('list') - lit('(') - identifier - lit(')'))
+any_type = P.Group(enum_type | array_type | list_type | scalar_type).setName("type name")
 
 # Structs
-struct_member = P.Group(any_type - identifier - s(';'))
-struct = kw('struct') - identifier - s('{') + \
-         P.Group(P.ZeroOrMore(struct_member)) + \
+pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
+discriminator_member = P.Group(tag('discriminator') + any_type + identifier + s('==') + s('?'))
+type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
+data_member = P.Group(tag('data') + any_type - identifier)
+
+struct_param_name = kw("align") | kw("length_includes_align")
+struct_param = P.Group(struct_param_name - s('=') - word)
+struct_param_list = P.Forward()
+struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))
+
+struct_member = pad_member | type_member | discriminator_member | data_member;
+parent = (s(':') - identifier) | tag(None)
+struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_list - s(')'))) - parent - s('{') + \
+         P.Group(P.ZeroOrMore(struct_member - s(';'))) + \
          s('}') - s(';')
 
 # Enums
-enum_member = P.Group(identifier + s('=') + integer)
+enum_param_name = kw("wire_type") | kw("bitmask") | kw("complete")
+enum_param = P.Group(enum_param_name  - s('=') - word)
+enum_param_list = P.Forward()
+enum_param_list << enum_param + P.Optional(s(',') + P.Optional(enum_param_list))
+
+enum_member_param_name = kw("virtual")
+enum_member_param = P.Group(enum_member_param_name  - s('=') - word)
+enum_member_param_list = P.Forward()
+enum_member_param_list << enum_member_param + P.Optional(s(',') + P.Optional(enum_member_param_list))
+
+enum_member = P.Group(identifier - P.Group(P.Optional(s('(') - enum_member_param_list - s(')'))) - s('=') + integer)
 enum_list = P.Forward()
 enum_list << enum_member + P.Optional(s(',') + P.Optional(enum_list))
-enum = kw('enum') - identifier - s('{') + \
+enum = kw('enum') - identifier - P.Group(P.Optional(s('(') - enum_param_list - s(')'))) - s('{') + \
          P.Group(P.Optional(enum_list)) + \
          s('}') - s(';')
 
@@ -71,4 +93,11 @@ grammar = P.ZeroOrMore(P.Group(struct) | P.Group(enum) | P.Group(metadata))
 grammar.ignore(P.cppStyleComment)
 
 def parse(src):
-    return grammar.parseString(src, parseAll=True)
+    """
+    Given an input string, return the AST.
+
+    The AST is a low-level representation of the input. It changes frequently
+    with the input file syntax. The frontend.py module transforms the AST
+    into the OFInput represntation.
+    """
+    return grammar.parseString(src, parseAll=True).asList()

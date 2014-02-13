@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2012, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 /******************************************************************************
  *

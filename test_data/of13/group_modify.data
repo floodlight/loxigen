@@ -1,0 +1,86 @@
+-- binary
+04 0f # version, type
+00 70 # length
+12 34 56 78 # xid
+00 01 # command
+03 # group_type
+00 # pad
+00 00 00 05 # group_id
+00 30 # buckets[0].len
+00 01 # buckets[0].weight
+00 00 00 05 # buckets[0].watch_port
+ff ff ff ff # buckets[0].watch_group
+00 00 00 00 # pad
+00 00 # buckets[0].actions[0].type
+00 10 # buckets[0].actions[0].len
+00 00 00 05 # buckets[0].actions[0].port
+00 00 # buckets[0].actions[0].max_len
+00 00 00 00 00 00 # pad
+00 00 # buckets[0].actions[1].type
+00 10 # buckets[0].actions[1].len
+00 00 00 06 # buckets[0].actions[1].port
+00 00 # buckets[0].actions[1].max_len
+00 00 00 00 00 00 # pad
+00 30 # buckets[1].len
+00 01 # buckets[1].weight
+00 00 00 06 # buckets[1].watch_port
+ff ff ff ff # buckets[1].watch_group
+00 00 00 00 # pad
+00 00 # buckets[1].actions[0].type
+00 10 # buckets[1].actions[0].len
+00 00 00 05 # buckets[1].actions[0].port
+00 00 # buckets[1].actions[0].max_len
+00 00 00 00 00 00 # pad
+00 00 # buckets[1].actions[1].type
+00 10 # buckets[1].actions[1].len
+00 00 00 06 # buckets[1].actions[1].port
+00 00 # buckets[1].actions[1].max_len
+00 00 00 00 00 00 # pad
+-- python
+ofp.message.group_modify(
+    xid=0x12345678,
+    group_type=ofp.OFPGT_FF,
+    group_id=5,
+    buckets=[
+        ofp.bucket(
+            weight=1,
+            watch_port=5,
+            watch_group=0xffffffff,
+            actions=[
+                ofp.action.output(port=5, max_len=0),
+                ofp.action.output(port=6, max_len=0)]),
+        ofp.bucket(
+            weight=1,
+            watch_port=6,
+            watch_group=0xffffffff,
+            actions=[
+                ofp.action.output(port=5, max_len=0),
+                ofp.action.output(port=6, max_len=0)])])
+-- java
+    OFActions actions = factory.actions();
+    builder
+      .setXid(0x12345678)
+      .setGroupType(OFGroupType.FF)
+      .setGroup(OFGroup.of(5))
+      .setBuckets(ImmutableList.<OFBucket>of(
+        factory.buildBucket()
+          .setWeight(1)
+          .setWatchPort(OFPort.of(5))
+          .setWatchGroup(OFGroup.ANY)
+          .setActions(ImmutableList.<OFAction>of(
+            actions.output(OFPort.of(5), 0),
+            actions.output(OFPort.of(6), 0)
+          ))
+          .build(),
+        factory.buildBucket()
+          .setWeight(1)
+          .setWatchPort(OFPort.of(6))
+          .setWatchGroup(OFGroup.ANY)
+          .setActions(ImmutableList.<OFAction>of(
+            actions.output(OFPort.of(5), 0),
+            actions.output(OFPort.of(6), 0)
+          ))
+          .build()
+         )
+      )
+      .build();

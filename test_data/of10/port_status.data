@@ -1,0 +1,54 @@
+-- binary
+01 0c # version / type
+00 40 # length
+00 00 00 04 # xid
+01 # reason
+00 00 00 00 00 00 00 # pad
+ff fd # desc.port_no
+01 02 03 04 05 06 # desc.hw_addr
+66 6f 6f 00 00 00 00 00 # desc.name
+00 00 00 00 00 00 00 00 # ...
+00 00 00 10 # desc.config
+00 00 02 00 # desc.state
+00 00 00 01 # desc.curr
+00 00 00 20 # desc.advertised
+00 00 02 00 # desc.supported
+00 00 08 00 # desc.peer
+-- python
+ofp.message.port_status(
+    xid=4,
+    reason=ofp.OFPPR_DELETE,
+    desc=ofp.port_desc(
+        port_no=ofp.OFPP_CONTROLLER,
+        hw_addr=[1,2,3,4,5,6],
+        name="foo",
+        config=ofp.OFPPC_NO_FLOOD,
+        state=ofp.OFPPS_STP_FORWARD,
+        curr=ofp.OFPPF_10MB_HD,
+        advertised=ofp.OFPPF_1GB_FD,
+        supported=ofp.OFPPF_AUTONEG,
+        peer=ofp.OFPPF_PAUSE_ASYM))
+-- c
+obj = of_port_status_new(OF_VERSION_1_0);
+{
+    of_object_t *desc = of_port_desc_new(OF_VERSION_1_0);
+    of_port_desc_advertised_set(desc, 32);
+    of_port_desc_config_set(desc, 16);
+    of_port_desc_curr_set(desc, 1);
+    {
+	of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
+	of_port_desc_hw_addr_set(desc, hw_addr);
+    }
+    {
+	of_port_name_t name = "foo";
+	of_port_desc_name_set(desc, name);
+    }
+    of_port_desc_peer_set(desc, 2048);
+    of_port_desc_port_no_set(desc, 65533);
+    of_port_desc_state_set(desc, 512);
+    of_port_desc_supported_set(desc, 512);
+    of_port_status_desc_set(obj, desc);
+    of_object_delete(desc);
+}
+of_port_status_reason_set(obj, 1);
+of_port_status_xid_set(obj, 4);

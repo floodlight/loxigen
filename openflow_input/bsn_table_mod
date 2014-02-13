@@ -29,12 +29,12 @@
 
 // This is the 1.1+ table mod message which we back port to 1.0
 // for use inside components
-struct ofp_table_mod {
+struct of_table_mod : of_header {
     uint8_t version;
-    uint8_t type;
+    uint8_t type == 22;
     uint16_t length;
     uint32_t xid;
     uint8_t table_id;
-    uint8_t[3] pad;
+    pad(3);
     uint32_t config;
 };

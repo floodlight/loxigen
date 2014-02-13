@@ -26,8 +26,14 @@
 :: # under the EPL.
 ::
 :: include('_copyright.py')
-
+:: import loxi_globals
 :: include('_autogen.py')
+
+version_names = {
+:: for v in loxi_globals.OFVersions.all_supported:
+    ${v.wire_version}: "${v.version}",
+:: #endfor
+}
 
 def protocol(ver):
     """
@@ -53,3 +59,26 @@ class ProtocolError(Exception):
     Raised when failing to deserialize an invalid OpenFlow message.
     """
     pass
+
+class Unimplemented(Exception):
+    """
+    Raised when an OpenFlow feature is not yet implemented in PyLoxi.
+    """
+    pass
+
+def unimplemented(msg):
+    raise Unimplemented(msg)
+
+class OFObject(object):
+    """
+    Superclass of all OpenFlow classes
+    """
+    def __init__(self, *args):
+        raise NotImplementedError("cannot instantiate abstract class")
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def show(self):
+        import loxi.pp
+        return loxi.pp.pp(self)

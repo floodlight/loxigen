@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2013, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 /*
  * @fixme THIS FILE NEEDS CLEANUP.  It may just go away.
@@ -46,16 +46,31 @@
 #include <loci/of_match.h>
 #include <loci/loci_base.h>
 #include <loci/of_message.h>
-
-#if defined(OF_OBJECT_TRACKING)
-#include <BigList/biglist.h>
-#endif
+#include <loci/of_wire_buf.h>
 
 /**
  * This is the number of bytes reserved for metadata in each
  * of_object_t instance.
  */
 #define OF_OBJECT_METADATA_BYTES 32
+
+/*
+ * Generic accessors:
+ *
+ * Many objects have a length represented in the wire buffer
+ * wire_length_get and wire_length_set access these values directly on the
+ * wire.
+ *
+ * Many objects have a length represented in the wire buffer
+ * wire_length_get and wire_length_set access these values directly on the
+ * wire.
+ *
+ * FIXME: TBD if wire_length_set and wire_type_set are required.
+ */
+typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
+typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
+typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
+typedef void (*of_wire_type_set_f)(of_object_t *obj);
 
 /****************************************************************
  * General list operations: first, next, append_setup, append_advance
@@ -74,78 +89,17 @@ extern int of_list_append_bind(of_object_t *parent, of_object_t *child);
 extern int of_list_append(of_object_t *list, of_object_t *item);
 
 extern of_object_t *of_object_new(int bytes);
-extern of_object_t * of_object_dup_(of_object_t *src);
+extern of_object_t *of_object_dup(of_object_t *src);
 
 /**
  * Callback function prototype for deleting an object
  */
 typedef void (*of_object_delete_callback_f)(of_object_t *obj);
 
-#if defined(OF_OBJECT_TRACKING)
-/**
- * When tracking is enabled, the location of each new or dup
- * call of an OF object is recorded and a list is kept of all
- * outstanding objects.
- *
- * This dovetails with using objects to track outstanding operations
- * for barrier processing.
- */
-
-/**
- * Global tracking stats
- */
-typedef struct loci_object_track_s {
-    biglist_t *objects;
-    int count_current;
-    uint32_t count_max;
-    uint32_t allocs;
-    uint32_t deletes;
-} loci_object_track_t;
-
-extern loci_object_track_t loci_global_tracking;
-
-/* Remap dup call to tracking */
-extern of_object_t * of_object_dup_tracking(of_object_t *src,
-                                            const char *file, int line);
-#define of_object_dup(src) of_object_dup_tracking(src, __FILE__, __LINE__)
-extern void of_object_track(of_object_t *obj, const char *file, int line);
-
-extern void of_object_track_output(of_object_t *obj, loci_writer_f writer, void* cookie); 
-extern void of_object_track_report(loci_writer_f writer, void* cookie); 
-
-/**
- * The data stored in each object related to tracking and
- * The LOCI client may install a delete callback function to allow
- * the notification of an object's destruction.
- */
-
-typedef struct of_object_track_info_s {
-    of_object_delete_callback_f delete_cb;  /* To be implemented */
-    void *delete_cookie;
-
-    /* Track file and line where allocated */
-    const char *file;
-    int line;
-    biglist_t *bl_entry; /* Pointer to self */
-    uint32_t magic; /* validation value */
-} of_object_track_info_t;
-
-#define OF_OBJECT_TRACKING_MAGIC 0x11235813
-#else
-
-/* Use native dup call */
-#define of_object_dup of_object_dup_
-
-/**
- * When tracking is not enabled, we still support a delete callback
- */
-
 typedef struct of_object_track_info_s {
     of_object_delete_callback_f delete_cb;  /* To be implemented */
     void *delete_cookie;
 } of_object_track_info_t;
-
-#endif
 
 extern int of_object_xid_set(of_object_t *obj, uint32_t xid);
 extern int of_object_xid_get(of_object_t *obj, uint32_t *xid);
@@ -172,5 +126,47 @@ extern of_object_t *of_object_new_from_message(of_message_t msg, int len);
 extern void of_object_delete(of_object_t *obj);
 
 int of_object_can_grow(of_object_t *obj, int new_len);
+
+void of_object_parent_length_update(of_object_t *obj, int delta);
+
+struct of_object_s {
+    /* The control block for the underlying data buffer */
+    of_wire_object_t wire_object;
+    /* The LOCI type enum value of the object */
+    of_object_id_t object_id;
+
+    /*
+     * Objects need to track their "parent" so that updates to the
+     * object that affect its length can be pushed to the parent.
+     * Treat as private.
+     */
+    of_object_t *parent;
+
+    /*
+     * Not all objects have length and version on the wire so we keep
+     * them here.  NOTE: Infrastructure manages length and version.
+     * Treat length as private and version as read only.
+     */
+    int length;
+    of_version_t version;
+
+    /*
+     * Many objects have a length and/or type represented in the wire buffer
+     * These accessors get and set those value when present.  Treat as private.
+     */
+    of_wire_length_get_f wire_length_get;
+    of_wire_length_set_f wire_length_set;
+    of_wire_type_get_f wire_type_get;
+    of_wire_type_set_f wire_type_set;
+
+    of_object_track_info_t track_info;
+
+    /*
+     * Metadata available for applications.  Ensure 8-byte alignment, but
+     * that buffer is at least as large as requested.  This data is not used
+     * or inspected by LOCI.
+     */
+    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
+};
 
 #endif /* _OF_OBJECT_H_ */

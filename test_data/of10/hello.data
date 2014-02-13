@@ -1,0 +1,11 @@
+-- binary
+01 00 # version / type
+00 08 # length
+12 34 56 78 # xid
+-- python
+ofp.message.hello(xid=0x12345678)
+-- c
+obj = of_hello_new(OF_VERSION_1_0);
+of_hello_xid_set(obj, 305419896);
+-- java
+builder.setXid(0x12345678)

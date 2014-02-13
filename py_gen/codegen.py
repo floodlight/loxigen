@@ -25,144 +25,110 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-from collections import namedtuple
-import of_g
-import loxi_front_end.type_maps as type_maps
+from collections import defaultdict
+import loxi_globals
+import struct
+import template_utils
 import loxi_utils.loxi_utils as utils
 import util
 import oftype
+from loxi_ir import *
 
-OFClass = namedtuple('OFClass', ['name', 'pyname',
-                                 'members', 'length_member', 'type_members',
-                                 'min_length', 'is_fixed_length'])
-Member = namedtuple('Member', ['name', 'oftype', 'offset', 'skip'])
-LengthMember = namedtuple('LengthMember', ['name', 'oftype', 'offset'])
-TypeMember = namedtuple('TypeMember', ['name', 'oftype', 'offset', 'value'])
+modules_by_version = {}
 
-def get_type_values(cls, version):
-    """
-    Returns a map from the name of the type member to its value.
-    """
-    type_values = {}
+# Map from inheritance root to module name
+roots = {
+    'of_header': 'message',
+    'of_action': 'action',
+    'of_action_id': 'action_id',
+    'of_oxm': 'oxm',
+    'of_instruction': 'instruction',
+    'of_instruction_id': 'instruction_id',
+    'of_meter_band': 'meter_band',
+    'of_bsn_tlv': 'bsn_tlv',
+}
 
-    # Primary wire type
-    if utils.class_is_message(cls):
-        type_values['version'] = 'const.OFP_VERSION'
-        type_values['type'] = util.constant_for_value(version, "ofp_type", util.primary_wire_type(cls, version))
-        if cls in type_maps.flow_mod_list:
-            type_values['_command'] = util.constant_for_value(version, "ofp_flow_mod_command",
-                                                              type_maps.flow_mod_types[version][cls[8:]])
-        if cls in type_maps.stats_request_list:
-            type_values['stats_type'] = util.constant_for_value(version, "ofp_stats_types",
-                                                                type_maps.stats_types[version][cls[3:-14]])
-        if cls in type_maps.stats_reply_list:
-            type_values['stats_type'] = util.constant_for_value(version, "ofp_stats_types",
-                                                                type_maps.stats_types[version][cls[3:-12]])
-        if type_maps.message_is_extension(cls, version):
-            type_values['experimenter'] = '%#x' % type_maps.extension_to_experimenter_id(cls)
-            type_values['subtype'] = type_maps.extension_message_to_subtype(cls, version)
-    elif utils.class_is_action(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_action_type", util.primary_wire_type(cls, version))
-        if type_maps.action_is_extension(cls, version):
-            type_values['experimenter'] = '%#x' % type_maps.extension_to_experimenter_id(cls)
-            type_values['subtype'] = type_maps.extension_action_to_subtype(cls, version)
-    elif utils.class_is_queue_prop(cls):
-        type_values['type'] = util.constant_for_value(version, "ofp_queue_properties", util.primary_wire_type(cls, version))
-
-    return type_values
-
-# Create intermediate representation
-def build_ofclasses(version):
-    blacklist = ["of_action", "of_action_header", "of_header", "of_queue_prop",
-                 "of_queue_prop_header", "of_experimenter", "of_action_experimenter"]
-    ofclasses = []
-    for cls in of_g.standard_class_order:
-        if version not in of_g.unified[cls] or cls in blacklist:
-            continue
-        unified_class = util.lookup_unified_class(cls, version)
-
-        # Name for the generated Python class
-        if utils.class_is_action(cls):
-            pyname = cls[10:]
-        else:
-            pyname = cls[3:]
-
-        type_values = get_type_values(cls, version)
-        members = []
-
-        length_member = None
-        type_members = []
-        pad_count = 0
-
-        for member in unified_class['members']:
-            if member['name'] in ['length', 'len']:
-                length_member = LengthMember(name=member['name'],
-                                             offset=member['offset'],
-                                             oftype=oftype.OFType(member['m_type'], version))
-            elif member['name'] in type_values:
-                type_members.append(TypeMember(name=member['name'],
-                                               offset=member['offset'],
-                                               oftype=oftype.OFType(member['m_type'], version),
-                                               value=type_values[member['name']]))
+# Return the module and class names for the generated Python class
+def generate_pyname(ofclass):
+    for root, module_name in roots.items():
+        if ofclass.name == root:
+            return module_name, module_name
+        elif ofclass.is_instanceof(root):
+            if root == 'of_header':
+                # The input files don't prefix message names
+                return module_name, ofclass.name[3:]
             else:
-                # HACK ensure member names are unique
-                if member['name'].startswith("pad"):
-                    if pad_count == 0:
-                        m_name = 'pad'
-                    else:
-                        m_name = "pad%d" % pad_count
-                    pad_count += 1
-                else:
-                    m_name = member['name']
-                members.append(Member(name=m_name,
-                                      oftype=oftype.OFType(member['m_type'], version),
-                                      offset=member['offset'],
-                                      skip=member['name'] in of_g.skip_members))
+                return module_name, ofclass.name[len(root)+1:]
+    return 'common', ofclass.name[3:]
 
-        ofclasses.append(
-            OFClass(name=cls,
-                    pyname=pyname,
-                    members=members,
-                    length_member=length_member,
-                    type_members=type_members,
-                    min_length=of_g.base_length[(cls, version)],
-                    is_fixed_length=(cls, version) in of_g.is_fixed_length))
-    return ofclasses
+# Create intermediate representation, extended from the LOXI IR
+def build_ofclasses(version):
+    modules = defaultdict(list)
+    for ofclass in loxi_globals.ir[version].classes:
+        module_name, ofclass.pyname = generate_pyname(ofclass)
+        modules[module_name].append(ofclass)
+    return modules
 
 def generate_init(out, name, version):
-    util.render_template(out, 'init.py')
+    util.render_template(out, 'init.py', version=version)
 
 def generate_action(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
-                 if utils.class_is_action(x.name)]
-    util.render_template(out, 'action.py', ofclasses=ofclasses)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['action'],
+                         version=version)
+
+def generate_action_id(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['action_id'],
+                         version=version)
+
+def generate_oxm(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['oxm'],
+                         version=version)
 
 def generate_common(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
-                 if not utils.class_is_message(x.name)
-                    and not utils.class_is_action(x.name)
-                    and not utils.class_is_list(x.name)]
-    util.render_template(out, 'common.py', ofclasses=ofclasses)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['common'],
+                         version=version,
+                         extra_template='_common_extra.py')
 
 def generate_const(out, name, version):
-    groups = {}
-    for (group, idents) in of_g.identifiers_by_group.items():
-        items = []
-        for ident in idents:
-            info = of_g.identifiers[ident]
-            if version in info["values_by_version"]:
-                items.append((info["ofp_name"], info["values_by_version"][version]))
-        if items:
-            groups[group] = items
-    util.render_template(out, 'const.py', version=version, groups=groups)
+    util.render_template(out, 'const.py', version=version,
+                         enums=loxi_globals.ir[version].enums)
+
+def generate_instruction(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['instruction'],
+                         version=version)
+
+def generate_instruction_id(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['instruction_id'],
+                         version=version)
 
 def generate_message(out, name, version):
-    ofclasses = [x for x in build_ofclasses(version)
-                 if utils.class_is_message(x.name)]
-    util.render_template(out, 'message.py', ofclasses=ofclasses, version=version)
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['message'],
+                         version=version,
+                         extra_template='_message_extra.py')
+
+def generate_meter_band(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['meter_band'],
+                         version=version)
 
 def generate_pp(out, name, version):
     util.render_template(out, 'pp.py')
 
 def generate_util(out, name, version):
-    util.render_template(out, 'util.py')
+    util.render_template(out, 'util.py', version=version)
+
+def generate_bsn_tlv(out, name, version):
+    util.render_template(out, 'module.py',
+                         ofclasses=modules_by_version[version]['bsn_tlv'],
+                         version=version)
+
+def init():
+    for version in loxi_globals.OFVersions.target_versions:
+        modules_by_version[version] = build_ofclasses(version)

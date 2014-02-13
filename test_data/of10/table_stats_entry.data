@@ -1,0 +1,33 @@
+-- binary
+03 # table_id
+00 00 00 # pad
+66 6f 6f 00 00 00 00 00 # name
+00 00 00 00 00 00 00 00 # name
+00 00 00 00 00 00 00 00 # name
+00 00 00 00 00 00 00 00 # name
+00 3f ff ff # wildcards
+00 00 00 05 # max_entries
+00 00 00 02 # active_count
+00 00 00 ff ff ff ff ff # lookup_count
+81 11 11 11 11 11 11 11 # matched_count
+-- python
+ofp.table_stats_entry(
+    table_id=3,
+    name="foo",
+    wildcards=ofp.OFPFW_ALL,
+    max_entries=5,
+    active_count=2,
+    lookup_count=1099511627775,
+    matched_count=9300233470495232273L)
+-- c
+obj = of_table_stats_entry_new(OF_VERSION_1_0);
+of_table_stats_entry_active_count_set(obj, 2);
+of_table_stats_entry_lookup_count_set(obj, 1099511627775ULL);
+of_table_stats_entry_matched_count_set(obj, 9300233470495232273ULL);
+of_table_stats_entry_max_entries_set(obj, 5);
+{
+    of_table_name_t name = "foo";
+    of_table_stats_entry_name_set(obj, name);
+}
+of_table_stats_entry_table_id_set(obj, 3);
+of_table_stats_entry_wildcards_set(obj, 4194303);

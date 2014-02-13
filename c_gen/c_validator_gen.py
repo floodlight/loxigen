@@ -33,14 +33,16 @@ Generates validator function files.
 """
 
 import sys
-import of_g
-import loxi_front_end.match as match
-import loxi_front_end.flags as flags
+import c_gen.of_g_legacy as of_g
+import c_gen.match as match
+import c_gen.flags as flags
 from generic_utils import *
-import loxi_front_end.type_maps as type_maps
+import c_gen.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
-import loxi_front_end.identifiers as identifiers
+import c_gen.loxi_utils_legacy as loxi_utils
+import c_gen.identifiers as identifiers
 from c_test_gen import var_name_map
+from c_code_gen import v3_match_offset_get
 
 def gen_h(out, name):
     loxi_utils.gen_c_copy_license(out)
@@ -208,11 +210,29 @@ static inline int
             return -1;
         }
 """ % dict(m_name=m_name, m_offset=m_offset, cls=cls))
+        elif version >= of_g.VERSION_1_2 and loxi_utils.cls_is_flow_mod(cls) and m_name == "instructions":
+            # See _FLOW_MOD_INSTRUCTIONS_OFFSET
+            match_offset = v3_match_offset_get(cls)
+            m_offset = '%s_offset' % m_name
+            out.write("""
+    {
+        uint16_t %(m_name)s_len, %(m_name)s_offset;
+        uint16_t match_len;
+        buf_u16_get(buf + %(match_offset)s + 2, &match_len);
+        %(m_name)s_offset = %(match_offset)s + OF_MATCH_BYTES(match_len);
+        %(m_name)s_len = len - %(m_name)s_offset;
+""" % dict(m_name=m_name, cls=cls, match_offset=match_offset))
+        elif cls == "of_bsn_gentable_entry_add" and m_name == "value":
+            continue;
+        elif cls == "of_bsn_gentable_entry_desc_stats_entry" and m_name == "value":
+            continue;
+        elif cls == "of_bsn_gentable_entry_stats_entry" and m_name == "stats":
+            continue;
         else:
             out.write("""
-    
+
     {    int %(m_name)s_len = len - %(m_offset)s;
-   
+
 """  % dict(m_name=m_name, m_offset=m_offset))
         out.write("""
         if (%(m_cls)s_%(ver_name)s_validate(buf + %(m_offset)s, %(m_name)s_len) < 0) {
@@ -240,7 +260,7 @@ static inline int
         subclasses = type_maps.inheritance_map[e_cls]
         out.write("""\
     while (len >= %(fixed_len)s) {
-        of_object_id_t e_id; 
+        of_object_id_t e_id;
         uint16_t e_type, e_len;
         buf_u16_get(buf, &e_type);
         buf_u16_get(buf+2, &e_len);

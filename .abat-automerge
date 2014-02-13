@@ -1,0 +1,10 @@
+#!/bin/bash -eux
+ROOTDIR=$(dirname $(readlink -f $0))
+cd "$ROOTDIR"
+
+ln -sf ../../.hooks/pre-commit .git/hooks/pre-commit
+make all check-all
+
+if [[ ${ARTIFACT_REPO_URL-} ]]; then
+    ./.build/push-artifacts.sh ${ARTIFACT_REPO_URL}
+fi

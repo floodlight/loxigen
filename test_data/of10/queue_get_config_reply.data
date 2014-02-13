@@ -1,0 +1,83 @@
+-- binary
+01 15 # version / type
+00 50 # length
+12 34 56 78 # xid
+ff fe # port
+00 00 00 00 00 00 # pad
+00 00 00 01 # queues[0].queue_id
+00 18 # queues[0].len
+00 00 # queues[0].pad
+00 01 # queues[0].properties[0].type
+00 10 # queues[0].properties[0].length
+00 00 00 00 # queues[0].properties[0].pad
+00 05 # queues[0].properties[0].rate
+00 00 00 00 00 00 # queues[0].properties[0].pad2
+00 00 00 02 # queues[1].queue_id
+00 28 # queues[1].len
+00 00 # queues[1].pad
+00 01 # queues[1].properties[0].type
+00 10 # queues[1].properties[0].length
+00 00 00 00 # queues[1].properties[0].pad
+00 06 # queues[1].properties[0].rate
+00 00 00 00 00 00 # queues[1].properties[0].pad2
+00 01 # queues[1].properties[1].type
+00 10 # queues[1].properties[1].length
+00 00 00 00 # queues[1].properties[1].pad
+00 07 # queues[1].properties[1].rate
+00 00 00 00 00 00 # queues[1].properties[1].pad2
+-- python
+ofp.message.queue_get_config_reply(
+    xid=0x12345678,
+    port=ofp.OFPP_LOCAL,
+    queues=[
+        ofp.packet_queue(queue_id=1, properties=[
+            ofp.queue_prop_min_rate(rate=5)]),
+        ofp.packet_queue(queue_id=2, properties=[
+            ofp.queue_prop_min_rate(rate=6),
+            ofp.queue_prop_min_rate(rate=7)])])
+-- c
+obj = of_queue_get_config_reply_new(OF_VERSION_1_0);
+of_queue_get_config_reply_port_set(obj, 65534);
+{
+    of_object_t list;
+    of_queue_get_config_reply_queues_bind(obj, &list);
+    {
+        of_object_t *obj = of_packet_queue_new(OF_VERSION_1_0);
+        {
+            of_object_t list;
+            of_packet_queue_properties_bind(obj, &list);
+            {
+                of_object_t *obj = of_queue_prop_min_rate_new(OF_VERSION_1_0);
+                of_queue_prop_min_rate_rate_set(obj, 5);
+                of_list_append(&list, obj);
+                of_object_delete(obj);
+            }
+        }
+        of_packet_queue_queue_id_set(obj, 1);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_packet_queue_new(OF_VERSION_1_0);
+        {
+            of_object_t list;
+            of_packet_queue_properties_bind(obj, &list);
+            {
+                of_object_t *obj = of_queue_prop_min_rate_new(OF_VERSION_1_0);
+                of_queue_prop_min_rate_rate_set(obj, 6);
+                of_list_append(&list, obj);
+                of_object_delete(obj);
+            }
+            {
+                of_object_t *obj = of_queue_prop_min_rate_new(OF_VERSION_1_0);
+                of_queue_prop_min_rate_rate_set(obj, 7);
+                of_list_append(&list, obj);
+                of_object_delete(obj);
+            }
+        }
+        of_packet_queue_queue_id_set(obj, 2);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+}
+of_queue_get_config_reply_xid_set(obj, 305419896);

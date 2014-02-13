@@ -1,0 +1,158 @@
+-- binary
+01 0e # version, type
+00 70 # length
+12 34 56 78 # xid
+
+#### ofp_flow_mod
+00 30 00 e2 # wild cards=(OFPFW_DL_VLAN|OFPFW_NW_PROTO|OFPFW_TP_SRC|OFPFW_TP_DST|OFPFW_DL_VLAN_PCP|OFPFW_NW_TOS)
+00 03 # in_port
+01 23 45 67 89 ab # eth_src
+cd ef 01 23 45 67 # eth_dst
+00 00 # dl_vlan
+00 00 # dl_pcp, pad
+08 00 # dl_type
+00 00 00 00 # nw_tos, nw_proto, pad[2]
+c0 a8 03 7f # nw_src
+ff ff ff ff # nw_dst
+00 00 00 00 # tcp_src, tcp_dst
+
+00 00 00 00 00 00 00 00 # cookie
+00 00 # command
+00 05 # idle_timeout
+00 00 # hard_timeout
+00 00 # priority
+00 00 00 00 # buffer_id
+00 00 #out_port
+00 02 # flags (CHECK_OVERLAP)
+
+#list(ofp_action)
+00 00 00 08 # type=OUTPUT, len=8
+ff fb # port=FLOOD
+00 00 # maxLen=0
+ff ff 00 10 # type=VENDOR, len=16
+00 00 23 20 # vendor = Nicira
+00 12 # subtype=dec_ttl
+00 00 00 00 00 00 # pad(6)
+ff ff 00 10 # type=VENDOR, len=16
+00 5c 16 c7 # vendor = BSN
+00 00 00 02 # subype = set_tunnel_dst
+00 00 00 00 # tunnel dst ip
+-- python
+ofp.message.flow_add(
+    xid=0x12345678,
+    match=ofp.match(
+        wildcards=ofp.OFPFW_DL_VLAN|ofp.OFPFW_NW_PROTO|ofp.OFPFW_TP_SRC|ofp.OFPFW_TP_DST|ofp.OFPFW_DL_VLAN_PCP|ofp.OFPFW_NW_TOS,
+        in_port=3,
+        eth_type=0x800,
+        ipv4_src=0xc0a8037f,
+        ipv4_dst=0xffffffff,
+        eth_src=[0x01, 0x23, 0x45, 0x67, 0x89, 0xab],
+        eth_dst=[0xcd, 0xef, 0x01, 0x23, 0x45, 0x67]),
+    idle_timeout=5,
+    flags=ofp.OFPFF_CHECK_OVERLAP,
+    actions=[
+        ofp.action.output(port=ofp.OFPP_FLOOD),
+        ofp.action.nicira_dec_ttl(),
+        ofp.action.bsn_set_tunnel_dst()])
+-- python pretty-printer
+flow_add {
+  xid = 0x12345678,
+  match = match_v1 {
+    wildcards = OFPFW_DL_VLAN|OFPFW_NW_PROTO|OFPFW_TP_SRC|OFPFW_TP_DST|OFPFW_DL_VLAN_PCP|OFPFW_NW_TOS,
+    in_port = 3,
+    eth_src = 01:23:45:67:89:ab,
+    eth_dst = cd:ef:01:23:45:67,
+    vlan_vid = 0x0,
+    vlan_pcp = 0x0,
+    eth_type = 0x800,
+    ip_dscp = 0x0,
+    ip_proto = 0x0,
+    ipv4_src = 192.168.3.127,
+    ipv4_dst = 255.255.255.255,
+    tcp_src = 0x0,
+    tcp_dst = 0x0
+  },
+  cookie = 0x0,
+  idle_timeout = 0x5,
+  hard_timeout = 0x0,
+  priority = 0x0,
+  buffer_id = 0x0,
+  out_port = 0,
+  flags = 0x2,
+  actions = [
+    output { port = OFPP_FLOOD, max_len = 0x0 },
+    nicira_dec_ttl {  },
+    bsn_set_tunnel_dst { dst = 0x0 }
+  ]
+}
+-- c
+obj = of_flow_add_new(OF_VERSION_1_0);
+of_flow_add_xid_set(obj, 0x12345678);
+of_flow_add_idle_timeout_set(obj, 5);
+of_flow_add_flags_set(obj, 2);
+{
+    of_match_t match = { OF_VERSION_1_0 };
+    match.fields.in_port = 3;
+    match.fields.eth_src = (of_mac_addr_t) { { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab } };
+    match.fields.eth_dst = (of_mac_addr_t) { { 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67 } };
+    match.fields.eth_type = 0x800;
+    match.fields.ipv4_src = 0xc0a8037f;
+    match.fields.ipv4_dst = 0xffffffff;
+    OF_MATCH_MASK_IN_PORT_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_SRC_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_DST_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_TYPE_EXACT_SET(&match);
+    //OF_MATCH_MASK_VLAN_VID_EXACT_SET(&match);
+    //OF_MATCH_MASK_VLAN_PCP_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_TYPE_EXACT_SET(&match);
+    //OF_MATCH_MASK_IP_DSCP_EXACT_SET(&match);
+    //OF_MATCH_MASK_IP_PROTO_EXACT_SET(&match);
+    OF_MATCH_MASK_IPV4_SRC_EXACT_SET(&match);
+    OF_MATCH_MASK_IPV4_DST_EXACT_SET(&match);
+    //OF_MATCH_MASK_TCP_SRC_EXACT_SET(&match);
+    //OF_MATCH_MASK_TCP_DST_EXACT_SET(&match);
+    of_flow_add_match_set(obj, &match);
+}
+{
+    of_list_action_t actions;
+    of_flow_add_actions_bind(obj, &actions);
+    {
+        of_action_t action;
+        of_action_output_init(&action.output, OF_VERSION_1_0, -1, 1);
+        of_list_action_append_bind(&actions, &action);
+        of_action_output_port_set(&action.output, OF_PORT_DEST_FLOOD);
+    }
+    {
+        of_action_t action;
+        of_action_nicira_dec_ttl_init(&action.nicira_dec_ttl, OF_VERSION_1_0, -1, 1);
+        of_list_action_append_bind(&actions, &action);
+    }
+    {
+        of_action_t action;
+        of_action_bsn_set_tunnel_dst_init(&action.bsn_set_tunnel_dst, OF_VERSION_1_0, -1, 1);
+        of_list_action_append_bind(&actions, &action);
+    }
+}
+-- java
+builder.setXid(0x12345678)
+    .setMatch(
+        factory.buildMatch()
+            .setExact(MatchField.IN_PORT, OFPort.of(3))
+            .setExact(MatchField.ETH_TYPE, EthType.IPv4)
+            .setExact(MatchField.IPV4_SRC, IPv4Address.of(0xc0a8037f))
+            .setExact(MatchField.IPV4_DST, IPv4Address.of(0xffffffff))
+            .setExact(MatchField.ETH_SRC, MacAddress.of("01:23:45:67:89:ab"))
+            .setExact(MatchField.ETH_DST, MacAddress.of("cd:ef:01:23:45:67"))
+            .build()
+    )
+    .setIdleTimeout(5)
+    .setFlags(Sets.immutableEnumSet(OFFlowModFlags.CHECK_OVERLAP))
+    .setBufferId(OFBufferId.of(0))
+    .setOutPort(OFPort.of(0)) // doesn't make that much sense, but is in the example
+    .setActions(
+        ImmutableList.of(
+            factory.actions().output(OFPort.FLOOD, 0),
+            factory.actions().niciraDecTtl(),
+            factory.actions().bsnSetTunnelDst(0)
+        )
+    );

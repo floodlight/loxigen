@@ -28,10 +28,10 @@
 #version any
 
 // BSN set tunnel destination IP action
-struct ofp_action_bsn_set_tunnel_dst {
-    uint16_t type;      // OF_ACTION_TYPE_EXPERIMENTER
+struct of_action_bsn_set_tunnel_dst : of_action_bsn {
+    uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter;    // OF_EXPERIMENTER_ID_BSN 
-    uint32_t subtype;   // ACTION_BSN_SET_TUNNEL_DST
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 2;
     uint32_t dst; // tunnel destination IP
 };

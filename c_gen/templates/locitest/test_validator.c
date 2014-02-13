@@ -25,7 +25,10 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2013, Big Switch Networks, Inc. */
+:: include('_copyright.c')
+:: import c_gen.of_g_legacy as of_g
+:: import c_gen.loxi_utils_legacy as loxi_utils
+:: from c_gen import type_maps
 
 /**
  * Test message validator
@@ -102,12 +105,45 @@ test_validate_tlv16_list(void)
     return TEST_PASS;
 }
 
+/*
+ * Create an instance of every message and run it through the validator.
+ */
+static int
+test_validate_all(void)
+{
+::    for version in of_g.of_version_range:
+::        ver_name = loxi_utils.version_to_name(version)
+::
+::        for cls in reversed(of_g.standard_class_order):
+::            if not loxi_utils.class_in_version(cls, version):
+::                continue
+::            elif type_maps.class_is_virtual(cls):
+::                continue
+::            elif not loxi_utils.class_is_message(cls):
+::                continue
+::            #endif
+    {
+        ${cls}_t *obj = ${cls}_new(${ver_name});
+        of_message_t msg;
+        ${cls}_${ver_name}_populate(obj, 1);
+        msg = OF_OBJECT_TO_MESSAGE(obj);
+        TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == 0);
+        ${cls}_delete(obj);
+    }
+
+::        #endfor
+::    #endfor
+
+    return TEST_PASS;
+}
+
 int
 run_validator_tests(void)
 {
     RUN_TEST(validate_fixed_length);
     RUN_TEST(validate_fixed_length_list);
     RUN_TEST(validate_tlv16_list);
+    RUN_TEST(validate_all);
 
     return TEST_PASS;
 }

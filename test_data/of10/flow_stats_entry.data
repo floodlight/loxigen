@@ -1,0 +1,137 @@
+-- binary
+00 68 # length
+03 # table_id
+00 # pad
+
+#### ofp_match_v1
+00 30 00 e2 # wild cards=(OFPFW_DL_VLAN|OFPFW_NW_PROTO|OFPFW_TP_SRC|OFPFW_TP_DST|OFPFW_DL_VLAN_PCP|OFPFW_NW_TOS)
+00 03 # in_port
+01 23 45 67 89 ab # eth_src
+cd ef 01 23 45 67 # eth_dst
+00 00 # dl_vlan
+00 00 # dl_pcp, pad
+08 00 # dl_type
+00 00 00 00 # nw_tos, nw_proto, pad[2]
+c0 a8 03 7f # nw_src
+ff ff ff ff # nw_dst
+00 00 00 00 # tcp_src, tcp_dst
+
+00 00 00 01 # duration_sec
+00 00 00 02 # duration_nsec
+00 64 # priority
+00 05 # idle_timeout
+00 0a # hard_timeout
+00 00 00 00 00 00 # pad
+01 23 45 67 89 ab cd ef # cookie
+00 00 00 00 00 00 00 0a # packet_count
+00 00 00 00 00 00 03 e8 # byte_count
+00 00 # actions[0].type
+00 08 # actions[0].len
+00 01 # actions[0].port
+00 00 # actions[0].max_len
+00 00 # actions[1].type
+00 08 # actions[1].len
+00 02 # actions[1].port
+00 00 # actions[1].max_len
+-- python
+ofp.flow_stats_entry(
+    table_id=3,
+    match=ofp.match(
+        wildcards=ofp.OFPFW_DL_VLAN|ofp.OFPFW_NW_PROTO|ofp.OFPFW_TP_SRC|ofp.OFPFW_TP_DST|ofp.OFPFW_DL_VLAN_PCP|ofp.OFPFW_NW_TOS,
+        in_port=3,
+        eth_type=0x800,
+        ipv4_src=0xc0a8037f,
+        ipv4_dst=0xffffffff,
+        eth_src=[0x01, 0x23, 0x45, 0x67, 0x89, 0xab],
+        eth_dst=[0xcd, 0xef, 0x01, 0x23, 0x45, 0x67]),
+    duration_sec=1,
+    duration_nsec=2,
+    priority=100,
+    idle_timeout=5,
+    hard_timeout=10,
+    cookie=0x0123456789abcdef,
+    packet_count=10,
+    byte_count=1000,
+    actions=[
+        ofp.action.output(port=1),
+        ofp.action.output(port=2)])
+-- c
+obj = of_flow_stats_entry_new(OF_VERSION_1_0);
+{
+    of_object_t list;
+    of_flow_stats_entry_actions_bind(obj, &list);
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 1);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 2);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+}
+
+of_flow_stats_entry_byte_count_set(obj, 1000);
+of_flow_stats_entry_cookie_set(obj, 81985529216486895);
+of_flow_stats_entry_duration_nsec_set(obj, 2);
+of_flow_stats_entry_duration_sec_set(obj, 1);
+of_flow_stats_entry_hard_timeout_set(obj, 10);
+of_flow_stats_entry_idle_timeout_set(obj, 5);
+{
+    of_match_t match = { OF_VERSION_1_0 };
+    match.fields.in_port = 3;
+    match.fields.eth_src = (of_mac_addr_t) { { 0x01, 0x23, 0x45, 0x67, 0x89, 0xab } };
+    match.fields.eth_dst = (of_mac_addr_t) { { 0xcd, 0xef, 0x01, 0x23, 0x45, 0x67 } };
+    match.fields.eth_type = 0x800;
+    match.fields.ipv4_src = 0xc0a8037f;
+    match.fields.ipv4_dst = 0xffffffff;
+    OF_MATCH_MASK_IN_PORT_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_SRC_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_DST_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_TYPE_EXACT_SET(&match);
+    //OF_MATCH_MASK_VLAN_VID_EXACT_SET(&match);
+    //OF_MATCH_MASK_VLAN_PCP_EXACT_SET(&match);
+    OF_MATCH_MASK_ETH_TYPE_EXACT_SET(&match);
+    //OF_MATCH_MASK_IP_DSCP_EXACT_SET(&match);
+    //OF_MATCH_MASK_IP_PROTO_EXACT_SET(&match);
+    OF_MATCH_MASK_IPV4_SRC_EXACT_SET(&match);
+    OF_MATCH_MASK_IPV4_DST_EXACT_SET(&match);
+    //OF_MATCH_MASK_TCP_SRC_EXACT_SET(&match);
+    //OF_MATCH_MASK_TCP_DST_EXACT_SET(&match);
+    of_flow_stats_entry_match_set(obj, &match);
+}
+of_flow_stats_entry_packet_count_set(obj, 10);
+of_flow_stats_entry_priority_set(obj, 100);
+of_flow_stats_entry_table_id_set(obj, 3);
+-- java
+    builder
+      .setTableId(TableId.of(3))
+      .setMatch(
+        factory.buildMatch()
+            .setExact(MatchField.IN_PORT, OFPort.of(3))
+            .setExact(MatchField.ETH_TYPE, EthType.IPv4)
+            .setExact(MatchField.IPV4_SRC, IPv4Address.of(0xc0a8037f))
+            .setExact(MatchField.IPV4_DST, IPv4Address.of(0xffffffff))
+            .setExact(MatchField.ETH_SRC, MacAddress.of("01:23:45:67:89:ab"))
+            .setExact(MatchField.ETH_DST, MacAddress.of("cd:ef:01:23:45:67"))
+            .build()
+      )
+      .setDurationSec(1)
+      .setDurationNsec(2)
+      .setPriority(100)
+      .setIdleTimeout(5)
+      .setHardTimeout(10)
+      .setCookie(U64.of(0x0123456789abcdefL))
+      .setPacketCount(U64.of(10))
+      .setByteCount(U64.of(1000))
+      .setActions(
+            ImmutableList.<OFAction>of(
+                   factory.actions().output(OFPort.of(1), 0),
+                   factory.actions().output(OFPort.of(2), 0)
+                   )
+      );

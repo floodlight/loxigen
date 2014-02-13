@@ -1,0 +1,10 @@
+-- binary
+00 19 # type
+00 18 # length
+80 00 34 10 # OXM header
+00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f # OXM value
+-- python
+ofp.action.set_field(field=ofp.oxm.ipv6_src("\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"))
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
+builder.setField(oxms.ipv6Src(IPv6Address.of("0001:0203:0405:0607:0809:0a0b:0c0d:0e0f")))

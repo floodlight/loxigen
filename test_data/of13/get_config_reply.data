@@ -1,0 +1,16 @@
+-- binary
+04 08 # version, type
+00 0c # length
+12 34 56 78 # xid
+00 02 # flags
+ff ff # miss_send_len
+-- python
+ofp.message.get_config_reply(
+    xid=0x12345678,
+    flags=ofp.OFPC_FRAG_REASM,
+    miss_send_len=0xffff)
+-- java
+builder.setXid(0x12345678)
+    .setFlags(Sets.immutableEnumSet(OFConfigFlags.FRAG_REASM))
+    .setMissSendLen(0xffff)
+    .build()

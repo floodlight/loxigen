@@ -1,0 +1,11 @@
+-- binary
+00 19 # type
+00 10 # length
+80 00 06 06 # OXM header
+00 01 02 03 04 05 # OXM value
+00 00 # pad
+-- python
+ofp.action.set_field(field=ofp.oxm.eth_dst([0, 1, 2, 3, 4, 5]))
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
+builder.setField(oxms.ethDst(MacAddress.of("00:01:02:03:04:05")))

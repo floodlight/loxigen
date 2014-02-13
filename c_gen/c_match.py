@@ -40,9 +40,8 @@
 # takes mask
 
 import sys
-import of_g
-import loxi_front_end.oxm as oxm
-import loxi_front_end.match as match
+import c_gen.of_g_legacy as of_g
+import c_gen.match as match
 import c_code_gen
 
 def match_c_top_matter(out, name):
@@ -179,6 +178,18 @@ typedef struct of_match_s {
 } of_match_t;
 
 /**
+ * Mask the values in the match structure according to its fields
+ */
+static inline void of_match_values_mask(of_match_t *match)
+{
+    int idx;
+
+    for (idx = 0; idx < sizeof(of_match_fields_t); idx++) {
+        ((uint8_t *)&match->fields)[idx] &= ((uint8_t *)&match->masks)[idx];
+    }
+}
+
+/**
  * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
  * indices into the map below.
  *
@@ -275,6 +286,14 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
     OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
+
+    OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
+    OF_OXM_INDEX_BSN_LAG_ID = 37,
+    OF_OXM_INDEX_BSN_VRF = 38,
+    OF_OXM_INDEX_BSN_GLOBAL_VRF_ALLOWED = 39,
+    OF_OXM_INDEX_BSN_L3_INTERFACE_CLASS_ID = 40,
+    OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
+    OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
@@ -589,8 +608,8 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
 
     /* For each active member, add an OXM entry to the list */
 """)
-    # @fixme Would like to generate the list in some reasonable order
-    for key, entry in match.of_match_members.items():
+    for key in match.match_keys_sorted:
+        entry = match.of_match_members[key]
         out.write("""\
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(src)) {
         if (!OF_MATCH_MASK_%(ku)s_EXACT_TEST(src)) {
@@ -598,17 +617,17 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
             elt = &oxm_entry.%(key)s_masked;
 
             of_oxm_%(key)s_masked_init(elt,
-                src->version, -1, 1);
+                oxm_list->version, -1, 1);
             of_list_oxm_append_bind(oxm_list, &oxm_entry);
-            of_oxm_%(key)s_masked_value_set(elt, 
+            of_oxm_%(key)s_masked_value_set(elt,
                    src->fields.%(key)s);
-            of_oxm_%(key)s_masked_value_mask_set(elt, 
+            of_oxm_%(key)s_masked_value_mask_set(elt,
                    src->masks.%(key)s);
         } else {  /* Active, but not masked */
             of_oxm_%(key)s_t *elt;
             elt = &oxm_entry.%(key)s;
             of_oxm_%(key)s_init(elt,
-                src->version, -1, 1);
+                oxm_list->version, -1, 1);
             of_list_oxm_append_bind(oxm_list, &oxm_entry);
             of_oxm_%(key)s_value_set(elt, src->fields.%(key)s);
         }
@@ -637,9 +656,9 @@ of_match_to_wire_match_v3(of_match_t *src, of_match_v3_t *dst)
         return OF_ERROR_PARAM;
     }
     if (dst->object_id != OF_MATCH_V3) {
-        of_match_v3_init(dst, src->version, 0, 0);
+        of_match_v3_init(dst, OF_VERSION_1_2, 0, 0);
     }
-    if ((oxm_list = of_list_oxm_new(src->version)) == NULL) {
+    if ((oxm_list = of_list_oxm_new(dst->version)) == NULL) {
         return OF_ERROR_RESOURCE;
     }
 
@@ -683,26 +702,14 @@ of_match_v1_to_match(of_match_v1_t *src, of_match_t *dst)
 
     of_match_v1_wildcards_get(src, &wc);
 """)
-    # Deal with nw fields first
-    out.write("""
-    /* Handle L3 src and dst wildcarding first */
-    /* @fixme Check mask values are properly treated for ipv4 src/dst */
-    if ((count = OF_MATCH_V1_WC_IPV4_DST_GET(wc)) < 32) {
-        of_match_v1_ipv4_dst_get(src, &dst->fields.ipv4_dst);
-        if (count > 0) { /* Not exact match */
-            dst->masks.ipv4_dst = ~(((uint32_t)1 << count) - 1);
-        } else {
-            OF_MATCH_MASK_IPV4_DST_EXACT_SET(dst);
-        }
-    }
-""")
     for key in sorted(match.of_v1_keys):
         if key in ["ipv4_src", "ipv4_dst"]: # Special cases for masks here
             out.write("""
     count = OF_MATCH_V1_WC_%(ku)s_GET(wc);
     dst->masks.%(key)s = of_ip_index_to_mask(count);
-    /* @todo Review if we should only get the addr when masks.%(key)s != 0 */
     of_match_v1_%(key)s_get(src, &dst->fields.%(key)s);
+    /* Clear the bits not indicated by mask; IP addrs are special for 1.0 */
+    dst->fields.%(key)s &= dst->masks.%(key)s;
 """ % dict(ku=key.upper(), key=key))
         else:
             out.write("""
@@ -750,6 +757,9 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
 """ % dict(ku=key.upper(), key=key))
 
     out.write("""
+    /* Clear values outside of masks */
+    of_match_values_mask(dst);
+
     return OF_ERROR_NONE;
 }
 """)
@@ -808,6 +818,9 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
         } /* end switch */
         rv = of_list_oxm_next(&oxm_list, &oxm_entry);
     } /* end OXM iteration */
+
+    /* Clear values outside of masks */
+    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
@@ -900,7 +913,7 @@ of_match_deserialize(of_version_t version, of_match_t *match,
             of_match_v%(version)d_t wire_match;
             of_match_v%(version)d_init(&wire_match,
                    %(ver_name)s, -1, 1);
-            of_object_buffer_bind((of_object_t *)&wire_match, 
+            of_object_buffer_bind((of_object_t *)&wire_match,
                 octets->data, octets->bytes, NULL);
             OF_TRY(of_match_v%(version)d_to_match(&wire_match, match));
 
@@ -958,7 +971,7 @@ of_restricted_match_ipv6(of_ipv6_t *v1, of_ipv6_t *v2, of_ipv6_t *mask) {
     int idx;
 
     for (idx = 0; idx < OF_IPV6_BYTES; idx++) {
-        if ((v1->addr[idx] & mask->addr[idx]) != 
+        if ((v1->addr[idx] & mask->addr[idx]) !=
                (v2->addr[idx] & mask->addr[idx])) {
             return 0;
         }
@@ -977,7 +990,7 @@ of_overlap_ipv6(of_ipv6_t *v1, of_ipv6_t *v2,
     int idx;
 
     for (idx = 0; idx < OF_IPV6_BYTES; idx++) {
-        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) != 
+        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) !=
                ((v2->addr[idx] & m1->addr[idx]) & m2->addr[idx])) {
             return 0;
         }
@@ -1020,12 +1033,12 @@ of_more_specific_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2) {
  * Boolean test if two values agree when restricted to a mask
  */
 static inline int
-of_restricted_match_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2, 
+of_restricted_match_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
                              of_mac_addr_t *mask) {
     int idx;
 
     for (idx = 0; idx < OF_MAC_ADDR_BYTES; idx++) {
-        if ((v1->addr[idx] & mask->addr[idx]) != 
+        if ((v1->addr[idx] & mask->addr[idx]) !=
                (v2->addr[idx] & mask->addr[idx])) {
             return 0;
         }
@@ -1044,7 +1057,7 @@ of_overlap_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
     int idx;
 
     for (idx = 0; idx < OF_MAC_ADDR_BYTES; idx++) {
-        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) != 
+        if (((v1->addr[idx] & m1->addr[idx]) & m2->addr[idx]) !=
                ((v2->addr[idx] & m1->addr[idx]) & m2->addr[idx])) {
             return 0;
         }
@@ -1060,6 +1073,15 @@ of_overlap_mac_addr(of_mac_addr_t *v1, of_mac_addr_t *v2,
 
 #define OF_OVERLAP_MAC_ADDR(v1, v2, m1, m2) \\
     of_overlap_mac_addr((v1), (v2), (m1), (m2))
+
+#define OF_MORE_SPECIFIC_BITMAP_128(v1, v2) \\
+    (OF_MORE_SPECIFIC_INT((v1)->lo, (v2)->lo) && OF_MORE_SPECIFIC_INT((v1)->hi, (v2)->hi))
+
+#define OF_RESTRICTED_MATCH_BITMAP_128(v1, v2, mask) \\
+    (OF_RESTRICTED_MATCH_INT((v1)->lo, (v2)->lo, (mask)->lo) && OF_RESTRICTED_MATCH_INT((v1)->hi, (v2)->hi, (mask)->hi))
+
+#define OF_OVERLAP_BITMAP_128(v1, v2, m1, m2) \\
+    (OF_OVERLAP_INT((v1)->lo, (v2)->lo, (m1)->lo, (m2)->lo) && OF_OVERLAP_INT((v1)->hi, (v2)->hi, (m1)->hi, (m2)->hi))
 
 /**
  * More-specific-than macro for integer types; see above
@@ -1131,6 +1153,9 @@ of_match_more_specific(of_match_t *entry, of_match_t *query)
         elif entry["m_type"] == "of_mac_addr_t":
             comp = "OF_MORE_SPECIFIC_MAC_ADDR"
             match_type = "OF_RESTRICTED_MATCH_MAC_ADDR"
+        elif entry["m_type"] == "of_bitmap_128_t":
+            comp = "OF_MORE_SPECIFIC_BITMAP_128"
+            match_type = "OF_RESTRICTED_MATCH_BITMAP_128"
         else: # Integer
             comp = "OF_MORE_SPECIFIC_INT"
             match_type = "OF_RESTRICTED_MATCH_INT"
@@ -1147,7 +1172,7 @@ of_match_more_specific(of_match_t *entry, of_match_t *query)
             %(q_m)s)) {
         return 0;
     }
-""" % dict(match_type=match_type, comp=comp, q_f=q_f, e_f=e_f, 
+""" % dict(match_type=match_type, comp=comp, q_f=q_f, e_f=e_f,
            q_m=q_m, e_m=e_m, key=key))
 
     out.write("""
@@ -1185,6 +1210,8 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
             check = "OF_OVERLAP_IPV6"
         elif entry["m_type"] == "of_mac_addr_t":
             check = "OF_OVERLAP_MAC_ADDR"
+        elif entry["m_type"] == "of_bitmap_128_t":
+            check = "OF_OVERLAP_BITMAP_128"
         else: # Integer
             check = "OF_OVERLAP_INT"
             m1 = "m1->%s" % key
@@ -1193,7 +1220,7 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
             f2 = "f2->%s" % key
         out.write("""
     /* Check overlap for %(key)s */
-    if (!%(check)s(%(f1)s, %(f2)s, 
+    if (!%(check)s(%(f1)s, %(f2)s,
         %(m2)s, %(m1)s)) {
         return 0; /* This field differentiates; all done */
     }

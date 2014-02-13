@@ -1,0 +1,102 @@
+-- binary
+04 0e # version, type
+00 80 # length
+12 34 56 78 # xid
+
+fe dc ba 98 76 54 32 10 # cookie
+
+ff 00 ff 00 ff 00 ff 00 # cookie_mask
+
+03 # table_id
+03 # _command
+00 05 # idle_timeout
+00 0a # hard_timeout
+17 70 # priority
+
+00 00 00 32 # buffer_id
+00 00 00 06 # out_port
+
+00 00 00 08 # out_group
+00 00 # flags
+00 00 # pad
+
+00 01 # match.type
+00 3F # match.length # 59 bytes OXMs + 4 bytes match header
+
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+
+80 00 0A 02 # match.oxm_list[1].type_len - ETH_TYPE
+86 DD # match.oxm_list[1].value - ETH_TYPE = IPv6
+
+80 00 14 01 # match.oxm_list[2].type_len - IP Proto
+06 # match.oxm_list[2].value = IP_PROTO = TCP
+
+80 00 35 20 # match.oxm_list[3].type_len - IPV6_SRC
+1C CA FE 1C B1 10 1C 00 00 28 00 00 00 00 00 00 # match.oxm_list[3].value
+FF FF FF FF FF F0 FF FF 1C 2C 3C 00 00 00 00 00 # match.oxm_list[3].mask
+
+00 # match.pad
+
+00 01 # instructions[0].type
+00 08 # instructions[0].length
+04 # instructions[0].table_id
+00 00 00 # pad
+
+00 01 # instructions[1].type
+00 08 # instructions[1].length
+07 # instructions[1].table_id
+00 00 00 # pad
+-- python
+ofp.message.flow_delete(
+    xid=0x12345678,
+    cookie=0xFEDCBA9876543210,
+    cookie_mask=0xFF00FF00FF00FF00,
+    table_id=3,
+    idle_timeout=5,
+    hard_timeout=10,
+    priority=6000,
+    buffer_id=50,
+    out_port=6,
+    out_group=8,
+    flags=0,
+    match=ofp.match(oxm_list=[
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
+        ofp.oxm.eth_type(value=0x86dd),
+        ofp.oxm.ip_proto(value=6),
+        ofp.oxm.ipv6_src_masked(
+            value     ='\x1C\xCA\xFE\x1C\xB1\x10\x1C\x00\x00\x28\x00\x00\x00\x00\x00\x00',
+            value_mask='\xFF\xFF\xFF\xFF\xFF\xF0\xFF\xFF\x1C\x2C\x3C\x00\x00\x00\x00\x00')
+        ]),
+    instructions=[
+        ofp.instruction.goto_table(table_id=4),
+        ofp.instruction.goto_table(table_id=7)])
+-- java
+builder.setXid(0x12345678)
+    .setCookie(U64.parseHex("FEDCBA9876543210"))
+    .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
+    .setTableId(TableId.of(3))
+    .setIdleTimeout(5)
+    .setHardTimeout(10)
+    .setPriority(6000)
+    .setBufferId(OFBufferId.of(50))
+    .setOutPort(OFPort.of(6))
+    .setOutGroup(OFGroup.of(8))
+    .setFlags(ImmutableSet.<OFFlowModFlags>of())
+    .setMatch(
+        factory.buildMatch()
+            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+            .setExact(MatchField.ETH_TYPE, EthType.IPv6)
+            .setExact(MatchField.IP_PROTO, IpProtocol.TCP)
+            .setMasked(MatchField.IPV6_SRC, 
+                       IPv6Address.of(0x1CCAFE1CB1101C00l, 0x0028000000000000l),
+                       IPv6Address.of(0xFFFFFFFFFFF0FFFFl, 0x1C2C3C0000000000l))
+        	.build()
+    )
+    .setInstructions(
+        ImmutableList.<OFInstruction>of(
+                factory.instructions().gotoTable(TableId.of(4)),
+                factory.instructions().gotoTable(TableId.of(7))
+        )
+    );

@@ -1,0 +1,42 @@
+-- binary
+04 13 # version, type
+00 50 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 8 # subtype
+# entries[0]
+00 18 # length
+00 00 # pad
+00 00 00 03 # port
+12 34 56 78 9a bc de f0 # values[0]
+11 22 33 44 55 66 77 88 # values[1]
+# entries[0]
+00 20 # length
+00 00 # pad
+00 00 00 04 # port
+12 34 56 78 9a bc de f0 # values[0]
+11 22 33 44 55 66 77 88 # values[1]
+ff ff ff ff ff ff ff ff # values[2]
+-- python
+ofp.message.bsn_port_counter_stats_reply(
+    xid=0x12345678,
+    flags=0,
+    entries=[
+        ofp.bsn_port_counter_stats_entry(
+            port_no=3,
+            values=[
+                ofp.uint64(0x123456789abcdef0),
+                ofp.uint64(0x1122334455667788),
+            ]),
+        ofp.bsn_port_counter_stats_entry(
+            port_no=4,
+            values=[
+                ofp.uint64(0x123456789abcdef0),
+                ofp.uint64(0x1122334455667788),
+                ofp.uint64(0xffffffffffffffff),
+            ])
+    ]
+)

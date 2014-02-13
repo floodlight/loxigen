@@ -1,0 +1,86 @@
+-- binary
+04 13 # version, type
+00 78 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 04 # subtype
+
+# entries[0]
+00 30 # length
+00 00 # table id
+74 61 62 6c 65 20 30 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # name
+00 00 00 20 # buckets_size
+00 00 00 40 # max_entries
+00 00 00 00 # pad
+
+# entries[1]
+00 30 # length
+00 01 # table id
+74 61 62 6c 65 20 31 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e 2e # name
+00 00 00 40 # buckets_size
+00 00 00 80 # max_entries
+00 00 00 00 # pad
+-- python
+ofp.message.bsn_gentable_desc_stats_reply(
+    xid=0x12345678,
+    entries=[
+        ofp.bsn_gentable_desc_stats_entry(
+            table_id=0,
+            name="table 0",
+            buckets_size=32,
+            max_entries=64),
+        ofp.bsn_gentable_desc_stats_entry(
+            table_id=1,
+            name="table 1".ljust(32, '.'),
+            buckets_size=64,
+            max_entries=128),
+    ])
+-- java
+builder.setXid(0x12345678)
+    .setEntries(
+        ImmutableList.<OFBsnGentableDescStatsEntry>of(
+            factory.buildBsnGentableDescStatsEntry()
+                .setTableId(GenTableId.of(0))
+                .setName("table 0")
+                .setBucketsSize(32)
+                .setMaxEntries(64)
+                .build(),
+            factory.buildBsnGentableDescStatsEntry()
+                .setTableId(GenTableId.of(1))
+                .setName("table 1.........................")
+                .setBucketsSize(64)
+                .setMaxEntries(128)
+                .build()
+        )
+    )
+-- c
+obj = of_bsn_gentable_desc_stats_reply_new(OF_VERSION_1_3);
+of_bsn_gentable_desc_stats_reply_xid_set(obj, 0x12345678);
+{
+    of_object_t *list = of_list_bsn_gentable_desc_stats_entry_new(OF_VERSION_1_3);
+    {
+        of_table_name_t name = "table 0";
+        of_object_t *entry = of_bsn_gentable_desc_stats_entry_new(OF_VERSION_1_3);
+        of_bsn_gentable_desc_stats_entry_table_id_set(entry, 0);
+        of_bsn_gentable_desc_stats_entry_name_set(entry, name);
+        of_bsn_gentable_desc_stats_entry_buckets_size_set(entry, 32);
+        of_bsn_gentable_desc_stats_entry_max_entries_set(entry, 64);
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    {
+        of_table_name_t name = "table 1.........................";
+        of_object_t *entry = of_bsn_gentable_desc_stats_entry_new(OF_VERSION_1_3);
+        of_bsn_gentable_desc_stats_entry_table_id_set(entry, 1);
+        of_bsn_gentable_desc_stats_entry_name_set(entry, name);
+        of_bsn_gentable_desc_stats_entry_buckets_size_set(entry, 64);
+        of_bsn_gentable_desc_stats_entry_max_entries_set(entry, 128);
+        of_list_append(list, entry);
+        of_object_delete(entry);
+    }
+    of_bsn_gentable_desc_stats_reply_entries_set(obj, list);
+    of_object_delete(list);
+}

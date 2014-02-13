@@ -26,24 +26,31 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: all_members = ofclass.members[:]
-:: if ofclass.length_member: all_members.append(ofclass.length_member)
-:: all_members.extend(ofclass.type_members)
-:: all_members.sort(key=lambda x: x.offset)
-:: for m in all_members:
-::     unpack_expr = m.oftype.gen_unpack_expr('buf', m.offset)
-::     if m == ofclass.length_member:
-        _length = ${unpack_expr}
-        assert(_length == len(buf))
-:: if ofclass.is_fixed_length:
-        if _length != ${ofclass.min_length}: raise loxi.ProtocolError("${ofclass.pyname} length is %d, should be ${ofclass.min_length}" % _length)
-:: else:
-        if _length < ${ofclass.min_length}: raise loxi.ProtocolError("${ofclass.pyname} length is %d, should be at least ${ofclass.min_length}" % _length)
-:: #endif
-::     elif m in ofclass.type_members:
-        ${m.name} = ${unpack_expr}
-        assert(${m.name} == ${m.value})
-::     else:
-        obj.${m.name} = ${unpack_expr}
+:: from loxi_ir import *
+:: from py_gen.oftype import gen_unpack_expr
+:: field_length_members = {}
+:: for m in ofclass.members:
+::     if type(m) == OFPadMember:
+        reader.skip(${m.length})
+::     elif type(m) == OFLengthMember:
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        orig_reader = reader
+        reader = orig_reader.slice(_${m.name} - (${m.offset} + ${m.length}))
+::     elif type(m) == OFFieldLengthMember:
+::         field_length_members[m.field_name] = m
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+::     elif type(m) == OFTypeMember:
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        assert(_${m.name} == ${m.value})
+::     elif type(m) == OFDataMember or type(m) == OFDiscriminatorMember:
+::         if m.name in field_length_members:
+::             reader_expr = 'reader.slice(_%s)' % field_length_members[m.name].name
+::         else:
+::             reader_expr = 'reader'
+::         #endif
+        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
 ::     #endif
 :: #endfor
+:: if ofclass.has_external_alignment:
+        orig_reader.skip_align()
+:: #endif

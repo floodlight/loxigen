@@ -26,7 +26,13 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
+import sys
+import os
 import unittest
+
+root_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), '..')
+sys.path.insert(0, root_dir)
+
 import pyparsing
 import loxi_front_end.parser as parser
 
@@ -36,7 +42,7 @@ class StructTests(unittest.TestCase):
 struct foo { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['struct', 'foo', []]])
+        self.assertEquals(ast, [['struct', 'foo', [], None, []]])
 
     def test_one_field(self):
         src = """\
@@ -45,8 +51,18 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['data', ['scalar', 'uint32_t'], 'bar']]]])
+
+    def test_struct_align_arg(self):
+        src = """\
+struct foo(align=8) {
+    uint32_t bar;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [['align', '8']], None, [['data', ['scalar', 'uint32_t'], 'bar']]]])
 
     def test_multiple_fields(self):
         src = """\
@@ -57,11 +73,11 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo',
-                [['uint32_t', 'bar'],
-                 ['uint8_t', 'baz'],
-                 ['uint64_t', 'abc']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None,
+                [['data', ['scalar', 'uint32_t'], 'bar'],
+                 ['data', ['scalar', 'uint8_t'], 'baz'],
+                 ['data', ['scalar', 'uint64_t'], 'abc']]]])
 
     def test_array_type(self):
         src = """\
@@ -70,8 +86,8 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t[4]', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['data', ['array', 'uint32_t[4]'], 'bar']]]])
 
     def test_list_type(self):
         src = """\
@@ -80,8 +96,48 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['list(of_action_t)', 'bar']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['data', ['list', 'list(of_action_t)'], 'bar']]]])
+
+    def test_pad_member(self):
+        src = """\
+struct foo {
+    pad(1);
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['pad', 1]]]])
+
+    def test_type_member(self):
+        src = """\
+struct foo {
+    uint16_t foo == 0x10;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['type', ['scalar', 'uint16_t'], 'foo', 0x10]]]])
+
+    def test_inheritance(self):
+        src = """\
+struct foo : bar {
+    uint16_t foo == 0x10;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], 'bar', [['type', ['scalar', 'uint16_t'], 'foo', 0x10]]]])
+
+    def test_discriminator(self):
+        src = """\
+struct foo {
+    uint16_t foo == ?;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['discriminator', ['scalar', 'uint16_t'], 'foo']]]])
 
 class EnumTests(unittest.TestCase):
     def test_empty(self):
@@ -90,7 +146,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', []]])
+        self.assertEquals(ast, [['enum', 'foo', [], []]])
 
     def test_one(self):
         src = """\
@@ -99,7 +155,18 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['BAR', 1]]]])
+        self.assertEquals(ast, [['enum', 'foo', [], [['BAR', [], 1]]]])
+
+    def test_params(self):
+        src = """\
+enum foo(wire_type=uint32, bitmask=False, complete=False) {
+    BAR = 1
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast, [['enum', 'foo',
+            [ ['wire_type', 'uint32'], ['bitmask','False'], ['complete', 'False']],
+            [['BAR', [], 1]]]])
 
     def test_multiple(self):
         src = """\
@@ -110,7 +177,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
 
     def test_trailing_comma(self):
         src = """\
@@ -121,7 +188,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['enum', 'foo', [['OFP_A', 1], ['OFP_B', 2], ['OFP_C', 3]]]])
+        self.assertEquals(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
 
 class TestMetadata(unittest.TestCase):
     def test_version(self):
@@ -129,7 +196,7 @@ class TestMetadata(unittest.TestCase):
 #version 1
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(), [['metadata', 'version', '1']])
+        self.assertEquals(ast, [['metadata', 'version', '1']])
 
 class TestToplevel(unittest.TestCase):
     def test_multiple_structs(self):
@@ -138,22 +205,22 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', []], ['struct', 'bar', []]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, []], ['struct', 'bar', [], None, []]])
 
     def test_comments(self):
         src = """\
 // comment 1
 struct foo { //comment 2
 // comment 3
-   uint32_t a; //comment 5 
+   uint32_t a; //comment 5
 // comment 6
 };
 // comment 4
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
-            [['struct', 'foo', [['uint32_t', 'a']]]])
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [['data', ['scalar', 'uint32_t'], 'a']]]])
 
     def test_mixed(self):
         src = """\
@@ -163,11 +230,11 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast.asList(),
+        self.assertEquals(ast,
             [['metadata', 'version', '1'],
-             ['struct', 'foo', []],
+             ['struct', 'foo', [], None, []],
              ['metadata', 'version', '2'],
-             ['struct', 'bar', []]])
+             ['struct', 'bar', [], None, []]])
 
 class TestErrors(unittest.TestCase):
     def syntax_error(self, src, regex):

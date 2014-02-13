@@ -1,0 +1,12 @@
+-- binary
+04 12 # version, type
+00 18 # length
+12 34 56 78 # xid
+ff ff # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 5c 16 c7 # experimenter
+00 00 00 04 # subtype
+-- python
+ofp.message.bsn_gentable_desc_stats_request(
+    xid=0x12345678)

@@ -25,7 +25,7 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-/* Copyright 2012, Big Switch Networks, Inc. */
+:: include('_copyright.c')
 
 #if !defined(_LOCI_SHOW_H_)
 #define _LOCI_SHOW_H_
@@ -74,7 +74,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
  */
 #define LOCI_SHOW_u32_ipv6_flabel(writer, cookie, val)     LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u8_vlan_pcp(writer, cookie, val)         LOCI_SHOW_u8(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_src(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_src(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_ipv6_ipv6_dst(writer, cookie, val)       LOCI_SHOW_ipv6(writer, cookie, val)
 #define LOCI_SHOW_u32_arp_tpa(writer, cookie, val)         LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u8_icmpv6_type(writer, cookie, val)      LOCI_SHOW_u8(writer, cookie, val)
@@ -99,7 +99,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_u8_ip_ecn(writer, cookie, val)           LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u16_udp_dst(writer, cookie, val)         LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_port_no_in_phy_port(writer, cookie, val) LOCI_SHOW_port_no(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_dst(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_dst(writer, cookie, val)        LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_src(writer, cookie, val)         LOCI_SHOW_mac(writer, cookie, val)
 #define LOCI_SHOW_u16_udp_src(writer, cookie, val)         LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_mac_ipv6_nd_tll(writer, cookie, val)     LOCI_SHOW_mac(writer, cookie, val)
@@ -109,6 +109,14 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_u8_ip_proto(writer, cookie, val)         LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u64_metadata(writer, cookie, val)        LOCI_SHOW_x64(writer, cookie, val)
 #define LOCI_SHOW_u8_enabled(writer, cookie, val)          LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u32_vport_no(writer, cookie, val)        LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_port_no(writer, cookie, val)         LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u16_ingress_tpid(writer, cookie, val)    LOCI_SHOW_x16(writer, cookie, val)
+#define LOCI_SHOW_u16_egress_tpid(writer, cookie, val)     LOCI_SHOW_x16(writer, cookie, val)
+#define LOCI_SHOW_u16_ingress_vlan_id(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_egress_vlan_id(writer, cookie, val)  LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u32_enabled(writer, cookie, val)         LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_enable(writer, cookie, val)          LOCI_SHOW_u32(writer, cookie, val)
 
 
 
@@ -146,12 +154,17 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_string(writer, cookie, val) writer(cookie, "%s", val)
 
 #define LOCI_SHOW_port_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
+#define LOCI_SHOW_port_name_if_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_tab_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_desc_str(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_ser_num(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 
 int loci_show_match(loci_writer_f writer, void *cookie, of_match_t *match);
 #define LOCI_SHOW_match(writer, cookie, val) loci_show_match(writer, cookie, &val)
+
+#define LOCI_SHOW_bitmap_128(writer, cookie, val) writer(cookie, "%" PRIx64 "%" PRIx64, (val).hi, (val).lo)
+
+#define LOCI_SHOW_checksum_128(writer, cookie, val) writer(cookie, "%016" PRIx64 "%016" PRIx64, (val).hi, (val).lo)
 
 /**
  * Generic version for any object
@@ -183,7 +196,9 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_desc_str_sw_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_ser_num_serial_num(writer, cookie, val) LOCI_SHOW_ser_num(writer, cookie, val)
 #define LOCI_SHOW_desc_str_dp_desc(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_desc_str_pipeline(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_octets_data(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
+#define LOCI_SHOW_octets_value(writer, cookie, val) LOCI_SHOW_octets(writer, cookie, val)
 #define LOCI_SHOW_u16_err_type(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u16_code(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_u64_datapath_id(writer, cookie, val) LOCI_SHOW_x64(writer, cookie, val)
@@ -224,7 +239,14 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_supported(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u32_peer(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_packets(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_rx_packets_broadcast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_uint64_value(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_packets(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_unicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_multicast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_u64_tx_packets_broadcast(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_bytes(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_tx_bytes(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u64_rx_dropped(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
@@ -258,8 +280,8 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u64_metadata_mask(writer, cookie, val) LOCI_SHOW_x64(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_src_mask(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
 #define LOCI_SHOW_mac_eth_dst_mask(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_src_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_dst_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_src_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_dst_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
 #define LOCI_SHOW_u32_curr_speed(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_max_speed(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_match_bmap_match(writer, cookie, val) LOCI_SHOW_match_bmap(writer, cookie, val)
@@ -320,10 +342,48 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_service(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_status(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u16_subtype(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_addr(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
-#define LOCI_SHOW_u32_ipv4_netmask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
-
-
-
+#define LOCI_SHOW_ipv4_ipv4_addr(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_ipv4_netmask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_u8_l2_table_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_l2_table_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_ipv4_value(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_ipv4_value_mask(writer, cookie, val) LOCI_SHOW_ipv4(writer, cookie, val)
+#define LOCI_SHOW_u8_hybrid_enable(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_hybrid_version(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_bitmap_128_value(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_bitmap_128_value_mask(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_bitmap_128_bsn_in_ports_128(writer, cookie, val) LOCI_SHOW_bitmap_128(writer, cookie, val)
+#define LOCI_SHOW_u32_timeout_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_tx_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_slot_num(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_lag_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_vrf(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_bsn_global_vrf_allowed(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_interface_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_src_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_l3_dst_class_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u8_convergence_status(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_actor_sys_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_mac_actor_sys_mac(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
+#define LOCI_SHOW_u16_actor_port_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_actor_port_num(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_actor_key(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_partner_sys_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_mac_partner_sys_mac(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
+#define LOCI_SHOW_u16_partner_port_priority(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_partner_port_num(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u16_partner_key(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u64_time_ms(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_desc_str_uri(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_u8_state(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
+#define LOCI_SHOW_u16_table_id(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
+#define LOCI_SHOW_u32_deleted_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_error_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_checksum_128_checksum_mask(writer, cookie, val) LOCI_SHOW_checksum_128(writer, cookie, val)
+#define LOCI_SHOW_u32_buckets_size(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_entry_count(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_num_aux(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u64_checksum(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */

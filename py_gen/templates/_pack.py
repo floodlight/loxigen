@@ -26,22 +26,42 @@
 :: # under the EPL.
 ::
 :: # TODO coalesce format strings
-:: all_members = ofclass.members[:]
-:: if ofclass.length_member: all_members.append(ofclass.length_member)
-:: all_members.extend(ofclass.type_members)
-:: all_members.sort(key=lambda x: x.offset)
+:: from loxi_ir import *
+:: from py_gen.oftype import gen_pack_expr
+:: length_member = None
 :: length_member_index = None
+:: field_length_members = {}
+:: field_length_indexes = {}
 :: index = 0
-:: for m in all_members:
-::     if m == ofclass.length_member:
+:: for m in ofclass.members:
+::     if type(m) == OFLengthMember:
+::         length_member = m
 ::         length_member_index = index
-        packed.append(${m.oftype.gen_pack_expr('0')}) # placeholder for ${m.name} at index ${length_member_index}
+        packed.append(${gen_pack_expr(m.oftype, '0', version=version)}) # placeholder for ${m.name} at index ${index}
+::     elif type(m) == OFFieldLengthMember:
+::         field_length_members[m.field_name] = m
+::         field_length_indexes[m.field_name] = index
+        packed.append(${gen_pack_expr(m.oftype, '0', version=version)}) # placeholder for ${m.name} at index ${index}
+::     elif type(m) == OFPadMember:
+        packed.append('\x00' * ${m.length})
 ::     else:
-        packed.append(${m.oftype.gen_pack_expr('self.' + m.name)})
+        packed.append(${gen_pack_expr(m.oftype, 'self.' + m.name, version=version)})
+::         if m.name in field_length_members:
+::             field_length_member = field_length_members[m.name]
+::             field_length_index = field_length_indexes[m.name]
+        packed[${field_length_index}] = ${gen_pack_expr(field_length_member.oftype, 'len(packed[-1])', version=version)}
+::         #endif
 ::     #endif
 ::     index += 1
 :: #endfor
 :: if length_member_index != None:
         length = sum([len(x) for x in packed])
-        packed[${length_member_index}] = ${ofclass.length_member.oftype.gen_pack_expr('length')}
+:: if ofclass.has_internal_alignment:
+        packed.append(loxi.generic_util.pad_to(8, length))
+        length += len(packed[-1])
+:: #endif
+        packed[${length_member_index}] = ${gen_pack_expr(length_member.oftype, 'length', version=version)}
+:: #endif
+:: if ofclass.has_external_alignment:
+        packed.append(loxi.generic_util.pad_to(8, length))
 :: #endif

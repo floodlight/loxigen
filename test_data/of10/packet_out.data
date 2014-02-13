@@ -1,0 +1,53 @@
+-- binary
+01 0d # version/type
+00 23 # length
+12 34 56 78 # xid
+ab cd ef 01 # buffer_id
+ff fe # in_port
+00 10 # actions_len
+00 00 # actions[0].type
+00 08 # actions[0].len
+00 01 # actions[0].port
+00 00 # actions[0].max_len
+00 00 # actions[1].type
+00 08 # actions[1].len
+00 02 # actions[1].port
+00 00 # actions[1].max_len
+61 62 63 # data
+-- python
+ofp.message.packet_out(
+    xid=0x12345678,
+    buffer_id=0xabcdef01,
+    in_port=ofp.OFPP_LOCAL,
+    actions=[
+        ofp.action.output(port=1),
+        ofp.action.output(port=2)],
+    data='abc')
+-- c
+obj = of_packet_out_new(OF_VERSION_1_0);
+of_packet_out_buffer_id_set(obj, 0xabcdef01);
+of_packet_out_in_port_set(obj, 65534);
+of_packet_out_xid_set(obj, 305419896);
+{
+    of_object_t *list = of_list_action_new(OF_VERSION_1_0);
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 1);
+        of_list_append(list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_action_output_new(OF_VERSION_1_0);
+        of_action_output_max_len_set(obj, 0);
+        of_action_output_port_set(obj, 2);
+        of_list_append(list, obj);
+        of_object_delete(obj);
+    }
+    of_packet_out_actions_set(obj, list);
+    of_object_delete(list);
+}
+{
+    of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
+    of_packet_out_data_set(obj, &data);
+}

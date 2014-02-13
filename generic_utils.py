@@ -30,28 +30,10 @@
 
 Intended to be imported into another namespace
 """
-
+import logging
+import collections
+import functools
 import sys
-import of_g
-
-
-################################################################
-#
-# Configuration related
-#
-################################################################
-
-def config_check(str, dictionary = of_g.code_gen_config):
-    """
-    Return config value if in dictionary; else return False.
-    @param str The lookup index
-    @param dictionary The dict to check; use code_gen_config if None
-    """
-
-    if str in dictionary:
-        return dictionary[str]
-
-    return False
 
 ################################################################
 #
@@ -61,15 +43,174 @@ def config_check(str, dictionary = of_g.code_gen_config):
 
 def debug(obj):
     """
-    Debug output to the current both the log file and debug output
-    @param out_str The stringified output to write
+    Legacy logging method. Delegate to logging.debug.
+    Use logging.debug directly in the future.
     """
-    of_g.loxigen_dbg_file.write(str(obj) + "\n")
-    log(obj)
+    logging.debug(obj)
 
 def log(obj):
     """
-    Log output to the current global log file
-    @param out_str The stringified output to write
+    Legacy logging method. Delegate to logging.info.
+    Use logging.info directly in the future.S
     """
-    of_g.loxigen_log_file.write(str(obj) + "\n")
+    logging.info(obj)
+
+################################################################
+#
+# Memoize
+#
+################################################################
+
+def memoize(obj):
+    """ A function/method decorator that memoizes the result"""
+    cache = obj.cache = {}
+
+    @functools.wraps(obj)
+    def memoizer(*args, **kwargs):
+        key = args + tuple(kwargs.items())
+        if key not in cache:
+            cache[key] = obj(*args, **kwargs)
+        return cache[key]
+    return memoizer
+
+################################################################
+#
+# OrderedSet
+#
+################################################################
+
+class OrderedSet(collections.MutableSet):
+    """
+    A set implementations that retains insertion order.  From the receipe
+    http://code.activestate.com/recipes/576694/
+    as referred to in the python documentation
+    """
+
+    def __init__(self, iterable=None):
+        self.end = end = []
+        end += [None, end, end]         # sentinel node for doubly linked list
+        self.map = {}                   # key --> [key, prev, next]
+        if iterable is not None:
+            self |= iterable
+
+    def __len__(self):
+        return len(self.map)
+
+    def __contains__(self, key):
+        return key in self.map
+
+    def add(self, key):
+        if key not in self.map:
+            end = self.end
+            curr = end[1]
+            curr[2] = end[1] = self.map[key] = [key, curr, end]
+
+    def discard(self, key):
+        if key in self.map:
+            key, prev, next = self.map.pop(key)
+            prev[2] = next
+            next[1] = prev
+
+    def __iter__(self):
+        end = self.end
+        curr = end[2]
+        while curr is not end:
+            yield curr[0]
+            curr = curr[2]
+
+    def __reversed__(self):
+        end = self.end
+        curr = end[1]
+        while curr is not end:
+            yield curr[0]
+            curr = curr[1]
+
+    def pop(self, last=True):
+        if not self:
+            raise KeyError('set is empty')
+        key = self.end[1][0] if last else self.end[2][0]
+        self.discard(key)
+        return key
+
+    def __repr__(self):
+        if not self:
+            return '%s()' % (self.__class__.__name__,)
+        return '%s(%r)' % (self.__class__.__name__, list(self))
+
+    def __eq__(self, other):
+        if isinstance(other, OrderedSet):
+            return len(self) == len(other) and list(self) == list(other)
+        return set(self) == set(other)
+
+################################################################
+#
+# OrderedDefaultDict
+#
+################################################################
+
+class OrderedDefaultDict(collections.OrderedDict):
+    """
+    A Dictionary that maintains insertion order where missing values
+    are provided by a factory function, i.e., a combination of
+    the semantics of collections.defaultdict and collections.OrderedDict.
+    """
+    def __init__(self, default_factory=None, *a, **kw):
+        if (default_factory is not None and
+                not callable(default_factory)):
+            raise TypeError('first argument must be callable')
+        collections.OrderedDict.__init__(self, *a, **kw)
+        self.default_factory = default_factory
+
+    def __getitem__(self, key):
+        try:
+            return collections.OrderedDict.__getitem__(self, key)
+        except KeyError:
+            return self.__missing__(key)
+
+    def __missing__(self, key):
+        if self.default_factory is None:
+            raise KeyError(key)
+        self[key] = value = self.default_factory()
+        return value
+
+    def __reduce__(self):
+        if self.default_factory is None:
+            args = tuple()
+        else:
+            args = self.default_factory,
+        return type(self), args, None, None, self.items()
+
+    def copy(self):
+        return self.__copy__()
+
+    def __copy__(self):
+        return type(self)(self.default_factory, self)
+
+    def __deepcopy__(self, memo):
+        import copy
+        return type(self)(self.default_factory,
+                          copy.deepcopy(self.items()))
+    def __repr__(self):
+        return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
+                                        collections.OrderedDict.__repr__(self))
+
+
+def find(func, iterable):
+    """
+    find the first item in iterable for which func returns something true'ish.
+    @returns None if no item in iterable fulfills the condition
+    """
+    for i in iterable:
+        if func(i):
+            return i
+    return None
+
+def count(func, iteratable):
+    """
+    count how the number of items in iterable for which func returns something true'ish.
+    """
+    c = 0
+    for i in iterable:
+        if func(i):
+            c +=1
+    return c

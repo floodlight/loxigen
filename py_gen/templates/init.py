@@ -30,6 +30,16 @@
 :: include('_autogen.py')
 
 import action, common, const, message
+:: if version >= 2:
+import instruction
+:: #endif
+:: if version >= 3:
+import oxm
+:: #endif
+:: if version >= 4:
+import meter_band
+import bsn_tlv
+:: #endif
 from const import *
 from common import *
 from loxi import ProtocolError

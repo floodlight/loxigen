@@ -1,0 +1,37 @@
+-- binary
+01 0a # version / type
+00 15 # length
+12 34 56 78 # xid
+ab cd ef 01 # buffer_id
+00 09 # total_len
+ff fe # in_port
+01 # reason
+00 # pad
+61 62 63 # data
+-- python
+ofp.message.packet_in(
+    xid=0x12345678,
+    buffer_id=0xabcdef01,
+    total_len=9,
+    in_port=ofp.OFPP_LOCAL,
+    reason=ofp.OFPR_ACTION,
+    data='abc')
+-- c
+obj = of_packet_in_new(OF_VERSION_1_0);
+of_packet_in_buffer_id_set(obj, 0xabcdef01);
+{
+    of_octets_t data = { .bytes=3, .data=(uint8_t *)"\x61\x62\x63" };
+    of_packet_in_data_set(obj, &data);
+}
+of_packet_in_in_port_set(obj, 65534);
+of_packet_in_reason_set(obj, 1);
+of_packet_in_total_len_set(obj, 9);
+of_packet_in_xid_set(obj, 305419896);
+-- java
+builder
+   .setXid(0x12345678)
+   .setBufferId(OFBufferId.of(0xabcdef01))
+   .setTotalLen(9)
+   .setInPort(OFPort.LOCAL)
+   .setReason(OFPacketInReason.ACTION)
+   .setData(new byte[] { 0x61, 0x62, 0x63 } );

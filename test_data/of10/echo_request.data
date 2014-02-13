@@ -1,0 +1,16 @@
+-- binary
+01 02 # version / type
+00 0b # length
+12 34 56 78 # xid
+61 62 01 # data
+-- python
+ofp.message.echo_request(xid=0x12345678, data="ab\x01")
+-- python pretty-printer
+echo_request { xid = 0x12345678, data = 'ab\x01' }
+-- c
+obj = of_echo_request_new(OF_VERSION_1_0);
+of_echo_request_xid_set(obj, 0x12345678);
+{
+    of_octets_t data = { .data=(uint8_t *)"ab\x01", .bytes=3 };
+    of_echo_request_data_set(obj, &data);
+}
