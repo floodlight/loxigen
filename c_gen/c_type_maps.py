@@ -229,7 +229,40 @@ of_%(name)s_to_object_id(int %(name)s, of_version_t version)
     return of_%(name)s_type_to_id[version][%(name)s];
 }
 """
+    table_features_prop_template = """
+/**
+ * %(name)s wire type to object ID array.
+ * Treat as private; use function accessor below
+ */
 
+extern const of_object_id_t *const of_%(name)s_type_to_id[OF_VERSION_ARRAY_MAX];
+
+#define OF_%(u_name)s_ITEM_COUNT %(ar_len)d\n
+
+/**
+ * Map an %(name)s wire value to an OF object
+ * @param %(name)s The %(name)s type wire value
+ * @param version The version associated with the check
+ * @return The %(name)s OF object type
+ * @return OF_OBJECT_INVALID if type does not map to an object
+ *
+ */
+of_object_id_t
+of_%(name)s_to_object_id(int %(name)s, of_version_t version)
+{
+    if (!OF_VERSION_OKAY(version)) {
+        return OF_OBJECT_INVALID;
+    }
+    if (%(name)s == OF_EXPERIMENTER_TYPE) {
+        return OF_%(u_name)s_EXPERIMENTER;
+    }
+    if (%(name)s < 0 || %(name)s >= OF_%(u_name)s_ITEM_COUNT) {
+        return OF_OBJECT_INVALID;
+    }
+
+    return of_%(name)s_type_to_id[version][%(name)s];
+}
+"""
     stats_template = """
 /**
  * %(name)s wire type to object ID array.
