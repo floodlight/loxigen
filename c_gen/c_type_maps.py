@@ -574,7 +574,7 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     # Table feature prop types array gen
     ar_len = type_maps.type_array_len(type_maps.table_feature_prop_types,
                                       max_type_value)
-    out.write(map_with_experimenter_template %
+    out.write(table_features_prop_template  %
               dict(name="table_feature_prop", u_name="TABLE_FEATURE_PROP",
                    ar_len=ar_len))
 
