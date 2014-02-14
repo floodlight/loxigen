@@ -372,19 +372,6 @@ of_queue_prop_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 
 
 /**
- * @fixme to do when we have table_feature_prop extensions
- * See extension_action above
- */
-
-static void
-extension_table_feature_prop_object_id_get(of_object_t *obj, of_object_id_t *id)
-{
-    (void)obj;
-
-    *id = OF_TABLE_FEATURE_PROP_EXPERIMENTER;
-}
-
-/**
  * Table feature property object ID determination
  *
  * @param obj The object being referenced
@@ -397,15 +384,7 @@ of_table_feature_prop_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     int wire_type;
 
     of_tlv16_wire_type_get(obj, &wire_type);
-    if (wire_type == OF_EXPERIMENTER_TYPE) {
-        extension_table_feature_prop_object_id_get(obj, id);
-        return;
-    }
-
-    ASSERT(wire_type >= 0 && wire_type < OF_TABLE_FEATURE_PROP_ITEM_COUNT);
-
-    *id = of_table_feature_prop_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    *id = of_table_feature_prop_to_object_id(wire_type, obj->version);
 }
 
 /**
