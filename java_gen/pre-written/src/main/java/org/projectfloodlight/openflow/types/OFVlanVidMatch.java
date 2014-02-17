@@ -143,7 +143,7 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
     }
 
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -155,7 +155,7 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
                 }
             }
         }
-        return bytesCache;
+        return bytesCache.clone();
     }
 
     public void write2Bytes(ChannelBuffer c) {

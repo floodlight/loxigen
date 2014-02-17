@@ -201,7 +201,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         return new IPv6Address(raw1, raw2);
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -228,7 +228,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
                 }
             }
         }
-        return bytesCache;
+        return bytesCache.clone();
     }
 
     @Override

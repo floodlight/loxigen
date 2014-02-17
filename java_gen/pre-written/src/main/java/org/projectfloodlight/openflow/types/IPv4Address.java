@@ -119,7 +119,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return rawValue;
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -133,7 +133,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
                 }
             }
         }
-        return bytesCache;
+        return bytesCache.clone();
     }
 
     @Override

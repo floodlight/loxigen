@@ -67,7 +67,7 @@ public class VlanVid implements OFValueType<VlanVid> {
         return LENGTH;
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -79,7 +79,7 @@ public class VlanVid implements OFValueType<VlanVid> {
                 }
             }
         }
-        return bytesCache;
+        return bytesCache.clone();
     }
 
     public void write2Bytes(ChannelBuffer c) {

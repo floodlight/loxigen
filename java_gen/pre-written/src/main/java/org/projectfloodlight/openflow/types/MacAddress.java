@@ -79,7 +79,7 @@ public class MacAddress implements OFValueType<MacAddress> {
         return MacAddress.of(raw);
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -95,7 +95,7 @@ public class MacAddress implements OFValueType<MacAddress> {
                 }
             }
         }
-        return bytesCache;
+        return bytesCache.clone();
     }
 
     /**
