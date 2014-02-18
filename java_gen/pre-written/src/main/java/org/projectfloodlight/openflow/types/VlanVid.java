@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -67,7 +69,7 @@ public class VlanVid implements OFValueType<VlanVid> {
         return LENGTH;
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -79,7 +81,7 @@ public class VlanVid implements OFValueType<VlanVid> {
                 }
             }
         }
-        return bytesCache;
+        return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
     public void write2Bytes(ChannelBuffer c) {
