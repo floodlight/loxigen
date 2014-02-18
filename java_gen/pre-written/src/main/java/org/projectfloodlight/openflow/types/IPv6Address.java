@@ -1,9 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -228,7 +230,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
                 }
             }
         }
-        return bytesCache.clone();
+        return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
     @Override

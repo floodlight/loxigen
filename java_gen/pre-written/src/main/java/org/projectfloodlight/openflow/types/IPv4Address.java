@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.google.common.hash.PrimitiveSink;
@@ -133,7 +135,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
                 }
             }
         }
-        return bytesCache.clone();
+        return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
     @Override
