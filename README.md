@@ -31,6 +31,8 @@ Nosetests is only required for running the unit tests, not for running LoxiGen
 itself. We do ask you to install it and use it before submitting pull requests,
 though.
 
+Running the Java unit tests requires Maven 3: `sudo apt-get install maven`.
+
 Usage
 =====
 
