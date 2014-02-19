@@ -41,9 +41,9 @@
     } while (0)
 
 #define TEST_ASSERT(result) if (!(result)) do {                         \
-        fprintf(stderr, "\nTEST ASSERT FAILURE "                        \
+        fprintf(stderr, "\nTEST LOCI_ASSERT FAILURE "                        \
                #result " :: %s:%d\n",__FILE__,__LINE__);                \
-        ASSERT(0);                                                      \
+        LOCI_ASSERT(0);                                                      \
         return TEST_FAIL;                                               \
     } while (0)
 

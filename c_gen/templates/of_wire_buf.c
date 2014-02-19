@@ -131,12 +131,12 @@ of_wire_buffer_replace_data(of_wire_buffer_t *wbuf,
     uint8_t *src_ptr, *dst_ptr;
     int cur_bytes;
 
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     cur_bytes = wbuf->current_bytes;
 
     /* Doesn't make sense; mismatch in current buffer info */
-    ASSERT(old_len + offset <= wbuf->current_bytes);
+    LOCI_ASSERT(old_len + offset <= wbuf->current_bytes);
 
     wbuf->current_bytes += (new_len - old_len); // may decrease size
 
@@ -151,5 +151,5 @@ of_wire_buffer_replace_data(of_wire_buffer_t *wbuf,
     dst_ptr = &wbuf->buf[offset];
     MEMCPY(dst_ptr, data, new_len);
 
-    ASSERT(wbuf->current_bytes == cur_bytes + (new_len - old_len));
+    LOCI_ASSERT(wbuf->current_bytes == cur_bytes + (new_len - old_len));
 }

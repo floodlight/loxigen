@@ -160,7 +160,7 @@ of_object_new_from_message(of_message_t msg, int len)
     }
 
     object_id = of_message_to_object_id(msg, len);
-    ASSERT(object_id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(object_id != OF_OBJECT_INVALID);
 
     if ((obj = of_object_new(-1)) == NULL) {
         return NULL;
@@ -199,9 +199,9 @@ of_object_buffer_bind(of_object_t *obj, uint8_t *buf, int bytes,
     of_wire_object_t *wobj;
     of_wire_buffer_t *wbuf;
 
-    ASSERT(buf != NULL);
-    ASSERT(bytes > 0);
-    // ASSERT(wobj is not bound);
+    LOCI_ASSERT(buf != NULL);
+    LOCI_ASSERT(bytes > 0);
+    // LOCI_ASSERT(wobj is not bound);
 
     wobj = &obj->wire_object;
     MEMSET(wobj, 0, sizeof(*wobj));
@@ -487,7 +487,7 @@ of_list_next(of_object_t *parent, of_object_t *child)
 {
     int offset;
 
-    ASSERT(child->length > 0);
+    LOCI_ASSERT(child->length > 0);
 
     /* Get offset of parent */
     if (of_list_is_last(parent, child)) {
@@ -505,7 +505,7 @@ of_list_next(of_object_t *parent, of_object_t *child)
 void
 of_object_wire_buffer_steal(of_object_t *obj, uint8_t **buffer)
 {
-    ASSERT(obj != NULL);
+    LOCI_ASSERT(obj != NULL);
     of_wire_buffer_steal(obj->wire_object.wbuf, buffer);
     obj->wire_object.wbuf = NULL;
 }
@@ -530,7 +530,7 @@ of_object_parent_length_update(of_object_t *obj, int delta)
 #endif
 
     while (obj != NULL) {
-        ASSERT(count++ < _MAX_PARENT_ITERATIONS);
+        LOCI_ASSERT(count++ < _MAX_PARENT_ITERATIONS);
         obj->length += delta;
         if (obj->wire_length_set != NULL) {
             obj->wire_length_set(obj, obj->length);
@@ -540,10 +540,10 @@ of_object_parent_length_update(of_object_t *obj, int delta)
 #endif
 
         /* Asserts for wire length checking */
-        ASSERT(obj->length + obj->wire_object.obj_offset <=
+        LOCI_ASSERT(obj->length + obj->wire_object.obj_offset <=
                WBUF_CURRENT_BYTES(wbuf));
         if (obj->parent == NULL) {
-            ASSERT(obj->length + obj->wire_object.obj_offset ==
+            LOCI_ASSERT(obj->length + obj->wire_object.obj_offset ==
                    WBUF_CURRENT_BYTES(wbuf));
         }
 
