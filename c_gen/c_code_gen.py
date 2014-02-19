@@ -467,7 +467,7 @@ extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
  * underlying wire buffer's current bytes.
  */
 #define OF_LENGTH_CHECK_ASSERT(obj) \\
-    ASSERT(((obj)->parent != NULL) || \\
+    LOCI_ASSERT(((obj)->parent != NULL) || \\
      ((obj)->wire_object.wbuf == NULL) || \\
      (WBUF_CURRENT_BYTES((obj)->wire_object.wbuf) == (obj)->length))
 
@@ -610,13 +610,13 @@ typedef enum of_error_codes_e {
 extern const char *const of_error_strings[];
 
 #ifndef NDEBUG
-/* #define ASSERT(val) assert(val) */
+/* #define LOCI_ASSERT(val) assert(val) */
 #define FORCE_FAULT *(volatile int *)0 = 1
-#define ASSERT(val) if (!(val)) \\
+#define LOCI_ASSERT(val) if (!(val)) \\
     fprintf(stderr, "\\nASSERT %s. %s:%d\\n", #val, __FILE__, __LINE__), \\
     FORCE_FAULT
 #else
-#define ASSERT(val)
+#define LOCI_ASSERT(val)
 #endif
 
 /*
@@ -1650,13 +1650,13 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
            out.write("    OF_PORT_NO_VALUE_CHECK(*%s, ver);\n" % m_name)
     elif m_type == "of_octets_t":
         out.write("""\
-    ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
+    LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     %(m_name)s->bytes = cur_len;
     %(m_name)s->data = OF_WIRE_BUFFER_INDEX(wbuf, abs_offset);
 """ % dict(m_name=m_name))
     elif m_type == "of_match_t":
         out.write("""
-    ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
+    LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     match_octets.bytes = cur_len;
     match_octets.data = OF_OBJECT_BUFFER_INDEX(obj, offset);
     OF_TRY(of_match_deserialize(ver, %(m_name)s, &match_octets));
@@ -1714,8 +1714,8 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
     if (obj->wire_object.wbuf == %(m_name)s->wire_object.wbuf) {
         of_wire_buffer_grow(wbuf, abs_offset + new_len);
         /* Verify that the offsets are correct */
-        ASSERT(abs_offset == OF_OBJECT_ABSOLUTE_OFFSET(%(m_name)s, 0));
-        /* ASSERT(new_len == cur_len); */ /* fixme: may fail for OXM lists */
+        LOCI_ASSERT(abs_offset == OF_OBJECT_ABSOLUTE_OFFSET(%(m_name)s, 0));
+        /* LOCI_ASSERT(new_len == cur_len); */ /* fixme: may fail for OXM lists */
         return %(ret_success)s;
     }
 
@@ -1831,10 +1831,10 @@ def gen_unified_acc_body(out, cls, m_name, ver_type_map, a_type, m_type):
 """)
 
     out.write("""
-    ASSERT(%(assert_str)s);
+    LOCI_ASSERT(%(assert_str)s);
     ver = obj->version;
     wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     /* By version, determine offset and current length (where needed) */
     switch (ver) {
@@ -1863,14 +1863,14 @@ def gen_unified_acc_body(out, cls, m_name, ver_type_map, a_type, m_type):
     gen_accessor_offsets(out, cls, m_name, next, a_type, m_type, prev_o)
     out.write("""\
     default:
-        ASSERT(0);
+        LOCI_ASSERT(0);
     }
 
     abs_offset = OF_OBJECT_ABSOLUTE_OFFSET(obj, offset);
-    ASSERT(abs_offset >= 0);
+    LOCI_ASSERT(abs_offset >= 0);
 """)
     if not loxi_utils.type_is_scalar(m_type):
-        out.write("    ASSERT(cur_len >= 0 && cur_len < 64 * 1024);\n")
+        out.write("    LOCI_ASSERT(cur_len >= 0 && cur_len < 64 * 1024);\n")
 
     # Now generate the common accessor code
     if a_type in ["get", "bind"]:
@@ -2038,7 +2038,7 @@ void
 """ % cls)
 
     out.write("""
-    ASSERT(of_object_fixed_len[version][%(enum)s] >= 0);
+    LOCI_ASSERT(of_object_fixed_len[version][%(enum)s] >= 0);
     if (clean_wire) {
         MEMSET(obj, 0, sizeof(*obj));
     }
