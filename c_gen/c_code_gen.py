@@ -609,12 +609,19 @@ typedef enum of_error_codes_e {
 
 extern const char *const of_error_strings[];
 
+#ifdef __GNUC__
+#define LOCI_NORETURN_ATTR __attribute__((__noreturn__))
+#else
+#define LOCI_NORETURN_ATTR
+#endif
+
+extern void loci_assert_fail(
+    const char *cond,
+    const char *file,
+    unsigned int line) LOCI_NORETURN_ATTR;
+
 #ifndef NDEBUG
-/* #define LOCI_ASSERT(val) assert(val) */
-#define FORCE_FAULT *(volatile int *)0 = 1
-#define LOCI_ASSERT(val) if (!(val)) \\
-    fprintf(stderr, "\\nASSERT %s. %s:%d\\n", #val, __FILE__, __LINE__), \\
-    FORCE_FAULT
+#define LOCI_ASSERT(val) ((val) ? (void)0 : loci_assert_fail(#val, __FILE__, __LINE__))
 #else
 #define LOCI_ASSERT(val)
 #endif
