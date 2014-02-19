@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
@@ -79,7 +81,7 @@ public class MacAddress implements OFValueType<MacAddress> {
         return MacAddress.of(raw);
     }
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -95,7 +97,7 @@ public class MacAddress implements OFValueType<MacAddress> {
                 }
             }
         }
-        return bytesCache;
+        return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
     /**

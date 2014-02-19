@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.util.Arrays;
+
 import javax.annotation.Nullable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -143,7 +145,7 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
     }
 
 
-    volatile byte[] bytesCache = null;
+    private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
         if (bytesCache == null) {
@@ -155,7 +157,7 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
                 }
             }
         }
-        return bytesCache;
+        return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
     public void write2Bytes(ChannelBuffer c) {
