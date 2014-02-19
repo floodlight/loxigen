@@ -55,8 +55,8 @@ ${legacy_code}
 void
 of_object_message_wire_length_get(of_object_t *obj, int *bytes)
 {
-    ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
-    // ASSERT(obj is message)
+    LOCI_ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
+    // LOCI_ASSERT(obj is message)
     *bytes = of_message_length_get(OF_OBJECT_TO_MESSAGE(obj));
 }
 
@@ -69,8 +69,8 @@ of_object_message_wire_length_get(of_object_t *obj, int *bytes)
 void
 of_object_message_wire_length_set(of_object_t *obj, int bytes)
 {
-    ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
-    // ASSERT(obj is message)
+    LOCI_ASSERT(OF_OBJECT_TO_WBUF(obj) != NULL);
+    // LOCI_ASSERT(obj is message)
     of_message_length_set(OF_OBJECT_TO_MESSAGE(obj), bytes);
 }
 
@@ -97,7 +97,7 @@ of_tlv16_wire_length_get(of_object_t *obj, int *bytes)
 {
     uint16_t val16;
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     of_wire_buffer_u16_get(wbuf, 
            OF_OBJECT_ABSOLUTE_OFFSET(obj, TLV16_WIRE_LENGTH_OFFSET), &val16);
@@ -115,7 +115,7 @@ void
 of_tlv16_wire_length_set(of_object_t *obj, int bytes)
 {
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     of_wire_buffer_u16_set(wbuf, 
         OF_OBJECT_ABSOLUTE_OFFSET(obj, TLV16_WIRE_LENGTH_OFFSET), bytes);
@@ -247,10 +247,10 @@ of_action_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
         return;
     }
 
-    ASSERT(wire_type >= 0 && wire_type < OF_ACTION_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_ACTION_ITEM_COUNT);
 
     *id = of_action_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 /**
@@ -271,10 +271,10 @@ of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
         return;
     }
 
-    ASSERT(wire_type >= 0 && wire_type < OF_ACTION_ID_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_ACTION_ID_ITEM_COUNT);
 
     *id = of_action_id_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 /**
@@ -328,10 +328,10 @@ of_instruction_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
         return;
     }
 
-    ASSERT(wire_type >= 0 && wire_type < OF_INSTRUCTION_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_INSTRUCTION_ITEM_COUNT);
 
     *id = of_instruction_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 
@@ -365,10 +365,10 @@ of_queue_prop_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
         return;
     }
 
-    ASSERT(wire_type >= 0 && wire_type < OF_QUEUE_PROP_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_QUEUE_PROP_ITEM_COUNT);
 
     *id = of_queue_prop_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 
@@ -405,10 +405,10 @@ of_meter_band_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
         return;
     }
 
-    ASSERT(wire_type >= 0 && wire_type < OF_METER_BAND_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_METER_BAND_ITEM_COUNT);
 
     *id = of_meter_band_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 /**
@@ -423,9 +423,9 @@ of_hello_elem_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     int wire_type;
 
     of_tlv16_wire_type_get(obj, &wire_type);
-    ASSERT(wire_type >= 0 && wire_type < OF_HELLO_ELEM_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_HELLO_ELEM_ITEM_COUNT);
     *id = of_hello_elem_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 /**
@@ -440,9 +440,9 @@ of_bsn_tlv_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     int wire_type;
 
     of_tlv16_wire_type_get(obj, &wire_type);
-    ASSERT(wire_type >= 0 && wire_type < OF_BSN_TLV_ITEM_COUNT);
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_BSN_TLV_ITEM_COUNT);
     *id = of_bsn_tlv_type_to_id[obj->version][wire_type];
-    ASSERT(*id != OF_OBJECT_INVALID);
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
 /****************************************************************
@@ -461,14 +461,14 @@ of_bsn_tlv_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
 
 #define _GET_OXM_TYPE_LEN(obj, tl_p, wbuf) do {                         \
         wbuf = OF_OBJECT_TO_WBUF(obj);                                  \
-        ASSERT(wbuf != NULL);                                           \
+        LOCI_ASSERT(wbuf != NULL);                                           \
         of_wire_buffer_u32_get(wbuf,                                    \
             OF_OBJECT_ABSOLUTE_OFFSET(obj, OXM_HDR_OFFSET), (tl_p));    \
     } while (0)
 
 #define _SET_OXM_TYPE_LEN(obj, tl_p, wbuf) do {                         \
         wbuf = OF_OBJECT_TO_WBUF(obj);                                  \
-        ASSERT(wbuf != NULL);                                           \
+        LOCI_ASSERT(wbuf != NULL);                                           \
         of_wire_buffer_u32_set(wbuf,                                    \
             OF_OBJECT_ABSOLUTE_OFFSET(obj, OXM_HDR_OFFSET), (tl_p));    \
     } while (0)
@@ -518,7 +518,7 @@ of_u16_len_wire_length_get(of_object_t *obj, int *bytes)
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
     uint16_t u16;
 
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     of_wire_buffer_u16_get(wbuf, 
            OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_U16_LEN_LENGTH_OFFSET),
@@ -537,9 +537,9 @@ void
 of_u16_len_wire_length_set(of_object_t *obj, int bytes)
 {
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
-    /* ASSERT(obj is u16-len entry) */
+    /* LOCI_ASSERT(obj is u16-len entry) */
 
     of_wire_buffer_u16_set(wbuf, 
            OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_U16_LEN_LENGTH_OFFSET),
@@ -564,9 +564,9 @@ of_packet_queue_wire_length_get(of_object_t *obj, int *bytes)
     uint16_t u16;
     int offset;
 
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
-    /* ASSERT(obj is packet queue obj) */
+    /* LOCI_ASSERT(obj is packet queue obj) */
     offset = OF_PACKET_QUEUE_LENGTH_OFFSET(obj->version);
     of_wire_buffer_u16_get(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, offset),
                            &u16);
@@ -588,9 +588,9 @@ of_packet_queue_wire_length_set(of_object_t *obj, int bytes)
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
     int offset;
 
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
-    /* ASSERT(obj is packet queue obj) */
+    /* LOCI_ASSERT(obj is packet queue obj) */
     offset = OF_PACKET_QUEUE_LENGTH_OFFSET(obj->version);
     of_wire_buffer_u16_set(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, offset),
                                   bytes);
@@ -607,8 +607,8 @@ of_packet_queue_wire_length_set(of_object_t *obj, int bytes)
 void
 of_list_meter_band_stats_wire_length_get(of_object_t *obj, int *bytes)
 {
-    ASSERT(obj->parent != NULL);
-    ASSERT(obj->parent->object_id == OF_METER_STATS);
+    LOCI_ASSERT(obj->parent != NULL);
+    LOCI_ASSERT(obj->parent->object_id == OF_METER_STATS);
 
     /* We're counting on the parent being properly initialized already.
      * The length is stored in a uint16 at offset 4 of the parent.
@@ -631,7 +631,7 @@ of_meter_stats_wire_length_get(of_object_t *obj, int *bytes)
 {
     uint16_t val16;
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
     of_wire_buffer_u16_get(wbuf, 
                OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_METER_STATS_LENGTH_OFFSET),
                &val16);
@@ -642,7 +642,7 @@ void
 of_meter_stats_wire_length_set(of_object_t *obj, int bytes)
 {
     of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
-    ASSERT(wbuf != NULL);
+    LOCI_ASSERT(wbuf != NULL);
 
     of_wire_buffer_u16_set(wbuf, 
         OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_METER_STATS_LENGTH_OFFSET), bytes);

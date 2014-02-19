@@ -35,6 +35,8 @@
  ****************************************************************/
 
 #include <loci/of_utils.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 
 /**
@@ -76,3 +78,9 @@ of_action_list_has_out_port(of_list_action_t *actions, of_port_no_t outport)
     return rv;
 }
 
+void
+loci_assert_fail(const char *msg, const char *file, unsigned int line)
+{
+    fprintf(stderr, "\\nASSERT %s. %s:%d\\n", msg, file, line);
+    abort();
+}
