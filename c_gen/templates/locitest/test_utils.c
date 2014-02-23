@@ -118,10 +118,32 @@ test_has_outport(void)
     return TEST_PASS;
 }
 
+static int
+test_of_object_new_from_message_preallocated(void)
+{
+    /* v1 OFPT_HELLO, xid=0x12345678 */
+    uint8_t buf[] = { 0x01, 0x00, 0x00, 0x08, 0x12, 0x34, 0x56, 0x78 };
+
+    of_object_storage_t storage;
+    of_object_t *obj = of_object_new_from_message_preallocated(
+        &storage, buf, sizeof(buf));
+
+    TEST_ASSERT(obj != NULL);
+    TEST_ASSERT(obj->version = OF_VERSION_1_0);
+    TEST_ASSERT(obj->object_id = OF_HELLO);
+
+    uint32_t xid;
+    of_hello_xid_get(obj, &xid);
+    TEST_ASSERT(xid == 0x12345678);
+
+    return TEST_PASS;
+}
+
 int
 run_utility_tests(void)
 {
     RUN_TEST(has_outport);
+    RUN_TEST(of_object_new_from_message_preallocated);
     RUN_TEST(dump_objs);
 
     return TEST_PASS;

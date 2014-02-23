@@ -180,6 +180,54 @@ of_object_new_from_message(of_message_t msg, int len)
 }
 
 /**
+ * Parse a message without allocating memory
+ *
+ * @param storage Pointer to an uninitialized of_object_storage_t
+ * @param buf Pointer to the buffer
+ * @param length Length of buf
+ * @returns Pointer to an initialized of_object_t
+ *
+ * The lifetime of the returned object is the minimum of the lifetimes of
+ * 'buf' and 'storage'.
+ */
+
+of_object_t *
+of_object_new_from_message_preallocated(of_object_storage_t *storage,
+                                        uint8_t *buf, int len)
+{
+    of_object_t *obj = &storage->obj;
+    of_wire_buffer_t *wbuf = &storage->wbuf;
+    of_message_t msg = buf;
+    of_version_t version;
+    of_object_id_t object_id;
+
+    memset(storage, 0, sizeof(*storage));
+
+    version = of_message_version_get(msg);
+    if (!OF_VERSION_OKAY(version)) {
+        return NULL;
+    }
+
+    if (of_validate_message(msg, len) != 0) {
+        LOCI_LOG_ERROR("message validation failed\n");
+        return NULL;
+    }
+
+    object_id = of_message_to_object_id(msg, len);
+    /* Already validated */
+    LOCI_ASSERT(object_id != OF_OBJECT_INVALID);
+
+    of_object_init_map[object_id](obj, version, len, 0);
+
+    obj->wire_object.wbuf = wbuf;
+    wbuf->buf = msg;
+    wbuf->alloc_bytes = len;
+    wbuf->current_bytes = len;
+
+    return obj;
+}
+
+/**
  * Bind an existing buffer to an LOCI object
  *
  * @param obj Pointer to the object to be updated

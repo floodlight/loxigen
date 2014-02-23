@@ -122,6 +122,11 @@ extern int of_object_append_buffer(of_object_t *dst, of_object_t *src);
 
 extern of_object_t *of_object_new_from_message(of_message_t msg, int len);
 
+typedef struct of_object_storage_s of_object_storage_t;
+
+of_object_t *of_object_new_from_message_preallocated(
+    of_object_storage_t *storage, uint8_t *buf, int len);
+
 /* Delete an OpenFlow object without reference to its type */
 extern void of_object_delete(of_object_t *obj);
 
@@ -167,6 +172,11 @@ struct of_object_s {
      * or inspected by LOCI.
      */
     uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
+};
+
+struct of_object_storage_s {
+    of_object_t obj;
+    of_wire_buffer_t wbuf;
 };
 
 #endif /* _OF_OBJECT_H_ */
