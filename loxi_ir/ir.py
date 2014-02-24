@@ -33,6 +33,8 @@ import sys
 from collections import namedtuple, OrderedDict
 from generic_utils import find, memoize, OrderedSet
 from loxi_ir import ir_offset
+#from loxi_ir.ir import *
+import loxi_ir.ir
 import loxi_front_end.frontend_ir as frontend_ir
 
 logger = logging.getLogger(__name__)
@@ -458,6 +460,10 @@ def build_protocol(version, ofinputs):
 
         members.extend( build_member(c, fe_member, member_lengths[fe_member])
                   for fe_member in fe.members)
+
+        if not 'bsn' in name:
+            for m in c.members:
+                if isinstance(m, OFPadMember): c.members.remove(m)
 
         name_classes[name] = c
         return c
