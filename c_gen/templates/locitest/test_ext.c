@@ -61,9 +61,13 @@ test_ext_objs(void)
     TEST_ASSERT(of_meter_band_to_object_id(OF_EXPERIMENTER_TYPE, OF_VERSION_1_0) ==
                 OF_METER_BAND_EXPERIMENTER);
 
-    TEST_ASSERT(of_table_feature_prop_to_object_id(OF_EXPERIMENTER_TYPE,
+    TEST_ASSERT(of_table_feature_prop_to_object_id(OF_EXPERIMENTER_TYPE-1,
                                                    OF_VERSION_1_3) ==
                 OF_TABLE_FEATURE_PROP_EXPERIMENTER);
+
+    TEST_ASSERT(of_table_feature_prop_to_object_id(OF_EXPERIMENTER_TYPE,
+                                                   OF_VERSION_1_3) ==
+                OF_TABLE_FEATURE_PROP_EXPERIMENTER_MISS);
 
     return TEST_PASS;
 }

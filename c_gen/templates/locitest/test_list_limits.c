@@ -44,19 +44,19 @@ test_list_limits(void)
 
     of_flow_stats_reply_entries_bind(obj, &list);
 
-    ASSERT(element != NULL);
+    LOCI_ASSERT(element != NULL);
 
 
     while (1) {
         int rv = of_list_flow_stats_entry_append(&list, element);
-        ASSERT(rv == OF_ERROR_NONE || rv == OF_ERROR_RESOURCE);
+        LOCI_ASSERT(rv == OF_ERROR_NONE || rv == OF_ERROR_RESOURCE);
         if (rv != OF_ERROR_NONE) {
             break;
         }
         i++;
     }
 
-    ASSERT(i == 744);
+    LOCI_ASSERT(i == 744);
 
     of_flow_stats_entry_delete(element);
     of_flow_stats_reply_delete(obj);
@@ -77,14 +77,14 @@ test_list_limits_bind(void)
         int rv; 
         of_flow_stats_entry_init(&element, OF_VERSION_1_0, -1, 1);
         rv = of_list_flow_stats_entry_append_bind(&list, &element);
-        ASSERT(rv == OF_ERROR_NONE || rv == OF_ERROR_RESOURCE);
+        LOCI_ASSERT(rv == OF_ERROR_NONE || rv == OF_ERROR_RESOURCE);
         if (rv != OF_ERROR_NONE) {
             break;
         }
         i++;
     }
 
-    ASSERT(i == 744);
+    LOCI_ASSERT(i == 744);
 
     of_flow_stats_reply_delete(obj);
     return TEST_PASS;
