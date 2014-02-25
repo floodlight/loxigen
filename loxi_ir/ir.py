@@ -441,15 +441,22 @@ def build_protocol(version, ofinputs):
             superclass_name = None
             superclass = None
 
+        ofc_members = []
+        for m in orig_fe.members:
+            if not isinstance(m, frontend_ir.OFDataMember) and not isinstance(m, frontend_ir.OFPadMember):
+                ofc_members.append(m)
+
         fe = frontend_ir.OFClass(
             name=name,
             superclass=superclass_name,
-            members=[m for m in orig_fe.members if not isinstance(m, frontend_ir.OFDataMember)],
+            members=ofc_members,
             virtual=orig_fe.virtual,
             params={})
 
+        print fe.members
         base_length, is_fixed_length, member_lengths = \
            ir_offset.calc_lengths(version, fe, name_classes, name_enums)
+        print fe.virtual, is_fixed_length
         assert fe.virtual or is_fixed_length
 
         members = []
@@ -459,10 +466,6 @@ def build_protocol(version, ofinputs):
 
         members.extend( build_member(c, fe_member, member_lengths[fe_member])
                   for fe_member in fe.members)
-
-        if not 'bsn' in name:
-            for m in c.members:
-                if isinstance(m, OFPadMember): c.members.remove(m)
 
         name_classes[name] = c
         return c
