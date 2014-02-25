@@ -758,7 +758,6 @@ struct of_match_v3(align=8, length_includes_align=False) {
 struct of_action_id {
     uint16_t type;
     uint16_t len;
-    pad(4);
 };
 
 struct of_action_output : of_action {
