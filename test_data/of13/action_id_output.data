@@ -5,3 +5,5 @@
 ofp.action_id.output()
 -- c
 obj = of_action_id_output_new(OF_VERSION_1_3);
+-- java
+builder
