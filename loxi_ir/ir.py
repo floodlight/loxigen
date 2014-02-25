@@ -33,7 +33,6 @@ import sys
 from collections import namedtuple, OrderedDict
 from generic_utils import find, memoize, OrderedSet
 from loxi_ir import ir_offset
-import loxi_ir.ir
 import loxi_front_end.frontend_ir as frontend_ir
 
 logger = logging.getLogger(__name__)
@@ -453,10 +452,8 @@ def build_protocol(version, ofinputs):
             virtual=orig_fe.virtual,
             params={})
 
-        print fe.members
         base_length, is_fixed_length, member_lengths = \
            ir_offset.calc_lengths(version, fe, name_classes, name_enums)
-        print fe.virtual, is_fixed_length
         assert fe.virtual or is_fixed_length
 
         members = []
