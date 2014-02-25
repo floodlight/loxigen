@@ -35,6 +35,7 @@ from collections import namedtuple
 from itertools import groupby
 from StringIO import StringIO
 import template_utils
+from generic_utils import chunks
 import loxi_globals
 import loxi_ir.ir as ir
 import util
@@ -42,6 +43,8 @@ import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 import c_gen.c_type_maps as c_type_maps
+
+CLASS_CHUNK_SIZE = 32
 
 PushWireTypesData = namedtuple('PushWireTypesData',
     ['class_name', 'versioned_type_members'])
@@ -75,14 +78,18 @@ def push_wire_types_data(uclass):
         class_name=uclass.name,
         versioned_type_members=versioned_type_members)
 
+# Output multiple LOCI classes into each C file. This reduces the overhead of
+# parsing header files, which takes longer than compiling the actual code
+# for many classes. It also reduces the compiled code size.
 def generate_classes(install_dir):
-    for uclass in loxi_globals.unified.classes:
-        with template_utils.open_output(install_dir, "loci/src/%s.c" % uclass.name) as out:
-            util.render_template(out, "class.c",
-                push_wire_types_data=push_wire_types_data(uclass))
-            # Append legacy generated code
-            c_code_gen.gen_new_function_definitions(out, uclass.name)
-            c_code_gen.gen_accessor_definitions(out, uclass.name)
+    for i, chunk in enumerate(chunks(loxi_globals.unified.classes, CLASS_CHUNK_SIZE)):
+        with template_utils.open_output(install_dir, "loci/src/class%02d.c" % i) as out:
+            for uclass in chunk:
+                util.render_template(out, "class.c",
+                    push_wire_types_data=push_wire_types_data(uclass))
+                # Append legacy generated code
+                c_code_gen.gen_new_function_definitions(out, uclass.name)
+                c_code_gen.gen_accessor_definitions(out, uclass.name)
 
 # TODO remove header classes and use the corresponding class instead
 def generate_header_classes(install_dir):
