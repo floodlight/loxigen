@@ -33,7 +33,6 @@ import sys
 from collections import namedtuple, OrderedDict
 from generic_utils import find, memoize, OrderedSet
 from loxi_ir import ir_offset
-#from loxi_ir.ir import *
 import loxi_ir.ir
 import loxi_front_end.frontend_ir as frontend_ir
 
