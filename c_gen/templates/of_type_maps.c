@@ -303,6 +303,8 @@ extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
         case 1: *id = OF_INSTRUCTION_BSN_ARP_OFFLOAD; break;
         case 2: *id = OF_INSTRUCTION_BSN_DHCP_OFFLOAD; break;
         case 3: *id = OF_INSTRUCTION_BSN_DISABLE_SPLIT_HORIZON_CHECK; break;
+        case 4: *id = OF_INSTRUCTION_BSN_PERMIT; break;
+        case 5: *id = OF_INSTRUCTION_BSN_DENY; break;
         }
         break;
     }
