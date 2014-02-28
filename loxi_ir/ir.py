@@ -440,10 +440,15 @@ def build_protocol(version, ofinputs):
             superclass_name = None
             superclass = None
 
+        ofc_members = []
+        for m in orig_fe.members:
+            if not isinstance(m, frontend_ir.OFDataMember) and not isinstance(m, frontend_ir.OFPadMember):
+                ofc_members.append(m)
+
         fe = frontend_ir.OFClass(
             name=name,
             superclass=superclass_name,
-            members=[m for m in orig_fe.members if not isinstance(m, frontend_ir.OFDataMember)],
+            members=ofc_members,
             virtual=orig_fe.virtual,
             params={})
 
