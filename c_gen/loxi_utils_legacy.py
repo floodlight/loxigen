@@ -196,6 +196,25 @@ def class_is_instruction(cls):
 
     return False
 
+def class_is_instruction_id(cls):
+    """
+    Return True if cls_name is an action object
+
+    Note that instruction_id is not an instruction object, though it has
+    the same header.  It looks like an instruction header, but the type
+    is used to identify a kind of instruction, it does not indicate the
+    type of the object following.
+    """
+    if cls.find("of_instruction_id") == 0:
+        return True
+
+    # For each vendor, check for vendor specific action
+    for exp in of_g.experimenter_name_to_id:
+        if cls.find("of_instruction_id_" + exp) == 0:
+            return True
+
+    return False
+
 def class_is_meter_band(cls):
     """
     Return True if cls_name is an instruction object

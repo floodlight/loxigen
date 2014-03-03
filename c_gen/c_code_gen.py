@@ -2372,6 +2372,10 @@ def gen_coerce_ops(out, cls):
                 out.write("""
     obj->wire_type_get = of_instruction_wire_object_id_get;
 """)
+            if loxi_utils.class_is_instruction_id(cls):
+                out.write("""
+    obj->wire_type_get = of_instruction_id_wire_object_id_get;
+""")
             if loxi_utils.class_is_queue_prop(cls):
                     out.write("""
     obj->wire_type_get = of_queue_prop_wire_object_id_get;

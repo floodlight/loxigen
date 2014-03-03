@@ -105,6 +105,7 @@ def generate_classes_header(install_dir):
     c_code_gen.gen_generics(tmp)
 
     with template_utils.open_output(install_dir, "loci/inc/loci/loci_classes.h") as out:
+        print tmp.getvalue()
         util.render_template(out, "loci_classes.h",
             legacy_code=tmp.getvalue())
 
