@@ -191,7 +191,7 @@ def class_is_instruction(cls):
 
     # For each vendor, check for vendor specific action
     for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_instruction_" + exp) == 0:
+        if cls.find("of_instruction" + exp) == 0:
             return True
 
     return False
