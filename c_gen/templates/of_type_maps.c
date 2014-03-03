@@ -319,7 +319,7 @@ extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
  * See extension_action above
  */
 
-static void
+static int
 extension_instruction_id_object_id_get(of_object_t *obj, of_object_id_t *id)
 {
     uint32_t exp_id;
@@ -347,7 +347,7 @@ extension_instruction_id_object_id_get(of_object_t *obj, of_object_id_t *id)
     }
     }
 
-    //return OF_ERROR_NONE;
+    return OF_ERROR_NONE;
 }
 
 /**
