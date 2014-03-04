@@ -584,6 +584,20 @@ extension_instruction_subtype = {
 }
 
 # Set to empty dict if no extension instructions defined
+extension_instruction_id_subtype = {
+    # version 1.0
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(
+        bsn = {   # of_instruction_bsn_
+            },
+        nicira = {   # of_instruction_nicira_
+            }
+        ),
+}
+
+# Set to empty dict if no extension instructions defined
 extension_queue_prop_subtype = {}
 
 # Set to empty dict if no extension instructions defined
@@ -594,6 +608,7 @@ extension_objects = [
     extension_action_subtype,
     extension_action_id_subtype,
     extension_instruction_subtype,
+    extension_instruction_id_subtype,
     extension_queue_prop_subtype,
     extension_table_feature_prop_subtype
 ]
@@ -766,6 +781,17 @@ def instruction_is_extension(cls, version):
     This is brute force, searching records for a match
     """
     return cls_is_ext_obj(cls, version, extension_instruction_subtype)
+
+################################################################
+# These are extension instruction specific
+################################################################
+
+def instruction_id_is_extension(cls, version):
+    """
+    Return True if cls, version is recognized as an instruction ID extension
+    This is brute force, searching records for a match
+    """
+    return cls_is_ext_obj(cls, version, extension_instruction_id_subtype)
 
 ################################################################
 # These are extension queue_prop specific

@@ -47,6 +47,11 @@ def gen_type_to_object_id(out, type_str, prefix, template,
     For each version, create an array mapping the type info to the
     object ID.  Then define an array containing those pointers.
     """
+    if type_str == "instruction_id_type_to_id" or \
+    type_str == "instruction_type_to_id":
+        print prefix
+        print value_array
+
 
     # Create unified arrays and get length
     arr_len = type_maps.type_array_len(value_array, max_val)
@@ -118,7 +123,7 @@ def gen_type_maps(out):
     gen_type_to_object_id(out, "instruction_type_to_id", "OF_INSTRUCTION",
                           "OF_INSTRUCTION_%s", type_maps.instruction_types,
                           max_type_value)
-    gen_type_to_object_id(out, "instruction_id_type_to_id", "OF_INSTRUCTION",
+    gen_type_to_object_id(out, "instruction_id_type_to_id", "OF_INSTRUCTION_ID",
                           "OF_INSTRUCTION_ID_%s", type_maps.instruction_id_types,
                           max_type_value)
     gen_type_to_object_id(out, "queue_prop_type_to_id", "OF_QUEUE_PROP",
