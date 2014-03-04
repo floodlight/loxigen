@@ -47,11 +47,6 @@ def gen_type_to_object_id(out, type_str, prefix, template,
     For each version, create an array mapping the type info to the
     object ID.  Then define an array containing those pointers.
     """
-    if type_str == "instruction_id_type_to_id" or \
-    type_str == "instruction_type_to_id":
-        print prefix
-        print value_array
-
 
     # Create unified arrays and get length
     arr_len = type_maps.type_array_len(value_array, max_val)
