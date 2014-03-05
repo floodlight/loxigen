@@ -52,7 +52,7 @@
 ::     #endif
 :: #endfor
 :: if 'table_feature_prop' in ofclass.name:
-        orig_reader.skip( ((_length+7)/8) * 8 - _length)
+        orig_reader.skip_align()
 :: #endif
 :: if ofclass.has_external_alignment:
         orig_reader.skip_align()
