@@ -703,7 +703,6 @@ extern void of_object_message_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_object_message_wire_length_set(of_object_t *obj, int bytes);
 
 extern void of_oxm_wire_length_get(of_object_t *obj, int *bytes);
-extern void of_oxm_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
 
 extern void of_tlv16_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_tlv16_wire_length_set(of_object_t *obj, int bytes);
@@ -711,21 +710,6 @@ extern void of_tlv16_wire_length_set(of_object_t *obj, int bytes);
 /* Wire length is uint16 at front of structure */
 extern void of_u16_len_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_u16_len_wire_length_set(of_object_t *obj, int bytes);
-
-extern void of_action_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
-extern void of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
-extern void of_instruction_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
-extern void of_queue_prop_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
-extern void of_table_feature_prop_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
-extern void of_meter_band_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
-extern void of_hello_elem_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
-extern void of_bsn_tlv_wire_object_id_get(of_object_t *obj,
-    of_object_id_t *id);
 
 #define OF_OXM_LENGTH_GET(hdr) (((hdr) & 0xff) + 4)
 #define OF_OXM_LENGTH_SET(hdr, val)                         \\
