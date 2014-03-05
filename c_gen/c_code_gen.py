@@ -437,6 +437,7 @@ int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t sub
 of_object_id_t of_action_to_object_id(int action, of_version_t version);
 of_object_id_t of_action_id_to_object_id(int action_id, of_version_t version);
 of_object_id_t of_instruction_to_object_id(int instruction, of_version_t version);
+of_object_id_t of_instruction_id_to_object_id(int instruction, of_version_t version);
 of_object_id_t of_queue_prop_to_object_id(int queue_prop, of_version_t version);
 of_object_id_t of_table_feature_prop_to_object_id(int table_feature_prop, of_version_t version);
 of_object_id_t of_meter_band_to_object_id(int meter_band, of_version_t version);
@@ -2370,6 +2371,10 @@ def gen_coerce_ops(out, cls):
             if loxi_utils.class_is_instruction(cls):
                 out.write("""
     obj->wire_type_get = of_instruction_wire_object_id_get;
+""")
+            if loxi_utils.class_is_instruction_id(cls):
+                out.write("""
+    obj->wire_type_get = of_instruction_id_wire_object_id_get;
 """)
             if loxi_utils.class_is_queue_prop(cls):
                     out.write("""

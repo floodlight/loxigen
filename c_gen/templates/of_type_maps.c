@@ -313,6 +313,43 @@ extension_instruction_object_id_get(of_object_t *obj, of_object_id_t *id)
     return OF_ERROR_NONE;
 }
 
+
+/**
+ * @fixme to do when we have instruction extensions
+ * See extension_action above
+ */
+
+static int
+extension_instruction_id_object_id_get(of_object_t *obj, of_object_id_t *id)
+{
+    uint32_t exp_id;
+    uint8_t *buf;
+
+    *id = OF_INSTRUCTION_ID_EXPERIMENTER;
+
+    buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+
+    buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET, &exp_id);
+
+    switch (exp_id) {
+    case OF_EXPERIMENTER_ID_BSN: {
+        uint32_t subtype;
+        buf_u32_get(buf + OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET, &subtype);
+        switch (subtype) {
+        case 0: *id = OF_INSTRUCTION_ID_BSN_DISABLE_SRC_MAC_CHECK; break;
+        case 1: *id = OF_INSTRUCTION_ID_BSN_ARP_OFFLOAD; break;
+        case 2: *id = OF_INSTRUCTION_ID_BSN_DHCP_OFFLOAD; break;
+        case 3: *id = OF_INSTRUCTION_ID_BSN_DISABLE_SPLIT_HORIZON_CHECK; break;
+        case 4: *id = OF_INSTRUCTION_ID_BSN_PERMIT; break;
+        case 5: *id = OF_INSTRUCTION_ID_BSN_DENY; break;
+        }
+        break;
+    }
+    }
+
+    return OF_ERROR_NONE;
+}
+
 /**
  * Get the object ID based on the wire buffer for an instruction object
  * @param obj The object being referenced
@@ -336,6 +373,29 @@ of_instruction_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
     LOCI_ASSERT(*id != OF_OBJECT_INVALID);
 }
 
+/**
+ * Get the object ID based on the wire buffer for an instruction ID object
+ * @param obj The object being referenced
+ * @param id Where to store the object ID
+ */
+
+
+void
+of_instruction_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
+{
+    int wire_type;
+
+    of_tlv16_wire_type_get(obj, &wire_type);
+    if (wire_type == OF_EXPERIMENTER_TYPE) {
+        extension_instruction_id_object_id_get(obj, id);
+        return;
+    }
+
+    LOCI_ASSERT(wire_type >= 0 && wire_type < OF_INSTRUCTION_ID_ITEM_COUNT);
+
+    *id = of_instruction_id_type_to_id[obj->version][wire_type];
+    LOCI_ASSERT(*id != OF_OBJECT_INVALID);
+}
 
 /**
  * @fixme to do when we have queue_prop extensions

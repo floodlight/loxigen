@@ -68,6 +68,8 @@ import c_gen.loxi_utils_legacy as loxi_utils
 import c_gen.identifiers as identifiers
 import util
 import test_data
+import loxi_globals
+from loxi_ir import *
 
 def var_name_map(m_type):
     """
@@ -124,40 +126,14 @@ def ignore_member(cls, version, m_name, m_type):
     or those that should not be messed with
     or whose types we're not ready to deal with yet.
     """
-    # This will probably need more granularity as more extensions are added
-    if (type_maps.class_is_extension(cls, version) and (
-            m_name == "experimenter" or
-            m_name == "subtype")):
+
+    uclass = loxi_globals.unified.class_by_name(cls)
+    if not uclass:
         return True
 
-    classes = ["of_bsn_lacp_stats_request",
-               "of_bsn_lacp_stats_reply",
-               "of_bsn_switch_pipeline_stats_request",
-               "of_bsn_switch_pipeline_stats_reply",
-               "of_bsn_port_counter_stats_request",
-               "of_bsn_port_counter_stats_reply",
-               "of_bsn_vlan_counter_stats_request",
-               "of_bsn_vlan_counter_stats_reply",
-               "of_bsn_gentable_entry_desc_stats_request",
-               "of_bsn_gentable_entry_desc_stats_reply",
-               "of_bsn_gentable_entry_stats_request",
-               "of_bsn_gentable_entry_stats_reply",
-               "of_bsn_gentable_desc_stats_request",
-               "of_bsn_gentable_desc_stats_reply",
-               "of_bsn_gentable_stats_request",
-               "of_bsn_gentable_stats_reply",
-               "of_bsn_gentable_bucket_stats_request",
-               "of_bsn_gentable_bucket_stats_reply",
-               "of_bsn_flow_checksum_bucket_stats_request",
-               "of_bsn_flow_checksum_bucket_stats_reply",
-               "of_bsn_table_checksum_stats_request",
-               "of_bsn_table_checksum_stats_reply",
-            ]
-
-    if (cls in classes and (
-            m_name == "experimenter" or
-            m_name == "subtype")):
+    if not isinstance(uclass.member_by_name(m_name), OFDataMember):
         return True
+
     return loxi_utils.skip_member_name(m_name) or m_type not in scalar_types
 
 def gen_fill_string(out):

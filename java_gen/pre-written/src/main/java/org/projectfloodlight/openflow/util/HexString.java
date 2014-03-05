@@ -17,8 +17,6 @@
 
 package org.projectfloodlight.openflow.util;
 
-import java.math.BigInteger;
-
 import org.projectfloodlight.openflow.types.U8;
 
 public class HexString {
@@ -86,13 +84,17 @@ public class HexString {
         return ret;
     }
 
-    public static long toLong(final String values) throws NumberFormatException {
-        // Long.parseLong() can't handle HexStrings with MSB set. Sigh.
-        BigInteger bi = new BigInteger(values.replaceAll(":", ""), 16);
-        if (bi.bitLength() > 64)
-            throw new NumberFormatException("Input string too big to fit in long: "
-                    + values);
-        return bi.longValue();
+    public static long toLong(String value) throws NumberFormatException {
+        String[] octets = value.split(":");
+        if (octets.length > 8)
+            throw new NumberFormatException("Input string is too big to fit in long: " + value);
+        long l = 0;
+        for (String octet: octets) {
+            if (octet.length() > 2)
+                throw new NumberFormatException("Each colon-separated byte component must consist of 1 or 2 hex digits: " + value);
+            short s = Short.parseShort(octet, 16);
+            l = (l << 8) + s;
+        }
+        return l;
     }
-
 }
