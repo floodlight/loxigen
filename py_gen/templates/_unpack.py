@@ -51,6 +51,9 @@
         obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
 ::     #endif
 :: #endfor
+:: if 'table_feature_prop' in ofclass.name:
+        orig_reader.skip( ((_length+7)/8) * 8 - _length)
+:: #endif
 :: if ofclass.has_external_alignment:
         orig_reader.skip_align()
 :: #endif
