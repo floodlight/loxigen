@@ -1,0 +1,21 @@
+-- binary
+00 00 # type
+00 0c # length
+00 04 00 04 00 05 00 04 # instruction_ids
+00 00 00 00 # padding
+-- python
+ofp.table_feature_prop_instructions(instruction_ids=[ofp.instruction_id.apply_actions(),ofp.instruction_id.clear_actions()])
+-- c
+of_instruction_id_apply_actions_t* apply_act;
+of_instruction_id_clear_actions_t* clear_act;
+apply_act = of_instruction_id_apply_actions_new(OF_VERSION_1_3);
+clear_act = of_instruction_id_clear_actions_new(OF_VERSION_1_3);
+
+of_list_instruction_id_t* inst_list;
+inst_list = of_list_instruction_id_new(OF_VERSION_1_3);
+of_list_instruction_id_append(inst_list, (of_instruction_id_t*)apply_act);
+of_list_instruction_id_append(inst_list, (of_instruction_id_t*)clear_act);
+
+obj = of_table_feature_prop_instructions_new(OF_VERSION_1_3);
+of_table_feature_prop_instructions_instruction_ids_set(obj, inst_list);
+-- java
