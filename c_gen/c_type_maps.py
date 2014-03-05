@@ -118,6 +118,9 @@ def gen_type_maps(out):
     gen_type_to_object_id(out, "instruction_type_to_id", "OF_INSTRUCTION",
                           "OF_INSTRUCTION_%s", type_maps.instruction_types,
                           max_type_value)
+    gen_type_to_object_id(out, "instruction_id_type_to_id", "OF_INSTRUCTION_ID",
+                          "OF_INSTRUCTION_ID_%s", type_maps.instruction_id_types,
+                          max_type_value)
     gen_type_to_object_id(out, "queue_prop_type_to_id", "OF_QUEUE_PROP",
                           "OF_QUEUE_PROP_%s", type_maps.queue_prop_types,
                           max_type_value)
@@ -565,6 +568,11 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
     out.write(map_with_experimenter_template %
               dict(name="instruction", u_name="INSTRUCTION", ar_len=ar_len))
 
+    # Instruction ID types array gen
+    ar_len = type_maps.type_array_len(type_maps.instruction_id_types, max_type_value)
+    out.write(map_with_experimenter_template %
+              dict(name="instruction_id", u_name="INSTRUCTION_ID", ar_len=ar_len))
+
     # Queue prop types array gen
     ar_len = type_maps.type_array_len(type_maps.queue_prop_types,
                                       max_type_value)
@@ -715,6 +723,8 @@ extern void of_u16_len_wire_length_set(of_object_t *obj, int bytes);
 extern void of_action_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
 extern void of_action_id_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
 extern void of_instruction_wire_object_id_get(of_object_t *obj,
+    of_object_id_t *id);
+extern void of_instruction_id_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
 extern void of_queue_prop_wire_object_id_get(of_object_t *obj,
     of_object_id_t *id);
