@@ -1,0 +1,8 @@
+-- binary
+00 01 # type
+00 04 # length
+-- python
+ofp.instruction_id.goto_table()
+-- c
+obj = of_instruction_id_goto_table_new(OF_VERSION_1_3);
+-- java

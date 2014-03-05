@@ -437,6 +437,7 @@ int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t sub
 of_object_id_t of_action_to_object_id(int action, of_version_t version);
 of_object_id_t of_action_id_to_object_id(int action_id, of_version_t version);
 of_object_id_t of_instruction_to_object_id(int instruction, of_version_t version);
+of_object_id_t of_instruction_id_to_object_id(int instruction, of_version_t version);
 of_object_id_t of_queue_prop_to_object_id(int queue_prop, of_version_t version);
 of_object_id_t of_table_feature_prop_to_object_id(int table_feature_prop, of_version_t version);
 of_object_id_t of_meter_band_to_object_id(int meter_band, of_version_t version);
@@ -738,7 +739,7 @@ typedef uint64_t of_match_bmap_t;
 
 #define OF_MATCH_BYTES(length) (((length) + 7) & 0xfff8)
 
-#if __BYTE_ORDER == __BIG_ENDIAN
+#if __BYTE_ORDER == __ORDER_BIG_ENDIAN
 #define U16_NTOH(val) (val)
 #define U32_NTOH(val) (val)
 #define U64_NTOH(val) (val)
@@ -748,7 +749,7 @@ typedef uint64_t of_match_bmap_t;
 #define U64_HTON(val) (val)
 #define IPV6_HTON(dst, src) /* NOTE different syntax; currently no-op */
 #else /* Little Endian */
-#define U16_NTOH(val) (((val) >> 8) | ((val) << 8))
+#define U16_NTOH(val) (((val) >> 8) | (((val) & 0xff) << 8))
 #define U32_NTOH(val) ((((val) & 0xff000000) >> 24) |                   \\
                        (((val) & 0x00ff0000) >>  8) |                   \\
                        (((val) & 0x0000ff00) <<  8) |                   \\
@@ -2370,6 +2371,10 @@ def gen_coerce_ops(out, cls):
             if loxi_utils.class_is_instruction(cls):
                 out.write("""
     obj->wire_type_get = of_instruction_wire_object_id_get;
+""")
+            if loxi_utils.class_is_instruction_id(cls):
+                out.write("""
+    obj->wire_type_get = of_instruction_id_wire_object_id_get;
 """)
             if loxi_utils.class_is_queue_prop(cls):
                     out.write("""

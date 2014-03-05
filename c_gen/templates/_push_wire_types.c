@@ -38,11 +38,11 @@ ${data.class_name}_push_wire_types(of_object_t *obj)
 :: if m.length == 1:
         *(uint8_t *)(buf + ${m.offset}) = ${m.value}; /* ${m.name} */
 :: elif m.length == 2:
-        *(uint16_t *)(buf + ${m.offset}) = htobe16(${m.value}); /* ${m.name} */
+        *(uint16_t *)(buf + ${m.offset}) = U16_HTON(${m.value}); /* ${m.name} */
 :: elif m.length == 4:
-        *(uint32_t *)(buf + ${m.offset}) = htobe32(${m.value}); /* ${m.name} */
+        *(uint32_t *)(buf + ${m.offset}) = U32_HTON(${m.value}); /* ${m.name} */
 :: elif m.length == 8:
-        *(uint64_t *)(buf + ${m.offset}) = htobe64(${m.value}); /* ${m.name} */
+        *(uint64_t *)(buf + ${m.offset}) = U64_HTON(${m.value}); /* ${m.name} */
 :: else:
 :: raise("unsupported push_wire_types length %d" % m.length)
 :: #endif
