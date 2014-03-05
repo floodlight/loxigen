@@ -741,7 +741,7 @@ typedef uint64_t of_match_bmap_t;
 #define U64_HTON(val) (val)
 #define IPV6_HTON(dst, src) /* NOTE different syntax; currently no-op */
 #else /* Little Endian */
-#define U16_NTOH(val) (((val) >> 8) | ((val) << 8))
+#define U16_NTOH(val) (((val) >> 8) | (((val) & 0xff) << 8))
 #define U32_NTOH(val) ((((val) & 0xff000000) >> 24) |                   \\
                        (((val) & 0x00ff0000) >>  8) |                   \\
                        (((val) & 0x0000ff00) <<  8) |                   \\
