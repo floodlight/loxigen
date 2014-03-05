@@ -722,7 +722,6 @@ extern void of_list_meter_band_stats_wire_length_get(of_object_t *obj,
                                                     int *bytes);
 extern void of_meter_stats_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_meter_stats_wire_length_set(of_object_t *obj, int bytes);
-extern int of_extension_object_wire_push(of_object_t *obj);
 
 """)
 

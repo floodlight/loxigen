@@ -309,65 +309,6 @@ of_meter_stats_wire_length_set(of_object_t *obj, int bytes)
         OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_METER_STATS_LENGTH_OFFSET), bytes);
 }
 
-/*
- * Non-message extension push wire values
- */
-
-int
-of_extension_object_wire_push(of_object_t *obj)
-{
-    of_action_bsn_mirror_t *action_mirror;
-    of_action_id_bsn_mirror_t *action_id_mirror;
-    of_action_bsn_set_tunnel_dst_t *action_set_tunnel_dst;
-    of_action_id_bsn_set_tunnel_dst_t *action_id_set_tunnel_dst;
-    of_action_nicira_dec_ttl_t *action_nicira_dec_ttl;
-    of_action_id_nicira_dec_ttl_t *action_id_nicira_dec_ttl;
-
-    /* Push exp type, subtype */
-    switch (obj->object_id) {
-    case OF_ACTION_BSN_MIRROR:
-        action_mirror = (of_action_bsn_mirror_t *)obj;
-        of_action_bsn_mirror_experimenter_set(action_mirror,
-            OF_EXPERIMENTER_ID_BSN);
-        of_action_bsn_mirror_subtype_set(action_mirror, 1);
-        break;
-    case OF_ACTION_ID_BSN_MIRROR:
-        action_id_mirror = (of_action_id_bsn_mirror_t *)obj;
-        of_action_id_bsn_mirror_experimenter_set(action_id_mirror,
-            OF_EXPERIMENTER_ID_BSN);
-        of_action_id_bsn_mirror_subtype_set(action_id_mirror, 1);
-        break;
-    case OF_ACTION_BSN_SET_TUNNEL_DST:
-        action_set_tunnel_dst = (of_action_bsn_set_tunnel_dst_t *)obj;
-        of_action_bsn_set_tunnel_dst_experimenter_set(action_set_tunnel_dst,
-            OF_EXPERIMENTER_ID_BSN);
-        of_action_bsn_set_tunnel_dst_subtype_set(action_set_tunnel_dst, 2);
-        break;
-    case OF_ACTION_ID_BSN_SET_TUNNEL_DST:
-        action_id_set_tunnel_dst = (of_action_id_bsn_set_tunnel_dst_t *)obj;
-        of_action_id_bsn_set_tunnel_dst_experimenter_set(action_id_set_tunnel_dst,
-            OF_EXPERIMENTER_ID_BSN);
-        of_action_id_bsn_set_tunnel_dst_subtype_set(action_id_set_tunnel_dst, 2);
-        break;
-    case OF_ACTION_NICIRA_DEC_TTL:
-        action_nicira_dec_ttl = (of_action_nicira_dec_ttl_t *)obj;
-        of_action_nicira_dec_ttl_experimenter_set(action_nicira_dec_ttl,
-            OF_EXPERIMENTER_ID_NICIRA);
-        of_action_nicira_dec_ttl_subtype_set(action_nicira_dec_ttl, 18);
-        break;
-    case OF_ACTION_ID_NICIRA_DEC_TTL:
-        action_id_nicira_dec_ttl = (of_action_id_nicira_dec_ttl_t *)obj;
-        of_action_id_nicira_dec_ttl_experimenter_set(action_id_nicira_dec_ttl,
-            OF_EXPERIMENTER_ID_NICIRA);
-        of_action_id_nicira_dec_ttl_subtype_set(action_id_nicira_dec_ttl, 18);
-        break;
-    default:
-        break;
-    }
-
-    return OF_ERROR_NONE;
-}
-
 int
 of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
 {
