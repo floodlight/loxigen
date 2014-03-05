@@ -1606,7 +1606,7 @@ struct of_experimenter_stats_reply : of_stats_reply {
 
 // FIXME: These are padded to 8 byte align beyond the length indicated
 
-struct of_table_feature_prop {
+struct of_table_feature_prop(align=8, length_includes_align=False) {
     uint16_t         type == ?;
     uint16_t         length;
 };
