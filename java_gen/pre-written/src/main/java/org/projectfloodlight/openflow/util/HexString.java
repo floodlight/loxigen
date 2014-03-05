@@ -92,7 +92,7 @@ public class HexString {
         for (String octet: octets) {
             if (octet.length() > 2)
                 throw new NumberFormatException("Each colon-separated byte component must consist of 1 or 2 hex digits: " + value);
-            short s = Short.valueOf(octet, 16);
+            short s = Short.parseShort(octet, 16);
             l = (l << 8) + s;
         }
         return l;
