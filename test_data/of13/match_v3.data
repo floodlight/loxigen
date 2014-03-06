@@ -23,6 +23,37 @@ ofp.match([
     ofp.oxm.udp_dst(53),
     ofp.oxm.ipv6_dst("\x12" * 16),
 ])
+-- c
+of_oxm_metadata_masked_t* oxm1 = of_oxm_metadata_masked_new(OF_VERSION_1_3);
+uint64_t m1 = 0xfedcba9812141210;
+uint64_t m2 = 0xffffffff12345678;
+of_oxm_metadata_masked_value_set(oxm1, m1);
+of_oxm_metadata_masked_value_mask_set(oxm1, m2);
+
+of_oxm_eth_src_t* oxm2 = of_oxm_eth_src_new(OF_VERSION_1_3);
+of_mac_addr_t e1 = { {0x01, 0x02, 0x03, 0x04, 0x05, 0x06} };
+of_oxm_eth_src_value_set(oxm2, e1);
+
+of_oxm_udp_dst_t* oxm3 = of_oxm_udp_dst_new(OF_VERSION_1_3);
+uint16_t u1 = 53;
+of_oxm_udp_dst_value_set(oxm3, u1);
+
+of_oxm_ipv4_dst_t* oxm4 = of_oxm_ipv6_dst_new(OF_VERSION_1_3);
+of_ipv6_t ip = {
+	  {0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+	   0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12}
+};
+of_oxm_ipv6_dst_value_set(oxm4, ip);
+
+of_list_oxm_t* oxm_list = of_list_oxm_new(OF_VERSION_1_3);
+of_list_oxm_append(oxm_list, (of_oxm_t*)oxm1);
+of_list_oxm_append(oxm_list, (of_oxm_t*)oxm2);
+of_list_oxm_append(oxm_list, (of_oxm_t*)oxm3);
+of_list_oxm_append(oxm_list, (of_oxm_t*)oxm4);
+
+obj = of_match_v3_new(OF_VERSION_1_3);
+of_match_v3_oxm_list_set(obj, oxm_list);
+
 -- java
 builder
        .setMasked(MatchField.METADATA, OFMetadata.ofRaw(0xFEDCBA9812141210l), OFMetadata.ofRaw(0xFFFFFFFF12345678l))
