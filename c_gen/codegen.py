@@ -78,6 +78,34 @@ def push_wire_types_data(uclass):
         class_name=uclass.name,
         versioned_type_members=versioned_type_members)
 
+ParseWireTypesData = namedtuple('ParseWireTypesData',
+    ['class_name', 'versioned'])
+ParseWireTypesVersion = namedtuple('ParseWireTypesVersion',
+    ['discriminator', 'subclasses'])
+ParseWireTypesSubclass = namedtuple('ParseWireTypesSubclass',
+    ['class_name', 'value', 'virtual'])
+
+def parse_wire_types_data(uclass):
+    if not uclass.virtual:
+        return None
+
+    discriminator = uclass.discriminator
+
+    # Generate a dict of version -> ParseWireTypesVersion
+    versioned = {}
+    for version, ofclass in sorted(uclass.version_classes.items()):
+        subclasses = [ParseWireTypesSubclass(class_name=subclass.name,
+                                             value=subclass.member_by_name(discriminator.name).value,
+                                             virtual=subclass.virtual)
+                      for subclass in ofclass.protocol.classes if subclass.superclass and subclass.superclass.name == ofclass.name]
+
+        subclasses.sort(key=lambda x: x.value)
+        versioned[version] = ParseWireTypesVersion(discriminator=discriminator,
+                                                   subclasses=subclasses)
+
+    return ParseWireTypesData(class_name=uclass.name,
+                              versioned=sorted(versioned.items()))
+
 # Output multiple LOCI classes into each C file. This reduces the overhead of
 # parsing header files, which takes longer than compiling the actual code
 # for many classes. It also reduces the compiled code size.
@@ -86,7 +114,8 @@ def generate_classes(install_dir):
         with template_utils.open_output(install_dir, "loci/src/class%02d.c" % i) as out:
             for uclass in chunk:
                 util.render_template(out, "class.c",
-                    push_wire_types_data=push_wire_types_data(uclass))
+                    push_wire_types_data=push_wire_types_data(uclass),
+                    parse_wire_types_data=parse_wire_types_data(uclass))
                 # Append legacy generated code
                 c_code_gen.gen_new_function_definitions(out, uclass.name)
                 c_code_gen.gen_accessor_definitions(out, uclass.name)
@@ -98,7 +127,8 @@ def generate_header_classes(install_dir):
             continue
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
             util.render_template(out, "class.c",
-                push_wire_types_data=None)
+                push_wire_types_data=None,
+                parse_wire_types_data=None)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_accessor_definitions(out, cls)
@@ -119,7 +149,8 @@ def generate_lists(install_dir):
     for cls in of_g.ordered_list_objects:
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
             util.render_template(out, "class.c",
-                push_wire_types_data=None)
+                push_wire_types_data=None,
+                parse_wire_types_data=None)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
             c_code_gen.gen_list_accessors(out, cls)
