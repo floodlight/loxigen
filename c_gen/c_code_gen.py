@@ -739,7 +739,7 @@ typedef uint64_t of_match_bmap_t;
 
 #define OF_MATCH_BYTES(length) (((length) + 7) & 0xfff8)
 
-#if __BYTE_ORDER == __ORDER_BIG_ENDIAN
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 #define U16_NTOH(val) (val)
 #define U32_NTOH(val) (val)
 #define U64_NTOH(val) (val)
