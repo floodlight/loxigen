@@ -35,3 +35,8 @@
 :: include("_push_wire_types.c", data=push_wire_types_data)
 
 :: #endif
+
+:: if parse_wire_types_data:
+:: include("_parse_wire_types.c", data=parse_wire_types_data)
+
+:: #endif

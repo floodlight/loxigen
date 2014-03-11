@@ -159,22 +159,19 @@ of_object_new_from_message(of_message_t msg, int len)
         return NULL;
     }
 
-    object_id = of_message_to_object_id(msg, len);
-    LOCI_ASSERT(object_id != OF_OBJECT_INVALID);
-
     if ((obj = of_object_new(-1)) == NULL) {
         return NULL;
     }
-
-    of_object_init_map[object_id](obj, version, 0, 0);
 
     if (of_object_buffer_bind(obj, OF_MESSAGE_TO_BUFFER(msg), len, 
                               OF_MESSAGE_FREE_FUNCTION) < 0) {
         FREE(obj);
         return NULL;
     }
-    obj->length = len;
     obj->version = version;
+
+    of_header_wire_object_id_get(obj, &object_id);
+    of_object_init_map[object_id](obj, version, len, 0);
 
     return obj;
 }
@@ -213,16 +210,14 @@ of_object_new_from_message_preallocated(of_object_storage_t *storage,
         return NULL;
     }
 
-    object_id = of_message_to_object_id(msg, len);
-    /* Already validated */
-    LOCI_ASSERT(object_id != OF_OBJECT_INVALID);
-
-    of_object_init_map[object_id](obj, version, len, 0);
-
+    obj->version = version;
     obj->wire_object.wbuf = wbuf;
     wbuf->buf = msg;
     wbuf->alloc_bytes = len;
     wbuf->current_bytes = len;
+
+    of_header_wire_object_id_get(obj, &object_id);
+    of_object_init_map[object_id](obj, version, len, 0);
 
     return obj;
 }

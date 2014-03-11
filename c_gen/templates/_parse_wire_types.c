@@ -25,16 +25,44 @@
 :: # EPL for the specific language governing permissions and limitations
 :: # under the EPL.
 ::
-:: import loxi_globals
-:: include('_copyright.c')
+void
+${data.class_name}_wire_object_id_get(of_object_t *obj, of_object_id_t *id)
+{
+    unsigned char *buf = OF_OBJECT_BUFFER_INDEX(obj, 0);
+    switch (obj->version) {
+:: for version, version_data in data.versioned:
+    case ${version.constant_version(prefix='OF_VERSION_')}: {
+:: m = version_data.discriminator
+:: if m.length == 1:
+        uint8_t value = *(uint8_t *)(buf + ${m.offset}); /* ${m.name} */
+:: elif m.length == 2:
+        uint16_t value = U16_NTOH(*(uint16_t *)(buf + ${m.offset})); /* ${m.name} */
+:: elif m.length == 4:
+        uint32_t value = U32_NTOH(*(uint32_t *)(buf + ${m.offset})); /* ${m.name} */
+:: elif m.length == 8:
+        uint64_t value = U64_NTOH(*(uint64_t *)(buf + ${m.offset})); /* ${m.name} */
+:: else:
+:: raise("unsupported parse_wire_types length %d" % m.length)
+:: #endif
 ::
-#ifndef __LOCI_CLASSES_H__
-#define __LOCI_CLASSES_H__
-
-:: for uclass in loxi_globals.unified.classes:
-void ${uclass.name}_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
+        switch (value) {
+:: for subclass in version_data.subclasses:
+        case ${hex(subclass.value)}:
+:: if subclass.virtual:
+            ${subclass.class_name}_wire_object_id_get(obj, id);
+:: else:
+            *id = ${subclass.class_name.upper()};
+:: #endif
+            break;
 :: #endfor
-
-${legacy_code}
-
-#endif
+        default:
+            *id = ${data.class_name.upper()};
+            break;
+        }
+        break;
+    }
+:: #endfor
+    default:
+        LOCI_ASSERT(0);
+    }
+}
