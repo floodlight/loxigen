@@ -9,6 +9,18 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
 
     public abstract IPVersion getIpVersion();
 
+    public F getSubnetBroadcastAddress() {
+        if (!mask.isCidrMask()) {
+            throw new IllegalArgumentException("Mask Invalid " + mask +
+                                               " cannot get subnet for non CIDR mask");
+        }
+        return value.or(mask.not());
+    }
+
+    public boolean isSubnetBroadcastAddress(F candidate) {
+        return getSubnetBroadcastAddress().equals(candidate);
+    }
+
     public static IPAddressWithMask<?> of(String ip) {
         if (ip == null) {
             throw new NullPointerException("String ip must not be null");
