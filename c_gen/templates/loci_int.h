@@ -294,4 +294,19 @@ ${packet_in} : ${packet_in_1_3}) + 2)
     (of_object_u16_get(obj, 2) + \
         of_object_fixed_len[(obj)->version][OF_BSN_GENTABLE_ENTRY_STATS_ENTRY])
 
+/**
+ * Macro to calculate the variable alignment of the table_feature_prop member
+ * family.
+ */
+#define _TABLE_FEATURE_PROP_ALIGN(obj) \
+    ((((obj->wire_object.wbuf->current_bytes+7)/8)*8) - \
+        obj->wire_object.wbuf->current_bytes)
+
+/**
+ * Macro to calculate the variable length of the table_feature_prop member
+ * family.
+ */
+#define _TABLE_FEATURE_PROP_LEN(obj) \
+  (obj->wire_object.wbuf->current_bytes + _TABLE_FEATURE_PROP_ALIGN(obj))
+
 #endif /* __LOCI_INT_H__ */

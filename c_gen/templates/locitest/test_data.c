@@ -11,6 +11,7 @@
  */
 
 #include <locitest/test_common.h>
+#include <loci_int.h>
 
 <?py
 def hexarray(data, indent):
