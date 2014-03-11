@@ -32,20 +32,20 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @param   IPAddress<?> other
      * @return  new IPAddress<?> object after the AND oper
      */
-    public abstract IPAddress<?> and(IPAddress<?> other);
+    public abstract F and(F other);
 
     /**
      * Perform a low level OR operation on the bits of two IPAddress<?> objects
      * @param   IPAddress<?> other
      * @return  new IPAddress<?> object after the AND oper
      */
-    public abstract IPAddress<?> or(IPAddress<?> other);
+    public abstract F or(F other);
 
     /**
      * Returns a new IPAddress object with the bits inverted
      * @return  IPAddress<?>
      */
-    public abstract IPAddress<?> not();
+    public abstract F not();
 
     @Override
     public abstract boolean equals(Object other);

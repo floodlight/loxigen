@@ -99,7 +99,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
     @Override
-    public IPv6Address and(IPAddress<?> other) {
+    public IPv6Address and(IPv6Address other) {
         if (other == null) {
             throw new NullPointerException("Other IP Address must not be null");
         }
@@ -108,7 +108,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
     @Override
-    public IPv6Address or(IPAddress<?> other) {
+    public IPv6Address or(IPv6Address other) {
         if (other == null) {
             throw new NullPointerException("Other IP Address must not be null");
         }
@@ -389,7 +389,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
     @Override
     public IPv6Address applyMask(IPv6Address mask) {
-        return IPv6Address.of(this.raw1 & mask.raw1, this.raw2 & mask.raw2);
+        return and(mask);
     }
 
     @Override

@@ -75,7 +75,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     @Override
-    public IPv4Address and(IPAddress<?> other) {
+    public IPv4Address and(IPv4Address other) {
         if (other == null) {
             throw new NullPointerException("Other IP Address must not be null");
         }
@@ -84,7 +84,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     @Override
-    public IPv4Address or(IPAddress<?> other) {
+    public IPv4Address or(IPv4Address other) {
         if (other == null) {
             throw new NullPointerException("Other IP Address must not be null");
         }
@@ -191,7 +191,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     @Override
     public IPv4Address applyMask(IPv4Address mask) {
-        return IPv4Address.of(this.rawValue & mask.rawValue);
+        return and(mask);
     }
 
     @Override
