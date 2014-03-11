@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -169,7 +171,22 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
     private final static Pattern colonPattern = Pattern.compile(":");
 
-    public static IPv6Address of(final String string) {
+    /** parse an IPv6Address from its conventional string representation.
+     *  <p>
+     *  Expects up to 8 groups of 16-bit hex words seperated by colons
+     *  (e.g., 2001:db8:85a3:8d3:1319:8a2e:370:7348).
+     *  <p>
+     *  Supports zero compression (e.g., 2001:db8::7348).
+     *  Does <b>not</b> currently support embedding a dotted-quad IPv4 address
+     *  into the IPv6 address (e.g., 2001:db8::192.168.0.1).
+     *
+     * @param string a string representation of an IPv6 address
+     * @return the parsed IPv6 address
+     * @throws NullPointerException if string is null
+     * @throws IllegalArgumentException if string is not a valid IPv6Address
+     */
+    @Nonnull
+    public static IPv6Address of(@Nonnull final String string) throws IllegalArgumentException {
         if (string == null) {
             throw new NullPointerException("String must not be null");
         }
@@ -225,6 +242,13 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         return builder.getIPv6();
     }
 
+    /** construct an IPv6 adress from two 64 bit integers representing the first and
+     *  second 8-byte blocks of the address.
+     *
+     * @param raw1 - the first 8 byte block of the address
+     * @param raw2 - the second 8 byte block of the address
+     * @return the constructed IPv6Address
+     */
     public static IPv6Address of(final long raw1, final long raw2) {
         if(raw1==NONE_VAL1 && raw2 == NONE_VAL2)
             return NONE;

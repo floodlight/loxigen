@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.Nonnull;
+
 public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F> {
 
     public abstract IPVersion getIpVersion();
@@ -53,7 +55,17 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     @Override
     public abstract int hashCode();
 
-    public static IPAddress<?> of(String ip) {
+    /** parse an IPv4Address or IPv6Address from their conventional string representation.
+     *  For details on supported representations,  refer to {@link IPv4Address#of(String)}
+     *  and {@link IPv6Address#of(String)}
+     *
+     * @param ip a string representation of an IP address
+     * @return the parsed IP address
+     * @throws NullPointerException if ip is null
+     * @throws IllegalArgumentException if string is not a valid IP address
+     */
+    @Nonnull
+    public static IPAddress<?> of(@Nonnull String ip) {
         if (ip == null) {
             throw new NullPointerException("String ip must not be null");
         }
