@@ -359,5 +359,13 @@ public class IPv4AddressTest {
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
         }
+        try {
+            IPv4AddressWithMask.of(IPv4Address.of("10.10.10.0"),
+                                   IPv4Address.of("255.0.255.0"))
+                                   .getSubnetBroadcastAddress();
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertNotNull(e.getMessage());
+        }
     }
 }

@@ -305,5 +305,13 @@ public class IPv6AddressTest {
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
         }
+        try {
+            IPv6AddressWithMask.of(IPv6Address.of("10:10::0"),
+                                   IPv6Address.of("ffff:0:ffff::"))
+                                   .getSubnetBroadcastAddress();
+            fail("Should have thrown IllegalArgumentException");
+        } catch (IllegalArgumentException e) {
+            assertNotNull(e.getMessage());
+        }
     }
 }
