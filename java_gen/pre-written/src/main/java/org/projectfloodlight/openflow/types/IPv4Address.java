@@ -69,6 +69,34 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         }
     }
 
+    @Override
+    public boolean isBroadcast() {
+        return this.equals(NO_MASK);
+    }
+
+    @Override
+    public IPv4Address and(IPv4Address other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv4Address otherIp = (IPv4Address) other;
+        return IPv4Address.of(rawValue & otherIp.rawValue);
+    }
+
+    @Override
+    public IPv4Address or(IPv4Address other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv4Address otherIp = (IPv4Address) other;
+        return IPv4Address.of(rawValue | otherIp.rawValue);
+    }
+
+    @Override
+    public IPv4Address not() {
+        return IPv4Address.of(~rawValue);
+    }
+
     public static IPv4Address of(final byte[] address) {
         if (address == null) {
             throw new NullPointerException("Address must not be null");
@@ -163,7 +191,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     @Override
     public IPv4Address applyMask(IPv4Address mask) {
-        return IPv4Address.of(this.rawValue & mask.rawValue);
+        return and(mask);
     }
 
     @Override

@@ -20,6 +20,33 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract int asCidrMaskLength();
 
+    /**
+     * Checks if the IPAddress is the global broadcast address
+     * 255.255.255.255 in case of IPv4
+     * @return boolean true or false
+     */
+    public abstract boolean isBroadcast();
+
+    /**
+     * Perform a low level AND operation on the bits of two IPAddress<?> objects
+     * @param   IPAddress<?> other
+     * @return  new IPAddress<?> object after the AND oper
+     */
+    public abstract F and(F other);
+
+    /**
+     * Perform a low level OR operation on the bits of two IPAddress<?> objects
+     * @param   IPAddress<?> other
+     * @return  new IPAddress<?> object after the AND oper
+     */
+    public abstract F or(F other);
+
+    /**
+     * Returns a new IPAddress object with the bits inverted
+     * @return  IPAddress<?>
+     */
+    public abstract F not();
+
     @Override
     public abstract boolean equals(Object other);
 
