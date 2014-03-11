@@ -19,5 +19,7 @@ of_list_instruction_id_append(inst_list, (of_instruction_id_t*)clear_act);
 obj = of_table_feature_prop_instructions_new(OF_VERSION_1_3);
 of_table_feature_prop_instructions_instruction_ids_set(obj, inst_list);
 
-of_wire_buffer_grow(obj->wire_object.wbuf, _TABLE_FEATURE_PROP_LEN(obj));
+#define OF_MATCH_BYTES(length) (((length) + 7) & 0xfff8)
+
+of_wire_buffer_grow(obj->wire_object.wbuf, OF_MATCH_BYTES(obj->length));
 -- java
