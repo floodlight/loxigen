@@ -104,6 +104,29 @@ public class IPv4AddressTest {
     };
 
     @Test
+    public void testLogicalOperatorsBroadcast() {
+        assertTrue(IPv4Address.NO_MASK.not().equals(IPv4Address.FULL_MASK));
+        assertTrue(IPv4Address.NO_MASK.or(IPv4Address.FULL_MASK).
+                   equals(IPv4Address.NO_MASK));
+        assertTrue(IPv4Address.NO_MASK.and(IPv4Address.FULL_MASK).
+                   equals(IPv4Address.FULL_MASK));
+
+        assertTrue(IPv4Address.NO_MASK.isBroadcast());
+        assertTrue(!IPv4Address.FULL_MASK.isBroadcast());
+    }
+
+    @Test
+    public void testMaskedSubnetBroadcast() {
+        assertTrue(IPv4AddressWithMask.of("10.10.10.1/24")
+                   .getSubnetBroadcastAddress()
+                   .equals(IPv4Address.of("10.10.10.255")));
+        assertTrue(IPv4AddressWithMask.of("10.10.10.1/24")
+                   .isSubnetBroadcastAddress(IPv4Address.of("10.10.10.255")));
+        assertTrue(!IPv4AddressWithMask.of("10.10.10.1/24")
+                   .isSubnetBroadcastAddress(IPv4Address.of("10.10.10.254")));
+    }
+
+    @Test
     public void testMaskedMatchesCidr() {
         IPv4AddressWithMask slash28 = IPv4AddressWithMask.of("10.0.42.16/28");
 

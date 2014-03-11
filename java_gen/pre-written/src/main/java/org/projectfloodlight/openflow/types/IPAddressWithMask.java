@@ -9,6 +9,14 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
 
     public abstract IPVersion getIpVersion();
 
+    public IPAddress<?> getSubnetBroadcastAddress() {
+        return value.or(mask.not());
+    }
+
+    public boolean isSubnetBroadcastAddress(IPAddress<?> candidate) {
+        return getSubnetBroadcastAddress().equals(candidate);
+    }
+
     public static IPAddressWithMask<?> of(String ip) {
         if (ip == null) {
             throw new NullPointerException("String ip must not be null");

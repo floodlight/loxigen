@@ -76,6 +76,29 @@ public class IPv6AddressTest {
     };
 
     @Test
+    public void testLogicalOperatorsBroadcast() {
+        assertTrue(IPv6Address.NO_MASK.not().equals(IPv6Address.FULL_MASK));
+        assertTrue(IPv6Address.NO_MASK.or(IPv6Address.FULL_MASK).
+                   equals(IPv6Address.NO_MASK));
+        assertTrue(IPv6Address.NO_MASK.and(IPv6Address.FULL_MASK).
+                   equals(IPv6Address.FULL_MASK));
+
+        assertTrue(IPv6Address.NO_MASK.isBroadcast());
+        assertTrue(!IPv6Address.FULL_MASK.isBroadcast());
+    }
+
+    @Test
+    public void testMaskedSubnetBroadcast() {
+        assertTrue(IPv6AddressWithMask.of("10:10::1/112")
+                   .getSubnetBroadcastAddress()
+                   .equals(IPv6Address.of("10:10::ffff")));
+        assertTrue(IPv6AddressWithMask.of("10:10::1/112")
+                   .isSubnetBroadcastAddress(IPv6Address.of("10:10::ffff")));
+        assertTrue(!IPv6AddressWithMask.of("10:10::1/112")
+                   .isSubnetBroadcastAddress(IPv6Address.of("10:10::fffd")));
+    }
+
+    @Test
     public void testConstants() {
         byte[] zeros = { (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,
                          (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x00,

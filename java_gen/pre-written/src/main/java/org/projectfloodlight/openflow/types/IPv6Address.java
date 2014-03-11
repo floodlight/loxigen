@@ -93,6 +93,34 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         }
     }
 
+    @Override
+    public boolean isBroadcast() {
+        return this.equals(NO_MASK);
+    }
+
+    @Override
+    public IPv6Address and(IPAddress<?> other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv6Address otherIp = (IPv6Address) other;
+        return IPv6Address.of((raw1 & otherIp.raw1), (raw2 & otherIp.raw2));
+    }
+
+    @Override
+    public IPv6Address or(IPAddress<?> other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv6Address otherIp = (IPv6Address) other;
+        return IPv6Address.of((raw1 | otherIp.raw1), (raw2 | otherIp.raw2));
+    }
+
+    @Override
+    public IPv6Address not() {
+        return IPv6Address.of(~raw1, ~raw2);
+    }
+
     public static IPv6Address of(final byte[] address) {
         if (address == null) {
             throw new NullPointerException("Address must not be null");
