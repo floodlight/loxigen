@@ -89,11 +89,10 @@ def parse_wire_types_data(uclass):
     if not uclass.virtual:
         return None
 
-    discriminator = uclass.discriminator
-
     # Generate a dict of version -> ParseWireTypesVersion
     versioned = {}
     for version, ofclass in sorted(uclass.version_classes.items()):
+        discriminator = ofclass.discriminator
         subclasses = [ParseWireTypesSubclass(class_name=subclass.name,
                                              value=subclass.member_by_name(discriminator.name).value,
                                              virtual=subclass.virtual)
