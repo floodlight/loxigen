@@ -543,6 +543,24 @@ test_%(cls)s_%(v_name)s_scalar(void)
     TEST_ASSERT(obj->object_id == %(u_cls)s);
 """ % dict(cls=cls, u_cls=cls.upper(),
            v_name=v_name, length=length, version=version))
+
+    # If this class is a concrete member of an inheritance hierarchy,
+    # run the hierarchy's root wire type parser and assert it returns
+    # the expected object id.
+    ofclass = loxi_globals.unified.class_by_name(cls)
+    if ofclass and not ofclass.virtual:
+        root = ofclass
+        while root.superclass:
+            root = root.superclass
+        if root.virtual:
+            out.write("""
+    {
+        of_object_id_t object_id;
+        %(root_cls)s_wire_object_id_get(obj, &object_id);
+        TEST_ASSERT(object_id == %(u_cls)s);
+    }
+""" % dict(root_cls=root.name, u_cls=cls.upper()))
+
     if not type_maps.class_is_virtual(cls):
         out.write("""
     if (obj->wire_length_get != NULL) {
@@ -1106,6 +1124,7 @@ test_%(cls)s_create_%(v_name)s(void)
     uint8_t *msg_buf;
     int value;
     int len;
+    of_object_id_t object_id;
 
     obj = %(cls)s_new(%(v_name)s);
     TEST_ASSERT(obj != NULL);
@@ -1113,6 +1132,9 @@ test_%(cls)s_create_%(v_name)s(void)
     TEST_ASSERT(obj->length == %(bytes)d);
     TEST_ASSERT(obj->parent == NULL);
     TEST_ASSERT(obj->object_id == %(enum)s);
+
+    of_header_wire_object_id_get(obj, &object_id);
+    TEST_ASSERT(object_id == %(enum)s);
 
     /* Set up incrementing values for scalar members */
     value = %(cls)s_%(v_name)s_populate_scalars(obj, 1);
