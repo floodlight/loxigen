@@ -459,6 +459,15 @@ of_match_members = dict(
         takes_mask_in_spec=True,
         order=1005,
         ),
+
+    bsn_egr_port_group_id = dict(
+        name="bsn_egr_port_group_id",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1006,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()

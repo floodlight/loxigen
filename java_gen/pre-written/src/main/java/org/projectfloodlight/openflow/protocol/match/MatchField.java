@@ -196,6 +196,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_L3_DST_CLASS_ID =
             new MatchField<ClassId>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
 
+    public final static MatchField<ClassId> BSN_EGR_PORT_GROUP_ID =
+            new MatchField<ClassId>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
+
     public String getName() {
         return name;
     }
