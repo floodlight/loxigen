@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
@@ -55,27 +57,38 @@ public class MacAddress implements OFValueType<MacAddress> {
         return new MacAddress(raw);
     }
 
-    public static MacAddress of(final String string) {
+    /** Parse a mac adress from the canonical string representation as
+     *  6 hex bytes separated by colons (01:02:03:04:05:06).
+     *
+     * @param macString - a mac address in canonical string representation
+     * @return the parsed MacAddress
+     * @throws IllegalArgumentException if macString is not a valid mac adddress
+     */
+    @Nonnull
+    public static MacAddress of(@Nonnull final String macString) throws IllegalArgumentException {
+        if (macString == null) {
+            throw new NullPointerException("macString must not be null");
+        }
         int index = 0;
         int shift = 40;
         final String FORMAT_ERROR = "Mac address is not well-formed. " +
                 "It must consist of 6 hex digit pairs separated by colons: ";
 
         long raw = 0;
-        if (string.length() != 6 * 2 + 5)
-            throw new IllegalArgumentException(FORMAT_ERROR + string);
+        if (macString.length() != 6 * 2 + 5)
+            throw new IllegalArgumentException(FORMAT_ERROR + macString);
 
         while (shift >= 0) {
-            int digit1 = Character.digit(string.charAt(index++), 16);
-            int digit2 = Character.digit(string.charAt(index++), 16);
+            int digit1 = Character.digit(macString.charAt(index++), 16);
+            int digit2 = Character.digit(macString.charAt(index++), 16);
             if ((digit1 < 0) || (digit2 < 0))
-                throw new IllegalArgumentException(FORMAT_ERROR + string);
+                throw new IllegalArgumentException(FORMAT_ERROR + macString);
             raw |= ((long) (digit1 << 4 | digit2)) << shift;
 
             if (shift == 0)
                 break;
-            if (string.charAt(index++) != ':')
-                throw new IllegalArgumentException(FORMAT_ERROR + string);
+            if (macString.charAt(index++) != ':')
+                throw new IllegalArgumentException(FORMAT_ERROR + macString);
             shift -= 8;
         }
         return MacAddress.of(raw);
