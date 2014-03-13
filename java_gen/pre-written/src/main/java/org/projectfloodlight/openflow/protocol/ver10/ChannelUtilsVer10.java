@@ -4,6 +4,8 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.match.Match;
@@ -21,8 +23,11 @@ public class ChannelUtilsVer10 {
         return OFMatchV1Ver10.READER.readFrom(bb);
     }
 
-    public static Set<OFActionType> readSupportedActions(ChannelBuffer bb) {
-        int actions = bb.readInt();
+    public static Match readOFMatch(final ByteBuffer bb) throws OFParseError {
+        return OFMatchV1Ver10.READER.readFrom(bb);
+    }
+
+    private static Set<OFActionType> readSupportedActions(int actions) {
         EnumSet<OFActionType> supportedActions = EnumSet.noneOf(OFActionType.class);
         if ((actions & (1 << OFActionTypeSerializerVer10.OUTPUT_VAL)) != 0)
             supportedActions.add(OFActionType.OUTPUT);
@@ -49,6 +54,15 @@ public class ChannelUtilsVer10 {
         if ((actions & (1 << OFActionTypeSerializerVer10.ENQUEUE_VAL)) != 0)
             supportedActions.add(OFActionType.ENQUEUE);
         return supportedActions;
+    }
+   
+
+    public static Set<OFActionType> readSupportedActions(ChannelBuffer bb) {
+        return readSupportedActions(bb.readInt());
+    }
+
+    public static Set<OFActionType> readSupportedActions(ByteBuffer bb) {
+        return readSupportedActions(bb.getInt());
     }
 
     public static int supportedActionsToWire(Set<OFActionType> supportedActions) {
@@ -88,4 +102,7 @@ public class ChannelUtilsVer10 {
         bb.writeInt(supportedActionsToWire(supportedActions));
     }
 
+    public static void writeSupportedActions(ByteBuffer bb, Set<OFActionType> supportedActions) {
+        bb.putInt(supportedActionsToWire(supportedActions));
+    }
 }

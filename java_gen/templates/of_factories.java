@@ -64,6 +64,21 @@ public final class OFFactories {
             }
             return factory.getReader().readFrom(bb);
         }
+
+        public OFMessage readFrom(ByteBuffer bb) throws OFParseError {
+            short wireVersion = U8.f(bb.get(0));
+            OFFactory factory;
+            switch (wireVersion) {
+            //:: for v in versions:
+            case ${v.int_version}:
+                factory = org.projectfloodlight.openflow.protocol.ver${v.dotless_version}.OFFactoryVer${v.dotless_version}.INSTANCE;
+                break;
+            //:: #endfor
+            default:
+                throw new IllegalArgumentException("Unknown wire version: " + wireVersion);
+            }
+            return factory.getReader().readFrom(bb);
+        }
     }
 
     public static OFMessageReader<OFMessage> getGenericReader() {

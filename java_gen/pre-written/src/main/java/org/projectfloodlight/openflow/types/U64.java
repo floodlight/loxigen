@@ -20,6 +20,8 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -119,6 +121,11 @@ public class U64 implements Writeable, OFValueType<U64> {
     }
 
     @Override
+    public void writeTo(ByteBuffer bb) {
+        bb.putLong(raw);
+    }
+
+    @Override
     public int compareTo(U64 o) {
         return UnsignedLongs.compare(raw, o.raw);
     }
@@ -134,6 +141,11 @@ public class U64 implements Writeable, OFValueType<U64> {
         @Override
         public U64 readFrom(ChannelBuffer bb) throws OFParseError {
             return U64.ofRaw(bb.readLong());
+        }
+
+        @Override
+        public U64 readFrom(ByteBuffer bb) throws OFParseError {
+            return U64.ofRaw(bb.getLong());
         }
     }
 }

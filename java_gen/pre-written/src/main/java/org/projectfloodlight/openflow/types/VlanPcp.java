@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -62,8 +64,16 @@ public class VlanPcp implements OFValueType<VlanPcp> {
         c.writeByte(this.pcp);
     }
 
+    public void writeByte(ByteBuffer c) {
+        c.put(this.pcp);
+    }
+
     public static VlanPcp readByte(ChannelBuffer c) throws OFParseError {
         return VlanPcp.of((byte)(c.readUnsignedByte() & 0xFF));
+    }
+
+    public static VlanPcp readByte(ByteBuffer c) throws OFParseError {
+        return VlanPcp.of((byte)(c.get() & 0x00FF));
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
@@ -150,8 +151,16 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
         c.writeShort(this.opcode);
     }
 
+    public void write2Bytes(ByteBuffer c) {
+        c.putShort((short)this.opcode);
+    }
+
     public static ArpOpcode read2Bytes(ChannelBuffer c) {
         return ArpOpcode.of(c.readUnsignedShort());
+    }
+
+    public static ArpOpcode read2Bytes(ByteBuffer c) {
+        return ArpOpcode.of(0x0000ffff & c.getShort());
     }
 
     @Override

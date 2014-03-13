@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.util;
 import java.util.List;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -21,9 +22,21 @@ import com.google.common.collect.ImmutableList.Builder;
 
 public class ChannelUtils {
     private static final Logger logger = LoggerFactory.getLogger(ChannelUtils.class);
+
     public static String readFixedLengthString(ChannelBuffer bb, int length) {
         byte[] dst = new byte[length];
         bb.readBytes(dst, 0, length);
+        int validLength = 0;
+        for (validLength = 0; validLength < length; validLength++) {
+            if (dst[validLength] == 0)
+                break;
+        }
+        return new String(dst, 0, validLength, Charsets.US_ASCII);
+    }
+
+    public static String readFixedLengthString(ByteBuffer bb, int length) {
+        byte[] dst = new byte[length];
+        bb.get(dst, 0, length);
         int validLength = 0;
         for (validLength = 0; validLength < length; validLength++) {
             if (dst[validLength] == 0)
@@ -45,15 +58,39 @@ public class ChannelUtils {
         }
     }
 
+    public static void writeFixedLengthString(ByteBuffer bb, String string,
+            int length) {
+        int l = string.length();
+        if (l > length) {
+            throw new IllegalArgumentException("Error writing string: length="
+                    + l + " > max Length=" + length);
+        }
+        bb.put(string.getBytes(Charsets.US_ASCII));
+	for ( ;l < length; ++l ) {
+            bb.put((byte)0);
+        }
+    }
+
     static public byte[] readBytes(final ChannelBuffer bb, final int length) {
         byte byteArray[] = new byte[length];
         bb.readBytes(byteArray);
         return byteArray;
     }
 
+    static public byte[] readBytes(final ByteBuffer bb, final int length) {
+        byte byteArray[] = new byte[length];
+        bb.get(byteArray);
+        return byteArray;
+    }
+
     static public void writeBytes(final ChannelBuffer bb,
             final byte byteArray[]) {
         bb.writeBytes(byteArray);
+    }
+
+    static public void writeBytes(final ByteBuffer bb,
+            final byte byteArray[]) {
+        bb.put(byteArray);
     }
 
     public static <T> List<T> readList(ChannelBuffer bb, int length, OFMessageReader<T> reader) throws OFParseError {
@@ -73,7 +110,30 @@ public class ChannelUtils {
         return builder.build();
     }
 
+    public static <T> List<T> readList(ByteBuffer bb, int length, OFMessageReader<T> reader) throws OFParseError {
+        int end = bb.position() + length;
+        Builder<T> builder = ImmutableList.<T>builder();
+        if(logger.isTraceEnabled())
+            logger.trace("readList(length={}, reader={})", length, reader.getClass());
+        while (bb.position() < end) {
+            T read = reader.readFrom(bb);
+            if(logger.isTraceEnabled())
+                logger.trace("readList: read={}, left={}", read, end - bb.position());
+            builder.add(read);
+        }
+        if(bb.position() != end) {
+            throw new IllegalStateException("Overread length: length="+ length + 
+                                            " overread by "+ (bb.position() - end) + " reader: "+reader);
+        }
+        return builder.build();
+    }
+
     public static void writeList(ChannelBuffer bb, List<? extends Writeable> writeables) {
+        for(Writeable w: writeables)
+            w.writeTo(bb);
+    }
+
+    public static void writeList(ByteBuffer bb, List<? extends Writeable> writeables) {
         for(Writeable w: writeables)
             w.writeTo(bb);
     }

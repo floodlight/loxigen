@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -355,8 +357,17 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         c.writeLong(this.raw2);
     }
 
+    public void write16Bytes(ByteBuffer c) {
+        c.putLong(this.raw1);
+        c.putLong(this.raw2);
+    }
+
     public static IPv6Address read16Bytes(ChannelBuffer c) throws OFParseError {
         return IPv6Address.of(c.readLong(), c.readLong());
+    }
+
+    public static IPv6Address read16Bytes(ByteBuffer c) throws OFParseError {
+        return IPv6Address.of(c.getLong(), c.getLong());
     }
 
     @Override

@@ -26,6 +26,9 @@
 //:: # under the EPL.
 //::
 //:: import itertools
+
+//:: from java_gen.buffers import *
+
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -52,10 +55,21 @@ public class ${class_name} {
         }
     }
 
+    public static ${enum.name} readFrom(ByteBuffer bb) throws OFParseError {
+        try {
+            return ofWireValue(${wire_type.read_op(version, buf_type=ByteBuffer)});
+        } catch (IllegalArgumentException e) {
+            throw new OFParseError(e);
+        }
+    }
+
     public static void writeTo(ChannelBuffer bb, ${enum.name} e) {
         ${wire_type.write_op(version=version, name="toWireValue(e)")};
     }
 
+    public static void writeTo(ByteBuffer bb, ${enum.name} e) {
+        ${wire_type.write_op(version=version, name="toWireValue(e)", buf_type=ByteBuffer)};
+    }
     public static void putTo(${enum.name} e, PrimitiveSink sink) {
         ${wire_type.funnel_op(version=version, name="toWireValue(e)")};
     }

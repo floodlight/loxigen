@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import javax.annotation.concurrent.Immutable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
@@ -76,8 +77,16 @@ public class ClassId implements OFValueType<ClassId> {
         c.writeInt(rawValue);
     }
 
+    public void write4Bytes(ByteBuffer c) {
+        c.putInt(rawValue);
+    }
+
     public static ClassId read4Bytes(ChannelBuffer c) {
         return ClassId.of(c.readInt());
+    }
+
+    public static ClassId read4Bytes(ByteBuffer c) {
+        return ClassId.of(c.getInt());
     }
 
     @Override

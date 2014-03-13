@@ -4,6 +4,8 @@ import re
 import subprocess
 import time
 
+from buffers import *
+
 import loxi_globals
 from generic_utils import memoize
 import loxi_utils.loxi_utils as loxi_utils
@@ -93,7 +95,7 @@ class JType(object):
         if priv_type is None:
             priv_type = pub_type
         self.priv_type = priv_type  # the internal storage type
-        self.ops = {}
+        self.ops = {}               # Loxigen-default operations 
 
     def set_priv_type(self, priv_type):
         self.priv_type = priv_type
@@ -141,7 +143,7 @@ class JType(object):
         """ Is the private type different from the public one?"""
         return self.pub_type != self.priv_type
 
-    def get_op(self, op_type, version, pub_type, default_value, arguments):
+    def get_op(self, op_type, version, pub_type, default_value, arguments, buf_type=ChannelBuffer):
         ver = ANY if version is None else version.int_version
 
         if not "version" in arguments:
@@ -149,7 +151,14 @@ class JType(object):
 
         def lookup(ver, pub_type):
             if (ver, pub_type) in self.ops:
-                return getattr(self.ops[(ver, pub_type)], op_type)
+                if op_type in ["read", "write"]:
+                    r = getattr(self.ops[(ver, pub_type)], op_type)
+                    if isinstance(r, dict):
+                        return r[buf_type]
+                    else:
+                        return r
+                else:
+                    return getattr(self.ops[(ver, pub_type)], op_type)
             else:
                 return None
 
@@ -159,27 +168,32 @@ class JType(object):
         else:
             return reduce(lambda a,repl: a.replace("$%s" % repl[0], str(repl[1])),  arguments.items(), _op)
 
-    def read_op(self, version=None, length=None, pub_type=True):
+    def read_op(self, version=None, length=None, pub_type=True, buf_type=ChannelBuffer):
         """ return a Java stanza that reads a value of this JType from ChannelBuffer bb.
         @param version int - OF wire version to generate expression for
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
         @param length string, for operations that need it (e.g., read a list of unknown length)
                Java expression evaluating to the byte length to be read. Defaults to the remainig
                length of the message.
+        @param buf_type type of the buffer to use for read operation.
         @return string containing generated Java expression.
         """
         if length is None:
              # assumes that
              # (1) length of the message has been read to 'length'
              # (2) readerIndex at the start of the message has been stored in 'start'
-            length = "length - (bb.readerIndex() - start)"
+            if buf_type is ByteBuffer:
+                length = "length - (bb.position() - start)"
+            else: 
+                length = "length - (bb.readerIndex() - start)" 
 
         return self.get_op("read", version, pub_type,
             default_value='ChannelUtilsVer$version.read%s(bb)' % self.pub_type,
-            arguments=dict(length=length)
+            arguments=dict(length=length),
+            buf_type=buf_type
             )
 
-    def write_op(self, version=None, name=None, pub_type=True):
+    def write_op(self, version=None, name=None, pub_type=True, buf_type=ChannelBuffer):
         """ return a Java stanza that writes a value of this JType contained in Java expression
         'name' to ChannelBuffer bb.
         @param name string containing Java expression that evaluations to the value to be written
@@ -190,7 +204,8 @@ class JType(object):
 
         return self.get_op("write", version, pub_type,
             default_value='ChannelUtilsVer$version.write%s(bb, $name)' % self.pub_type,
-            arguments=dict(name=name)
+            arguments=dict(name=name),
+            buf_type=buf_type
             )
 
 
@@ -204,18 +219,19 @@ class JType(object):
             default_value = self.format_value(0) if self.is_primitive else "null"
         )
 
-    def skip_op(self, version=None, length=None):
+    def skip_op(self, version=None, length=None, buf_type=ChannelBuffer):
         """ return a java stanza that skips an instance of JType in the input ChannelBuffer 'bb'.
             This is used in the Reader implementations for virtual classes (because after the
             discriminator field, the concrete Reader instance will re-read all the fields)
             Currently just delegates to read_op + throws away the result."""
-        return self.read_op(version, length)
+        return self.read_op(version, length, buf_type=buf_type)
 
-    def funnel_op(self, version=None, name=None, pub_type=True):
+    def funnel_op(self, version=None, name=None, pub_type=True, buf_type=ChannelBuffer):
         t = self.pub_type if pub_type else self.priv_type
         return self.get_op("funnel", version, pub_type,
             arguments = dict(name=name),
-            default_value =  '$name.putTo(sink)' if not self._is_primitive(pub_type) else "sink.put{}($name)".format(t[0].upper() + t[1:])
+            default_value = '$name.putTo(sink)' if not self._is_primitive(pub_type) else "sink.put{}($name)".format(t[0].upper() + t[1:]),
+            buf_type=buf_type
         )
 
     @property
@@ -259,8 +275,7 @@ def gen_list_jtype(java_base_name):
     # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
     # write op assumes class implements Writeable
     return JType("List<{}>".format(java_base_name)) \
-        .op(
-            read= 'ChannelUtils.readList(bb, $length, {}Ver$version.READER)'.format(java_base_name), \
+        .op(read='ChannelUtils.readList(bb, $length, {}Ver$version.READER)'.format(java_base_name), 
             write='ChannelUtils.writeList(bb, $name)',
             default="ImmutableList.<{}>of()".format(java_base_name),
             funnel='FunnelUtils.putList($name, sink)'
@@ -278,8 +293,12 @@ def gen_fixed_length_string_jtype(length):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
-        .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
+        .op(read={ChannelBuffer:'U8.f(bb.readByte())',ByteBuffer:'U8.f(bb.get())'}, 
+            write={ChannelBuffer:'bb.writeByte(U8.t($name))',ByteBuffer:'bb.put(U8.t($name))'}, 
+            pub_type=True) \
+        .op(read={ChannelBuffer:'bb.readByte()',ByteBuffer:'bb.get()'}, 
+            write={ChannelBuffer:'bb.writeByte($name)',ByteBuffer:'bb.put($name)'}, 
+            pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)',
             write='ChannelUtils.writeList(bb, $name)',
@@ -287,59 +306,91 @@ u8_list =  JType('List<U8>') \
             funnel='FunnelUtils.putList($name, sink)'
            )
 u16 = JType('int', 'short') \
-        .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
-        .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+        .op(read={ChannelBuffer:'U16.f(bb.readShort())',ByteBuffer:'U16.f(bb.getShort())'}, 
+            write={ChannelBuffer:'bb.writeShort(U16.t($name))',ByteBuffer:'bb.putShort(U16.t($name))'}, 
+            pub_type=True) \
+        .op(read={ChannelBuffer:'bb.readShort()', ByteBuffer:'bb.getShort()'}, 
+            write={ChannelBuffer:'bb.writeShort($name)',ByteBuffer:'bb.putShort($name)'}, 
+            pub_type=False)
 u32 = JType('long', 'int') \
-        .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
-        .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
+        .op(read={ChannelBuffer:'U32.f(bb.readInt())',ByteBuffer:'U32.f(bb.getInt())'}, 
+            write={ChannelBuffer:'bb.writeInt(U32.t($name))',ByteBuffer:'bb.putInt(U32.t($name))'}, 
+            pub_type=True) \
+        .op(read={ChannelBuffer:'bb.readInt()',ByteBuffer:'bb.getInt()'}, 
+            write={ChannelBuffer:'bb.writeInt($name)',ByteBuffer:'bb.putInt($name)'}, 
+            pub_type=False)
 u32_list = JType('List<U32>', 'int[]') \
-        .op(
-                read='ChannelUtils.readList(bb, $length, U32.READER)',
-                write='ChannelUtils.writeList(bb, $name)',
-                default="ImmutableList.<U32>of()",
-                funnel="FunnelUtils.putList($name, sink)")
+        .op(read='ChannelUtils.readList(bb, $length, U32.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default="ImmutableList.<U32>of()",
+            funnel="FunnelUtils.putList($name, sink)")
 u64_list = JType('List<U64>', 'int[]') \
-        .op(
-                read='ChannelUtils.readList(bb, $length, U64.READER)',
-                write='ChannelUtils.writeList(bb, $name)',
-                default="ImmutableList.<U64>of()",
-                funnel="FunnelUtils.putList($name, sink)")
+        .op(read='ChannelUtils.readList(bb, $length, U64.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default="ImmutableList.<U64>of()",
+            funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
-        .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
+        .op(read={ChannelBuffer:'U8.of(bb.readByte())',ByteBuffer:'U8.of(bb.get())'}, 
+            write={ChannelBuffer:'bb.writeByte($name.getRaw())',ByteBuffer:'bb.put($name.getRaw())'}, 
+            default="U8.ZERO")
 u32obj = JType('U32', 'U32') \
-        .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())', default="U32.ZERO")
+        .op(read={ChannelBuffer:'U32.of(bb.readInt())',ByteBuffer:'U32.of(bb.getInt())'}, 
+            write={ChannelBuffer:'bb.writeInt($name.getRaw())',ByteBuffer:'bb.putInt($name.getRaw())'}, 
+            default="U32.ZERO")
 u64 = JType('U64', 'long') \
-        .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO", pub_type=True) \
-        .op(read='bb.readLong()', write='bb.writeLong($name)', pub_type=False)
+        .op(read={ChannelBuffer:'U64.ofRaw(bb.readLong())',ByteBuffer:'U64.ofRaw(bb.getLong())'}, 
+            write={ChannelBuffer:'bb.writeLong($name.getValue())',ByteBuffer:'bb.putLong($name.getValue())'}, 
+            default="U64.ZERO", 
+            pub_type=True) \
+        .op(read={ChannelBuffer:'bb.readLong()',ByteBuffer:'bb.getLong()'}, 
+            write={ChannelBuffer:'bb.writeLong($name)',ByteBuffer:'bb.putLong($name)'}, 
+            pub_type=False)
 of_port = JType("OFPort") \
-         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
-         .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
+         .op(version=1, 
+             read="OFPort.read2Bytes(bb)", 
+             write="$name.write2Bytes(bb)", 
+             default="OFPort.ANY") \
+         .op(version=ANY, 
+             read="OFPort.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="OFPort.ANY")
 # the same OFPort, but with a default value of ZERO, only for OF10 match
 of_port_match_v1 = JType("OFPort") \
-         .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ZERO")
+         .op(version=1, 
+             read="OFPort.read2Bytes(bb)", 
+             write="$name.write2Bytes(bb)", 
+             default="OFPort.ZERO")
+
 actions_list = gen_list_jtype("OFAction")
 instructions_list = gen_list_jtype("OFInstruction")
 buckets_list = gen_list_jtype("OFBucket")
 port_desc_list = gen_list_jtype("OFPortDesc")
 packet_queue_list = gen_list_jtype("OFPacketQueue")
+
 port_desc = JType('OFPortDesc') \
-        .op(read='OFPortDescVer$version.READER.readFrom(bb)', \
+        .op(read='OFPortDescVer$version.READER.readFrom(bb)', 
             write='$name.writeTo(bb)')
 octets = JType('byte[]')\
-        .op(read='ChannelUtils.readBytes(bb, $length)', \
-            write='bb.writeBytes($name)', \
+        .op(read='ChannelUtils.readBytes(bb, $length)', 
+            write={ChannelBuffer:'bb.writeBytes($name)',ByteBuffer:'bb.put($name)'}, 
             default="new byte[0]",
             funnel="sink.putBytes($name)"
             );
 of_match = JType('Match') \
-        .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
+        .op(read='ChannelUtilsVer$version.readOFMatch(bb)', 
             write='$name.writeTo(bb)',
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
 group_mod_cmd = JType('OFGroupModCommand', 'short') \
-        .op(version=ANY, read="bb.readShort()", write="bb.writeShort($name)")
+        .op(version=ANY, 
+            read={ChannelBuffer:"bb.readShort()",ByteBuffer:"bb.getShort()"}, 
+            write={ChannelBuffer:"bb.writeShort($name)",ByteBuffer:"bb.putShort($name)"})
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
-        .op(version=1, read="bb.readShort()", write="bb.writeShort($name)") \
-        .op(version=ANY, read="bb.readByte()", write="bb.writeByte($name)")
+        .op(version=1, 
+            read={ChannelBuffer:"bb.readShort()",ByteBuffer:"bb.getShort()"}, 
+            write={ChannelBuffer:"bb.writeShort($name)",ByteBuffer:"bb.putShort($name)"}) \
+        .op(version=ANY, 
+            read={ChannelBuffer:"bb.readByte()",ByteBuffer:"bb.get()"}, 
+            write={ChannelBuffer:"bb.writeByte($name)",ByteBuffer:"bb.put(Short.valueOf($name).byteValue())"})
 mac_addr = JType('MacAddress') \
         .op(read="MacAddress.read6Bytes(bb)", \
             write="$name.write6Bytes(bb)",
@@ -349,6 +400,7 @@ port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
+
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -357,7 +409,9 @@ ipv6 = JType("IPv6Address") \
         .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
+
 packetin_reason = gen_enum_jtype("OFPacketInReason")
+
 transport_port = JType("TransportPort")\
         .op(read="TransportPort.read2Bytes(bb)",
             write="$name.write2Bytes(bb)",
@@ -412,8 +466,7 @@ oxm = JType("OFOxm<?>")\
         .op(  read="OFOxmVer$version.READER.readFrom(bb)",
               write="$name.writeTo(bb)")
 oxm_list = JType("OFOxmList") \
-        .op(
-            read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', \
+        .op(read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', 
             write='$name.writeTo(bb)',
             default="OFOxmList.EMPTY")
 meter_features = JType("OFMeterFeatures")\
@@ -423,12 +476,12 @@ bsn_vport_q_in_q = JType("OFBsnVportQInQ")\
         .op(read="OFBsnVportQInQVer$version.READER.readFrom(bb)",
             write="$name.writeTo(bb)")
 flow_wildcards = JType("int") \
-        .op(read='bb.readInt()',
-            write='bb.writeInt($name)',
+        .op(read={ChannelBuffer:'bb.readInt()',ByteBuffer:'bb.getInt()'},
+            write={ChannelBuffer:'bb.writeInt($name)',ByteBuffer:'bb.putInt($name)'},
             default="OFFlowWildcardsSerializerVer$version.ALL_VAL")
 table_stats_wildcards = JType("int") \
-        .op(read='bb.readInt()',
-            write='bb.writeInt($name)')
+        .op(read={ChannelBuffer:'bb.readInt()',ByteBuffer:'bb.getInt()'},
+            write={ChannelBuffer:'bb.writeInt($name)',ByteBuffer:'bb.putInt($name)'})
 port_bitmap = JType('OFBitMask128') \
             .op(read='OFBitMask128.read16Bytes(bb)',
                 write='$name.write16Bytes(bb)',
@@ -446,27 +499,35 @@ of_aux_id = JType("OFAuxId") \
             write='$name.writeByte(bb)',
             default='OFAuxId.MAIN')
 of_version = JType("OFVersion", 'byte') \
-            .op(read='bb.readByte()', write='bb.writeByte($name)')
+            .op(read={ChannelBuffer:'bb.readByte()',ByteBuffer:'bb.get()'}, 
+                write={ChannelBuffer:'bb.writeByte($name)',ByteBuffer:'bb.put($name)'})
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
 of_type = JType("OFType", 'byte') \
-            .op(read='bb.readByte()', write='bb.writeByte($name)')
+            .op(read={ChannelBuffer:'bb.readByte()',ByteBuffer:'bb.get()'}, 
+                write={ChannelBuffer:'bb.writeByte($name)',ByteBuffer:'bb.put($name)'})
 action_type= gen_enum_jtype("OFActionType")\
                .set_priv_type("short")\
-               .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+               .op(read={ChannelBuffer:'bb.readShort()',ByteBuffer:'bb.getShort()'}, 
+                   write={ChannelBuffer:'bb.writeShort($name)',ByteBuffer:'bb.putShort($name)'}, 
+                   pub_type=False)
 instruction_type = gen_enum_jtype("OFInstructionType")\
                .set_priv_type('short') \
-               .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+               .op(read={ChannelBuffer:'bb.readShort()',ByteBuffer:'bb.getShort()'}, 
+                   write={ChannelBuffer:'bb.writeShort($name)',ByteBuffer:'bb.putShort($name)'}, 
+                   pub_type=False)
 buffer_id = JType("OFBufferId") \
-            .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+            .op(read={ChannelBuffer:"OFBufferId.of(bb.readInt())",ByteBuffer:"OFBufferId.of(bb.getInt())"}, 
+                write={ChannelBuffer:"bb.writeInt($name.getInt())",ByteBuffer:"bb.putInt($name.getInt())"}, 
+                default="OFBufferId.NO_BUFFER")
 boolean = JType("boolean", "byte") \
-        .op(read='(bb.readByte() != 0)',
-            write='bb.writeByte($name ? 1 : 0)',
+        .op(read={ChannelBuffer:'(bb.readByte() != 0)',ByteBuffer:'(bb.get() != 0)'},
+            write={ChannelBuffer:'bb.writeByte($name ? 1 : 0)',ByteBuffer:'bb.put((byte)($name ? 1 : 0))'},
             default="false")
 datapath_id = JType("DatapathId") \
-        .op(read='DatapathId.of(bb.readLong())',
-            write='bb.writeLong($name.getLong())',
+        .op(read={ChannelBuffer:'DatapathId.of(bb.readLong())',ByteBuffer:'DatapathId.of(bb.getLong())'},
+            write={ChannelBuffer:'bb.writeLong($name.getLong())',ByteBuffer:'bb.putLong($name.getLong())'},
             default='DatapathId.NONE')
 action_type_set = JType("Set<OFActionType>") \
         .op(read='ChannelUtilsVer10.readSupportedActions(bb)',
@@ -474,22 +535,45 @@ action_type_set = JType("Set<OFActionType>") \
             default='ImmutableSet.<OFActionType>of()',
             funnel='ChannelUtilsVer10.putSupportedActionsTo($name, sink)')
 of_group = JType("OFGroup") \
-         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ALL")
+         .op(version=ANY, 
+             read="OFGroup.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="OFGroup.ALL")
 of_group_default_any = JType("OFGroup") \
-         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
+         .op(version=ANY, 
+             read="OFGroup.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="OFGroup.ANY")
+
 # the outgroup field of of_flow_stats_request has a special default value
 of_group_default_any = JType("OFGroup") \
-         .op(version=ANY, read="OFGroup.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFGroup.ANY")
+         .op(version=ANY, 
+             read="OFGroup.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="OFGroup.ANY")
 buffer_id = JType("OFBufferId") \
-         .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
+            .op(read={ChannelBuffer:"OFBufferId.of(bb.readInt())",ByteBuffer:"OFBufferId.of(bb.getInt())"}, 
+                write={ChannelBuffer:"bb.writeInt($name.getInt())",ByteBuffer:"bb.putInt($name.getInt())"}, 
+                default="OFBufferId.NO_BUFFER")
 lag_id = JType("LagId") \
-         .op(version=ANY, read="LagId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="LagId.NONE")
+         .op(version=ANY, 
+             read="LagId.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="LagId.NONE")
 vrf = JType("VRF") \
-         .op(version=ANY, read="VRF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="VRF.ZERO")
+         .op(version=ANY, 
+             read="VRF.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="VRF.ZERO")
 class_id = JType("ClassId") \
-         .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
+         .op(version=ANY, 
+             read="ClassId.read4Bytes(bb)", 
+             write="$name.write4Bytes(bb)", 
+             default="ClassId.NONE")
 boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
-        .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
+        .op(read={ChannelBuffer:'OFBooleanValue.of(bb.readByte() != 0)',ByteBuffer:'OFBooleanValue.of(bb.get() != 0)'}, 
+             write={ChannelBuffer:'bb.writeByte($name.getInt())',ByteBuffer:'bb.put((byte) $name.getInt())'},
+             default="OFBooleanValue.FALSE")
 checksum = JType("OFChecksum128") \
         .op(read='OFChecksum128.read16Bytes(bb)',
             write='$name.write16Bytes(bb)',
@@ -682,10 +766,12 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return action_type
     elif field_name == "err_type":
         return JType("OFErrorType", 'short') \
-            .op(read='bb.readShort()', write='bb.writeShort($name)')
+            .op(read={ChannelBuffer:'bb.readShort()',ByteBuffer:'bb.getShort()'}, 
+                write={ChannelBuffer:'bb.writeShort($name)',ByteBuffer:'bb.putShort($name)'})
     elif field_name == "stats_type":
         return JType("OFStatsType", 'short') \
-            .op(read='bb.readShort()', write='bb.writeShort($name)')
+            .op(read={ChannelBuffer:'bb.readShort()',ByteBuffer:'bb.getShort()'}, 
+                write={ChannelBuffer:'bb.writeShort($name)',ByteBuffer:'bb.putShort($name)'})
     elif field_name == "type" and re.match(r'of_instruction.*', obj_name):
         return instruction_type
     elif loxi_utils.class_is(obj_name, "of_flow_mod") and field_name == "table_id" and c_type == "uint8_t":
@@ -720,10 +806,18 @@ def convert_to_jtype(obj_name, field_name, c_type):
 
 #### Enum specific wiretype definitions
 enum_wire_types = {
-        "uint8_t": JType("byte").op(read="bb.readByte()", write="bb.writeByte($name)"),
-        "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
-        "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
-        "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+        "uint8_t": JType("byte")\
+                   .op(read={ChannelBuffer:"bb.readByte()",ByteBuffer:"bb.get()"}, 
+                       write={ChannelBuffer:"bb.writeByte($name)",ByteBuffer:"bb.put($name)"}),
+        "uint16_t": JType("short")\
+                   .op(read={ChannelBuffer:"bb.readShort()",ByteBuffer:"bb.getShort()"}, 
+                       write={ChannelBuffer:"bb.writeShort($name)",ByteBuffer:"bb.putShort($name)"}),
+        "uint32_t": JType("int")\
+                   .op(read={ChannelBuffer:"bb.readInt()",ByteBuffer:"bb.getInt()"}, 
+                       write={ChannelBuffer:"bb.writeInt($name)",ByteBuffer:"bb.putInt($name)"}),
+        "uint64_t": JType("long")\
+                   .op(read={ChannelBuffer:"bb.readLong()",ByteBuffer:"bb.getLong()"}, 
+                       write={ChannelBuffer:"bb.writeLong($name)",ByteBuffer:"bb.putLong($name)"}),
 }
 
 def convert_enum_wire_type_to_jtype(wire_type):

@@ -61,7 +61,7 @@ public class ${test.name} {
 
     //:: if "java" in test_data:
     @Test
-    public void testWrite() {
+    public void testWriteChannelBuffer() {
         //:: if use_builder:
         ${var_type}.Builder builder = factory.${factory_method}();
         ${test_data["java"]};
@@ -69,16 +69,34 @@ public class ${test.name} {
         //:: else:
         ${var_type} ${var_name} = factory.${factory_method}();
         //:: #endif
-        ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
-        ${var_name}.writeTo(bb);
-        byte[] written = new byte[bb.readableBytes()];
-        bb.readBytes(written);
+        ChannelBuffer cb = ChannelBuffers.dynamicBuffer();
+        ${var_name}.writeTo(cb);
+        byte[] cWritten = new byte[cb.readableBytes()];
+        cb.readBytes(cWritten);
 
-        assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
+        assertThat(cWritten, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
     }
 
     @Test
-    public void testRead() throws Exception {
+    public void testWriteByteBuffer() {
+        //:: if use_builder:
+        ${var_type}.Builder builder = factory.${factory_method}();
+        ${test_data["java"]};
+        ${var_type} ${var_name} = builder.build();
+        //:: else:
+        ${var_type} ${var_name} = factory.${factory_method}();
+        //:: #endif
+        ByteBuffer bb = ByteBuffer.allocateDirect(65535);
+        ${var_name}.writeTo(bb);
+        byte[] bWritten = new byte[bb.position()];
+        bb.position(0);
+        bb.get(bWritten);
+
+        assertThat(bWritten, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
+    }
+
+    @Test
+    public void testReadChannelBuffer() throws Exception {
         //:: if use_builder:
         ${var_type}.Builder builder = factory.${factory_method}();
         ${test_data["java"]};
@@ -94,26 +112,67 @@ public class ${test.name} {
         assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
         assertEquals(${var_name}Built, ${var_name}Read);
+    }
+
+    @Test
+    public void testReadByteBuffer() throws Exception {
+        //:: if use_builder:
+        ${var_type}.Builder builder = factory.${factory_method}();
+        ${test_data["java"]};
+        ${var_type} ${var_name}Built = builder.build();
+        //:: else:
+        ${var_type} ${var_name}Built = factory.${factory_method}();
+        //:: #endif
+
+        ByteBuffer bb = ByteBuffer.allocateDirect(${msg.constant_name}_SERIALIZED.length);
+        bb.put(${msg.constant_name}_SERIALIZED);
+        bb.position(0);
+
+        // FIXME should invoke the overall reader once implemented
+        ${var_type} ${var_name}Read = ${msg.name}.READER.readFrom(bb);
+        assertEquals("raw:" + ${msg.constant_name}_SERIALIZED, 
+			${msg.constant_name}_SERIALIZED.length, bb.position());
+
+        assertEquals(${var_name}Built, ${var_name}Read);
    }
    //:: else:
    // FIXME: No java stanza in test_data for this class. Add for more comprehensive unit testing
    //:: #endif
 
    @Test
-   public void testReadWrite() throws Exception {
+   public void testReadWriteChannelBuffer() throws Exception {
        ChannelBuffer input = ChannelBuffers.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
        // FIXME should invoke the overall reader once implemented
-       ${var_type} ${var_name} = ${msg.name}.READER.readFrom(input);
+       ${var_type} ${var_name}_c = ${msg.name}.READER.readFrom(input);
        assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
        // write message again
-       ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
-       ${var_name}.writeTo(bb);
-       byte[] written = new byte[bb.readableBytes()];
-       bb.readBytes(written);
+       ChannelBuffer cb = ChannelBuffers.dynamicBuffer();
+       ${var_name}_c.writeTo(cb);
+       byte[] written = new byte[cb.readableBytes()];
+       cb.readBytes(written);
 
        assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
    }
 
+   @Test
+   public void testReadWriteByteBuffer() throws Exception {
+       ByteBuffer bb = ByteBuffer.allocateDirect(${msg.constant_name}_SERIALIZED.length);
+       bb.put(${msg.constant_name}_SERIALIZED);
+       bb.position(0);
+
+       // FIXME should invoke the overall reader once implemented
+       ${var_type} ${var_name}_b = ${msg.name}.READER.readFrom(bb);
+       assertEquals(${msg.constant_name}_SERIALIZED.length, bb.position());
+
+       // write message again
+       bb = ByteBuffer.allocateDirect(65535);
+       ${var_name}_b.writeTo(bb); 
+       byte[] written2 = new byte[bb.position()];
+       bb.flip();
+       bb.get(written2);
+
+       assertThat(written2, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
+   }
 }

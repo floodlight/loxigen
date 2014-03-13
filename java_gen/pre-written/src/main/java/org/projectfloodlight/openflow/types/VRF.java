@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import javax.annotation.concurrent.Immutable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
@@ -64,8 +65,16 @@ public class VRF implements OFValueType<VRF> {
         c.writeInt(rawValue);
     }
 
+    public void write4Bytes(ByteBuffer c) {
+        c.putInt(rawValue);
+    }
+
     public static VRF read4Bytes(ChannelBuffer c) {
         return VRF.of(c.readInt());
+    }
+
+    public static VRF read4Bytes(ByteBuffer c) {
+        return VRF.of(c.getInt());
     }
 
     @Override

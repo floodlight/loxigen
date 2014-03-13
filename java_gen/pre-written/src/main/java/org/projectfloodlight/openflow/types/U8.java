@@ -18,6 +18,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -93,6 +95,11 @@ public class U8 implements Writeable, OFValueType<U8> {
         bb.writeByte(raw);
     }
 
+    @Override
+    public void writeTo(ByteBuffer bb) {
+        bb.put(raw);
+    }
+
     public static short f(final byte i) {
         return (short) (i & 0xff);
     }
@@ -108,6 +115,11 @@ public class U8 implements Writeable, OFValueType<U8> {
         @Override
         public U8 readFrom(ChannelBuffer bb) throws OFParseError {
             return new U8(bb.readByte());
+        }
+
+        @Override
+        public U8 readFrom(ByteBuffer bb) throws OFParseError {
+            return new U8(bb.get());
         }
     }
 

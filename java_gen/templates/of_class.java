@@ -28,6 +28,9 @@
 //:: from loxi_ir import *
 //:: import os
 //:: import itertools
+
+//:: from java_gen.buffers import *
+
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -268,6 +271,85 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             return INSTANCE;
             //:: #endif
         }
+
+        public ${msg.interface.name} readFrom(ByteBuffer bb) throws OFParseError {
+//:: for prop in msg.members:
+//:: if not prop.is_virtual and (prop.is_length_value or prop.is_field_length_value):
+            int start = bb.position();
+//::     break
+//:: #endif
+//:: #endfor
+//:: fields_with_length_member = {}
+//:: for prop in msg.members:
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True,
+                    length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None, buf_type=ByteBuffer)};
+//:: elif prop.is_pad:
+            // pad: ${prop.length} bytes
+            bb.position( bb.position() + ${prop.length});
+//:: elif prop.is_length_value:
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True, buf_type=ByteBuffer)};
+            //:: if prop.is_fixed_value:
+            if(${prop.name} != ${prop.value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+            //:: else:
+            if(${prop.name} < MINIMUM_LENGTH)
+                throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
+            //:: #endif
+            if(bb.remaining() + (bb.position() - start) < ${prop.name}) {
+                // Buffer does not have all data yet
+                bb.position(start);
+                return null;
+            }
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - length={}", ${prop.name});
+            //:: #endif
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} == ${prop.value}
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False, buf_type=ByteBuffer)};
+            if(${prop.name} != ${prop.priv_value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+//:: elif prop.is_field_length_value:
+//::        fields_with_length_member[prop.member.field_name] = prop.name
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True, buf_type=ByteBuffer)};
+//:: else:
+    // fixme: todo ${prop.name}
+//:: #endif
+//:: #endfor
+            //:: if msg.align:
+            //:: if msg.length_includes_align:
+            // align message to ${msg.align} bytes (length contains aligned value)
+            bb.position( bb.position() + length - (bb.position() - start));
+            //:: else:
+            // align message to ${msg.align} bytes (length does not contain alignment)
+            bb.position( bb.position() + ((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            //:: #endif
+            //:: #endif
+
+            //:: if msg.data_members:
+            //:: if os.path.exists("%s/custom/%s.Reader_normalize_stanza.java" % (template_dir, msg.name)):
+            //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+            //:: #endif
+            ${impl_class} ${msg.variable_name} = new ${impl_class}(
+                    ${",\n                      ".join(
+                         [ prop.name for prop in msg.data_members])}
+                    );
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - read={}", ${msg.variable_name});
+            //:: #endif
+            return ${msg.variable_name};
+            //:: else:
+            //:: if genopts.instrument:
+            if(logger.isTraceEnabled())
+                logger.trace("readFrom - returning shared instance={}", INSTANCE);
+            //:: #endif
+            return INSTANCE;
+            //:: #endif
+        }
     }
 
     public void putTo(PrimitiveSink sink) {
@@ -298,6 +380,10 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
 
     public void writeTo(ChannelBuffer bb) {
+        WRITER.write(bb, this);
+    }
+
+    public void writeTo(ByteBuffer bb) {
         WRITER.write(bb, this);
     }
 
@@ -335,6 +421,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             // ${prop.name} is length indicator for ${prop.member.field_name}, will be
             // udpated when ${prop.member.field_name} has been written
             int ${prop.name}Index = bb.writerIndex();
+            // ${prop.name}
             ${prop.java_type.write_op(version, 0, pub_type=False)};
 //:: else:
             // FIXME: todo write ${prop.name}
@@ -357,6 +444,66 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: if msg.align:
             // align message to ${msg.align} bytes
             bb.writeZero(alignedLength - length);
+            //:: #endif
+//:: #end
+
+        }
+
+        @Override
+        public void write(ByteBuffer bb, ${impl_class} message) {
+//:: if not msg.is_fixed_length:
+            int startIndex = bb.position();
+//:: #endif
+//:: fields_with_length_member = {}
+//:: for prop in msg.members:
+//:: if prop.c_name in fields_with_length_member:
+            int ${prop.name}StartIndex = bb.position();
+//:: #endif
+//:: if prop.is_virtual:
+//::    continue
+//:: elif prop.is_data:
+            ${prop.java_type.write_op(version, "message." + prop.name, pub_type=True, buf_type=ByteBuffer)};
+//:: elif prop.is_pad:
+            // pad: ${prop.length} bytes
+            for ( int i = 0; i < ${prop.length}; ++i ) { bb.put((byte)0); }
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} = ${prop.value} 
+            ${prop.java_type.write_op(version, prop.priv_value, pub_type=False, buf_type=ByteBuffer)};
+//:: elif prop.is_length_value:
+            // ${prop.name} is length of variable message, will be updated at the end
+//:: if not msg.is_fixed_length:
+            int lengthIndex = bb.position();
+//:: #end
+            ${prop.java_type.write_op(version, 0, buf_type=ByteBuffer)};
+
+//:: elif prop.is_field_length_value:
+//::        fields_with_length_member[prop.member.field_name] = prop.name
+            // ${prop.name} is length indicator for ${prop.member.field_name}, will be
+            // udpated when ${prop.member.field_name} has been written
+            int ${prop.name}Index = bb.position();
+            // ${prop.name}
+            ${prop.java_type.write_op(version, '(%s) 0' % prop.java_type.priv_type, pub_type=False, buf_type=ByteBuffer)};
+//:: else:
+            // FIXME: todo write ${prop.name}
+//:: #endif
+//:: if prop.c_name in fields_with_length_member:
+//::     length_member_name = fields_with_length_member[prop.c_name]
+            // update field length member ${length_member_name}
+            int ${prop.name}Length = bb.position() - ${prop.name}StartIndex;
+            bb.putShort(${length_member_name}Index, (short) ${prop.name}Length);
+//:: #endif
+//:: #endfor
+
+//:: if not msg.is_fixed_length:
+            // update length field
+            int length = bb.position() - startIndex;
+            //:: if msg.align:
+            int alignedLength = ((length + ${msg.align-1})/${msg.align} * ${msg.align});
+            //:: #endif
+            bb.putShort(lengthIndex, (short) ${"alignedLength" if msg.length_includes_align else "length"});
+            //:: if msg.align:
+            // align message to ${msg.align} bytes
+            for ( int i = 0; i < (alignedLength - length); ++i ) { bb.put((byte)0); }
             //:: #endif
 //:: #end
 

@@ -28,6 +28,8 @@
 //:: import itertools
 //:: include('_copyright.java')
 
+//:: from java_gen.buffers import *
+
 //:: include('_autogen.java')
 
 package ${package};
@@ -53,8 +55,20 @@ public class ${class_name} {
         }
     }
 
+    public static Set<${enum.name}> readFrom(ByteBuffer bb) throws OFParseError {
+        try {
+            return ofWireValue(${wire_type.read_op(version, buf_type=ByteBuffer)});
+        } catch (IllegalArgumentException e) {
+            throw new OFParseError(e);
+        }
+    }
+
     public static void writeTo(ChannelBuffer bb, Set<${enum.name}> set) {
         ${wire_type.write_op(version=version, name="toWireValue(set)")};
+    }
+
+    public static void writeTo(ByteBuffer bb, Set<${enum.name}> set) {
+        ${wire_type.write_op(version=version, name="toWireValue(set)", buf_type=ByteBuffer)};
     }
 
     public static void putTo(Set<${enum.name}> set, PrimitiveSink sink) {

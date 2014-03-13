@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 
@@ -52,9 +53,20 @@ public class OFChecksum128 implements OFValueType<OFChecksum128> {
         cb.writeLong(raw2);
     }
 
+    public void write16Bytes(ByteBuffer cb) {
+        cb.putLong(raw1);
+        cb.putLong(raw2);
+    }
+
     public static OFChecksum128 read16Bytes(ChannelBuffer cb) {
         long raw1 = cb.readLong();
         long raw2 = cb.readLong();
+        return of(raw1, raw2);
+    }
+
+    public static OFChecksum128 read16Bytes(ByteBuffer cb) {
+        long raw1 = cb.getLong();
+        long raw2 = cb.getLong();
         return of(raw1, raw2);
     }
 

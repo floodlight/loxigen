@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -74,8 +76,16 @@ public class TransportPort implements OFValueType<TransportPort> {
         c.writeShort(this.port);
     }
 
+    public void write2Bytes(ByteBuffer c) {
+        c.putShort((short)this.port);
+    }
+
     public static TransportPort read2Bytes(ChannelBuffer c) throws OFParseError {
         return TransportPort.of((c.readUnsignedShort() & 0x0FFFF));
+    }
+
+    public static TransportPort read2Bytes(ByteBuffer c) throws OFParseError {
+        return TransportPort.of((c.getShort() & 0x0FFFF));
     }
 
     @Override

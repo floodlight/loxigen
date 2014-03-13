@@ -22,11 +22,25 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 public class StringByteSerializer {
     public static String readFrom(final ChannelBuffer data, final int length) {
         byte[] stringBytes = new byte[length];
         data.readBytes(stringBytes);
+        // find the first index of 0
+        int index = 0;
+        for (byte b : stringBytes) {
+            if (0 == b)
+                break;
+            ++index;
+        }
+        return new String(Arrays.copyOf(stringBytes, index), Charset.forName("ascii"));
+    }
+
+    public static String readFrom(final ByteBuffer data, final int length) {
+        byte[] stringBytes = new byte[length];
+        data.get(stringBytes);
         // find the first index of 0
         int index = 0;
         for (byte b : stringBytes) {
@@ -53,6 +67,23 @@ public class StringByteSerializer {
         } catch (UnsupportedEncodingException e) {
             throw new RuntimeException(e);
         }
+    }
 
+    public static void writeTo(final ByteBuffer data, final int length,
+            final String value) {
+        try {
+            byte[] name = value.getBytes("ASCII");
+            if (name.length < length) {
+                data.put(name);
+                for (int i = name.length; i < length; ++i) {
+                    data.put((byte) 0);
+                }
+            } else {
+                data.put(name, 0, length - 1);
+                data.put((byte) 0);
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
