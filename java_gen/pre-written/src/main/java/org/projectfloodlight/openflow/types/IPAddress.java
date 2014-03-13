@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.Nonnull;
+
 public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F> {
 
     public abstract IPVersion getIpVersion();
@@ -20,13 +22,50 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract int asCidrMaskLength();
 
+    /**
+     * Checks if the IPAddress is the global broadcast address
+     * 255.255.255.255 in case of IPv4
+     * @return boolean true or false
+     */
+    public abstract boolean isBroadcast();
+
+    /**
+     * Perform a low level AND operation on the bits of two IPAddress<?> objects
+     * @param   IPAddress<?> other
+     * @return  new IPAddress<?> object after the AND oper
+     */
+    public abstract F and(F other);
+
+    /**
+     * Perform a low level OR operation on the bits of two IPAddress<?> objects
+     * @param   IPAddress<?> other
+     * @return  new IPAddress<?> object after the AND oper
+     */
+    public abstract F or(F other);
+
+    /**
+     * Returns a new IPAddress object with the bits inverted
+     * @return  IPAddress<?>
+     */
+    public abstract F not();
+
     @Override
     public abstract boolean equals(Object other);
 
     @Override
     public abstract int hashCode();
 
-    public static IPAddress<?> of(String ip) {
+    /** parse an IPv4Address or IPv6Address from their conventional string representation.
+     *  For details on supported representations,  refer to {@link IPv4Address#of(String)}
+     *  and {@link IPv6Address#of(String)}
+     *
+     * @param ip a string representation of an IP address
+     * @return the parsed IP address
+     * @throws NullPointerException if ip is null
+     * @throws IllegalArgumentException if string is not a valid IP address
+     */
+    @Nonnull
+    public static IPAddress<?> of(@Nonnull String ip) {
         if (ip == null) {
             throw new NullPointerException("String ip must not be null");
         }

@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
 
+import javax.annotation.Nonnull;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import java.nio.ByteBuffer;
 
@@ -70,6 +72,34 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         }
     }
 
+    @Override
+    public boolean isBroadcast() {
+        return this.equals(NO_MASK);
+    }
+
+    @Override
+    public IPv4Address and(IPv4Address other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv4Address otherIp = (IPv4Address) other;
+        return IPv4Address.of(rawValue & otherIp.rawValue);
+    }
+
+    @Override
+    public IPv4Address or(IPv4Address other) {
+        if (other == null) {
+            throw new NullPointerException("Other IP Address must not be null");
+        }
+        IPv4Address otherIp = (IPv4Address) other;
+        return IPv4Address.of(rawValue | otherIp.rawValue);
+    }
+
+    @Override
+    public IPv4Address not() {
+        return IPv4Address.of(~rawValue);
+    }
+
     public static IPv4Address of(final byte[] address) {
         if (address == null) {
             throw new NullPointerException("Address must not be null");
@@ -85,13 +115,27 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPv4Address.of(raw);
     }
 
+    /** construct an IPv4Address from a 32-bit integer value.
+     *
+     * @param raw the IPAdress represented as a 32-bit integer
+     * @return the constructed IPv4Address
+     */
     public static IPv4Address of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
         return new IPv4Address(raw);
     }
 
-    public static IPv4Address of(final String string) {
+    /** parse an IPv4Address from the canonical dotted-quad representation
+     * (1.2.3.4).
+     *
+     * @param string an IPv4 address in dotted-quad representation
+     * @return the parsed IPv4 address
+     * @throws NullPointerException if string is null
+     * @throws IllegalArgumentException if string is not a valid IPv4Address
+     */
+    @Nonnull
+    public static IPv4Address of(@Nonnull final String string) throws IllegalArgumentException {
         if (string == null) {
             throw new NullPointerException("String must not be null");
         }
@@ -172,7 +216,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     @Override
     public IPv4Address applyMask(IPv4Address mask) {
-        return IPv4Address.of(this.rawValue & mask.rawValue);
+        return and(mask);
     }
 
     @Override

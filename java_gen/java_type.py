@@ -693,6 +693,9 @@ exceptions = {
         'of_oxm_bsn_l3_dst_class_id' : { 'value' : class_id },
         'of_oxm_bsn_l3_dst_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
+        'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
+        'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
@@ -703,6 +706,7 @@ exceptions = {
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
         'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
         'of_flow_stats_request': { 'out_group': of_group_default_any },
+        'of_aggregate_stats_request': { 'out_group': of_group_default_any },
 
         'of_action_bsn_mirror': { 'dest_port': of_port },
         'of_action_push_mpls': { 'ethertype': eth_type },

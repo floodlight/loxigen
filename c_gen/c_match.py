@@ -294,6 +294,7 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_BSN_L3_INTERFACE_CLASS_ID = 40,
     OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
     OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
+    OF_OXM_INDEX_BSN_EGR_PORT_GROUP_ID = 43,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
