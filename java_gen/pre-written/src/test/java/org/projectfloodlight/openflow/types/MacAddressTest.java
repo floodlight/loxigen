@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.nio.ByteBuffer;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -151,4 +153,37 @@ public class MacAddressTest {
         assertFalse(MacAddress.of("00:80:C2:f0:00:00").isLLDPAddress());
         assertFalse(MacAddress.of("FE:80:C2:00:00:00").isLLDPAddress());
     }
+
+    @Test
+    public void testMacAgainstByteBuffer() {
+        MacAddress start = MacAddress.of("01:80:c2:00:01:02");
+
+	ByteBuffer buf = ByteBuffer.allocateDirect(6);
+        start.write6Bytes(buf);
+
+        buf.position(0);
+
+        MacAddress end = null;
+        try { 
+            end = MacAddress.read6Bytes(buf);
+            assertEquals("before:"+start+",after:"+end, start, end);
+        } catch ( OFParseError e ) {
+            fail("before:" + start + ", and after: " + end);
+        }
+    }
+
+    @Test
+    public void testMacAgainstByteBuffer2() {
+        for ( int i = 0; i < testAddresses.length; ++i ) {
+	    ByteBuffer buf = ByteBuffer.wrap(testAddresses[0]);
+	    MacAddress end = null;
+	    try { 
+	        end = MacAddress.read6Bytes(buf);
+	        assertEquals(MacAddress.of(testAddresses[0]), end);
+	    } catch ( OFParseError e ) {
+	        fail("after: " + end);
+	    }
+        }
+    }
+  
 }

@@ -5,6 +5,8 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
@@ -181,8 +183,19 @@ public class MacAddress implements OFValueType<MacAddress> {
         c.writeShort((int) this.rawValue & 0xFFFF);
     }
 
+    public void write6Bytes(ByteBuffer c) {
+        c.putInt((int) (this.rawValue >> 16));
+        c.putShort((short)(this.rawValue & 0xFFFF));
+    }
+
     public static MacAddress read6Bytes(ChannelBuffer c) throws OFParseError {
         long raw = c.readUnsignedInt() << 16 | c.readUnsignedShort();
+        return MacAddress.of(raw);
+    }
+
+    public static MacAddress read6Bytes(ByteBuffer c) throws OFParseError {
+	// and with 0x0000ffff is to remove sign bit. 
+        long raw = (((long) c.getInt()) << 16) | (0x0000ffff & c.getShort());
         return MacAddress.of(raw);
     }
 
@@ -201,7 +214,4 @@ public class MacAddress implements OFValueType<MacAddress> {
         sink.putInt((int) (this.rawValue >> 16));
         sink.putShort((short) (this.rawValue & 0xFFFF));
     }
-
-
-
 }

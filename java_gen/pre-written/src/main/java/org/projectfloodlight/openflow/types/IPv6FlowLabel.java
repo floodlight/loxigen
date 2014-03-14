@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -60,8 +62,16 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
         c.writeInt(this.label);
     }
 
+    public void write4Bytes(ByteBuffer c) {
+        c.putInt(this.label);
+    }
+
     public static IPv6FlowLabel read4Bytes(ChannelBuffer c) throws OFParseError {
         return IPv6FlowLabel.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
+    }
+
+    public static IPv6FlowLabel read4Bytes(ByteBuffer c) throws OFParseError {
+        return IPv6FlowLabel.of((int)(c.getInt() & 0xFFFFFFFF));
     }
 
     @Override

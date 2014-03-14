@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.match.MatchFields;
@@ -102,8 +103,20 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkab
         return ofList(ChannelUtils.readList(bb, length, reader));
     }
 
+    public static OFOxmList readFrom(ByteBuffer bb, int length,
+            OFMessageReader<OFOxm<?>> reader) throws OFParseError {
+        return ofList(ChannelUtils.readList(bb, length, reader));
+    }
+
     @Override
     public void writeTo(ChannelBuffer bb) {
+        for (OFOxm<?> o : this) {
+            o.writeTo(bb);
+        }
+    }
+
+    @Override
+    public void writeTo(ByteBuffer bb) {
         for (OFOxm<?> o : this) {
             o.writeTo(bb);
         }

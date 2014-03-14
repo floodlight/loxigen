@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -135,8 +137,16 @@ public class OFGroup implements OFValueType<OFGroup> {
         c.writeInt(this.groupNumber);
     }
 
+    public void write4Bytes(ByteBuffer c) {
+        c.putInt(this.groupNumber);
+    }
+
     public static OFGroup read4Bytes(ChannelBuffer c) throws OFParseError {
         return OFGroup.of(c.readInt());
+    }
+
+    public static OFGroup read4Bytes(ByteBuffer c) throws OFParseError {
+        return OFGroup.of(c.getInt());
     }
 
     @Override

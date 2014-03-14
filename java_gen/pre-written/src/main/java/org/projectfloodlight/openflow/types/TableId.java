@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -62,8 +64,16 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
         c.writeByte(this.id);
     }
 
+    public void writeByte(ByteBuffer c) {
+        c.put((byte)this.id);
+    }
+
     public static TableId readByte(ChannelBuffer c) throws OFParseError {
         return TableId.of(c.readUnsignedByte());
+    }
+
+    public static TableId readByte(ByteBuffer c) throws OFParseError {
+        return TableId.of(0x00ff & c.get());
     }
 
     @Override

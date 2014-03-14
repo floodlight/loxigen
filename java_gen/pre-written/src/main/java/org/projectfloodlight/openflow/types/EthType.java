@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
@@ -225,8 +226,16 @@ public class EthType implements OFValueType<EthType> {
         c.writeShort(this.rawValue);
     }
 
+    public void write2Bytes(ByteBuffer c) {
+        c.putShort((short)this.rawValue);
+    }
+
     public static EthType read2Bytes(ChannelBuffer c) {
         return EthType.of(c.readUnsignedShort());
+    }
+
+    public static EthType read2Bytes(ByteBuffer c) {
+        return EthType.of(0x0000ffff & c.getShort());
     }
 
     @Override

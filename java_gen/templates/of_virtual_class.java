@@ -32,6 +32,8 @@
 
 //:: include('_autogen.java')
 
+//:: from java_gen.buffers import *
+
 package ${msg.package};
 
 //:: include("_imports.java", msg=msg)
@@ -81,6 +83,62 @@ abstract class ${msg.name} {
 //:: elif prop.is_discriminator:
             ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
             bb.readerIndex(start);
+            switch(${prop.name}) {
+//::     for sub in msg.subclasses:
+//::           if not model.generate_class(sub):
+               // skip ${sub.name} - excluded from generation
+//::           else:
+//::           m = sub.member_by_name(prop.name)
+//::           if not m.is_fixed_value:
+//::                  raise Exception("subtype %s of %s does not have fixed value for discriminator %s" %
+//::                           (sub.name, msg.name, prop.name))
+//::           #endif
+               case ${m.priv_value}:
+                   // discriminator value ${m.enum_value}=${m.value} for class ${sub.name}
+                   return ${sub.name}.READER.readFrom(bb);
+//:: #endif    # generate_class
+//:: #endfor
+               default:
+                   throw new OFParseError("Unknown value for discriminator ${prop.name} of class ${msg.name}: " + ${prop.name});
+            }
+//::        break
+//:: #endif
+//:: #endfor
+        }
+
+        @Override
+        public ${msg.interface.inherited_declaration()} readFrom(ByteBuffer bb) throws OFParseError {
+//:: if msg.is_fixed_length:
+            if(bb.remaining() < LENGTH)
+//:: else:
+            if(bb.remaining() < MINIMUM_LENGTH)
+//:: #endif
+                return null;
+            int start = bb.position();
+//:: fields_with_length_member = {}
+//::    for prop in msg.members:
+//::       if prop.is_data:
+            ${prop.java_type.skip_op(version,
+                    length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None,
+                    buf_type=ByteBuffer)};
+//:: elif prop.is_pad:
+            // pad: ${prop.length} bytes
+            for ( int i = 0; i < ${prop.length}; ++i ) { bb.get(); }
+//:: elif prop.is_fixed_value:
+            // fixed value property ${prop.name} == ${prop.value}
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False, buf_type=ByteBuffer)};
+            if(${prop.name} != ${prop.priv_value})
+                throw new OFParseError("Wrong ${prop.name}: Expected=${prop.enum_value}(${prop.value}), got="+${prop.name});
+//:: elif prop.is_length_value:
+            ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True, buf_type=ByteBuffer)};
+            if(${prop.name} < MINIMUM_LENGTH)
+                throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
+//:: elif prop.is_field_length_value:
+//::        fields_with_length_member[prop.member.field_name] = prop.name
+            int ${prop.name} = ${prop.java_type.read_op(version, buf_type=ByteBuffer)};
+//:: elif prop.is_discriminator:
+            ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False, buf_type=ByteBuffer)};
+            bb.position(start);
             switch(${prop.name}) {
 //::     for sub in msg.subclasses:
 //::           if not model.generate_class(sub):

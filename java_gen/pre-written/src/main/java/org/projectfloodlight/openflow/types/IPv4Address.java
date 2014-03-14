@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
@@ -201,8 +202,16 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         c.writeInt(rawValue);
     }
 
+    public void write4Bytes(ByteBuffer c) {
+        c.putInt(rawValue);
+    }
+
     public static IPv4Address read4Bytes(ChannelBuffer c) {
         return IPv4Address.of(c.readInt());
+    }
+
+    public static IPv4Address read4Bytes(ByteBuffer c) {
+        return IPv4Address.of(c.getInt());
     }
 
     @Override

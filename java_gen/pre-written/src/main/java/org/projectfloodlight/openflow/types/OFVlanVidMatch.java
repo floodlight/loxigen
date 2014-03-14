@@ -5,6 +5,8 @@ import java.util.Arrays;
 import javax.annotation.Nullable;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,6 +52,11 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
         @Override
         public void write2BytesOF10(ChannelBuffer c) {
             c.writeShort(UNTAGGED_VAL_OF10);
+        }
+
+        @Override
+        public void write2BytesOF10(ByteBuffer c) {
+            c.putShort(UNTAGGED_VAL_OF10);
         }
     };
 
@@ -164,16 +171,32 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
         c.writeShort(this.vid);
     }
 
+    public void write2Bytes(ByteBuffer c) {
+        c.putShort(this.vid);
+    }
+
     public void write2BytesOF10(ChannelBuffer c) {
         c.writeShort(this.getVlan());
+    }
+
+    public void write2BytesOF10(ByteBuffer c) {
+        c.putShort(this.getVlan());
     }
 
     public static OFVlanVidMatch read2Bytes(ChannelBuffer c) throws OFParseError {
         return OFVlanVidMatch.ofRawVid(c.readShort());
     }
 
+    public static OFVlanVidMatch read2Bytes(ByteBuffer c) throws OFParseError {
+        return OFVlanVidMatch.ofRawVid(c.getShort());
+    }
+
     public static OFVlanVidMatch read2BytesOF10(ChannelBuffer c) throws OFParseError {
         return OFVlanVidMatch.ofVlanOF10(c.readShort());
+    }
+
+    public static OFVlanVidMatch read2BytesOF10(ByteBuffer c) throws OFParseError {
+        return OFVlanVidMatch.ofVlanOF10(c.getShort());
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import java.nio.ByteBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -68,8 +70,16 @@ public class OFAuxId implements Comparable<OFAuxId>, PrimitiveSinkable {
         c.writeByte(this.id);
     }
 
+    public void writeByte(ByteBuffer c) {
+        c.put((byte) this.id);
+    }
+
     public static OFAuxId readByte(ChannelBuffer c) throws OFParseError {
         return OFAuxId.of(c.readUnsignedByte());
+    }
+
+    public static OFAuxId readByte(ByteBuffer c) throws OFParseError {
+        return OFAuxId.of(0x00ff & c.get());
     }
 
 

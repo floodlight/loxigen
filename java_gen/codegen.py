@@ -34,6 +34,8 @@ import pdb
 import os
 import shutil
 
+from buffers import *
+
 import loxi_globals
 from loxi_ir import *
 import lang_java

@@ -41,6 +41,7 @@ public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotati
 //:: #endfor
 
     void writeTo(ChannelBuffer channelBuffer);
+    void writeTo(ByteBuffer channelBuffer);
 
     Builder${msg.type_variable} createBuilder();
     //:: simple_type, annotation = re.match(r'(\w+)(<.*>)?', msg.parent_interface).groups() if msg.parent_interface else ("", "")
