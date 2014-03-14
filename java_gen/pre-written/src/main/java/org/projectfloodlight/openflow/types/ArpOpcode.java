@@ -191,4 +191,8 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
         sink.putShort((short) this.opcode);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(this.opcode);
+    }
 }
