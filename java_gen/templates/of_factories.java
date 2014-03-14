@@ -66,7 +66,9 @@ public final class OFFactories {
         }
 
         public OFMessage readFrom(ByteBuffer bb) throws OFParseError {
-            short wireVersion = U8.f(bb.get(0));
+            bb.mark();
+            short wireVersion = U8.f(bb.get());
+            bb.reset();
             OFFactory factory;
             switch (wireVersion) {
             //:: for v in versions:
