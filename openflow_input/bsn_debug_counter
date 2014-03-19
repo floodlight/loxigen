@@ -33,7 +33,7 @@
 // Switches have many non-dataplane counters that are mainly useful for
 // debugging. An example is the number of packet-ins dropped due to
 // queueing inside the switch. This extension allows the controller to
-// query and reset these counters.
+// query these counters.
 
 struct of_bsn_debug_counter_stats_request : of_bsn_stats_request {
     uint8_t version;
@@ -94,13 +94,4 @@ struct of_bsn_debug_counter_desc_stats_reply : of_bsn_stats_reply {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 13;
     list(of_bsn_debug_counter_desc_stats_entry_t) entries;
-};
-
-struct of_bsn_debug_counter_reset : of_bsn_header {
-    uint8_t version;
-    uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
-    uint32_t experimenter == 0x5c16c7;
-    uint32_t subtype == 62;
 };
