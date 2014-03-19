@@ -79,7 +79,7 @@ struct of_bsn_debug_counter_desc_stats_request : of_bsn_stats_request {
 
 struct of_bsn_debug_counter_desc_stats_entry {
     uint64_t counter_id;
-    of_table_name_t name;
+    of_str64_t name;
     of_desc_str_t description;
 };
 

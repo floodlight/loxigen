@@ -397,5 +397,6 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_bsn_udf7(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u64_counter_id(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_desc_str_description(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_str64_name(writer, cookie, val) LOCI_SHOW_str64(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */
