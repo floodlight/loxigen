@@ -700,6 +700,7 @@ typedef char of_port_name_t[OF_MAX_PORT_NAME_LEN];
 typedef char of_table_name_t[OF_MAX_TABLE_NAME_LEN];
 typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
+typedef char of_str64_t[64];
 
 typedef struct of_bitmap_128_s {
     uint64_t hi;
