@@ -46,4 +46,12 @@ public enum MatchFields {
     BSN_L3_SRC_CLASS_ID,
     BSN_L3_DST_CLASS_ID,
     BSN_EGR_PORT_GROUP_ID,
+    BSN_UDF0,
+    BSN_UDF1,
+    BSN_UDF2,
+    BSN_UDF3,
+    BSN_UDF4,
+    BSN_UDF5,
+    BSN_UDF6,
+    BSN_UDF7,
 }
