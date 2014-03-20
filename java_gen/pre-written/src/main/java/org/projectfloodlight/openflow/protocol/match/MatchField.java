@@ -22,6 +22,7 @@ import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
+import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
 
@@ -198,6 +199,30 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_EGR_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
+
+    public final static MatchField<UDF> BSN_UDF0 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF0);
+
+    public final static MatchField<UDF> BSN_UDF1 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF1);
+
+    public final static MatchField<UDF> BSN_UDF2 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF2);
+
+    public final static MatchField<UDF> BSN_UDF3 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF3);
+
+    public final static MatchField<UDF> BSN_UDF4 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF4);
+
+    public final static MatchField<UDF> BSN_UDF5 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF5);
+
+    public final static MatchField<UDF> BSN_UDF6 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF6);
+
+    public final static MatchField<UDF> BSN_UDF7 =
+            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF7);
 
     public String getName() {
         return name;

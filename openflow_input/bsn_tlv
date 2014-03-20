@@ -118,3 +118,33 @@ struct of_bsn_tlv_circuit_id : of_bsn_tlv {
     uint16_t length;
     of_octets_t value;
 };
+
+struct of_bsn_tlv_udf_id : of_bsn_tlv {
+    uint16_t type == 15;
+    uint16_t length;
+    uint16_t value;
+};
+
+enum ofp_bsn_udf_anchor(wire_type=uint16_t) {
+    OFP_BSN_UDF_ANCHOR_PACKET_START = 0,
+    OFP_BSN_UDF_ANCHOR_L3_HEADER_START = 1,
+    OFP_BSN_UDF_ANCHOR_L4_HEADER_START = 2,
+};
+
+struct of_bsn_tlv_udf_anchor : of_bsn_tlv {
+    uint16_t type == 16;
+    uint16_t length;
+    enum ofp_bsn_udf_anchor value;
+};
+
+struct of_bsn_tlv_udf_offset : of_bsn_tlv {
+    uint16_t type == 17;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_udf_length : of_bsn_tlv {
+    uint16_t type == 18;
+    uint16_t length;
+    uint16_t value;
+};

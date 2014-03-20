@@ -498,6 +498,8 @@ gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
            )
+udf = JType("UDF") \
+         .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
 
 generic_t = JType("T")
 
@@ -611,6 +613,30 @@ exceptions = {
 
         'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
+        'of_oxm_bsn_udf0' : { 'value' : udf },
+        'of_oxm_bsn_udf0_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf1' : { 'value' : udf },
+        'of_oxm_bsn_udf1_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf2' : { 'value' : udf },
+        'of_oxm_bsn_udf2_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf3' : { 'value' : udf },
+        'of_oxm_bsn_udf3_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf4' : { 'value' : udf },
+        'of_oxm_bsn_udf4_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf5' : { 'value' : udf },
+        'of_oxm_bsn_udf5_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf6' : { 'value' : udf },
+        'of_oxm_bsn_udf6_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf7' : { 'value' : udf },
+        'of_oxm_bsn_udf7_masked' : { 'value' : udf, 'value_mask' : udf },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
