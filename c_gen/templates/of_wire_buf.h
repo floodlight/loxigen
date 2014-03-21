@@ -853,6 +853,30 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
     _wbuf_octets_set(buf, offset, (uint8_t *)sernum, OF_SERIAL_NUM_LEN)
 
 /**
+ * Get a str64 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str64_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 64)
+
+/**
+ * Set a str64 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str64
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str64_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 64)
+
+/**
  * Get an ipv6 address from a wire buffer
  * @param wbuf The pointer to the wire buffer structure
  * @param offset Offset in the wire buffer
