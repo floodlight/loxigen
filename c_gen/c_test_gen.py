@@ -92,6 +92,7 @@ def var_name_map(m_type):
         of_table_name_t="table_name",
         of_desc_str_t="desc_str",
         of_serial_num_t="ser_num",
+        of_str64_t="str64",
         of_mac_addr_t="mac_addr",
         of_ipv6_t="ipv6",
         # Non-scalars; more TBD
@@ -115,7 +116,8 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_match_bmap_t", "of_ipv4_t"]
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t"]
+                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
+                "of_str64_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
