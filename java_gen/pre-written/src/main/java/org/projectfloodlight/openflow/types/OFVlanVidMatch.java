@@ -74,7 +74,14 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
     }
 
     public static OFVlanVidMatch ofVlanVid(VlanVid vid) {
-        return ofVlan(vid.getVlan());
+        if(vid == null)
+            return UNTAGGED;
+        else if(VlanVid.NO_MASK.equals(vid))
+            // NO_MASK is a special value in that it doesn't fit in the
+            // allowed value space (0x1FFF) of this type. Do a manual conversion
+            return NO_MASK;
+        else
+            return ofVlan(vid.getVlan());
     }
 
 
@@ -110,7 +117,12 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
      */
     @Nullable
     public VlanVid getVlanVid() {
-        return isPresentBitSet() ? VlanVid.ofVlan((short) (vid & VLAN_MASK)) : null;
+        if(this.equals(NO_MASK))
+            return VlanVid.NO_MASK;
+        else if(isPresentBitSet())
+            return VlanVid.ofVlan((short) (vid & VLAN_MASK));
+        else
+            return null;
     }
 
     @Override
