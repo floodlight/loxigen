@@ -2146,6 +2146,10 @@ def gen_new_fn_body(cls, out):
     if not type_maps.class_is_virtual(cls):
         gen_wire_push_fn(cls, out)
 
+    uclass = loxi_globals.unified.class_by_name(cls)
+    is_fixed_length = uclass and uclass.is_fixed_length
+    max_length = is_fixed_length and "bytes" or "OF_WIRE_BUFFER_MAX_LENGTH"
+
     out.write("""
 /**
  * Create a new %(cls)s object
@@ -2170,13 +2174,12 @@ def gen_new_fn_body(cls, out):
 
     bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
 
-    /* Allocate a maximum-length wire buffer assuming we'll be appending to it. */
-    if ((obj = (%(cls)s_t *)of_object_new(OF_WIRE_BUFFER_MAX_LENGTH)) == NULL) {
+    if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
         return NULL;
     }
 
     %(cls)s_init(obj, version, bytes, 0);
-""" % dict(cls=cls, enum=enum_name(cls)))
+""" % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
         out.write("""
     if (%(cls)s_push_wire_values(obj) < 0) {
