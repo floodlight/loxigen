@@ -149,7 +149,7 @@ struct of_bsn_tlv_udf_length : of_bsn_tlv {
     uint16_t value;
 };
 
-struct of_bsn_tlv_bsn_vrf : of_bsn_tlv {
+struct of_bsn_tlv_vrf : of_bsn_tlv {
     uint16_t type == 19;
     uint16_t length;
     uint16_t value;
