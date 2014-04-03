@@ -85,16 +85,6 @@ extern int of_list_append(of_object_t *list, of_object_t *item);
 extern of_object_t *of_object_new(int bytes);
 extern of_object_t *of_object_dup(of_object_t *src);
 
-/**
- * Callback function prototype for deleting an object
- */
-typedef void (*of_object_delete_callback_f)(of_object_t *obj);
-
-typedef struct of_object_track_info_s {
-    of_object_delete_callback_f delete_cb;  /* To be implemented */
-    void *delete_cookie;
-} of_object_track_info_t;
-
 extern int of_object_xid_set(of_object_t *obj, uint32_t xid);
 extern int of_object_xid_get(of_object_t *obj, uint32_t *xid);
 
@@ -157,8 +147,6 @@ struct of_object_s {
     of_wire_length_set_f wire_length_set;
     of_wire_type_get_f wire_type_get;
     of_wire_type_set_f wire_type_set;
-
-    of_object_track_info_t track_info;
 };
 
 struct of_object_storage_s {

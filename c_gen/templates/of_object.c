@@ -87,13 +87,6 @@ of_object_delete(of_object_t *obj)
         return;
     }
 
-    /*
-     * Make callback if present
-     */
-    if (obj->track_info.delete_cb != NULL) {
-        obj->track_info.delete_cb(obj);
-    }
-
     if (obj->wire_object.owned) {
         of_wire_buffer_free(obj->wire_object.wbuf);
     }
