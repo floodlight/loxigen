@@ -108,9 +108,6 @@ struct of_object_s {
      * underlying buffer */
     int obj_offset;
 
-    /* Boolean, whether the object owns the wire buffer. */
-    char owned;
-
     /* The LOCI type enum value of the object */
     of_object_id_t object_id;
 

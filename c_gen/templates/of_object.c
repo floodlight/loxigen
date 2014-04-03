@@ -65,7 +65,6 @@ of_object_new(int bytes)
             FREE(obj);
             return NULL;
         }
-        obj->owned = 1;
     }
 
     return obj;
@@ -87,7 +86,7 @@ of_object_delete(of_object_t *obj)
         return;
     }
 
-    if (obj->owned) {
+    if (obj->parent == NULL) {
         of_wire_buffer_free(obj->wbuf);
     }
 
@@ -118,8 +117,6 @@ of_object_dup(of_object_t *src)
         FREE(dst);
         return NULL;
     }
-
-    dst->owned = 1;
 
     init_fn = of_object_init_map[src->object_id];
     init_fn(dst, src->version, src->length, 0);
@@ -244,7 +241,6 @@ of_object_buffer_bind(of_object_t *obj, uint8_t *buf, int bytes,
 
     obj->wbuf = wbuf;
     obj->obj_offset = 0;
-    obj->owned = 1;
     obj->length = bytes;
 
     return OF_ERROR_NONE;
@@ -288,7 +284,6 @@ object_child_attach(of_object_t *parent, of_object_t *child,
     /* Set up the child's wire buf to point to same as parent */
     child->wbuf = wbuf;
     child->obj_offset = parent->obj_offset + offset;
-    child->owned = 0;
 
     /*
      * bytes determines if this is a read or write setup.
