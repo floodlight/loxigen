@@ -189,6 +189,18 @@ static inline void of_match_values_mask(of_match_t *match)
     }
 }
 
+static inline void
+of_memmask(void *_fields, void *_masks, size_t len)
+{
+    int idx;
+    uint8_t *fields = _fields;
+    uint8_t *masks = _masks;
+
+    for (idx = 0; idx < len; idx++) {
+        fields[idx] &= masks[idx];
+    }
+}
+
 /**
  * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
  * indices into the map below.
@@ -811,6 +823,7 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
             of_oxm_%(key)s_masked_value_get(
                 &oxm_entry.%(key)s,
                 &dst->fields.%(key)s);
+            of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
             break;
         case OF_OXM_%(ku)s:
             OF_MATCH_MASK_%(ku)s_EXACT_SET(dst);
@@ -827,9 +840,6 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
         } /* end switch */
         rv = of_list_oxm_next(&oxm_list, &oxm_entry);
     } /* end OXM iteration */
-
-    /* Clear values outside of masks */
-    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
