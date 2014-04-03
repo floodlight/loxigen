@@ -101,8 +101,16 @@ int of_object_can_grow(of_object_t *obj, int new_len);
 void of_object_parent_length_update(of_object_t *obj, int delta);
 
 struct of_object_s {
-    /* The control block for the underlying data buffer */
-    of_wire_object_t wire_object;
+    /** A pointer to the underlying buffer's management structure. */
+    of_wire_buffer_t *wbuf;
+
+    /** The start offset for this object relative to the start of the
+     * underlying buffer */
+    int obj_offset;
+
+    /* Boolean, whether the object owns the wire buffer. */
+    char owned;
+
     /* The LOCI type enum value of the object */
     of_object_id_t object_id;
 

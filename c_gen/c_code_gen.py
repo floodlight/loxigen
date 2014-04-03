@@ -375,7 +375,7 @@ extern loci_logger_f loci_logger;
  * Treat as private
  */
 #define OF_OBJECT_TO_MESSAGE(obj) \\
-    ((of_message_t)(WBUF_BUF((obj)->wire_object.wbuf)))
+    ((of_message_t)(WBUF_BUF((obj)->wbuf)))
 
 /**
  * Macro for the fixed length part of an object
@@ -469,8 +469,8 @@ extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
  */
 #define OF_LENGTH_CHECK_ASSERT(obj) \\
     LOCI_ASSERT(((obj)->parent != NULL) || \\
-     ((obj)->wire_object.wbuf == NULL) || \\
-     (WBUF_CURRENT_BYTES((obj)->wire_object.wbuf) == (obj)->length))
+     ((obj)->wbuf == NULL) || \\
+     (WBUF_CURRENT_BYTES((obj)->wbuf) == (obj)->length))
 
 #define OF_DEBUG_DUMP
 #if defined(OF_DEBUG_DUMP)
@@ -1677,9 +1677,9 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
     %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wire_object.wbuf = obj->wire_object.wbuf;
-    %(m_name)s->wire_object.obj_offset = abs_offset;
-    %(m_name)s->wire_object.owned = 0;
+    %(m_name)s->wbuf = obj->wbuf;
+    %(m_name)s->obj_offset = abs_offset;
+    %(m_name)s->owned = 0;
     %(m_name)s->length = cur_len;
 """ % dict(m_type=m_type[:-2], m_name=m_name))
 
@@ -1721,7 +1721,7 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
         out.write("""
     new_len = %(m_name)s->length;
     /* If underlying buffer already shared; nothing to do */
-    if (obj->wire_object.wbuf == %(m_name)s->wire_object.wbuf) {
+    if (obj->wbuf == %(m_name)s->wbuf) {
         of_wire_buffer_grow(wbuf, abs_offset + new_len);
         /* Verify that the offsets are correct */
         LOCI_ASSERT(abs_offset == OF_OBJECT_ABSOLUTE_OFFSET(%(m_name)s, 0));
@@ -2060,11 +2060,11 @@ void
 
     out.write("""
     /* Grow the wire buffer */
-    if (obj->wire_object.wbuf != NULL) {
+    if (obj->wbuf != NULL) {
         int tot_bytes;
 
-        tot_bytes = bytes + obj->wire_object.obj_offset;
-        of_wire_buffer_grow(obj->wire_object.wbuf, tot_bytes);
+        tot_bytes = bytes + obj->obj_offset;
+        of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
 

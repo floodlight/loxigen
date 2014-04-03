@@ -67,8 +67,8 @@ static inline int
 of_object_u16_get(of_object_t *obj, int offset) {
     uint16_t val16;
 
-    of_wire_buffer_u16_get(obj->wire_object.wbuf,
-        obj->wire_object.obj_offset + offset, &val16);
+    of_wire_buffer_u16_get(obj->wbuf,
+        obj->obj_offset + offset, &val16);
 
     return (int)val16;
 }
@@ -86,8 +86,8 @@ of_object_u16_set(of_object_t *obj, int offset, int value) {
     uint16_t val16;
 
     val16 = (uint16_t)value;
-    of_wire_buffer_u16_set(obj->wire_object.wbuf,
-        obj->wire_object.obj_offset + offset, val16);
+    of_wire_buffer_u16_set(obj->wbuf,
+        obj->obj_offset + offset, val16);
 }
 
 /**
