@@ -48,12 +48,6 @@
 #include <loci/of_message.h>
 #include <loci/of_wire_buf.h>
 
-/**
- * This is the number of bytes reserved for metadata in each
- * of_object_t instance.
- */
-#define OF_OBJECT_METADATA_BYTES 32
-
 /*
  * Generic accessors:
  *
@@ -165,13 +159,6 @@ struct of_object_s {
     of_wire_type_set_f wire_type_set;
 
     of_object_track_info_t track_info;
-
-    /*
-     * Metadata available for applications.  Ensure 8-byte alignment, but
-     * that buffer is at least as large as requested.  This data is not used
-     * or inspected by LOCI.
-     */
-    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
 };
 
 struct of_object_storage_s {
