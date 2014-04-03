@@ -48,24 +48,6 @@
 #include <loci/of_message.h>
 #include <loci/of_wire_buf.h>
 
-/*
- * Generic accessors:
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * FIXME: TBD if wire_length_set and wire_type_set are required.
- */
-typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
-typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
-typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj);
-
 /****************************************************************
  * General list operations: first, next, append_setup, append_advance
  ****************************************************************/
@@ -138,15 +120,6 @@ struct of_object_s {
      */
     int length;
     of_version_t version;
-
-    /*
-     * Many objects have a length and/or type represented in the wire buffer
-     * These accessors get and set those value when present.  Treat as private.
-     */
-    of_wire_length_get_f wire_length_get;
-    of_wire_length_set_f wire_length_set;
-    of_wire_type_get_f wire_type_get;
-    of_wire_type_set_f wire_type_set;
 };
 
 struct of_object_storage_s {

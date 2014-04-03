@@ -410,13 +410,8 @@ of_list_append_bind(of_object_t *parent, of_object_t *child)
                         child->length);
 
     /* Update the wire length and type if needed */
-    if (child->wire_length_set) {
-        child->wire_length_set(child, child->length);
-    }
-
-    if (child->wire_type_set) {
-        child->wire_type_set(child);
-    }
+    of_object_wire_length_set(child, child->length);
+    of_object_wire_type_set(child);
 
     /* Update the parent's length */
     of_object_parent_length_update(parent, child->length);
@@ -568,9 +563,7 @@ of_object_parent_length_update(of_object_t *obj, int delta)
     while (obj != NULL) {
         LOCI_ASSERT(count++ < _MAX_PARENT_ITERATIONS);
         obj->length += delta;
-        if (obj->wire_length_set != NULL) {
-            obj->wire_length_set(obj, obj->length);
-        }
+        of_object_wire_length_set(obj, obj->length);
 #ifndef NDEBUG
         wbuf = obj->wire_object.wbuf;
 #endif
@@ -605,9 +598,9 @@ int
 of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
                     int max_len)
 {
-    if (obj->wire_type_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_type_get != NULL) {
         of_object_id_t id;
-        obj->wire_type_get(obj, &id);
+        loci_class_metadata[obj->object_id].wire_type_get(obj, &id);
         if (!of_wire_id_valid(id, base_object_id)) {
             return OF_ERROR_PARSE;
         }
@@ -615,9 +608,9 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
         /* Call the init function for this object type; do not push to wire */
         of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);
     }
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
-        obj->wire_length_get(obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get(obj, &length);
         if (length < 0 || (max_len > 0 && length > max_len)) {
             return OF_ERROR_PARSE;
         }
