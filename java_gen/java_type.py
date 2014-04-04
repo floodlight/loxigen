@@ -649,6 +649,7 @@ exceptions = {
         'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
         'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
+        'of_bsn_controller_connection': { 'auxiliary_id' : of_aux_id},
         'of_flow_stats_request': { 'out_group': of_group_default_any },
         'of_aggregate_stats_request': { 'out_group': of_group_default_any },
 
