@@ -48,30 +48,6 @@
 #include <loci/of_message.h>
 #include <loci/of_wire_buf.h>
 
-/**
- * This is the number of bytes reserved for metadata in each
- * of_object_t instance.
- */
-#define OF_OBJECT_METADATA_BYTES 32
-
-/*
- * Generic accessors:
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * Many objects have a length represented in the wire buffer
- * wire_length_get and wire_length_set access these values directly on the
- * wire.
- *
- * FIXME: TBD if wire_length_set and wire_type_set are required.
- */
-typedef void (*of_wire_length_get_f)(of_object_t *obj, int *bytes);
-typedef void (*of_wire_length_set_f)(of_object_t *obj, int bytes);
-typedef void (*of_wire_type_get_f)(of_object_t *obj, of_object_id_t *id);
-typedef void (*of_wire_type_set_f)(of_object_t *obj);
-
 /****************************************************************
  * General list operations: first, next, append_setup, append_advance
  ****************************************************************/
@@ -90,16 +66,6 @@ extern int of_list_append(of_object_t *list, of_object_t *item);
 
 extern of_object_t *of_object_new(int bytes);
 extern of_object_t *of_object_dup(of_object_t *src);
-
-/**
- * Callback function prototype for deleting an object
- */
-typedef void (*of_object_delete_callback_f)(of_object_t *obj);
-
-typedef struct of_object_track_info_s {
-    of_object_delete_callback_f delete_cb;  /* To be implemented */
-    void *delete_cookie;
-} of_object_track_info_t;
 
 extern int of_object_xid_set(of_object_t *obj, uint32_t xid);
 extern int of_object_xid_get(of_object_t *obj, uint32_t *xid);
@@ -135,8 +101,13 @@ int of_object_can_grow(of_object_t *obj, int new_len);
 void of_object_parent_length_update(of_object_t *obj, int delta);
 
 struct of_object_s {
-    /* The control block for the underlying data buffer */
-    of_wire_object_t wire_object;
+    /** A pointer to the underlying buffer's management structure. */
+    of_wire_buffer_t *wbuf;
+
+    /** The start offset for this object relative to the start of the
+     * underlying buffer */
+    int obj_offset;
+
     /* The LOCI type enum value of the object */
     of_object_id_t object_id;
 
@@ -154,24 +125,6 @@ struct of_object_s {
      */
     int length;
     of_version_t version;
-
-    /*
-     * Many objects have a length and/or type represented in the wire buffer
-     * These accessors get and set those value when present.  Treat as private.
-     */
-    of_wire_length_get_f wire_length_get;
-    of_wire_length_set_f wire_length_set;
-    of_wire_type_get_f wire_type_get;
-    of_wire_type_set_f wire_type_set;
-
-    of_object_track_info_t track_info;
-
-    /*
-     * Metadata available for applications.  Ensure 8-byte alignment, but
-     * that buffer is at least as large as requested.  This data is not used
-     * or inspected by LOCI.
-     */
-    uint64_t metadata[(OF_OBJECT_METADATA_BYTES + 7) / 8];
 };
 
 struct of_object_storage_s {

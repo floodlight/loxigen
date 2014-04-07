@@ -61,11 +61,10 @@ of_object_new(int bytes)
     MEMSET(obj, 0, sizeof(*obj));
 
     if (bytes > 0) {
-        if ((obj->wire_object.wbuf = of_wire_buffer_new(bytes)) == NULL) {
+        if ((obj->wbuf = of_wire_buffer_new(bytes)) == NULL) {
             FREE(obj);
             return NULL;
         }
-        obj->wire_object.owned = 1;
     }
 
     return obj;
@@ -87,15 +86,8 @@ of_object_delete(of_object_t *obj)
         return;
     }
 
-    /*
-     * Make callback if present
-     */
-    if (obj->track_info.delete_cb != NULL) {
-        obj->track_info.delete_cb(obj);
-    }
-
-    if (obj->wire_object.owned) {
-        of_wire_buffer_free(obj->wire_object.wbuf);
+    if (obj->parent == NULL) {
+        of_wire_buffer_free(obj->wbuf);
     }
 
     FREE(obj);
@@ -121,12 +113,10 @@ of_object_dup(of_object_t *src)
     MEMSET(dst, 0, sizeof(*dst));
 
     /* Allocate a minimal wire buffer assuming we will not write to it. */
-    if ((dst->wire_object.wbuf = of_wire_buffer_new(src->length)) == NULL) {
+    if ((dst->wbuf = of_wire_buffer_new(src->length)) == NULL) {
         FREE(dst);
         return NULL;
     }
-
-    dst->wire_object.owned = 1;
 
     init_fn = of_object_init_map[src->object_id];
     init_fn(dst, src->version, src->length, 0);
@@ -211,7 +201,7 @@ of_object_new_from_message_preallocated(of_object_storage_t *storage,
     }
 
     obj->version = version;
-    obj->wire_object.wbuf = wbuf;
+    obj->wbuf = wbuf;
     wbuf->buf = msg;
     wbuf->alloc_bytes = len;
     wbuf->current_bytes = len;
@@ -239,23 +229,18 @@ int
 of_object_buffer_bind(of_object_t *obj, uint8_t *buf, int bytes, 
                       of_buffer_free_f buf_free)
 {
-    of_wire_object_t *wobj;
     of_wire_buffer_t *wbuf;
 
     LOCI_ASSERT(buf != NULL);
     LOCI_ASSERT(bytes > 0);
-    // LOCI_ASSERT(wobj is not bound);
-
-    wobj = &obj->wire_object;
-    MEMSET(wobj, 0, sizeof(*wobj));
 
     wbuf = of_wire_buffer_new_bind(buf, bytes, buf_free);
     if (wbuf == NULL) {
         return OF_ERROR_RESOURCE;
     }
 
-    wobj->wbuf = wbuf;
-    wobj->owned = 1;
+    obj->wbuf = wbuf;
+    obj->obj_offset = 0;
     obj->length = bytes;
 
     return OF_ERROR_NONE;
@@ -291,17 +276,14 @@ static void
 object_child_attach(of_object_t *parent, of_object_t *child, 
                        int offset, int bytes)
 {
-    of_wire_object_t *c_wobj; /* Pointer to child's wire object */
     of_wire_buffer_t *wbuf; /* Pointer to common wire buffer manager */
 
     child->parent = parent;
-    wbuf = parent->wire_object.wbuf;
+    wbuf = parent->wbuf;
 
     /* Set up the child's wire buf to point to same as parent */
-    c_wobj = &child->wire_object;
-    c_wobj->wbuf = wbuf;
-    c_wobj->obj_offset = parent->wire_object.obj_offset + offset;
-    c_wobj->owned = 0;
+    child->wbuf = wbuf;
+    child->obj_offset = parent->obj_offset + offset;
 
     /*
      * bytes determines if this is a read or write setup.
@@ -312,7 +294,7 @@ object_child_attach(of_object_t *parent, of_object_t *child,
         int tot_bytes; /* Total bytes to request for buffer if updated */
 
         /* Set up space for the child in the parent's buffer */
-        tot_bytes = parent->wire_object.obj_offset + offset + bytes;
+        tot_bytes = parent->obj_offset + offset + bytes;
 
         of_wire_buffer_grow(wbuf, tot_bytes);
         child->length = bytes;
@@ -331,7 +313,7 @@ int
 of_object_can_grow(of_object_t *obj, int new_len)
 {
     return OF_OBJECT_ABSOLUTE_OFFSET(obj, new_len) <=
-        WBUF_ALLOC_BYTES(obj->wire_object.wbuf);
+        WBUF_ALLOC_BYTES(obj->wbuf);
 }
 
 /**
@@ -405,7 +387,7 @@ int
 of_list_append_bind(of_object_t *parent, of_object_t *child)
 {
     if (parent == NULL || child == NULL ||
-           parent->wire_object.wbuf == NULL) {
+           parent->wbuf == NULL) {
         return OF_ERROR_PARAM;
     }
 
@@ -417,13 +399,8 @@ of_list_append_bind(of_object_t *parent, of_object_t *child)
                         child->length);
 
     /* Update the wire length and type if needed */
-    if (child->wire_length_set) {
-        child->wire_length_set(child, child->length);
-    }
-
-    if (child->wire_type_set) {
-        child->wire_type_set(child);
-    }
+    of_object_wire_length_set(child, child->length);
+    of_object_wire_type_set(child);
 
     /* Update the parent's length */
     of_object_parent_length_update(parent, child->length);
@@ -452,7 +429,7 @@ of_list_append(of_object_t *list, of_object_t *item)
         return OF_ERROR_RESOURCE;
     }
 
-    of_wire_buffer_grow(list->wire_object.wbuf,
+    of_wire_buffer_grow(list->wbuf,
                         OF_OBJECT_ABSOLUTE_OFFSET(list, new_len));
 
     MEMCPY(OF_OBJECT_BUFFER_INDEX(list, list->length),
@@ -503,8 +480,8 @@ of_list_first(of_object_t *parent, of_object_t *child)
 static int
 of_list_is_last(of_object_t *parent, of_object_t *child)
 {
-    if (child->wire_object.obj_offset + child->length >= 
-        parent->wire_object.obj_offset + parent->length) {
+    if (child->obj_offset + child->length >=
+        parent->obj_offset + parent->length) {
         return 1;
     }
 
@@ -538,7 +515,7 @@ of_list_next(of_object_t *parent, of_object_t *child)
     }
 
     /* Offset is relative to parent start */
-    offset = (child->wire_object.obj_offset - parent->wire_object.obj_offset) +
+    offset = (child->obj_offset - parent->obj_offset) +
         child->length;
     object_child_attach(parent, child, offset, 0);
 
@@ -549,8 +526,8 @@ void
 of_object_wire_buffer_steal(of_object_t *obj, uint8_t **buffer)
 {
     LOCI_ASSERT(obj != NULL);
-    of_wire_buffer_steal(obj->wire_object.wbuf, buffer);
-    obj->wire_object.wbuf = NULL;
+    of_wire_buffer_steal(obj->wbuf, buffer);
+    obj->wbuf = NULL;
 }
 
 #define _MAX_PARENT_ITERATIONS 4
@@ -575,18 +552,16 @@ of_object_parent_length_update(of_object_t *obj, int delta)
     while (obj != NULL) {
         LOCI_ASSERT(count++ < _MAX_PARENT_ITERATIONS);
         obj->length += delta;
-        if (obj->wire_length_set != NULL) {
-            obj->wire_length_set(obj, obj->length);
-        }
+        of_object_wire_length_set(obj, obj->length);
 #ifndef NDEBUG
-        wbuf = obj->wire_object.wbuf;
+        wbuf = obj->wbuf;
 #endif
 
         /* Asserts for wire length checking */
-        LOCI_ASSERT(obj->length + obj->wire_object.obj_offset <=
+        LOCI_ASSERT(obj->length + obj->obj_offset <=
                WBUF_CURRENT_BYTES(wbuf));
         if (obj->parent == NULL) {
-            LOCI_ASSERT(obj->length + obj->wire_object.obj_offset ==
+            LOCI_ASSERT(obj->length + obj->obj_offset ==
                    WBUF_CURRENT_BYTES(wbuf));
         }
 
@@ -612,9 +587,9 @@ int
 of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
                     int max_len)
 {
-    if (obj->wire_type_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_type_get != NULL) {
         of_object_id_t id;
-        obj->wire_type_get(obj, &id);
+        loci_class_metadata[obj->object_id].wire_type_get(obj, &id);
         if (!of_wire_id_valid(id, base_object_id)) {
             return OF_ERROR_PARSE;
         }
@@ -622,9 +597,9 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
         /* Call the init function for this object type; do not push to wire */
         of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);
     }
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
-        obj->wire_length_get(obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get(obj, &length);
         if (length < 0 || (max_len > 0 && length > max_len)) {
             return OF_ERROR_PARSE;
         }
@@ -665,8 +640,8 @@ of_object_append_buffer(of_object_t *dst, of_object_t *src)
 
     d_wbuf = OF_OBJECT_TO_WBUF(dst);
     s_wbuf = OF_OBJECT_TO_WBUF(src);
-    dst_offset = dst->wire_object.obj_offset + dst_length;
-    src_offset = src->wire_object.obj_offset;
+    dst_offset = dst->obj_offset + dst_length;
+    src_offset = src->obj_offset;
     OF_WIRE_BUFFER_INIT_CHECK(d_wbuf, dst_offset + src->length);
     MEMCPY(OF_WBUF_BUFFER_POINTER(d_wbuf, dst_offset),
            OF_WBUF_BUFFER_POINTER(s_wbuf, 0), src->length);
@@ -685,7 +660,7 @@ int
 of_packet_out_actions_length_set(of_packet_t *obj, int len)
 {
     if (obj == NULL || obj->object_id != OF_PACKET_IN ||
-        obj->wire_object.wbuf == NULL) {
+        obj->wbuf == NULL) {
         return OF_ERROR_PARAM;
     }
 
@@ -696,7 +671,7 @@ int
 _packet_out_data_offset_get(of_packet_t *obj)
 {
     if (obj == NULL || obj->object_id != OF_PACKET_IN ||
-        obj->wire_object.wbuf == NULL) {
+        obj->wbuf == NULL) {
         return -1;
     }
 

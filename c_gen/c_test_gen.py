@@ -565,10 +565,10 @@ test_%(cls)s_%(v_name)s_scalar(void)
 
     if not type_maps.class_is_virtual(cls):
         out.write("""
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
 
-        obj->wire_length_get((of_object_t *)obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get((of_object_t *)obj, &length);
         TEST_ASSERT(length == %(length)d);
     }
 
@@ -717,10 +717,10 @@ def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
     if inst_len >= 0:
         check_template = """
     TEST_ASSERT(%(inst)s->length == %(inst_len)d);
-    if (%(inst)s->wire_length_get != NULL) {
+    if (loci_class_metadata[%(inst)s->object_id].wire_length_get != NULL) {
         int length;
 
-        %(inst)s->wire_length_get(
+        loci_class_metadata[%(inst)s->object_id].wire_length_get(
             (of_object_t *)&elt, &length);
         TEST_ASSERT(length == %(inst_len)d);
     }
@@ -1552,16 +1552,16 @@ test_%(cls)s_%(v_name)s(void)
            v_name=v_name, length=length, version=version))
     if (not type_maps.class_is_virtual(cls)) or loxi_utils.class_is_list(cls):
         out.write("""
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
 
-        obj->wire_length_get((of_object_t *)obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get((of_object_t *)obj, &length);
         TEST_ASSERT(length == %(length)d);
     }
-    if (obj->wire_type_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_type_get != NULL) {
         of_object_id_t obj_id;
 
-        obj->wire_type_get((of_object_t *)obj, &obj_id);
+        loci_class_metadata[obj->object_id].wire_type_get((of_object_t *)obj, &obj_id);
         TEST_ASSERT(obj_id == %(u_cls)s);
     }
 
