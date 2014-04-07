@@ -99,6 +99,7 @@ def var_name_map(m_type):
         of_octets_t="octets",
         of_meter_features_t="features",
         of_match_t="match",
+        of_oxm_header_t="oxm",
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
