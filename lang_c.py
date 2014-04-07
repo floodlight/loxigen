@@ -131,3 +131,4 @@ def generate(install_dir):
     c_gen.codegen.generate_strings(install_dir)
     c_gen.codegen.generate_init_map(install_dir)
     c_gen.codegen.generate_type_maps(install_dir)
+    c_gen.codegen.generate_class_metadata(install_dir)

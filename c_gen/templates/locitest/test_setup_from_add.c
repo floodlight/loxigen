@@ -112,8 +112,8 @@ test_stats_entry_setup_from_add(void)
 
     /* Verify lists agree */
     TEST_ASSERT(list->length == list_out.length);
-    TEST_ASSERT(memcmp(WBUF_BUF(list->wire_object.wbuf),
-                       WBUF_BUF(list_out.wire_object.wbuf),
+    TEST_ASSERT(memcmp(WBUF_BUF(list->wbuf),
+                       WBUF_BUF(list_out.wbuf),
                        list->length));
 
     of_flow_add_delete(add);

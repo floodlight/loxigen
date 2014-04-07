@@ -375,7 +375,7 @@ extern loci_logger_f loci_logger;
  * Treat as private
  */
 #define OF_OBJECT_TO_MESSAGE(obj) \\
-    ((of_message_t)(WBUF_BUF((obj)->wire_object.wbuf)))
+    ((of_message_t)(WBUF_BUF((obj)->wbuf)))
 
 /**
  * Macro for the fixed length part of an object
@@ -469,8 +469,8 @@ extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
  */
 #define OF_LENGTH_CHECK_ASSERT(obj) \\
     LOCI_ASSERT(((obj)->parent != NULL) || \\
-     ((obj)->wire_object.wbuf == NULL) || \\
-     (WBUF_CURRENT_BYTES((obj)->wire_object.wbuf) == (obj)->length))
+     ((obj)->wbuf == NULL) || \\
+     (WBUF_CURRENT_BYTES((obj)->wbuf) == (obj)->length))
 
 #define OF_DEBUG_DUMP
 #if defined(OF_DEBUG_DUMP)
@@ -803,6 +803,7 @@ def external_h_top_matter(out, name):
 #include <loci/of_match.h>
 #include <loci/of_object.h>
 #include <loci/loci_classes.h>
+#include <loci/loci_class_metadata.h>
 
 /****************************************************************
  *
@@ -1676,9 +1677,8 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
     %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wire_object.wbuf = obj->wire_object.wbuf;
-    %(m_name)s->wire_object.obj_offset = abs_offset;
-    %(m_name)s->wire_object.owned = 0;
+    %(m_name)s->wbuf = obj->wbuf;
+    %(m_name)s->obj_offset = abs_offset;
     %(m_name)s->length = cur_len;
 """ % dict(m_type=m_type[:-2], m_name=m_name))
 
@@ -1720,7 +1720,7 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
         out.write("""
     new_len = %(m_name)s->length;
     /* If underlying buffer already shared; nothing to do */
-    if (obj->wire_object.wbuf == %(m_name)s->wire_object.wbuf) {
+    if (obj->wbuf == %(m_name)s->wbuf) {
         of_wire_buffer_grow(wbuf, abs_offset + new_len);
         /* Verify that the offsets are correct */
         LOCI_ASSERT(abs_offset == OF_OBJECT_ABSOLUTE_OFFSET(%(m_name)s, 0));
@@ -1752,9 +1752,7 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
         elif m_type not in ["of_match_t", "of_octets_t"]:
             out.write("""
     /* @fixme Shouldn't this precede copying value's data to buffer? */
-    if (%(m_name)s->wire_length_set != NULL) {
-        %(m_name)s->wire_length_set((of_object_t *)%(m_name)s, %(m_name)s->length);
-    }
+    of_object_wire_length_set((of_object_t *)%(m_name)s, %(m_name)s->length);
 """ % dict(m_name=m_name))
         out.write("""
     /* Not scalar, update lengths if needed */
@@ -2058,15 +2056,14 @@ void
     obj->length = bytes;
     obj->object_id = %(enum)s;
 """ % dict(cls=cls, enum=enum_name(cls)))
-    gen_coerce_ops(out, cls)
 
     out.write("""
     /* Grow the wire buffer */
-    if (obj->wire_object.wbuf != NULL) {
+    if (obj->wbuf != NULL) {
         int tot_bytes;
 
-        tot_bytes = bytes + obj->wire_object.obj_offset;
-        of_wire_buffer_grow(obj->wire_object.wbuf, tot_bytes);
+        tot_bytes = bytes + obj->obj_offset;
+        of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
 
@@ -2117,7 +2114,7 @@ static inline int
 
         if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
             out.write("""
-    obj->wire_length_set((of_object_t *)obj, obj->length);
+    of_object_wire_length_set((of_object_t *)obj, obj->length);
 """)
 
         if cls == "of_meter_stats":
@@ -2330,99 +2327,6 @@ extern const of_object_init_f of_object_init_map[];
  * These are part of the "coerce" type casting for objects
  *
  ****************************************************************/
-""")
-
-#
-# @fixme Not clear that these should all be set for virtual fns
-#
-# @fixme Clean up.  should have a (language specific) map from class
-# to length and type get/set functions
-#
-
-def gen_coerce_ops(out, cls):
-    out.write("""
-    /* Set up the object's function pointers */
-""")
-
-    uclass = loxi_globals.unified.class_by_name(cls)
-    if uclass and not uclass.virtual and uclass.has_type_members:
-        out.write("""
-    obj->wire_type_set = %(cls)s_push_wire_types;
-""" % dict(cls=cls))
-
-    if loxi_utils.class_is_message(cls):
-        out.write("""
-    obj->wire_length_get = of_object_message_wire_length_get;
-    obj->wire_length_set = of_object_message_wire_length_set;
-""")
-    else:
-        if loxi_utils.class_is_tlv16(cls):
-            if not (cls in type_maps.inheritance_map): # Don't set for super
-                out.write("""
-    obj->wire_length_set = of_tlv16_wire_length_set;
-""")
-            out.write("""
-    obj->wire_length_get = of_tlv16_wire_length_get;
-""")
-            if loxi_utils.class_is_action(cls):
-                out.write("""
-    obj->wire_type_get = of_action_wire_object_id_get;
-""")
-            if loxi_utils.class_is_action_id(cls):
-                out.write("""
-    obj->wire_type_get = of_action_id_wire_object_id_get;
-""")
-            if loxi_utils.class_is_instruction(cls):
-                out.write("""
-    obj->wire_type_get = of_instruction_wire_object_id_get;
-""")
-            if loxi_utils.class_is_instruction_id(cls):
-                out.write("""
-    obj->wire_type_get = of_instruction_id_wire_object_id_get;
-""")
-            if loxi_utils.class_is_queue_prop(cls):
-                    out.write("""
-    obj->wire_type_get = of_queue_prop_wire_object_id_get;
-""")
-            if loxi_utils.class_is_table_feature_prop(cls):
-                    out.write("""
-    obj->wire_type_get = of_table_feature_prop_wire_object_id_get;
-""")
-            if loxi_utils.class_is_meter_band(cls):
-                    out.write("""
-    obj->wire_type_get = of_meter_band_wire_object_id_get;
-""")
-            if loxi_utils.class_is_hello_elem(cls):
-                    out.write("""
-    obj->wire_type_get = of_hello_elem_wire_object_id_get;
-""")
-            if loxi_utils.class_is_bsn_tlv(cls):
-                    out.write("""
-    obj->wire_type_get = of_bsn_tlv_wire_object_id_get;
-""")
-        if loxi_utils.class_is_oxm(cls):
-            out.write("""
-    obj->wire_length_get = of_oxm_wire_length_get;
-    obj->wire_type_get = of_oxm_wire_object_id_get;
-""")
-        if loxi_utils.class_is_u16_len(cls):
-            out.write("""
-    obj->wire_length_get = of_u16_len_wire_length_get;
-    obj->wire_length_set = of_u16_len_wire_length_set;
-""")
-        if cls == "of_packet_queue":
-            out.write("""
-    obj->wire_length_get = of_packet_queue_wire_length_get;
-    obj->wire_length_set = of_packet_queue_wire_length_set;
-""")
-#        if cls == "of_list_meter_band_stats":
-#            out.write("""
-#    obj->wire_length_get = of_list_meter_band_stats_wire_length_get;
-#""")
-        if cls == "of_meter_stats":
-            out.write("""
-    obj->wire_length_get = of_meter_stats_wire_length_get;
-    obj->wire_length_set = of_meter_stats_wire_length_set;
 """)
 
 def gen_new_function_definitions(out, cls):
