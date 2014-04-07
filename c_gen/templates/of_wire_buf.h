@@ -150,7 +150,6 @@ of_wire_buffer_new(int a_bytes)
         FREE(wbuf);
         return NULL;
     }
-    MEMSET(wbuf->buf, 0, a_bytes);
     wbuf->current_bytes = 0;
     wbuf->alloc_bytes = a_bytes;
 
@@ -221,6 +220,7 @@ of_wire_buffer_grow(of_wire_buffer_t *wbuf, int bytes)
     LOCI_ASSERT(wbuf != NULL);
     LOCI_ASSERT(wbuf->alloc_bytes >= bytes);
     if (bytes > wbuf->current_bytes) {
+        MEMSET(wbuf->buf + wbuf->current_bytes, 0, bytes - wbuf->current_bytes);
         wbuf->current_bytes = bytes;
     }
 }
