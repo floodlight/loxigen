@@ -142,7 +142,7 @@ embedded_structs = {
     'of_match_t': 'common.match',
     'of_port_desc_t': 'common.port_desc',
     'of_meter_features_t': 'common.meter_features',
-    'of_bsn_vport_q_in_q_t': 'common.bsn_vport_q_in_q',
+    'of_bsn_vport_t': 'common.bsn_vport',
 }
 
 for (cls, pyclass) in embedded_structs.items():

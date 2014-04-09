@@ -72,8 +72,7 @@ struct of_bsn_virtual_port_create_request : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 15;
-    // FIXME This should be an instance of the inheritance superclass
-    of_bsn_vport_q_in_q_t vport;   // Description of vport to create
+    of_bsn_vport_t vport;   // Description of vport to create
     // Additional data follows depending on header type
 };
 
