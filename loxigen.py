@@ -132,7 +132,6 @@ def read_input():
     filenames = [x for x in filenames if not x.endswith('~')]
 
     # Read input files
-    all_ofinputs = []
     for filename in filenames:
         log("Processing struct file: " + filename)
         ofinput = process_input_file(filename)
@@ -167,20 +166,9 @@ if __name__ == '__main__':
     lang_file = "lang_%s" % options.lang
     lang_module = __import__(lang_file)
 
-    if hasattr(lang_module, "config_sanity_check") and not lang_module.config_sanity_check():
-        debug("Config sanity check failed\n")
-        sys.exit(1)
-
-    # If list files, just list auto-gen files to stdout and exit
-    if options.list_files:
-        for name in lang_module.targets:
-            print options.install_dir + '/' + name
-        sys.exit(0)
-
     log("\nGenerating files for target language %s\n" % options.lang)
 
     loxi_globals.OFVersions.target_versions = target_versions
     inputs = read_input()
     build_ir(inputs)
-    #log_all_class_info()
     lang_module.generate(options.install_dir)

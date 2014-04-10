@@ -172,7 +172,6 @@ def member_length(version, fe_class, fe_member, existing_classes, existing_enums
     """
     count, base_type = type_dec_to_count_base(fe_member.oftype)
 
-    len_update = 0
     if base_type in of_mixed_types:
         base_type = of_mixed_types[base_type][version.wire_version]
 

@@ -112,7 +112,6 @@ def create_ofinput(filename, ast):
                     ofinput.wire_versions.add(int(decl_ast[2]))
                 else:
                     raise InputError("Unrecognized wire protocol version %r" % decl_ast[2])
-                found_wire_version = True
 
     if not ofinput.wire_versions:
         raise InputError("Missing #version metadata")
