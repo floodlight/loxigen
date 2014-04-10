@@ -142,4 +142,13 @@ pylint:
 ctags:
 	ctags ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
 
-.PHONY: all clean debug check pylint c python
+coverage:
+	find -name '*,cover' -exec rm {} \;
+	coverage erase
+	coverage run -a ./loxigen.py --lang=c
+	coverage run -a ./loxigen.py --lang=python
+	coverage run -a ./loxigen.py --lang=java
+	coverage run -a ./loxigen.py --lang=wireshark
+	coverage annotate -i --omit tenjin.py,pyparsing.py
+
+.PHONY: all clean debug check pylint c python coverage
