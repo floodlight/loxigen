@@ -349,7 +349,6 @@ extern int run_utility_tests(void);
 extern int run_scalar_acc_tests(void);
 extern int run_list_tests(void);
 extern int run_message_tests(void);
-extern int run_setup_from_add_tests(void);
 
 extern int run_validator_tests(void);
 

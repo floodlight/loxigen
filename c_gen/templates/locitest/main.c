@@ -33,7 +33,6 @@ main(int argc, char *argv[])
     TEST_ASSERT(run_scalar_acc_tests() == TEST_PASS);
     TEST_ASSERT(run_list_tests() == TEST_PASS);
     TEST_ASSERT(run_message_tests() == TEST_PASS);
-    TEST_ASSERT(run_setup_from_add_tests() == TEST_PASS);
 
     TEST_ASSERT(run_validator_tests() == TEST_PASS);
 
