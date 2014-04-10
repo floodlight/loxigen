@@ -37,6 +37,3 @@ template_path = [templates_dir, templates_dir + '/locitest']
 
 def render_template(out, name, **context):
     template_utils.render_template(out, name, template_path, context)
-
-def render_static(out, name):
-    template_utils.render_static(out, name, template_path)

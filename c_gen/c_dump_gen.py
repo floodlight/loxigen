@@ -86,9 +86,6 @@ int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj);
 
 """)
 
-    type_to_emitter = dict(
-
-        )
     for version in of_g.of_version_range:
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):

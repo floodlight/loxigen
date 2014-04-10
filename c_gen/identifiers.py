@@ -65,15 +65,6 @@ This could indicate a name collision in LOXI identifier translation.
         if name not in idents_by_group[ofp_group]:
             idents_by_group[ofp_group].append(name)
 
-def all_versions_agree(all_idents, version_list, name):
-    val_list = all_idents[name]["values_by_version"]
-    for version in version_list:
-        if not version in val_list:
-            return False
-        if str(val_list[version]) != str(all_idents[name]["common_value"]):
-            return False
-    return True
-
 def defined_versions_agree(all_idents, version_list, name):
     val_list = all_idents[name]["values_by_version"]
     for version in version_list:

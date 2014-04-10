@@ -118,9 +118,6 @@ def generate_meter_band(out, name, version):
                          ofclasses=modules_by_version[version]['meter_band'],
                          version=version)
 
-def generate_pp(out, name, version):
-    util.render_template(out, 'pp.py')
-
 def generate_util(out, name, version):
     util.render_template(out, 'util.py', version=version)
 

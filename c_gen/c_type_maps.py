@@ -367,7 +367,6 @@ of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
 
     /* Do a simple if/else search for the ver, experimenter and subtype */
 """
-    first = True
     for version, experimenter_lists in type_maps.extension_message_subtype.items():
         for exp, subtypes in experimenter_lists.items():
             experimenter_function += """
