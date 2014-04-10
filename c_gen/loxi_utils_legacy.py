@@ -161,121 +161,11 @@ def class_is_action(cls):
 
     return False
 
-def class_is_action_id(cls):
-    """
-    Return True if cls_name is an action object
-
-    Note that action_id is not an action object, though it has
-    the same header.  It looks like an action header, but the type
-    is used to identify a kind of action, it does not indicate the
-    type of the object following.
-    """
-    if cls.find("of_action_id") == 0:
-        return True
-
-    # For each vendor, check for vendor specific action
-    for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_action_id_" + exp) == 0:
-            return True
-
-    return False
-
-def class_is_instruction(cls):
-    """
-    Return True if cls_name is an instruction object
-    """
-    if cls.find("of_instruction_id") == 0:
-        return False
-    if cls.find("of_instruction") == 0:
-        return True
-
-    # For each vendor, check for vendor specific action
-    for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_instruction" + exp) == 0:
-            return True
-
-    return False
-
-def class_is_instruction_id(cls):
-    """
-    Return True if cls_name is an action object
-
-    Note that instruction_id is not an instruction object, though it has
-    the same header.  It looks like an instruction header, but the type
-    is used to identify a kind of instruction, it does not indicate the
-    type of the object following.
-    """
-    if cls.find("of_instruction_id") == 0:
-        return True
-
-    # For each vendor, check for vendor specific action
-    for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_instruction_id_" + exp) == 0:
-            return True
-
-    return False
-
-def class_is_meter_band(cls):
-    """
-    Return True if cls_name is an instruction object
-    """
-    # meter_band_stats is not a member of meter_band class hierarchy
-    if cls.find("of_meter_band_stats") == 0:
-        return False
-    if cls.find("of_meter_band") == 0:
-        return True
-    return False
-
-def class_is_hello_elem(cls):
-    """
-    Return True if cls_name is an instruction object
-    """
-    if cls.find("of_hello_elem") == 0:
-        return True
-    return False
-
-def class_is_queue_prop(cls):
-    """
-    Return True if cls_name is a queue_prop object
-    """
-    if cls.find("of_queue_prop") == 0:
-        return True
-
-    # For each vendor, check for vendor specific action
-    for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_queue_prop_" + exp) == 0:
-            return True
-
-    return False
-
-def class_is_table_feature_prop(cls):
-    """
-    Return True if cls_name is a queue_prop object
-    """
-    if cls.find("of_table_feature_prop") == 0:
-        return True
-    return False
-
-def class_is_stats_message(cls):
-    """
-    Return True if cls_name is a message object based on info in unified
-    """
-
-    return "stats_type" in of_g.unified[cls]["union"]
-
 def class_is_list(cls):
     """
     Return True if cls_name is a list object
     """
     return (cls.find("of_list_") == 0)
-
-def class_is_bsn_tlv(cls):
-    """
-    Return True if cls_name is a BSN TLV object
-    """
-    if cls.find("of_bsn_tlv") == 0:
-        return True
-    return False
 
 def type_is_of_object(m_type):
     """
@@ -301,26 +191,6 @@ def type_to_short_name(m_type):
     else:
         tname = "unknown"
     return tname
-
-def type_to_name_type(cls, member_name):
-    """
-    Generate the root name of a member for accessor functions, etc
-    @param cls The class name
-    @param member_name The member name
-    """
-    members = of_g.unified[cls]["union"]
-    if not member_name in members:
-        debug("Error:  %s is not in class %s for acc_name defn" %
-              (member_name, cls))
-        os.exit()
-
-    mem = members[member_name]
-    m_type = mem["m_type"]
-    id = mem["memid"]
-    tname = type_to_short_name(m_type)
-
-    return "o%d_m%d_%s" % (of_g.unified[cls]["object_id"], id, tname)
-
 
 def member_to_index(m_name, members):
     """
@@ -350,27 +220,6 @@ def member_base_type(cls, m_name):
         return rv
     return rv + "_t"
 
-def member_type_is_octets(cls, m_name):
-    return member_base_type(cls, m_name) == "of_octets_t"
-
-def h_file_to_define(name):
-    """
-    Convert a .h file name to the define used for the header
-    """
-    h_name = name[:-2].upper()
-    h_name = "_" + h_name + "_H_"
-    return h_name
-
-def type_to_cof_type(m_type):
-    if m_type in of_g.of_base_types:
-        if "cof_type" in of_g.of_base_types[m_type]:
-            return of_g.of_base_types[m_type]["cof_type"]
-    return m_type
-
-
-def member_is_scalar(cls, m_name):
-    return of_g.unified[cls]["union"][m_name]["m_type"] in of_g.of_scalar_types
-
 def type_is_scalar(m_type):
     return m_type in of_g.of_scalar_types
 
@@ -397,32 +246,12 @@ def instance_to_class(instance, parent):
     """
     return parent + "_" + instance
 
-def sub_class_to_var_name(cls):
-    """
-    Given a subclass name like of_action_output, generate the
-    name of a variable like 'output'
-    @param cls The class name
-    """
-    pass
-
 def class_is_var_len(cls, version):
     # Match is special case.  Only version 1.2 (wire version 3) is var
     if cls == "of_match":
         return version == 3
 
     return not (cls, version) in of_g.is_fixed_length
-
-def base_type_to_length(base_type, version):
-    if base_type + "_t" in of_g.of_base_types:
-        inst_len = of_g.of_base_types[base_type + "_t"]["bytes"]
-    else:
-        inst_len = of_g.base_length[(base_type, version)]
-
-def version_to_name(version):
-    """
-    Convert an integer version to the C macro name
-    """
-    return "OF_" + of_g.version_names[version]
 
 ##
 # Is class a flow modify of some sort?
@@ -499,31 +328,3 @@ def accessor_returns_error(a_type, m_type):
         return True
     else:
         return False
-
-def render_template(out, name, path, context, prefix = None):
-    """
-    Render a template using tenjin.
-    out: a file-like object
-    name: name of the template
-    path: array of directories to search for the template
-    context: dictionary of variables to pass to the template
-    prefix: optional prefix to use for embedding (for other languages than python)
-    """
-    pp = [ tenjin.PrefixedLinePreprocessor(prefix=prefix) if prefix else tenjin.PrefixedLinePreprocessor() ] # support "::" syntax
-    template_globals = { "to_str": str, "escape": str } # disable HTML escaping
-    engine = TemplateEngine(path=path, pp=pp)
-    out.write(engine.render(name, context, template_globals))
-
-def render_static(out, name, path):
-    """
-    Write out a static template.
-    out: a file-like object
-    name: name of the template
-    path: array of directories to search for the template
-    """
-    # Reuse the tenjin logic for finding the template
-    template_filename = tenjin.FileSystemLoader().find(name, path)
-    if not template_filename:
-        raise ValueError("template %s not found" % name)
-    with open(template_filename) as infile:
-        out.write(infile.read())

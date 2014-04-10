@@ -306,20 +306,6 @@ def identifiers_gen(out, filename):
     log("Generated %d identifiers" % (count - 1))
     out.write("\n#endif /* Loci identifiers header file */\n")
 
-def base_h_external(out, filename):
-    """
-    Copy contents of external file to base header
-
-    The contents of the filename are copied literally into the
-    out file handler.  This allows openflow common defines to
-    be entered into the LoxiGen code base.  The content of this
-    code must depend only on standard C headers.
-    """
-    infile = open(filename, "r")
-    contents = infile.read()
-    out.write(contents)
-    infile.close()
-
 def match_h_gen(out, name):
     """
     Generate code for
@@ -330,7 +316,6 @@ def match_h_gen(out, name):
     c_match.gen_incompat_members(out)
     c_match.gen_match_struct(out)
     c_match.gen_match_comp(out)
-#    c_match.gen_match_accessors(out)
     out.write("\n#endif /* Match header file */\n")
 
 def top_h_gen(out, name):
@@ -909,12 +894,6 @@ typedef enum of_object_id_e {
                                    of_g.unified[cls]["object_id"]))
         last = of_g.unified[cls]["object_id"]
 
-    out.write("\n    /* Generic stats request/reply types; pseudo objects */\n")
-    for cls in of_g.ordered_pseudo_objects:
-        out.write("    %s = %d,\n" % (enum_name(cls),
-                                   of_g.unified[cls]["object_id"]))
-        last = of_g.unified[cls]["object_id"]
-
     out.write("""
     OF_OBJECT_COUNT = %d
 } of_object_id_t;
@@ -1038,23 +1017,6 @@ def param_list(cls, m_name, a_type):
         sys.exit(1)
     return params
 
-def typed_function_base(cls, m_name):
-    """
-    Generate the core name for accessors based on the type
-    @param cls The class name
-    @param m_name The member name
-    """
-    (m_type, get_rv) = get_acc_rv(cls, m_name)
-    return "%s_%s" % (cls, m_type)
-
-def member_function_base(cls, m_name):
-    """
-    Generate the core name for accessors based on the member name
-    @param cls The class name
-    @param m_name The member name
-    """
-    return "%s_%s" % (cls, m_name)
-
 def field_ver_get(cls, m_name):
     """
     Generate a dict, indexed by wire version, giving a pair (type, offset)
@@ -1106,13 +1068,6 @@ def v3_match_offset_get(cls):
 # OpenFlow Object Definitions
 #
 ################################################################
-
-
-def gen_of_object_defs(out):
-    """
-    Generate low level of_object core operations
-    @param out The file for output, already open
-    """
 
 def gen_generics(out):
     for (cls, subclasses) in type_maps.inheritance_map.items():
@@ -1313,58 +1268,6 @@ int
     return rv;
 }
 """ % dict(cls=cls, e_type=e_type, u_type=enum_name(e_type), len_str=len_str))
-
-
-def gen_bind(out, cls, m_name, m_type):
-    """
-    Generate the body of a bind function
-    @param out The file to which to write
-    @param cls The class name for which code is being generated
-    @param m_name The name of the data member
-    @param m_type The type of the data member
-    """
-
-    bparams = ",\n    ".join(param_list(cls, m_name, "bind"))
-
-    i_call = init_call(e_type, "child", "parent->version", "0", "1")
-
-    out.write("""
-/**
- * Bind the child object to the parent object for read processing
- * @param parent The parent object
- * @param child The child object
- *
- * The child obj instance is completely initialized.
- */
-
-int
-%(cls)s_%(m_name)_bind(%(cls)s_t *parent,
-    %(e_type)s_t *child)
-{
-    int rv;
-
-    %(i_call)s;
-
-    /* Derive offset and length of child in parent */
-    OF_TRY(of_object_child_attach(parent, child,
-    if ((rv = of_list_first((of_object_t *)list, (of_object_t *)obj)) < 0) {
-        return rv;
-    }
-""" % dict(cls=cls, e_type=e_type, i_call=i_call))
-
-    # Special case flow_stats_entry lists
-
-    out.write("""
-    rv = of_object_wire_init((of_object_t *) obj, %(u_type)s,
-                               list->length);
-    if ((rv == OF_ERROR_NONE) && (%(len_str)s == 0)) {
-        return OF_ERROR_PARSE;
-    }
-
-    return rv;
-}
-""" % dict(cls=cls, e_type=e_type, u_type=enum_name(e_type), len_str=len_str))
-
 
 def gen_list_next(out, cls, e_type):
     """
@@ -1994,20 +1897,6 @@ def gen_accessor_definitions(out, cls):
 #
 ################################################################
 
-
-################################################################
-# First, some utility functions for new/delete
-################################################################
-
-def del_function_proto(cls):
-    """
-    Return the prototype for the delete operator for the given class
-    @param cls The class name
-    """
-    fn = "void\n"
-    return fn
-
-
 ################################################################
 # Routines to generate the body of new/delete functions
 ################################################################
@@ -2420,201 +2309,3 @@ typedef struct %(cls)s_s %(cls)s_t;
 """ % dict(cls=cls))
 
     out.write("#endif /* _LOCI_DOC_H_ */\n")
-
-################################################################
-#
-# For fun, here are some unified, traditional C structure representation
-#
-################################################################
-
-def gen_cof_to_wire(out):
-    pass
-
-def gen_wire_to_cof(out):
-    pass
-
-def gen_cof_instance(out, cls):
-    out.write("struct c%s_s {\n" % cls)
-    for m in of_g.ordered_members[cls]:
-        if m in of_g.skip_members:
-            continue
-        entry = of_g.unified[cls]["union"][m]
-        cof_type = type_to_cof_type(entry["m_type"])
-        out.write("    %-20s %s;\n" % (cof_type, m))
-    out.write("};\n\n");
-
-def gen_cof_structs(out):
-    """
-    Generate non-version specific (common) representation of structures
-
-    @param out The file to which to write the functions
-    """
-
-    out.write("\n/* Common, unified OpenFlow structure representations */\n")
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
-        gen_cof_instance(out, cls)
-
-################################################################
-#
-# Generate code samples for applications.
-#
-################################################################
-
-def gen_code_samples(out, name):
-    out.write("""
-#if 0 /* Do not compile in */
-/**
- * @file %(name)s
- *
- * These are code samples for inclusion in other components
- */
-
-""" % dict(name=name))
-
-    gen_jump_table_template(out)
-    # These are messages that a switch might expect.
-    msg_list = ["of_echo_request",
-                "of_hello",
-                "of_packet_in",
-                "of_packet_out",
-                "of_port_mod",
-                "of_port_stats_request",
-                "of_queue_get_config_request",
-                "of_queue_stats_request",
-                "of_flow_add",
-                "of_flow_modify",
-                "of_flow_modify_strict",
-                "of_flow_delete",
-                "of_flow_delete_strict",
-                "of_get_config_request",
-                "of_flow_stats_request",
-                "of_barrier_request",
-                "of_echo_reply",
-                "of_aggregate_stats_request",
-                "of_desc_stats_request",
-                "of_table_stats_request",
-                "of_features_request",
-                "of_table_mod",
-                "of_set_config",
-                "of_experimenter",
-                "of_experimenter_stats_request",
-                "of_group_desc_stats_request",
-                "of_group_features_stats_request",
-                "of_role_request"]
-
-    gen_message_handler_templates(out, msgs=msg_list)
-
-    out.write("""
-#endif
-""")
-
-def gen_jump_table_template(out=sys.stdout, all_unhandled=True,
-                            cxn_type="ls_cxn_handle_t",
-                            unhandled="unhandled_message"):
-    """
-    Generate a template for a jump table.
-    @param out The file to which to write the functions
-    """
-    out.write("""
-/*
- * Simple jump table definition for message handling
- */
-typedef int (*msg_handler_f)(%(cxn_type)s cxn, of_object_t *obj);
-typedef msg_handler_f msg_jump_table_t[OF_MESSAGE_OBJECT_COUNT];
-
-/* Jump table template for message objects */
-extern msg_jump_table_t jump_table;
-
-/* C-code template */
-msg_jump_table_t jump_table = {
-    %(unhandled)s, /* OF_OBJECT; place holder for generic object  */
-""" % dict(unhandled=unhandled, cxn_type=cxn_type))
-    count = 0
-    fn_name = unhandled
-    for cls in of_g.ordered_messages:
-        comma = ","
-        count += 1
-        if count == len(of_g.ordered_messages):
-            comma = " "
-        if not all_unhandled:
-            fn_name = "%s_handler" % cls[3:]
-        out.write("    %s%s /* %s */\n" % (fn_name, comma, enum_name(cls)))
-
-    out.write("};\n")
-
-def gen_message_switch_stmt_tmeplate(out=sys.stdout, all_unhandled=True,
-                                     cxn_type="ls_cxn_handle_t",
-                                     unhandled="unhandled_message"):
-    out.write("""
-/*
- * Simple switch statement for message handling
- */
-
-    switch (obj->object_id):
-""")
-    fn_name = unhandled
-    for cls in of_g.ordered_messages:
-        if not all_unhandled:
-            fn_name = "%s_handler" % cls[3:]
-        out.write("""
-    case %(enum)s:
-        rv = %(fn_name)s(cxn, obj);
-        break;
-""" % dict(fn_name=fn_name, cls=cls, enum=enum_name(cls)))
-    out.write("""
-    default:
-        rv = LS_ERROR_PARAM;
-        break;
-    }
-
-    TRACE("Handled msg %p with rv %d (%s)", obj, rv, ls_error_strings[rv]);
-
-    return rv;
-""")
-
-
-def gen_message_handler_templates(out=sys.stdout, cxn_type="ls_cxn_handle_t",
-                                  unhandled="unhandled_message", msgs=None):
-    gen_jump_table_template(out, False, cxn_type)
-    out.write("""
-/**
- * Function for unhandled message
- */
-static int
-unhandled_message(%(cxn_type)s cxn, of_object_t *obj)
-{
-    (void)cxn;
-    (void)obj;
-    TRACE("Unhandled message %%p.  Object id %%d", obj, obj->object_id);
-
-    return LS_ERROR_UNAVAIL;
-}
-""" % dict(unhandled=unhandled, cxn_type=cxn_type))
-
-    if not msgs:
-        msgs = of_g.ordered_messages
-    for cls in msgs:
-        out.write("""
-/**
- * Handle a %(s_cls)s message
- * @param cxn Connection handler for the owning connection
- * @param _obj Generic type object for the message to be coerced
- * @returns Error code
- */
-
-static int
-%(s_cls)s_handler(%(cxn_type)s cxn, of_object_t *_obj)
-{
-    %(cls)s_t *obj;
-
-    TRACE("Handling %(cls)s message: %%p.", obj);
-    obj = (%(cls)s_t *)_obj;
-
-    /* Handle object of type %(cls)s_t */
-
-    return LS_ERROR_NONE;
-}
-""" % dict(s_cls=cls[3:], cls=cls, cxn_type=cxn_type))
-    gen_message_switch_stmt_tmeplate(out, False, cxn_type)

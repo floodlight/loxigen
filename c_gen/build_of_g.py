@@ -286,10 +286,6 @@ def order_and_assign_object_ids():
     for cls in of_g.ordered_list_objects:
         of_g.unified[cls]["object_id"] = of_g.object_id
         of_g.object_id += 1
-    for cls in of_g.ordered_pseudo_objects:
-        of_g.unified[cls] = {}
-        of_g.unified[cls]["object_id"] = of_g.object_id
-        of_g.object_id += 1
 
 
 def initialize_versions():
@@ -471,70 +467,3 @@ def unify_input():
         classes = versions[version]["classes"]
         for cls in of_g.ordered_classes[wire_version]:
             add_class(wire_version, cls, classes[cls])
-
-
-def log_all_class_info():
-    """
-    Log the results of processing the input
-
-    Debug function
-    """
-
-    for cls in of_g.unified:
-        for v in of_g.unified[cls]:
-            if type(v) == type(0):
-                log("cls: %s. ver: %d. base len %d. %s" %
-                    (str(cls), v, of_g.base_length[(cls, v)],
-                     loxi_utils.class_is_var_len(cls,v) and "not fixed"
-                     or "fixed"))
-                if "use_version" in of_g.unified[cls][v]:
-                    log("cls %s: v %d mapped to %d" % (str(cls), v,
-                           of_g.unified[cls][v]["use_version"]))
-                if "members" in of_g.unified[cls][v]:
-                    for member in of_g.unified[cls][v]["members"]:
-                        log("   %-20s: type %-20s. offset %3d" %
-                            (member["name"], member["m_type"],
-                             member["offset"]))
-
-def generate_all_files():
-    """
-    Create the files for the language target
-    """
-    for (name, fn) in lang_module.targets.items():
-        path = of_g.options.install_dir + '/' + name
-        os.system("mkdir -p %s" % os.path.dirname(path))
-        with open(path, "w") as outfile:
-            fn(outfile, os.path.basename(name))
-        print("Wrote contents for " + name)
-
-if __name__ == '__main__':
-    of_g.loxigen_log_file = open("loxigen.log", "w")
-    of_g.loxigen_dbg_file = sys.stdout
-
-    of_g.process_commandline()
-    # @fixme Use command line params to select log
-
-    if not config_sanity_check():
-        debug("Config sanity check failed\n")
-        sys.exit(1)
-
-    # Import the language file
-    lang_file = "lang_%s" % of_g.options.lang
-    lang_module = __import__(lang_file)
-
-    # If list files, just list auto-gen files to stdout and exit
-    if of_g.options.list_files:
-        for name in lang_module.targets:
-            print of_g.options.install_dir + '/' + name
-        sys.exit(0)
-
-    log("\nGenerating files for target language %s\n" % of_g.options.lang)
-
-    initialize_versions()
-    read_input()
-    populate_type_maps()
-    analyze_input()
-    unify_input()
-    order_and_assign_object_ids()
-    log_all_class_info()
-    generate_all_files()

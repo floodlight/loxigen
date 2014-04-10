@@ -244,8 +244,6 @@ def generate_class_metadata(install_dir):
             elif uclass.name == "of_packet_queue":
                 wire_length_get = 'of_packet_queue_wire_length_get'
                 wire_length_set = 'of_packet_queue_wire_length_set'
-            elif uclass.name == "of_list_meter_band_stats":
-                wire_length_get = 'of_list_meter_band_stats_wire_length_get'
             elif uclass.name == "of_meter_stats":
                 wire_length_get = 'of_meter_stats_wire_length_get'
                 wire_length_set = 'of_meter_stats_wire_length_set'
