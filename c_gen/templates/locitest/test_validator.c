@@ -71,10 +71,8 @@ test_validate_fixed_length_list(void)
 
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == 0);
 
-#if 0
     of_message_length_set(msg, of_message_length_get(msg) - 1);
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == -1);
-#endif
 
     of_table_stats_reply_delete(obj);
     return TEST_PASS;
@@ -97,13 +95,11 @@ test_validate_tlv16_list(void)
 
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == 0);
 
-#if 0
     of_message_length_set(msg, of_message_length_get(msg) - 1);
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == -1);
 
     of_message_length_set(msg, of_message_length_get(msg) + 2);
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == -1);
-#endif
 
     of_flow_modify_delete(obj);
     return TEST_PASS;

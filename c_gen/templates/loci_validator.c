@@ -43,12 +43,13 @@
 
 #define VALIDATOR_LOG(...) LOCI_LOG_ERROR("Validator Error: " __VA_ARGS__)
 
+:: raw_validator_name = lambda cls, version: "loci_validate_%s_%s" % (cls, version.constant_version(prefix='OF_VERSION_'))
 :: validator_name = lambda ofclass: "loci_validate_%s_%s" % (ofclass.name, ofclass.protocol.version.constant_version(prefix='OF_VERSION_'))
 
 /* Forward declarations */
 :: for version, proto in loxi_globals.ir.items():
 :: for ofclass in proto.classes:
-static int __attribute__((unused)) ${validator_name(ofclass)}(uint8_t *data, int len);
+static int __attribute__((unused)) ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len);
 :: #endfor
 :: #endfor
 
@@ -56,15 +57,51 @@ static int __attribute__((unused)) ${validator_name(ofclass)}(uint8_t *data, int
 :: types = { 1: 'uint8_t', 2: 'uint16_t', 4: 'uint32_t' }
 
 :: for version, proto in loxi_globals.ir.items():
+
+:: # Identify classes in lists and generate list validators
+:: seen_lists = set()
+:: for ofclass in proto.classes:
+:: for m in ofclass.members:
+:: if type(m) == OFDataMember and m.oftype.startswith('list'):
+:: element_name = m.oftype[8:-3]
+:: if element_name in seen_lists:
+:: continue
+:: #endif
+:: seen_lists.add(element_name)
+:: list_validator_name = raw_validator_name('of_list_' + element_name, version)
+static int __attribute__((unused))
+${list_validator_name}(uint8_t *data, int len, int *out_len)
+{
+    while (len > 0) {
+        int cur_len = 0xffff;
+        if (${raw_validator_name('of_' + element_name, version)}(data, len, &cur_len) < 0) {
+            return -1;
+        }
+        len -= cur_len;
+        data += cur_len;
+    }
+
+    return 0;
+}
+
+:: #endif
+:: #endfor
+:: #endfor
+
 :: for ofclass in proto.classes:
 static int
-${validator_name(ofclass)}(uint8_t *data, int len)
+${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
 {
     if (len < ${ofclass.base_length}) {
         return -1;
     }
 
+:: if ofclass.is_fixed_length:
+    len = ${ofclass.base_length};
+:: #endif
+
 :: # Read and validate length fields
+:: field_length_members = {}
 :: for m in ofclass.members:
 :: if type(m) == OFLengthMember:
     ${types[m.length]} wire_len;
@@ -74,6 +111,8 @@ ${validator_name(ofclass)}(uint8_t *data, int len)
     }
 
     len = wire_len;
+:: elif type(m) == OFFieldLengthMember:
+:: field_length_members[m.field_name] = m
 :: #endif
 :: #endfor
 
@@ -86,12 +125,30 @@ ${validator_name(ofclass)}(uint8_t *data, int len)
 :: for subclass in proto.classes:
 :: if subclass.superclass == ofclass:
     case ${subclass.member_by_name(discriminator.name).value}:
-        return ${validator_name(subclass)}(data, len);
+        return ${validator_name(subclass)}(data, len, out_len);
 :: #endif
 :: #endfor
     }
 :: #endif
 
+:: # Validate fixed-offset lists
+:: for m in ofclass.members:
+:: if type(m) == OFDataMember and m.oftype.startswith('list') and m.offset is not None:
+:: if m.name in field_length_members:
+:: continue # TODO handle field length members
+:: #endif
+:: element_name = m.oftype[8:-3]
+:: list_validator_name = raw_validator_name('of_list_' + element_name, version)
+    if (${list_validator_name}(data + ${m.offset}, len - ${m.offset}, out_len) < 0) {
+        return -1;
+    }
+
+:: #endif
+:: #endfor
+
+:: # TODO handle non-fixed-offset lists
+
+    *out_len = len;
     return 0;
 }
 
@@ -110,10 +167,11 @@ of_validate_message(of_message_t msg, int len)
     }
 
     version = of_message_version_get(msg);
+    int out_len;
     switch (version) {
 :: for version, proto in loxi_globals.ir.items():
     case ${version.constant_version(prefix='OF_VERSION_')}:
-        return ${validator_name(proto.class_by_name('of_header'))}(msg, len);
+        return ${validator_name(proto.class_by_name('of_header'))}(msg, len, &out_len);
 :: #endfor
     default:
         VALIDATOR_LOG("Bad version %d", OF_VERSION_1_3);
