@@ -29,14 +29,6 @@ from optparse import OptionParser
 
 from loxi_globals import OFVersions
 
-##
-# Command line options
-options = {}
-
-##
-# Command line arguments
-args = []
-
 ##@var config_default
 # The default configuration dictionary for LOXI code generation
 options_default = {
@@ -77,10 +69,6 @@ def process_commandline(default_vals=options_default):
     @param cfg_dflt The default configuration dictionary
     @return A pair (options, args) as per parser return
     """
-    global options
-    global args
-    global target_version_list
-
     parser = OptionParser(version="%prog 0.1")
 
     #@todo Add options via dictionary

@@ -618,7 +618,6 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
     /* For each active member, add an OXM entry to the list */
 """)
     for key in match.match_keys_sorted:
-        entry = match.of_match_members[key]
         out.write("""\
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(src)) {
         if (!OF_MATCH_MASK_%(ku)s_EXACT_TEST(src)) {

@@ -12,3 +12,5 @@ tags
 *.cache
 openflowj-loxi
 /bin
+*,cover
+/.coverage
