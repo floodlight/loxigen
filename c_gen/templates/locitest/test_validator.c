@@ -49,10 +49,8 @@ test_validate_fixed_length(void)
 
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == 0);
 
-#if 0
     of_message_length_set(msg, of_message_length_get(msg) - 1);
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == -1);
-#endif
 
     of_table_stats_request_delete(obj);
     return TEST_PASS;

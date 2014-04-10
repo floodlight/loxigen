@@ -27,6 +27,7 @@
 ::
 :: include('_copyright.c')
 :: import loxi_globals
+:: from loxi_ir import *
 
 /**
  *
@@ -41,6 +42,61 @@
 #include <loci/loci_validator.h>
 
 #define VALIDATOR_LOG(...) LOCI_LOG_ERROR("Validator Error: " __VA_ARGS__)
+
+:: validator_name = lambda ofclass: "loci_validate_%s_%s" % (ofclass.name, ofclass.protocol.version.constant_version(prefix='OF_VERSION_'))
+
+/* Forward declarations */
+:: for version, proto in loxi_globals.ir.items():
+:: for ofclass in proto.classes:
+static int __attribute__((unused)) ${validator_name(ofclass)}(uint8_t *data, int len);
+:: #endfor
+:: #endfor
+
+:: readers = { 1: 'buf_u8_get', 2: 'buf_u16_get', 4: 'buf_u32_get' }
+:: types = { 1: 'uint8_t', 2: 'uint16_t', 4: 'uint32_t' }
+
+:: for version, proto in loxi_globals.ir.items():
+:: for ofclass in proto.classes:
+static int
+${validator_name(ofclass)}(uint8_t *data, int len)
+{
+    if (len < ${ofclass.base_length}) {
+        return -1;
+    }
+
+:: # Read and validate length fields
+:: for m in ofclass.members:
+:: if type(m) == OFLengthMember:
+    ${types[m.length]} wire_len;
+    ${readers[m.length]}(data + ${m.offset}, &wire_len);
+    if (wire_len > len || wire_len < ${ofclass.base_length}) {
+        return -1;
+    }
+
+    len = wire_len;
+:: #endif
+:: #endfor
+
+:: # Dispatch to subclass validators
+:: if ofclass.virtual:
+:: discriminator = ofclass.discriminator
+    ${types[discriminator.length]} wire_type;
+    ${readers[discriminator.length]}(data + ${discriminator.offset}, &wire_type);
+    switch (wire_type) {
+:: for subclass in proto.classes:
+:: if subclass.superclass == ofclass:
+    case ${subclass.member_by_name(discriminator.name).value}:
+        return ${validator_name(subclass)}(data, len);
+:: #endif
+:: #endfor
+    }
+:: #endif
+
+    return 0;
+}
+
+:: #endfor
+:: #endfor
 
 int
 of_validate_message(of_message_t msg, int len)
@@ -57,7 +113,7 @@ of_validate_message(of_message_t msg, int len)
     switch (version) {
 :: for version, proto in loxi_globals.ir.items():
     case ${version.constant_version(prefix='OF_VERSION_')}:
-        return 0;
+        return ${validator_name(proto.class_by_name('of_header'))}(msg, len);
 :: #endfor
     default:
         VALIDATOR_LOG("Bad version %d", OF_VERSION_1_3);
