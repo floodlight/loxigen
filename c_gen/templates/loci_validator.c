@@ -111,8 +111,13 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
     }
 
     len = wire_len;
+
 :: elif type(m) == OFFieldLengthMember:
+:: # Read field length members
 :: field_length_members[m.field_name] = m
+    ${types[m.length]} wire_len_${m.field_name};
+    ${readers[m.length]}(data + ${m.offset}, &wire_len_${m.field_name});
+
 :: #endif
 :: #endfor
 
@@ -131,9 +136,16 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
     }
 :: #endif
 
-:: # Validate fixed-offset lists
 :: for m in ofclass.members:
+:: # Validate field-length members
+:: if type(m) == OFDataMember and m.name in field_length_members and m.offset is not None:
+    if (${m.offset} + wire_len_${m.name} > len) {
+        return -1;
+    }
+
+:: #endif
 :: if type(m) == OFDataMember and m.oftype.startswith('list') and m.offset is not None:
+:: # Validate fixed-offset lists
 :: if m.name in field_length_members:
 :: continue # TODO handle field length members
 :: #endif
