@@ -144,8 +144,12 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
     }
 
 :: #endif
-:: if type(m) == OFDataMember and m.oftype.startswith('list') and m.offset is not None:
-:: # Validate fixed-offset lists
+:: if type(m) == OFDataMember and m.oftype.startswith('list'):
+:: # Validate lists
+:: if m.offset is None:
+    // TODO validate non fixed offset member ${m.name}
+:: continue
+:: #endif
 :: if not m.name in field_length_members:
     int wire_len_${m.name} = len - ${m.offset};
 :: #endif
@@ -155,10 +159,16 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
         return -1;
     }
 
+:: elif type(m) == OFDataMember and m.oftype == "of_match_t":
+    // TODO validate of_match_t
+:: elif type(m) == OFDataMember and m.oftype == "of_bsn_vport_t":
+    // TODO validate of_bsn_vport_t
+:: elif type(m) == OFDataMember and m.oftype == "of_meter_config_t":
+    // TODO validate of_meter_config_t
+:: elif type(m) == OFDataMember and m.oftype == "of_meter_features_t":
+    // TODO validate of_meter_features_t
 :: #endif
 :: #endfor
-
-:: # TODO handle non-fixed-offset lists
 
     *out_len = len;
     return 0;
