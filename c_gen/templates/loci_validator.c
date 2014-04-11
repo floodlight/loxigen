@@ -146,12 +146,12 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
 :: #endif
 :: if type(m) == OFDataMember and m.oftype.startswith('list') and m.offset is not None:
 :: # Validate fixed-offset lists
-:: if m.name in field_length_members:
-:: continue # TODO handle field length members
+:: if not m.name in field_length_members:
+    int wire_len_${m.name} = len - ${m.offset};
 :: #endif
 :: element_name = m.oftype[8:-3]
 :: list_validator_name = raw_validator_name('of_list_' + element_name, version)
-    if (${list_validator_name}(data + ${m.offset}, len - ${m.offset}, out_len) < 0) {
+    if (${list_validator_name}(data + ${m.offset}, wire_len_${m.name}, out_len) < 0) {
         return -1;
     }
 
