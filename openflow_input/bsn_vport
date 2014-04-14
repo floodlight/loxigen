@@ -42,6 +42,19 @@ enum ofp_bsn_vport_q_in_q_untagged(wire_type=uint16_t, complete=False) {
     OF_BSN_VPORT_Q_IN_Q_UNTAGGED = 0xffff,
 };
 
+enum ofp_bsn_vport_l2gre_dscp_mode(wire_type=uint8_t) {
+    OF_BSN_VPORT_L2GRE_DSCP_ASSIGN = 0,
+    OF_BSN_VPORT_L2GRE_DSCP_COPY = 1,
+};
+
+enum ofp_bsn_vport_l2gre_dscp_dont_care(wire_type=uint8_t, complete=False) {
+    OF_BSN_VPORT_L2GRE_DSCP_DONT_CARE = 0xff,
+};
+
+enum ofp_bsn_vport_l2gre_ttl_dont_care(wire_type=uint8_t, complete=False) {
+    OF_BSN_VPORT_L2GRE_TTL_DONT_CARE = 0xff,
+};
+
 // BSN Virtual port object header
 // FIXME For now, inheritance is not exercised.  See below.
 struct of_bsn_vport {
@@ -55,7 +68,7 @@ struct of_bsn_vport {
 
 struct of_bsn_vport_q_in_q : of_bsn_vport {
     uint16_t type == 0;
-    uint16_t length;  /* 32 */
+    uint16_t length;
     uint32_t port_no;     /* OF port number of parent; usually phys port */
     uint16_t ingress_tpid;
     uint16_t ingress_vlan_id;
@@ -63,6 +76,26 @@ struct of_bsn_vport_q_in_q : of_bsn_vport {
     uint16_t egress_vlan_id;
     of_port_name_t if_name;  /* Name to use in create operation */
 };
+
+
+// L2GRE tunnel virtual port specification
+
+struct of_bsn_vport_l2gre : of_bsn_vport {
+    uint16_t type == 1;
+    uint16_t length;
+    of_port_no_t port_no;       /* OF port number of parent */
+    of_mac_addr_t local_mac;    /* Local MAC */
+    of_mac_addr_t nh_mac;       /* Next Hop MAC */
+    of_ipv4_t src_ip;           /* Source IP */
+    of_ipv4_t dst_ip;           /* Destination IP */
+    enum ofp_bsn_vport_l2gre_dscp_mode dscp_mode;
+    uint8_t dscp;
+    uint8_t ttl;
+    pad(1);
+    uint32_t vpn;               /* VPN ID (for GRE Key) */
+    of_port_name_t if_name;     /* Virtual Interface Name */
+};
+
 
 // Request from controller to switch to create vport
 struct of_bsn_virtual_port_create_request : of_bsn_header {

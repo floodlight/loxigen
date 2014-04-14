@@ -1585,6 +1585,17 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     %(m_name)s->length = cur_len;
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
+    elif m_type == "of_bsn_vport_header_t":
+        out.write("""
+    /* Initialize child */
+    %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
+    /* Attach to parent */
+    %(m_name)s->parent = (of_object_t *)obj;
+    %(m_name)s->wbuf = obj->wbuf;
+    %(m_name)s->obj_offset = abs_offset;
+    %(m_name)s->length = cur_len;
+    of_object_wire_init(%(m_name)s, OF_BSN_VPORT, 0);
+""" % dict(m_type=m_type[:-2], m_name=m_name))
     else:
         out.write("""
     /* Initialize child */

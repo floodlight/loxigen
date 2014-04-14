@@ -22,3 +22,20 @@ egress_tpid=4,
 egress_vlan_id=5,
 if_name="foo"
 ))
+-- c
+obj = of_bsn_virtual_port_create_request_new(OF_VERSION_1_3);
+of_bsn_virtual_port_create_request_xid_set(obj, 0x01020304);
+{
+    of_object_t *vport = of_bsn_vport_q_in_q_new(OF_VERSION_1_3);
+    {
+        of_port_name_t if_name = "foo";
+        of_bsn_vport_q_in_q_port_no_set(vport, 1);
+        of_bsn_vport_q_in_q_ingress_tpid_set(vport, 2);
+        of_bsn_vport_q_in_q_ingress_vlan_id_set(vport, 3);
+        of_bsn_vport_q_in_q_egress_tpid_set(vport, 4);
+        of_bsn_vport_q_in_q_egress_vlan_id_set(vport, 5);
+        of_bsn_vport_q_in_q_if_name_set(vport, if_name);
+    }
+    of_bsn_virtual_port_create_request_vport_set(obj, vport);
+    of_object_delete(vport);
+}
