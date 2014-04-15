@@ -28,7 +28,7 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-#version any
+#version 4
 
 struct of_bsn_image_desc_stats_request : of_bsn_stats_request {
     uint8_t version;
