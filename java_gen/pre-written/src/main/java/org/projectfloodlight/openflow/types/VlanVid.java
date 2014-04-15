@@ -33,6 +33,8 @@ public class VlanVid implements OFValueType<VlanVid> {
     }
 
     public static VlanVid ofVlan(int vid) {
+        if (vid == NO_MASK.vid)
+            return NO_MASK;
         if ((vid & VALIDATION_MASK) != vid)
             throw new IllegalArgumentException(String.format("Illegal VLAN value: %x", vid));
         return new VlanVid((short) vid);
