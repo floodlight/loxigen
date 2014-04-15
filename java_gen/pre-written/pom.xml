@@ -179,7 +179,7 @@
                     <failOnNoGitDirectory>false</failOnNoGitDirectory>
 
                     <gitDescribe>
-                        <skip>false</skip>
+                        <skip>true</skip>
                         <always>true</always>
                         <abbrev>7</abbrev>
                         <dirty>-dirty</dirty>
@@ -211,10 +211,20 @@
                                     <projectName>${project.name}</projectName>
                                     <version>${project.version}</version>
                                     <vcsRevision>${git.commit.id.abbrev}</vcsRevision>
-                                    <vcsBranch>${git.branch}</vcsBranch>
-                                    <vcsDirty>${git.commit.id.describe}</vcsDirty>
+                                    <!-- note: git.branch does not work in jenkins, because jenkins
+                                         builds the system in 'detached head' state. Because we mostly
+                                         about jenkins builds, we instead use the environment variable
+                                         GIT_BRANCH set by jenkins here -->
+                                    <vcsBranch>${env.GIT_BRANCH}</vcsBranch>
                                     <buildUser>${user.name}</buildUser>
                                     <buildDate>${git.build.time}</buildDate>
+                                    <!-- continuous integration information from jenkins env variables:
+                                         https://wiki.jenkins-ci.org/display/JENKINS/Building+a+software+project#Buildingasoftwareproject-below -->
+                                    <ciBuildNumber>${env.BUILD_NUMBER}</ciBuildNumber>
+                                    <ciBuildId>${env.BUILD_ID}</ciBuildId>
+                                    <ciBuildTag>${env.BUILD_TAG}</ciBuildTag>
+                                   <ciJobName>${env.JOB_NAME}</ciJobName>
+i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
                                 </manifestEntries>
                             </manifestSection>
                         </manifestSections>

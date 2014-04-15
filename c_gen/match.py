@@ -468,6 +468,78 @@ of_match_members = dict(
         takes_mask_in_spec=True,
         order=1006,
         ),
+
+    bsn_udf0 = dict(
+        name="bsn_udf0",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf1 = dict(
+        name="bsn_udf1",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf2 = dict(
+        name="bsn_udf2",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf3 = dict(
+        name="bsn_udf3",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf4 = dict(
+        name="bsn_udf4",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf5 = dict(
+        name="bsn_udf5",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf6 = dict(
+        name="bsn_udf6",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
+
+    bsn_udf7 = dict(
+        name="bsn_udf7",
+        m_type="uint32_t",
+        print_type="PRIu32",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()

@@ -192,6 +192,7 @@ of_base_types = dict(
                          short_name="desc_str"),
     of_serial_num_t = dict(bytes=ofp_constants["OF_SERIAL_NUM_LEN"],
                            short_name="ser_num"),
+    of_str64_t = dict(bytes=64, short_name="str64"),
     of_match_v1_t = dict(bytes=40, to_w="match_v1_hton",
                          from_w="match_v1_ntoh",
                          short_name="match_v1"),
@@ -213,7 +214,8 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                   "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t", "of_checksum_128_t"]
+                   "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t", "of_checksum_128_t",
+                   "of_str64_t"]
 
 ##
 # LOXI identifiers
@@ -290,47 +292,12 @@ VERSION_1_1 = 2
 VERSION_1_2 = 3
 VERSION_1_3 = 4
 
-# Ignore version for some functions
-VERSION_ANY = -1
-
-## @var supported_wire_protos
-# The wire protocols this version of LoxiGen supports
-supported_wire_protos = set([1, 2, 3, 4])
 version_names = {1:"VERSION_1_0", 2:"VERSION_1_1", 3:"VERSION_1_2",
                  4:"VERSION_1_3"}
 short_version_names = {1:"OF_1_0", 2:"OF_1_1", 3:"OF_1_2", 4:"OF_1_3"}
-param_version_names = {1:"1.0", 2:"1.1", 3:"1.2", 4:"1.3"}
-
-##
-# Maps and ranges related to versioning
-
-# For parameter version indications
-of_param_version_map = {
-    "1.0":VERSION_1_0,
-    "1.1":VERSION_1_1,
-    "1.2":VERSION_1_2,
-    "1.3":VERSION_1_3
-    }
-
-# For parameter version indications
-of_version_map = {
-    "1.0":VERSION_1_0,
-    "1.1":VERSION_1_1,
-    "1.2":VERSION_1_2,
-    "1.3":VERSION_1_3
-    }
 
 # The iteration object that gives the wire versions supported
 of_version_range = [VERSION_1_0, VERSION_1_1, VERSION_1_2, VERSION_1_3]
-of_version_max = VERSION_1_3
-
-
-of_version_name2wire = dict(
-    OF_VERSION_1_0=VERSION_1_0,
-    OF_VERSION_1_1=VERSION_1_1,
-    OF_VERSION_1_2=VERSION_1_2,
-    OF_VERSION_1_3=VERSION_1_3
-    )
 
 of_version_wire2name = {
     VERSION_1_0:"OF_VERSION_1_0",
@@ -365,21 +332,3 @@ experimenter_name_to_id = dict(
     nicira = 0x00002320,
     openflow = 0x000026e1
     )
-
-def experimenter_name_lookup(experimenter_id):
-    """
-    Map an experimenter ID to its LOXI recognized name string
-    """
-    for name, id in of_g.experimenter_name_to_id.items():
-        if id == experimenter_id:
-            return name
-    return None
-
-################################################################
-#
-# Debug
-#
-################################################################
-
-loxigen_dbg_file = sys.stdout
-loxigen_log_file = sys.stdout

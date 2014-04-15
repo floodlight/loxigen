@@ -367,7 +367,6 @@ of_message_experimenter_to_object_id(of_message_t msg, of_version_t version) {
 
     /* Do a simple if/else search for the ver, experimenter and subtype */
 """
-    first = True
     for version, experimenter_lists in type_maps.extension_message_subtype.items():
         for exp, subtypes in experimenter_lists.items():
             experimenter_function += """
@@ -544,6 +543,22 @@ of_oxm_to_object_id(uint32_t type_len, of_version_t version)
         case 0x0b: return OF_OXM_BSN_L3_SRC_CLASS_ID_MASKED;
         case 0x0c: return OF_OXM_BSN_L3_DST_CLASS_ID;
         case 0x0d: return OF_OXM_BSN_L3_DST_CLASS_ID_MASKED;
+        case 0x10: return OF_OXM_BSN_UDF0;
+        case 0x11: return OF_OXM_BSN_UDF0_MASKED;
+        case 0x12: return OF_OXM_BSN_UDF1;
+        case 0x13: return OF_OXM_BSN_UDF1_MASKED;
+        case 0x14: return OF_OXM_BSN_UDF2;
+        case 0x15: return OF_OXM_BSN_UDF2_MASKED;
+        case 0x16: return OF_OXM_BSN_UDF3;
+        case 0x17: return OF_OXM_BSN_UDF3_MASKED;
+        case 0x18: return OF_OXM_BSN_UDF4;
+        case 0x19: return OF_OXM_BSN_UDF4_MASKED;
+        case 0x1a: return OF_OXM_BSN_UDF5;
+        case 0x1b: return OF_OXM_BSN_UDF5_MASKED;
+        case 0x1c: return OF_OXM_BSN_UDF6;
+        case 0x1d: return OF_OXM_BSN_UDF6_MASKED;
+        case 0x1e: return OF_OXM_BSN_UDF7;
+        case 0x1f: return OF_OXM_BSN_UDF7_MASKED;
         default: return OF_OBJECT_INVALID;
         }
     } else {

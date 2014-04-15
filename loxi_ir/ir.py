@@ -220,7 +220,7 @@ class MemberMixin(object):
         else:
             raise Exception("Not a fixed length member: {}.{} [{}]".format(
                 self.of_class.name,
-                self.name if hasattr("self", name) else "(unnnamed)",
+                self.name if hasattr("self", "name") else "(unnnamed)",
                 type(self).__name__))
 
 """

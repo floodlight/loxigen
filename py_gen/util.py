@@ -41,18 +41,3 @@ def render_template(out, name, **context):
 
 def render_static(out, name):
     template_utils.render_static(out, name, [templates_dir])
-
-def constant_for_value(version, group, value):
-    enums = loxi_globals.ir[version].enums
-    enum = [x for x in enums if x.name == group][0]
-    for name, value2 in enum.values:
-        if value == value2:
-            return "const." + name
-    return repr(value)
-
-def ancestors(ofclass):
-    r = []
-    while ofclass:
-        r.append(ofclass)
-        ofclass = ofclass.superclass
-    return r

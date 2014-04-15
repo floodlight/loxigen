@@ -92,12 +92,14 @@ def var_name_map(m_type):
         of_table_name_t="table_name",
         of_desc_str_t="desc_str",
         of_serial_num_t="ser_num",
+        of_str64_t="str64",
         of_mac_addr_t="mac_addr",
         of_ipv6_t="ipv6",
         # Non-scalars; more TBD
         of_octets_t="octets",
         of_meter_features_t="features",
         of_match_t="match",
+        of_oxm_header_t="oxm",
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
@@ -115,7 +117,8 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_match_bmap_t", "of_ipv4_t"]
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
-                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t"]
+                "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
+                "of_str64_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
@@ -346,7 +349,6 @@ extern int run_utility_tests(void);
 extern int run_scalar_acc_tests(void);
 extern int run_list_tests(void);
 extern int run_message_tests(void);
-extern int run_setup_from_add_tests(void);
 
 extern int run_validator_tests(void);
 
@@ -382,9 +384,6 @@ extern int %(cls)s_%(v_name)s_check_scalars(
 
     for version in of_g.of_version_range:
         for cls in of_g.ordered_list_objects:
-            if cls in type_maps.inheritance_map:
-                continue
-
             if version in of_g.unified[cls]:
                out.write("""
 extern int
@@ -563,10 +562,10 @@ test_%(cls)s_%(v_name)s_scalar(void)
 
     if not type_maps.class_is_virtual(cls):
         out.write("""
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
 
-        obj->wire_length_get((of_object_t *)obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get((of_object_t *)obj, &length);
         TEST_ASSERT(length == %(length)d);
     }
 
@@ -690,7 +689,7 @@ def gen_scalar_set_check_funs(out):
 
 
 # Helper function to set up a subclass instance for a test
-def setup_instance(out, cls, subcls, instance, v_name, inst_len, version):
+def setup_instance(out, cls, subcls, instance, v_name, version):
     base_type = loxi_utils.list_to_entry_type(cls)
     setup_template = """
     %(subcls)s_init(%(inst)s, %(v_name)s, -1, 1);
@@ -707,23 +706,11 @@ def setup_instance(out, cls, subcls, instance, v_name, inst_len, version):
     for i in range(2):
         out.write(setup_template %
                   dict(inst=instance, subcls=subcls, v_name=v_name,
-                       base_type=base_type, cls=cls, inst_len=inst_len,
+                       base_type=base_type, cls=cls,
                        version=version))
 
-def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
-    check_template = ""
-    if inst_len >= 0:
-        check_template = """
-    TEST_ASSERT(%(inst)s->length == %(inst_len)d);
-    if (%(inst)s->wire_length_get != NULL) {
-        int length;
-
-        %(inst)s->wire_length_get(
-            (of_object_t *)&elt, &length);
-        TEST_ASSERT(length == %(inst_len)d);
-    }
-"""
-    check_template += """
+def check_instance(out, cls, subcls, instance, v_name, version, last):
+    check_template = """
     TEST_ASSERT(%(inst)s->object_id == %(elt_name)s);
     value = %(subcls)s_%(v_name)s_check(
         %(inst)s, value);
@@ -732,7 +719,7 @@ def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
     out.write("\n    /* Check two instances of type %s */" % instance)
 
     out.write(check_template %
-              dict(elt_name=loxi_utils.enum_name(subcls), inst_len=inst_len,
+              dict(elt_name=loxi_utils.enum_name(subcls),
                    inst=instance, subcls=subcls,
                    v_name=loxi_utils.version_to_name(version)))
     out.write("""\
@@ -740,7 +727,7 @@ def check_instance(out, cls, subcls, instance, v_name, inst_len, version, last):
 """ % dict(cls=cls))
 
     out.write(check_template %
-              dict(elt_name=loxi_utils.enum_name(subcls), inst_len=inst_len,
+              dict(elt_name=loxi_utils.enum_name(subcls),
                    inst=instance, subcls=subcls,
                    v_name=loxi_utils.version_to_name(version)))
     if last:
@@ -789,12 +776,10 @@ list_setup_%(cls)s_%(v_name)s(
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
     if len(sub_classes) == 0: # No inheritance case
-        inst_len = loxi_utils.base_type_to_length(base_type, version)
-        setup_instance(out, cls, base_type, "elt_p", v_name, inst_len, version)
+        setup_instance(out, cls, base_type, "elt_p", v_name, version)
     else:
         for instance, subcls in sub_classes:
-            inst_len = of_g.base_length[(subcls, version)]
-            setup_instance(out, cls, subcls, instance, v_name, inst_len, version)
+            setup_instance(out, cls, subcls, instance, v_name, version)
     out.write("""
 
     return value;
@@ -838,21 +823,12 @@ list_check_%(cls)s_%(v_name)s(
 
     out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
     if len(sub_classes) == 0: # No inheritance case
-        if loxi_utils.class_is_var_len(base_type, version):
-            inst_len = -1
-        else:
-            inst_len = loxi_utils.base_type_to_length(base_type, version)
-        check_instance(out, cls, base_type, "elt_p", v_name, inst_len,
-                       version, True)
+        check_instance(out, cls, base_type, "elt_p", v_name, version, True)
     else:
         count = 0
         for instance, subcls in sub_classes:
             count += 1
-            if loxi_utils.class_is_var_len(subcls, version):
-                inst_len = -1
-            else:
-                inst_len = of_g.base_length[(subcls, version)]
-            check_instance(out, cls, subcls, instance, v_name, inst_len,
+            check_instance(out, cls, subcls, instance, v_name,
                            version, count==len(sub_classes))
 
     out.write("""
@@ -863,9 +839,6 @@ list_check_%(cls)s_%(v_name)s(
 def gen_list_set_check_funs(out):
     for version in of_g.of_version_range:
         for cls in of_g.ordered_list_objects:
-            if cls in type_maps.inheritance_map:
-                continue
-
             if version in of_g.unified[cls]:
                 setup_list_fn(out, version, cls)
                 check_list_fn(out, version, cls)
@@ -937,8 +910,6 @@ def gen_list_test(out, name):
  */
 """ % v_name)
         for cls in of_g.ordered_list_objects:
-            if cls in type_maps.inheritance_map:
-                continue
             if version in of_g.unified[cls]:
                 list_test(out, version, cls)
 
@@ -950,8 +921,6 @@ run_list_tests(void)
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
         for cls in of_g.ordered_list_objects:
-            if cls in type_maps.inheritance_map:
-                continue
             if version in of_g.unified[cls]:
                 test_name = "%s_%s" % (cls, v_name)
                 out.write("    RUN_TEST(%s);\n" % test_name)
@@ -1219,24 +1188,11 @@ int
         for instance, subcls in sub_classes:
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
-#     if type_maps.class_is_virtual(base_type):
-#         out.write("""\
-#     TEST_OK(%(base_type)s_header_init(
-#         (%(base_type)s_header_t *)&elt, %(v_name)s, -1, 1));
-# """ % dict(base_type=base_type, v_name=loxi_utils.version_to_name(version)))
-#     else:
-#         out.write("""\
-#     TEST_OK(%(base_type)s_init(&elt, %(v_name)s, -1, 1));
-# """ % dict(base_type=base_type, v_name=loxi_utils.version_to_name(version)))
-
     if len(sub_classes) == 0: # No inheritance case
-        inst_len = loxi_utils.base_type_to_length(base_type, version)
-        setup_instance(out, cls, base_type, "elt_p", v_name, inst_len, version)
+        setup_instance(out, cls, base_type, "elt_p", v_name, version)
     else:
         for instance, subcls in sub_classes:
-            inst_len = of_g.base_length[(subcls, version)]
-            setup_instance(out, cls, subcls, instance, v_name,
-                           inst_len, version)
+            setup_instance(out, cls, subcls, instance, v_name, version)
     out.write("""
     return value;
 }
@@ -1282,21 +1238,13 @@ int
 
     out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
     if len(sub_classes) == 0: # No inheritance case
-        if loxi_utils.class_is_var_len(base_type, version):
-            inst_len = -1
-        else:
-            inst_len = loxi_utils.base_type_to_length(base_type, version)
-        check_instance(out, cls, base_type, "elt_p", v_name, inst_len,
+        check_instance(out, cls, base_type, "elt_p", v_name,
                        version, True)
     else:
         count = 0
         for instance, subcls in sub_classes:
             count += 1
-            if loxi_utils.class_is_var_len(subcls, version):
-                inst_len = -1
-            else:
-                inst_len = of_g.base_length[(subcls, version)]
-            check_instance(out, cls, subcls, instance, v_name, inst_len,
+            check_instance(out, cls, subcls, instance, v_name,
                            version, count==len(sub_classes))
     out.write("""
 """ % dict(base_type=base_type))
@@ -1550,16 +1498,16 @@ test_%(cls)s_%(v_name)s(void)
            v_name=v_name, length=length, version=version))
     if (not type_maps.class_is_virtual(cls)) or loxi_utils.class_is_list(cls):
         out.write("""
-    if (obj->wire_length_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_length_get != NULL) {
         int length;
 
-        obj->wire_length_get((of_object_t *)obj, &length);
+        loci_class_metadata[obj->object_id].wire_length_get((of_object_t *)obj, &length);
         TEST_ASSERT(length == %(length)d);
     }
-    if (obj->wire_type_get != NULL) {
+    if (loci_class_metadata[obj->object_id].wire_type_get != NULL) {
         of_object_id_t obj_id;
 
-        obj->wire_type_get((of_object_t *)obj, &obj_id);
+        loci_class_metadata[obj->object_id].wire_type_get((of_object_t *)obj, &obj_id);
         TEST_ASSERT(obj_id == %(u_cls)s);
     }
 

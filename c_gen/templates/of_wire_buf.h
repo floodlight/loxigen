@@ -62,21 +62,6 @@ typedef struct of_wire_buffer_s {
     of_buffer_free_f free;
 } of_wire_buffer_t;
 
-/**
- * Decouples object from underlying wire buffer
- *
- * Called a 'slice' in some places.
- */
-typedef struct of_wire_object_s {
-    /** A pointer to the underlying buffer's management structure. */
-    of_wire_buffer_t *wbuf;  
-    /** The start offset for this object relative to the start of the
-     * underlying buffer */
-    int obj_offset;
-    /* Boolean, whether the object owns the wire buffer. */
-    char owned;
-} of_wire_object_t;
-
 #define WBUF_BUF(wbuf) (wbuf)->buf
 #define WBUF_ALLOC_BYTES(wbuf) (wbuf)->alloc_bytes
 #define WBUF_CURRENT_BYTES(wbuf) (wbuf)->current_bytes
@@ -104,15 +89,6 @@ typedef struct of_wire_object_s {
  */
 #define OF_WIRE_BUFFER_INDEX(wbuf, offset) (&((WBUF_BUF(wbuf))[offset]))
 
-/**
- * Return a pointer to a particular offset in the underlying buffer
- * associated with a wire object
- * @param wobj Pointer to an of_wire_object_t structure
- * @param offset The location to reference relative to the start of the object
- */
-#define OF_WIRE_OBJECT_INDEX(wobj, offset) \
-    OF_WIRE_BUFFER_INDEX((wobj)->wbuf, (offset) + (wobj)->obj_offset)
-
 /****************************************************************
  * Object specific macros; of_object_t includes a wire_object
  ****************************************************************/
@@ -124,7 +100,7 @@ typedef struct of_wire_object_s {
  * @param offset The location to reference relative to the start of the object
  */
 #define OF_OBJECT_BUFFER_INDEX(obj, offset) \
-    OF_WIRE_OBJECT_INDEX(&((obj)->wire_object), offset)
+    OF_WIRE_BUFFER_INDEX((obj)->wbuf, (obj)->obj_offset + offset)
 
 /**
  * Return the absolute offset as an integer from a object-relative offset
@@ -132,7 +108,7 @@ typedef struct of_wire_object_s {
  * @param offset The location to reference relative to the start of the object
  */
 #define OF_OBJECT_ABSOLUTE_OFFSET(obj, offset) \
-    ((obj)->wire_object.obj_offset + offset)
+    ((obj)->obj_offset + offset)
 
 
 /**
@@ -140,7 +116,7 @@ typedef struct of_wire_object_s {
  *
  * Treat as private
  */
-#define OF_OBJECT_TO_WBUF(obj) ((obj)->wire_object.wbuf)
+#define OF_OBJECT_TO_WBUF(obj) ((obj)->wbuf)
 
 
 
@@ -174,7 +150,6 @@ of_wire_buffer_new(int a_bytes)
         FREE(wbuf);
         return NULL;
     }
-    MEMSET(wbuf->buf, 0, a_bytes);
     wbuf->current_bytes = 0;
     wbuf->alloc_bytes = a_bytes;
 
@@ -245,6 +220,7 @@ of_wire_buffer_grow(of_wire_buffer_t *wbuf, int bytes)
     LOCI_ASSERT(wbuf != NULL);
     LOCI_ASSERT(wbuf->alloc_bytes >= bytes);
     if (bytes > wbuf->current_bytes) {
+        MEMSET(wbuf->buf + wbuf->current_bytes, 0, bytes - wbuf->current_bytes);
         wbuf->current_bytes = bytes;
     }
 }
@@ -851,6 +827,30 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
 
 #define of_wire_buffer_ser_num_set(buf, offset, sernum) \
     _wbuf_octets_set(buf, offset, (uint8_t *)sernum, OF_SERIAL_NUM_LEN)
+
+/**
+ * Get a str64 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str64_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 64)
+
+/**
+ * Set a str64 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str64
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str64_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 64)
 
 /**
  * Get an ipv6 address from a wire buffer

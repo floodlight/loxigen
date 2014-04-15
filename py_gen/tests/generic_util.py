@@ -44,12 +44,6 @@ class TestUnpackList(unittest.TestCase):
         self.assertEquals(['\x04abc', '\x03de', '\x02f', '\x01'], a)
 
 class TestOFReader(unittest.TestCase):
-    def test_empty(self):
-        reader = OFReader("")
-        self.assertEquals(str(reader.read('')), "")
-        with self.assertRaisesRegexp(loxi.ProtocolError, "Buffer too short"):
-            reader.read_buf(1)
-
     def test_simple(self):
         reader = OFReader("abcdefg")
         self.assertEquals(reader.read('2s')[0], "ab")

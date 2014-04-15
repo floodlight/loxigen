@@ -158,6 +158,7 @@ typedef int (*loci_obj_show_f)(loci_writer_f writer,
 #define LOCI_SHOW_tab_name(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_desc_str(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 #define LOCI_SHOW_ser_num(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
+#define LOCI_SHOW_str64(writer, cookie, val) LOCI_SHOW_string(writer, cookie, val)
 
 int loci_show_match(loci_writer_f writer, void *cookie, of_match_t *match);
 #define LOCI_SHOW_match(writer, cookie, val) loci_show_match(writer, cookie, &val)
@@ -386,7 +387,16 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_num_aux(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u64_checksum(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
 #define LOCI_SHOW_u32_bsn_egr_port_group_id(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_u32_on_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_u32_off_interval_ms(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
-#define LOCI_SHOW_u32_num_iterations(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf0(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf1(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf2(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf3(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf4(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf5(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf6(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_bsn_udf7(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u64_counter_id(writer, cookie, val) LOCI_SHOW_u64(writer, cookie, val)
+#define LOCI_SHOW_desc_str_description(writer, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_str64_name(writer, cookie, val) LOCI_SHOW_str64(writer, cookie, val)
+
 #endif /* _LOCI_SHOW_H_ */

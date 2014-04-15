@@ -84,7 +84,6 @@ targets = {
     'loci/src/of_object.c': static,
     'loci/src/of_utils.c': static,
     'loci/src/of_wire_buf.c': static,
-    'loci/src/loci_setup_from_add_fns.c': static,
 
     # Static LOCI documentation
     'loci/README': static,
@@ -107,7 +106,6 @@ targets = {
     'locitest/src/test_ext.c': static,
     'locitest/src/test_list_limits.c': static,
     'locitest/src/test_match_utils.c': static,
-    'locitest/src/test_setup_from_add.c': static,
     'locitest/src/test_utils.c': static,
     'locitest/src/test_validator.c': static,
     'locitest/src/main.c': static,
@@ -131,3 +129,4 @@ def generate(install_dir):
     c_gen.codegen.generate_strings(install_dir)
     c_gen.codegen.generate_init_map(install_dir)
     c_gen.codegen.generate_type_maps(install_dir)
+    c_gen.codegen.generate_class_metadata(install_dir)

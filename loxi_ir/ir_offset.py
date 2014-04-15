@@ -95,6 +95,7 @@ of_base_lengths = dict(
     of_table_name_t = (ofp_constants["OF_MAX_TABLE_NAME_LEN"], True),
     of_desc_str_t = (ofp_constants["OF_DESC_STR_LEN"], True),
     of_serial_num_t = (ofp_constants["OF_SERIAL_NUM_LEN"], True),
+    of_str64_t = (64, True),
     of_match_v1_t = (40, True),
     of_match_v2_t = (88, True),
     of_match_v3_t = (8, False),
@@ -171,7 +172,6 @@ def member_length(version, fe_class, fe_member, existing_classes, existing_enums
     """
     count, base_type = type_dec_to_count_base(fe_member.oftype)
 
-    len_update = 0
     if base_type in of_mixed_types:
         base_type = of_mixed_types[base_type][version.wire_version]
 

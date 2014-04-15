@@ -295,6 +295,14 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
     OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
     OF_OXM_INDEX_BSN_EGR_PORT_GROUP_ID = 43,
+    OF_OXM_INDEX_BSN_UDF0 = 44,
+    OF_OXM_INDEX_BSN_UDF1 = 45,
+    OF_OXM_INDEX_BSN_UDF2 = 46,
+    OF_OXM_INDEX_BSN_UDF3 = 47,
+    OF_OXM_INDEX_BSN_UDF4 = 48,
+    OF_OXM_INDEX_BSN_UDF5 = 49,
+    OF_OXM_INDEX_BSN_UDF6 = 50,
+    OF_OXM_INDEX_BSN_UDF7 = 51,
 };
 
 #define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
@@ -610,7 +618,6 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
     /* For each active member, add an OXM entry to the list */
 """)
     for key in match.match_keys_sorted:
-        entry = match.of_match_members[key]
         out.write("""\
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(src)) {
         if (!OF_MATCH_MASK_%(ku)s_EXACT_TEST(src)) {
@@ -865,7 +872,8 @@ of_match_serialize(of_version_t version, of_match_t *match, of_octets_t *octets)
                 of_match_v%(version)s_delete(wire_match);
                 return rv;
             }
-            octets->bytes = OF_MATCH_BYTES(wire_match->length);
+            of_wire_buffer_grow(wire_match->wbuf, OF_MATCH_BYTES(wire_match->length));
+            octets->bytes = wire_match->wbuf->current_bytes;
             of_object_wire_buffer_steal((of_object_t *)wire_match,
                                         &octets->data);
             of_match_v%(version)s_delete(wire_match);
@@ -920,7 +928,7 @@ of_match_deserialize(of_version_t version, of_match_t *match,
 
             /* Free the wire buffer control block without freeing
              * octets->bytes. */
-            of_wire_buffer_steal(wire_match.wire_object.wbuf, &tmp);
+            of_wire_buffer_steal(wire_match.wbuf, &tmp);
         }
         break;
 """ % dict(version=version, ver_name=of_g.of_version_wire2name[version]))

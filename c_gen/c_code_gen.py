@@ -306,20 +306,6 @@ def identifiers_gen(out, filename):
     log("Generated %d identifiers" % (count - 1))
     out.write("\n#endif /* Loci identifiers header file */\n")
 
-def base_h_external(out, filename):
-    """
-    Copy contents of external file to base header
-
-    The contents of the filename are copied literally into the
-    out file handler.  This allows openflow common defines to
-    be entered into the LoxiGen code base.  The content of this
-    code must depend only on standard C headers.
-    """
-    infile = open(filename, "r")
-    contents = infile.read()
-    out.write(contents)
-    infile.close()
-
 def match_h_gen(out, name):
     """
     Generate code for
@@ -330,7 +316,6 @@ def match_h_gen(out, name):
     c_match.gen_incompat_members(out)
     c_match.gen_match_struct(out)
     c_match.gen_match_comp(out)
-#    c_match.gen_match_accessors(out)
     out.write("\n#endif /* Match header file */\n")
 
 def top_h_gen(out, name):
@@ -375,7 +360,7 @@ extern loci_logger_f loci_logger;
  * Treat as private
  */
 #define OF_OBJECT_TO_MESSAGE(obj) \\
-    ((of_message_t)(WBUF_BUF((obj)->wire_object.wbuf)))
+    ((of_message_t)(WBUF_BUF((obj)->wbuf)))
 
 /**
  * Macro for the fixed length part of an object
@@ -469,8 +454,8 @@ extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
  */
 #define OF_LENGTH_CHECK_ASSERT(obj) \\
     LOCI_ASSERT(((obj)->parent != NULL) || \\
-     ((obj)->wire_object.wbuf == NULL) || \\
-     (WBUF_CURRENT_BYTES((obj)->wire_object.wbuf) == (obj)->length))
+     ((obj)->wbuf == NULL) || \\
+     (WBUF_CURRENT_BYTES((obj)->wbuf) == (obj)->length))
 
 #define OF_DEBUG_DUMP
 #if defined(OF_DEBUG_DUMP)
@@ -700,6 +685,7 @@ typedef char of_port_name_t[OF_MAX_PORT_NAME_LEN];
 typedef char of_table_name_t[OF_MAX_TABLE_NAME_LEN];
 typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
+typedef char of_str64_t[64];
 
 typedef struct of_bitmap_128_s {
     uint64_t hi;
@@ -802,6 +788,7 @@ def external_h_top_matter(out, name):
 #include <loci/of_match.h>
 #include <loci/of_object.h>
 #include <loci/loci_classes.h>
+#include <loci/loci_class_metadata.h>
 
 /****************************************************************
  *
@@ -903,12 +890,6 @@ typedef enum of_object_id_e {
         last = of_g.unified[cls]["object_id"]
     out.write("\n    /* List objects */\n")
     for cls in of_g.ordered_list_objects:
-        out.write("    %s = %d,\n" % (enum_name(cls),
-                                   of_g.unified[cls]["object_id"]))
-        last = of_g.unified[cls]["object_id"]
-
-    out.write("\n    /* Generic stats request/reply types; pseudo objects */\n")
-    for cls in of_g.ordered_pseudo_objects:
         out.write("    %s = %d,\n" % (enum_name(cls),
                                    of_g.unified[cls]["object_id"]))
         last = of_g.unified[cls]["object_id"]
@@ -1036,23 +1017,6 @@ def param_list(cls, m_name, a_type):
         sys.exit(1)
     return params
 
-def typed_function_base(cls, m_name):
-    """
-    Generate the core name for accessors based on the type
-    @param cls The class name
-    @param m_name The member name
-    """
-    (m_type, get_rv) = get_acc_rv(cls, m_name)
-    return "%s_%s" % (cls, m_type)
-
-def member_function_base(cls, m_name):
-    """
-    Generate the core name for accessors based on the member name
-    @param cls The class name
-    @param m_name The member name
-    """
-    return "%s_%s" % (cls, m_name)
-
 def field_ver_get(cls, m_name):
     """
     Generate a dict, indexed by wire version, giving a pair (type, offset)
@@ -1104,13 +1068,6 @@ def v3_match_offset_get(cls):
 # OpenFlow Object Definitions
 #
 ################################################################
-
-
-def gen_of_object_defs(out):
-    """
-    Generate low level of_object core operations
-    @param out The file for output, already open
-    """
 
 def gen_generics(out):
     for (cls, subclasses) in type_maps.inheritance_map.items():
@@ -1311,58 +1268,6 @@ int
     return rv;
 }
 """ % dict(cls=cls, e_type=e_type, u_type=enum_name(e_type), len_str=len_str))
-
-
-def gen_bind(out, cls, m_name, m_type):
-    """
-    Generate the body of a bind function
-    @param out The file to which to write
-    @param cls The class name for which code is being generated
-    @param m_name The name of the data member
-    @param m_type The type of the data member
-    """
-
-    bparams = ",\n    ".join(param_list(cls, m_name, "bind"))
-
-    i_call = init_call(e_type, "child", "parent->version", "0", "1")
-
-    out.write("""
-/**
- * Bind the child object to the parent object for read processing
- * @param parent The parent object
- * @param child The child object
- *
- * The child obj instance is completely initialized.
- */
-
-int
-%(cls)s_%(m_name)_bind(%(cls)s_t *parent,
-    %(e_type)s_t *child)
-{
-    int rv;
-
-    %(i_call)s;
-
-    /* Derive offset and length of child in parent */
-    OF_TRY(of_object_child_attach(parent, child,
-    if ((rv = of_list_first((of_object_t *)list, (of_object_t *)obj)) < 0) {
-        return rv;
-    }
-""" % dict(cls=cls, e_type=e_type, i_call=i_call))
-
-    # Special case flow_stats_entry lists
-
-    out.write("""
-    rv = of_object_wire_init((of_object_t *) obj, %(u_type)s,
-                               list->length);
-    if ((rv == OF_ERROR_NONE) && (%(len_str)s == 0)) {
-        return OF_ERROR_PARSE;
-    }
-
-    return rv;
-}
-""" % dict(cls=cls, e_type=e_type, u_type=enum_name(e_type), len_str=len_str))
-
 
 def gen_list_next(out, cls, e_type):
     """
@@ -1669,15 +1574,25 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     match_octets.data = OF_OBJECT_BUFFER_INDEX(obj, offset);
     OF_TRY(of_match_deserialize(ver, %(m_name)s, &match_octets));
 """ % dict(m_name=m_name))
+    elif m_type == "of_oxm_header_t":
+        out.write("""
+    /* Initialize child */
+    %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
+    /* Attach to parent */
+    %(m_name)s->parent = (of_object_t *)obj;
+    %(m_name)s->wbuf = obj->wbuf;
+    %(m_name)s->obj_offset = abs_offset;
+    %(m_name)s->length = cur_len;
+    of_object_wire_init(%(m_name)s, OF_OXM, 0);
+""" % dict(m_type=m_type[:-2], m_name=m_name))
     else:
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
     %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wire_object.wbuf = obj->wire_object.wbuf;
-    %(m_name)s->wire_object.obj_offset = abs_offset;
-    %(m_name)s->wire_object.owned = 0;
+    %(m_name)s->wbuf = obj->wbuf;
+    %(m_name)s->obj_offset = abs_offset;
     %(m_name)s->length = cur_len;
 """ % dict(m_type=m_type[:-2], m_name=m_name))
 
@@ -1719,7 +1634,7 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
         out.write("""
     new_len = %(m_name)s->length;
     /* If underlying buffer already shared; nothing to do */
-    if (obj->wire_object.wbuf == %(m_name)s->wire_object.wbuf) {
+    if (obj->wbuf == %(m_name)s->wbuf) {
         of_wire_buffer_grow(wbuf, abs_offset + new_len);
         /* Verify that the offsets are correct */
         LOCI_ASSERT(abs_offset == OF_OBJECT_ABSOLUTE_OFFSET(%(m_name)s, 0));
@@ -1751,9 +1666,7 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
         elif m_type not in ["of_match_t", "of_octets_t"]:
             out.write("""
     /* @fixme Shouldn't this precede copying value's data to buffer? */
-    if (%(m_name)s->wire_length_set != NULL) {
-        %(m_name)s->wire_length_set((of_object_t *)%(m_name)s, %(m_name)s->length);
-    }
+    of_object_wire_length_set((of_object_t *)%(m_name)s, %(m_name)s->length);
 """ % dict(m_name=m_name))
         out.write("""
     /* Not scalar, update lengths if needed */
@@ -1984,20 +1897,6 @@ def gen_accessor_definitions(out, cls):
 #
 ################################################################
 
-
-################################################################
-# First, some utility functions for new/delete
-################################################################
-
-def del_function_proto(cls):
-    """
-    Return the prototype for the delete operator for the given class
-    @param cls The class name
-    """
-    fn = "void\n"
-    return fn
-
-
 ################################################################
 # Routines to generate the body of new/delete functions
 ################################################################
@@ -2057,15 +1956,14 @@ void
     obj->length = bytes;
     obj->object_id = %(enum)s;
 """ % dict(cls=cls, enum=enum_name(cls)))
-    gen_coerce_ops(out, cls)
 
     out.write("""
     /* Grow the wire buffer */
-    if (obj->wire_object.wbuf != NULL) {
+    if (obj->wbuf != NULL) {
         int tot_bytes;
 
-        tot_bytes = bytes + obj->wire_object.obj_offset;
-        of_wire_buffer_grow(obj->wire_object.wbuf, tot_bytes);
+        tot_bytes = bytes + obj->obj_offset;
+        of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
 
@@ -2116,7 +2014,7 @@ static inline int
 
         if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
             out.write("""
-    obj->wire_length_set((of_object_t *)obj, obj->length);
+    of_object_wire_length_set((of_object_t *)obj, obj->length);
 """)
 
         if cls == "of_meter_stats":
@@ -2145,6 +2043,10 @@ def gen_new_fn_body(cls, out):
     if not type_maps.class_is_virtual(cls):
         gen_wire_push_fn(cls, out)
 
+    uclass = loxi_globals.unified.class_by_name(cls)
+    is_fixed_length = uclass and uclass.is_fixed_length
+    max_length = is_fixed_length and "bytes" or "OF_WIRE_BUFFER_MAX_LENGTH"
+
     out.write("""
 /**
  * Create a new %(cls)s object
@@ -2169,13 +2071,12 @@ def gen_new_fn_body(cls, out):
 
     bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
 
-    /* Allocate a maximum-length wire buffer assuming we'll be appending to it. */
-    if ((obj = (%(cls)s_t *)of_object_new(OF_WIRE_BUFFER_MAX_LENGTH)) == NULL) {
+    if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
         return NULL;
     }
 
     %(cls)s_init(obj, version, bytes, 0);
-""" % dict(cls=cls, enum=enum_name(cls)))
+""" % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
         out.write("""
     if (%(cls)s_push_wire_values(obj) < 0) {
@@ -2328,99 +2229,6 @@ extern const of_object_init_f of_object_init_map[];
  ****************************************************************/
 """)
 
-#
-# @fixme Not clear that these should all be set for virtual fns
-#
-# @fixme Clean up.  should have a (language specific) map from class
-# to length and type get/set functions
-#
-
-def gen_coerce_ops(out, cls):
-    out.write("""
-    /* Set up the object's function pointers */
-""")
-
-    uclass = loxi_globals.unified.class_by_name(cls)
-    if uclass and not uclass.virtual and uclass.has_type_members:
-        out.write("""
-    obj->wire_type_set = %(cls)s_push_wire_types;
-""" % dict(cls=cls))
-
-    if loxi_utils.class_is_message(cls):
-        out.write("""
-    obj->wire_length_get = of_object_message_wire_length_get;
-    obj->wire_length_set = of_object_message_wire_length_set;
-""")
-    else:
-        if loxi_utils.class_is_tlv16(cls):
-            if not (cls in type_maps.inheritance_map): # Don't set for super
-                out.write("""
-    obj->wire_length_set = of_tlv16_wire_length_set;
-""")
-            out.write("""
-    obj->wire_length_get = of_tlv16_wire_length_get;
-""")
-            if loxi_utils.class_is_action(cls):
-                out.write("""
-    obj->wire_type_get = of_action_wire_object_id_get;
-""")
-            if loxi_utils.class_is_action_id(cls):
-                out.write("""
-    obj->wire_type_get = of_action_id_wire_object_id_get;
-""")
-            if loxi_utils.class_is_instruction(cls):
-                out.write("""
-    obj->wire_type_get = of_instruction_wire_object_id_get;
-""")
-            if loxi_utils.class_is_instruction_id(cls):
-                out.write("""
-    obj->wire_type_get = of_instruction_id_wire_object_id_get;
-""")
-            if loxi_utils.class_is_queue_prop(cls):
-                    out.write("""
-    obj->wire_type_get = of_queue_prop_wire_object_id_get;
-""")
-            if loxi_utils.class_is_table_feature_prop(cls):
-                    out.write("""
-    obj->wire_type_get = of_table_feature_prop_wire_object_id_get;
-""")
-            if loxi_utils.class_is_meter_band(cls):
-                    out.write("""
-    obj->wire_type_get = of_meter_band_wire_object_id_get;
-""")
-            if loxi_utils.class_is_hello_elem(cls):
-                    out.write("""
-    obj->wire_type_get = of_hello_elem_wire_object_id_get;
-""")
-            if loxi_utils.class_is_bsn_tlv(cls):
-                    out.write("""
-    obj->wire_type_get = of_bsn_tlv_wire_object_id_get;
-""")
-        if loxi_utils.class_is_oxm(cls):
-            out.write("""
-    obj->wire_length_get = of_oxm_wire_length_get;
-    obj->wire_type_get = of_oxm_wire_object_id_get;
-""")
-        if loxi_utils.class_is_u16_len(cls):
-            out.write("""
-    obj->wire_length_get = of_u16_len_wire_length_get;
-    obj->wire_length_set = of_u16_len_wire_length_set;
-""")
-        if cls == "of_packet_queue":
-            out.write("""
-    obj->wire_length_get = of_packet_queue_wire_length_get;
-    obj->wire_length_set = of_packet_queue_wire_length_set;
-""")
-#        if cls == "of_list_meter_band_stats":
-#            out.write("""
-#    obj->wire_length_get = of_list_meter_band_stats_wire_length_get;
-#""")
-        if cls == "of_meter_stats":
-            out.write("""
-    obj->wire_length_get = of_meter_stats_wire_length_get;
-    obj->wire_length_set = of_meter_stats_wire_length_set;
-""")
-
 def gen_new_function_definitions(out, cls):
     """
     Generate the new operator for all classes
@@ -2501,201 +2309,3 @@ typedef struct %(cls)s_s %(cls)s_t;
 """ % dict(cls=cls))
 
     out.write("#endif /* _LOCI_DOC_H_ */\n")
-
-################################################################
-#
-# For fun, here are some unified, traditional C structure representation
-#
-################################################################
-
-def gen_cof_to_wire(out):
-    pass
-
-def gen_wire_to_cof(out):
-    pass
-
-def gen_cof_instance(out, cls):
-    out.write("struct c%s_s {\n" % cls)
-    for m in of_g.ordered_members[cls]:
-        if m in of_g.skip_members:
-            continue
-        entry = of_g.unified[cls]["union"][m]
-        cof_type = type_to_cof_type(entry["m_type"])
-        out.write("    %-20s %s;\n" % (cof_type, m))
-    out.write("};\n\n");
-
-def gen_cof_structs(out):
-    """
-    Generate non-version specific (common) representation of structures
-
-    @param out The file to which to write the functions
-    """
-
-    out.write("\n/* Common, unified OpenFlow structure representations */\n")
-    for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
-        gen_cof_instance(out, cls)
-
-################################################################
-#
-# Generate code samples for applications.
-#
-################################################################
-
-def gen_code_samples(out, name):
-    out.write("""
-#if 0 /* Do not compile in */
-/**
- * @file %(name)s
- *
- * These are code samples for inclusion in other components
- */
-
-""" % dict(name=name))
-
-    gen_jump_table_template(out)
-    # These are messages that a switch might expect.
-    msg_list = ["of_echo_request",
-                "of_hello",
-                "of_packet_in",
-                "of_packet_out",
-                "of_port_mod",
-                "of_port_stats_request",
-                "of_queue_get_config_request",
-                "of_queue_stats_request",
-                "of_flow_add",
-                "of_flow_modify",
-                "of_flow_modify_strict",
-                "of_flow_delete",
-                "of_flow_delete_strict",
-                "of_get_config_request",
-                "of_flow_stats_request",
-                "of_barrier_request",
-                "of_echo_reply",
-                "of_aggregate_stats_request",
-                "of_desc_stats_request",
-                "of_table_stats_request",
-                "of_features_request",
-                "of_table_mod",
-                "of_set_config",
-                "of_experimenter",
-                "of_experimenter_stats_request",
-                "of_group_desc_stats_request",
-                "of_group_features_stats_request",
-                "of_role_request"]
-
-    gen_message_handler_templates(out, msgs=msg_list)
-
-    out.write("""
-#endif
-""")
-
-def gen_jump_table_template(out=sys.stdout, all_unhandled=True,
-                            cxn_type="ls_cxn_handle_t",
-                            unhandled="unhandled_message"):
-    """
-    Generate a template for a jump table.
-    @param out The file to which to write the functions
-    """
-    out.write("""
-/*
- * Simple jump table definition for message handling
- */
-typedef int (*msg_handler_f)(%(cxn_type)s cxn, of_object_t *obj);
-typedef msg_handler_f msg_jump_table_t[OF_MESSAGE_OBJECT_COUNT];
-
-/* Jump table template for message objects */
-extern msg_jump_table_t jump_table;
-
-/* C-code template */
-msg_jump_table_t jump_table = {
-    %(unhandled)s, /* OF_OBJECT; place holder for generic object  */
-""" % dict(unhandled=unhandled, cxn_type=cxn_type))
-    count = 0
-    fn_name = unhandled
-    for cls in of_g.ordered_messages:
-        comma = ","
-        count += 1
-        if count == len(of_g.ordered_messages):
-            comma = " "
-        if not all_unhandled:
-            fn_name = "%s_handler" % cls[3:]
-        out.write("    %s%s /* %s */\n" % (fn_name, comma, enum_name(cls)))
-
-    out.write("};\n")
-
-def gen_message_switch_stmt_tmeplate(out=sys.stdout, all_unhandled=True,
-                                     cxn_type="ls_cxn_handle_t",
-                                     unhandled="unhandled_message"):
-    out.write("""
-/*
- * Simple switch statement for message handling
- */
-
-    switch (obj->object_id):
-""")
-    fn_name = unhandled
-    for cls in of_g.ordered_messages:
-        if not all_unhandled:
-            fn_name = "%s_handler" % cls[3:]
-        out.write("""
-    case %(enum)s:
-        rv = %(fn_name)s(cxn, obj);
-        break;
-""" % dict(fn_name=fn_name, cls=cls, enum=enum_name(cls)))
-    out.write("""
-    default:
-        rv = LS_ERROR_PARAM;
-        break;
-    }
-
-    TRACE("Handled msg %p with rv %d (%s)", obj, rv, ls_error_strings[rv]);
-
-    return rv;
-""")
-
-
-def gen_message_handler_templates(out=sys.stdout, cxn_type="ls_cxn_handle_t",
-                                  unhandled="unhandled_message", msgs=None):
-    gen_jump_table_template(out, False, cxn_type)
-    out.write("""
-/**
- * Function for unhandled message
- */
-static int
-unhandled_message(%(cxn_type)s cxn, of_object_t *obj)
-{
-    (void)cxn;
-    (void)obj;
-    TRACE("Unhandled message %%p.  Object id %%d", obj, obj->object_id);
-
-    return LS_ERROR_UNAVAIL;
-}
-""" % dict(unhandled=unhandled, cxn_type=cxn_type))
-
-    if not msgs:
-        msgs = of_g.ordered_messages
-    for cls in msgs:
-        out.write("""
-/**
- * Handle a %(s_cls)s message
- * @param cxn Connection handler for the owning connection
- * @param _obj Generic type object for the message to be coerced
- * @returns Error code
- */
-
-static int
-%(s_cls)s_handler(%(cxn_type)s cxn, of_object_t *_obj)
-{
-    %(cls)s_t *obj;
-
-    TRACE("Handling %(cls)s message: %%p.", obj);
-    obj = (%(cls)s_t *)_obj;
-
-    /* Handle object of type %(cls)s_t */
-
-    return LS_ERROR_NONE;
-}
-""" % dict(s_cls=cls[3:], cls=cls, cxn_type=cxn_type))
-    gen_message_switch_stmt_tmeplate(out, False, cxn_type)

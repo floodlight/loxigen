@@ -349,6 +349,7 @@ port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
+str64 = gen_fixed_length_string_jtype(64)
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -498,6 +499,8 @@ gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
            )
+udf = JType("UDF") \
+         .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
 
 generic_t = JType("T")
 
@@ -526,6 +529,7 @@ default_mtype_to_jtype_convert_map = {
         'of_serial_num_t': serial_num,
         'of_port_name_t': port_name,
         'of_table_name_t': table_name,
+        'of_str64_t': str64,
         'of_ipv4_t': ipv4,
         'of_ipv6_t': ipv6,
         'of_wc_bmap_t': flow_wildcards,
@@ -612,6 +616,30 @@ exceptions = {
         'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
+        'of_oxm_bsn_udf0' : { 'value' : udf },
+        'of_oxm_bsn_udf0_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf1' : { 'value' : udf },
+        'of_oxm_bsn_udf1_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf2' : { 'value' : udf },
+        'of_oxm_bsn_udf2_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf3' : { 'value' : udf },
+        'of_oxm_bsn_udf3_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf4' : { 'value' : udf },
+        'of_oxm_bsn_udf4_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf5' : { 'value' : udf },
+        'of_oxm_bsn_udf5_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf6' : { 'value' : udf },
+        'of_oxm_bsn_udf6_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_udf7' : { 'value' : udf },
+        'of_oxm_bsn_udf7_masked' : { 'value' : udf, 'value_mask' : udf },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
@@ -621,6 +649,7 @@ exceptions = {
         'of_bsn_set_l2_table_request': { 'l2_table_enable': boolean },
         'of_bsn_set_l2_table_reply': { 'l2_table_enable': boolean },
         'of_bsn_set_pktin_suppression_request': { 'enabled': boolean },
+        'of_bsn_controller_connection': { 'auxiliary_id' : of_aux_id},
         'of_flow_stats_request': { 'out_group': of_group_default_any },
         'of_aggregate_stats_request': { 'out_group': of_group_default_any },
 
