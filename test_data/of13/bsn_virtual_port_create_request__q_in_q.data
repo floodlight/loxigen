@@ -1,0 +1,53 @@
+-- binary
+04 04           # version, type
+00 30           # len
+01 02 03 04     # xid
+00 5c 16 c7     # experimenter
+00 00 00 0f     # subtype
+00 00           # vport type
+00 20           # vport len
+00 00 00 01     # vport port no
+00 02           # vport ingress tpid
+00 03           # vport ingress vlan id
+00 04           # vport egress tpid
+00 05           # vport egress vlan id
+66 6f 6f 00 00 00 00 00 00 00 00 00 00 00 00 00 # vport if name
+-- python
+ofp.message.bsn_virtual_port_create_request(
+xid=0x01020304, vport=ofp.bsn_vport_q_in_q(
+port_no=1,
+ingress_tpid=2,
+ingress_vlan_id=3,
+egress_tpid=4,
+egress_vlan_id=5,
+if_name="foo"
+))
+-- c
+obj = of_bsn_virtual_port_create_request_new(OF_VERSION_1_3);
+of_bsn_virtual_port_create_request_xid_set(obj, 0x01020304);
+{
+    of_object_t *vport = of_bsn_vport_q_in_q_new(OF_VERSION_1_3);
+    {
+        of_port_name_t if_name = "foo";
+        of_bsn_vport_q_in_q_port_no_set(vport, 1);
+        of_bsn_vport_q_in_q_ingress_tpid_set(vport, 2);
+        of_bsn_vport_q_in_q_ingress_vlan_id_set(vport, 3);
+        of_bsn_vport_q_in_q_egress_tpid_set(vport, 4);
+        of_bsn_vport_q_in_q_egress_vlan_id_set(vport, 5);
+        of_bsn_vport_q_in_q_if_name_set(vport, if_name);
+    }
+    of_bsn_virtual_port_create_request_vport_set(obj, vport);
+    of_object_delete(vport);
+}
+-- java
+builder.setXid(0x01020304)
+    .setVport(
+        factory.buildBsnVportQInQ()
+            .setPortNo(1)
+            .setIngressTpid(2)
+            .setIngressVlanId(3)
+            .setEgressTpid(4)
+            .setEgressVlanId(5)
+            .setIfName("foo")
+            .build()
+    );

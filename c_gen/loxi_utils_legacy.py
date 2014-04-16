@@ -120,6 +120,8 @@ def class_is_tlv16(cls):
         return True
     if cls.find("of_bsn_tlv") == 0:
         return True
+    if cls.find("of_bsn_vport") == 0:
+        return True
     return False
 
 def class_is_u16_len(cls):
