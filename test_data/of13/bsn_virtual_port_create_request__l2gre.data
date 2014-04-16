@@ -54,3 +54,24 @@ of_bsn_virtual_port_create_request_xid_set(obj, 0x01020304);
     of_bsn_virtual_port_create_request_vport_set(obj, vport);
     of_object_delete(vport);
 }
+-- java
+builder.setXid(0x01020304)
+    .setVport(
+        factory.buildBsnVportL2Gre()
+            .setFlags(
+                ImmutableSet.<OFBsnVportL2GreFlags>of(
+                    OFBsnVportL2GreFlags.BSN_VPORT_L2GRE_LOCAL_MAC_IS_VALID,
+                    OFBsnVportL2GreFlags.BSN_VPORT_L2GRE_DSCP_ASSIGN
+                )
+            )
+            .setPortNo(OFPort.of(1))
+            .setLocalMac(MacAddress.of("0a:0b:0c:0d:0e:0f"))
+            .setNhMac(MacAddress.of("01:02:03:04:05:06"))
+            .setSrcIp(IPv4Address.of("192.0.0.2"))
+            .setDstIp(IPv4Address.of("192.0.16.2"))
+            .setDscp((short)1)
+            .setTtl((short)64)
+            .setVpn(0xbeef)
+            .setIfName("foo")
+            .build()
+    );

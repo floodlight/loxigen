@@ -39,3 +39,15 @@ of_bsn_virtual_port_create_request_xid_set(obj, 0x01020304);
     of_bsn_virtual_port_create_request_vport_set(obj, vport);
     of_object_delete(vport);
 }
+-- java
+builder.setXid(0x01020304)
+    .setVport(
+        factory.buildBsnVportQInQ()
+            .setPortNo(1)
+            .setIngressTpid(2)
+            .setIngressVlanId(3)
+            .setEgressTpid(4)
+            .setEgressVlanId(5)
+            .setIfName("foo")
+            .build()
+    );
