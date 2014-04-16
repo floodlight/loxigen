@@ -31,7 +31,7 @@
 // should be sent to the controller. The packet-in reason field is only 8 bits,
 // so we use the metadata OXM to carry this information.
 
-enum ofp_bsn_pktin_flag(wire_type=uint64, bitmask=True) {
+enum ofp_bsn_pktin_flag(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_PKTIN_FLAG_PDU = 0x1,
     OFP_BSN_PKTIN_FLAG_NEW_HOST = 0x2,
     OFP_BSN_PKTIN_FLAG_STATION_MOVE = 0x4,
