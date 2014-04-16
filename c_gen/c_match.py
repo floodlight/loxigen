@@ -177,15 +177,19 @@ typedef struct of_match_s {
     of_match_fields_t masks;
 } of_match_t;
 
-/**
- * Mask the values in the match structure according to its fields
+/*
+ * AND 'len' bytes starting from 'value' with the corresponding byte in
+ * 'mask'.
  */
-static inline void of_match_values_mask(of_match_t *match)
+static inline void
+of_memmask(void *value, const void *mask, size_t len)
 {
-    int idx;
+    int i;
+    uint8_t *v = value;
+    const uint8_t *m = mask;
 
-    for (idx = 0; idx < sizeof(of_match_fields_t); idx++) {
-        ((uint8_t *)&match->fields)[idx] &= ((uint8_t *)&match->masks)[idx];
+    for (i = 0; i < len; i++) {
+        v[i] &= m[i];
     }
 }
 
@@ -755,6 +759,7 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
     if (OF_VARIABLE_IS_NON_ZERO(&dst->masks.%(key)s)) { /* Matching something */
         of_match_v2_%(key)s_get(src, &dst->fields.%(key)s);
     }
+    of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
 """ % dict(ku=key.upper(), key=key))
         else:
             out.write("""
@@ -765,8 +770,6 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
 """ % dict(ku=key.upper(), key=key))
 
     out.write("""
-    /* Clear values outside of masks */
-    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
@@ -810,6 +813,7 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
             of_oxm_%(key)s_masked_value_get(
                 &oxm_entry.%(key)s,
                 &dst->fields.%(key)s);
+            of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
             break;
         case OF_OXM_%(ku)s:
             OF_MATCH_MASK_%(ku)s_EXACT_SET(dst);
@@ -826,9 +830,6 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
         } /* end switch */
         rv = of_list_oxm_next(&oxm_list, &oxm_entry);
     } /* end OXM iteration */
-
-    /* Clear values outside of masks */
-    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
