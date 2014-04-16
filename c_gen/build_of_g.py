@@ -158,6 +158,11 @@ def update_offset(cls, wire_version, name, offset, m_type):
             # but is variable length
             bytes = -1
             len_update = 4
+        elif base_type == "of_bsn_vport_header_t":
+            # This is a special case: it has non-zero min length
+            # but is variable length
+            bytes = -1
+            len_update = 4
         elif base_type in of_g.of_base_types:
             bytes = of_g.of_base_types[base_type]["bytes"]
         else:
@@ -332,6 +337,9 @@ def build_ordered_classes():
                     # HACK the C backend does not yet support of_oxm_t
                     if m.oftype == 'of_oxm_t':
                         m_type = 'of_oxm_header_t'
+                    # HACK the C backend does not yet support of_bsn_vport_t
+                    elif m.oftype == 'of_bsn_vport_t':
+                        m_type = 'of_bsn_vport_header_t'
                     else:
                         enum = find(lambda e: e.name == m.oftype, protocol.enums)
                         if enum and "wire_type" in enum.params:

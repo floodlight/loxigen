@@ -1,0 +1,77 @@
+-- binary
+04 04               # version, type
+00 48               # len
+01 02 03 04         # xid
+00 5c 16 c7         # experimenter
+00 00 00 0f         # subtype
+00 01               # vport type
+00 38               # vport len
+00 00 00 03         # vport flags
+00 00 00 01         # vport port no
+0a 0b 0c 0d 0e 0f   # local mac
+01 02 03 04 05 06   # next hop mac
+c0 00 00 02         # src ip
+c0 00 10 02         # dst ip
+01 40 00 00         # dscp, ttl, pad(2)
+00 00 be ef         # vpn
+66 6f 6f 00 00 00 00 00 00 00 00 00 00 00 00 00 # vport if name
+-- python
+ofp.message.bsn_virtual_port_create_request(
+xid=0x01020304, vport=ofp.bsn_vport_l2gre(
+flags=ofp.OF_BSN_VPORT_L2GRE_LOCAL_MAC_IS_VALID | ofp.OF_BSN_VPORT_L2GRE_DSCP_ASSIGN,
+port_no=1,
+local_mac=[0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f],
+nh_mac=[0x01, 0x02, 0x03, 0x04, 0x05, 0x06],
+src_ip=0xc0000002,
+dst_ip=0xc0001002,
+dscp=1,
+ttl=64,
+vpn=0xbeef,
+if_name="foo"
+))
+-- c
+obj = of_bsn_virtual_port_create_request_new(OF_VERSION_1_3);
+of_bsn_virtual_port_create_request_xid_set(obj, 0x01020304);
+{
+    of_object_t *vport = of_bsn_vport_l2gre_new(OF_VERSION_1_3);
+    {
+        of_port_name_t if_name = "foo";
+        of_mac_addr_t local_mac = { { 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f } };
+        of_mac_addr_t nh_mac = { { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06 } };
+        of_bsn_vport_l2gre_flags_set(vport,
+            OF_BSN_VPORT_L2GRE_LOCAL_MAC_IS_VALID |
+            OF_BSN_VPORT_L2GRE_DSCP_ASSIGN);
+        of_bsn_vport_l2gre_port_no_set(vport, 1);
+        of_bsn_vport_l2gre_local_mac_set(vport, local_mac);
+        of_bsn_vport_l2gre_nh_mac_set(vport, nh_mac);
+        of_bsn_vport_l2gre_src_ip_set(vport, 0xc0000002);
+        of_bsn_vport_l2gre_dst_ip_set(vport, 0xc0001002);
+        of_bsn_vport_l2gre_dscp_set(vport, 1);
+        of_bsn_vport_l2gre_ttl_set(vport, 64);
+        of_bsn_vport_l2gre_vpn_set(vport, 0xbeef);
+        of_bsn_vport_l2gre_if_name_set(vport, if_name);
+    }
+    of_bsn_virtual_port_create_request_vport_set(obj, vport);
+    of_object_delete(vport);
+}
+-- java
+builder.setXid(0x01020304)
+    .setVport(
+        factory.buildBsnVportL2Gre()
+            .setFlags(
+                ImmutableSet.<OFBsnVportL2GreFlags>of(
+                    OFBsnVportL2GreFlags.BSN_VPORT_L2GRE_LOCAL_MAC_IS_VALID,
+                    OFBsnVportL2GreFlags.BSN_VPORT_L2GRE_DSCP_ASSIGN
+                )
+            )
+            .setPortNo(OFPort.of(1))
+            .setLocalMac(MacAddress.of("0a:0b:0c:0d:0e:0f"))
+            .setNhMac(MacAddress.of("01:02:03:04:05:06"))
+            .setSrcIp(IPv4Address.of("192.0.0.2"))
+            .setDstIp(IPv4Address.of("192.0.16.2"))
+            .setDscp((short)1)
+            .setTtl((short)64)
+            .setVpn(0xbeef)
+            .setIfName("foo")
+            .build()
+    );

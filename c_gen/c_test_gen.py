@@ -100,6 +100,7 @@ def var_name_map(m_type):
         of_meter_features_t="features",
         of_match_t="match",
         of_oxm_header_t="oxm",
+        of_bsn_vport_header_t="bsn_vport",
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
@@ -1363,6 +1364,19 @@ int
         FREE(octets.data);
     }
 """ % dict(var_name=var_name_map(m_type), cls=cls, m_name=m_name))
+        elif m_type == "of_bsn_vport_t": # FIXME: tests only q_in_q
+            out.write("""\
+    %(var_name)s = %(sub_cls)s_new(%(v_name)s);
+    TEST_ASSERT(%(var_name)s != NULL);
+    value = %(sub_cls)s_q_in_q_%(v_name)s_populate(
+        &%(var_name)s->q_in_q, value);
+    TEST_ASSERT(value != 0);
+    %(cls)s_%(m_name)s_set(
+        obj, %(var_name)s);
+    %(sub_cls)s_delete(%(var_name)s);
+""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name, m_type=m_type,
+           var_name=var_name_map(m_type),
+           v_name=loxi_utils.version_to_name(version)))
         else:
             sub_cls = m_type[:-2] # Trim _t
             out.write("""
@@ -1428,6 +1442,22 @@ int
     %(cls)s_%(m_name)s_get(obj, &%(var_name)s);
     value = of_octets_check(&%(var_name)s, value);
 """ % dict(cls=cls, var_name=var_name_map(m_type), m_name=m_name,
+           v_name=loxi_utils.version_to_name(version)))
+        elif m_type == "of_bsn_vport_t": # FIXME: tests only q_in_q
+            sub_cls = m_type[:-2] # Trim _t
+            out.write("""
+    { /* Use get/delete to access on check */
+        %(m_type)s *%(m_name)s_ptr;
+
+        %(m_name)s_ptr = %(cls)s_%(m_name)s_get(obj);
+        TEST_ASSERT(%(m_name)s_ptr != NULL);
+        value = %(sub_cls)s_q_in_q_%(v_name)s_check(
+            &%(m_name)s_ptr->q_in_q, value);
+        TEST_ASSERT(value != 0);
+        %(sub_cls)s_delete(%(m_name)s_ptr);
+    }
+""" % dict(cls=cls, sub_cls=sub_cls, m_name=m_name, m_type=m_type,
+           var_name=var_name_map(m_type),
            v_name=loxi_utils.version_to_name(version)))
         else:
             sub_cls = m_type[:-2] # Trim _t

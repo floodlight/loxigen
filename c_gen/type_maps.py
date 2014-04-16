@@ -89,22 +89,10 @@ queue_prop_types = {
     }
 
 bsn_vport_types = {
-    # version 1.0
-    of_g.VERSION_1_0:dict(
-        q_in_q      = 0,
-        ),
-    # version 1.1
-    of_g.VERSION_1_1:dict(
-        q_in_q      = 0,
-        ),
-    # version 1.2
-    of_g.VERSION_1_2:dict(
-        q_in_q      = 0,
-        ),
-    # version 1.3
-    of_g.VERSION_1_3:dict(
-        q_in_q      = 0,
-        )
+    of_g.VERSION_1_0:dict(),
+    of_g.VERSION_1_1:dict(),
+    of_g.VERSION_1_2:dict(),
+    of_g.VERSION_1_3:dict(),
     }
 
 oxm_types = {
