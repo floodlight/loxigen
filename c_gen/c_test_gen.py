@@ -272,7 +272,7 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
     }
 
     /* Restrict values according to masks */
-    of_match_values_mask(match);
+    of_memmask(&match->fields, &match->masks, sizeof(match->fields));
     return value;
 }
 
