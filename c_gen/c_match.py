@@ -768,6 +768,7 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
     if (OF_VARIABLE_IS_NON_ZERO(&dst->masks.%(key)s)) { /* Matching something */
         of_match_v2_%(key)s_get(src, &dst->fields.%(key)s);
     }
+    of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
 """ % dict(ku=key.upper(), key=key))
         else:
             out.write("""
@@ -778,8 +779,6 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
 """ % dict(ku=key.upper(), key=key))
 
     out.write("""
-    /* Clear values outside of masks */
-    of_match_values_mask(dst);
 
     return OF_ERROR_NONE;
 }
