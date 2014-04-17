@@ -52,6 +52,6 @@ struct of_bsn_image_desc_stats_reply : of_bsn_stats_reply {
     pad(4);
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 14;
-    uint32_t image_checksum_hash;
-    uint32_t startup_config_hash;
+    of_desc_str_t image_checksum;
+    of_desc_str_t startup_config_checksum;
 };
