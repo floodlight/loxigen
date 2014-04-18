@@ -42,4 +42,5 @@ enum ofp_bsn_pktin_flag(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_PKTIN_FLAG_TTL_EXPIRED = 0x80,
     OFP_BSN_PKTIN_FLAG_L3_MISS = 0x100,
     OFP_BSN_PKTIN_FLAG_L3_CPU = 0x200,
+    OFP_BSN_PKTIN_FLAG_L3_BAD_MTU = 0x400,
 };
