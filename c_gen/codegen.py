@@ -206,6 +206,10 @@ def generate_class_metadata(install_dir):
                 wire_length_set = 'of_tlv16_wire_length_set'
                 wire_length_get = 'of_tlv16_wire_length_get'
                 wire_type_get = 'of_action_wire_object_id_get'
+            elif uclass.is_instanceof('of_bsn_vport'):
+                wire_length_set = 'of_tlv16_wire_length_set'
+                wire_length_get = 'of_tlv16_wire_length_get'
+                wire_type_get = 'of_bsn_vport_wire_object_id_get'
             elif uclass.is_action_id:
                 wire_length_set = 'of_tlv16_wire_length_set'
                 wire_length_get = 'of_tlv16_wire_length_get'
@@ -278,6 +282,12 @@ def generate_class_metadata(install_dir):
                 wire_length_set='of_tlv16_wire_length_set',
                 wire_length_get='of_tlv16_wire_length_get',
                 wire_type_get='of_action_id_wire_object_id_get',
+                wire_type_set='NULL'),
+            ClassMetadata(
+                name="of_bsn_vport_header",
+                wire_length_set='of_tlv16_wire_length_set',
+                wire_length_get='of_tlv16_wire_length_get',
+                wire_type_get='of_bsn_vport_wire_object_id_get',
                 wire_type_set='NULL'),
             ClassMetadata(
                 name="of_instruction_header",
