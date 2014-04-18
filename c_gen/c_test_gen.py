@@ -1306,6 +1306,8 @@ int
     for m_type in member_types:
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
+        elif m_type == "of_bsn_vport_header_t":
+            out.write("    of_bsn_vport_q_in_q_t *%s;\n" % var_name_map(m_type))
         else:
             out.write("    %s *%s;\n" % (m_type, var_name_map(m_type)))
     out.write("""
@@ -1315,6 +1317,8 @@ int
         m_type = member["m_type"]
         m_name = member["name"]
         if loxi_utils.skip_member_name(m_name):
+            continue
+        if m_type == "of_bsn_vport_header_t":
             continue
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("""\
@@ -1364,12 +1368,13 @@ int
         FREE(octets.data);
     }
 """ % dict(var_name=var_name_map(m_type), cls=cls, m_name=m_name))
-        elif m_type == "of_bsn_vport_t": # FIXME: tests only q_in_q
+        elif m_type == "of_bsn_vport_header_t": # test q_in_q
+            sub_cls = "of_bsn_vport_q_in_q"
             out.write("""\
     %(var_name)s = %(sub_cls)s_new(%(v_name)s);
     TEST_ASSERT(%(var_name)s != NULL);
-    value = %(sub_cls)s_q_in_q_%(v_name)s_populate(
-        &%(var_name)s->q_in_q, value);
+    value = %(sub_cls)s_%(v_name)s_populate(
+        %(var_name)s, value);
     TEST_ASSERT(value != 0);
     %(cls)s_%(m_name)s_set(
         obj, %(var_name)s);
@@ -1443,16 +1448,16 @@ int
     value = of_octets_check(&%(var_name)s, value);
 """ % dict(cls=cls, var_name=var_name_map(m_type), m_name=m_name,
            v_name=loxi_utils.version_to_name(version)))
-        elif m_type == "of_bsn_vport_t": # FIXME: tests only q_in_q
-            sub_cls = m_type[:-2] # Trim _t
+        elif m_type == "of_bsn_vport_header_t": # tests only q_in_q
+            sub_cls = "of_bsn_vport_q_in_q"
             out.write("""
     { /* Use get/delete to access on check */
-        %(m_type)s *%(m_name)s_ptr;
+        %(sub_cls)s_t *%(m_name)s_ptr;
 
         %(m_name)s_ptr = %(cls)s_%(m_name)s_get(obj);
         TEST_ASSERT(%(m_name)s_ptr != NULL);
-        value = %(sub_cls)s_q_in_q_%(v_name)s_check(
-            &%(m_name)s_ptr->q_in_q, value);
+        value = %(sub_cls)s_%(v_name)s_check(
+            %(m_name)s_ptr, value);
         TEST_ASSERT(value != 0);
         %(sub_cls)s_delete(%(m_name)s_ptr);
     }
@@ -1728,6 +1733,11 @@ def gen_dup_cls(out, cls, version):
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             # Declare instance of these
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
+        elif m_type == "of_bsn_vport_header_t": # test q_in_q
+            out.write("""
+    of_bsn_vport_q_in_q_t src_%(v_name)s;
+    of_bsn_vport_q_in_q_t *dst_%(v_name)s;
+""" % dict(v_name=var_name_map(m_type)))
         else:
             out.write("""
     %(m_type)s src_%(v_name)s;
@@ -1755,6 +1765,20 @@ def gen_dup_cls(out, cls, version):
     %(cls)s_%(m_name)s_get(src, &%(v_name)s);
     %(cls)s_%(m_name)s_set(dst, &%(v_name)s);
 """ % dict(cls=cls, m_name=m_name, v_name=var_name_map(m_type)))
+        elif m_type == "of_bsn_vport_header_t": # test q_in_q
+            sub_cls = "of_bsn_vport_q_in_q"
+            out.write("""
+    %(cls)s_%(m_name)s_bind(
+        src, &src_%(v_name)s);
+    dst_%(v_name)s = %(sub_cls)s_%(ver_name)s_dup(&src_%(v_name)s);
+    if (dst_%(v_name)s == NULL) {
+        %(cls)s_delete(dst);
+        return NULL;
+    }
+    %(cls)s_%(m_name)s_set(dst, dst_%(v_name)s);
+    %(sub_cls)s_delete(dst_%(v_name)s);
+""" % dict(sub_cls=sub_cls, cls=cls, m_name=m_name,
+           v_name=var_name_map(m_type), ver_name=ver_name))
         else:
             sub_cls = m_type[:-2] # Trim _t
             out.write("""
@@ -1923,7 +1947,19 @@ test_dump_objs(void)
                 continue
             if cls in type_maps.inheritance_map:
                 continue
-            out.write("""
+            if cls == "of_bsn_virtual_port_create_request": # test q_in_q
+                out.write("""
+    obj = (of_object_t *)%(cls)s_new(%(version)s);
+    {
+        of_object_t *vport = of_bsn_vport_q_in_q_new(%(version)s);
+        %(cls)s_vport_set(obj, vport);
+        of_object_delete(vport);
+    }
+    of_object_dump((loci_writer_f)fprintf, out, obj);
+    of_object_delete(obj);
+""" % dict(cls=cls, version=of_g.of_version_wire2name[version]))
+            else:
+                out.write("""
     obj = (of_object_t *)%(cls)s_new(%(version)s);
     of_object_dump((loci_writer_f)fprintf, out, obj);
     of_object_delete(obj);
