@@ -39,7 +39,6 @@ import c_gen.c_code_gen as c_code_gen
 import c_gen.c_test_gen as c_test_gen
 import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
-import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
 import c_gen.codegen
 import loxi_utils.loxi_utils as loxi_utils
