@@ -129,7 +129,7 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
     switch (wire_type) {
 :: for subclass in proto.classes:
 :: if subclass.superclass == ofclass:
-    case ${subclass.member_by_name(discriminator.name).value}:
+    case ${hex(subclass.member_by_name(discriminator.name).value)}:
         return ${validator_name(subclass)}(data, len, out_len);
 :: #endif
 :: #endfor
