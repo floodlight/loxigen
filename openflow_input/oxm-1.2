@@ -431,3 +431,14 @@ struct of_oxm_vlan_vid_masked : of_oxm {
     uint16_t value;
     uint16_t value_mask;
 };
+
+struct of_oxm_tunnel_id : of_oxm {
+    uint32_t type_len == 0x80004c08;
+    uint64_t value;
+};
+
+struct of_oxm_tunnel_id_masked : of_oxm {
+    uint32_t type_len == 0x80004d10;
+    uint64_t value;
+    uint64_t value_mask;
+};
