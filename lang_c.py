@@ -39,7 +39,6 @@ import c_gen.c_code_gen as c_code_gen
 import c_gen.c_test_gen as c_test_gen
 import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
-import c_gen.c_validator_gen as c_validator_gen
 import c_gen.util
 import c_gen.codegen
 import loxi_utils.loxi_utils as loxi_utils
@@ -57,7 +56,7 @@ targets = {
     'loci/inc/loci/loci_doc.h': c_code_gen.gen_accessor_doc,
     'loci/inc/loci/loci_obj_dump.h': c_dump_gen.gen_obj_dump_h,
     'loci/inc/loci/loci_obj_show.h': c_show_gen.gen_obj_show_h,
-    'loci/inc/loci/loci_validator.h': c_validator_gen.gen_h,
+    'loci/inc/loci/loci_validator.h': static,
 
     # Static LOCI headers
     'loci/inc/loci/bsn_ext.h': static,
@@ -75,7 +74,7 @@ targets = {
     'loci/src/of_match.c': c_code_gen.match_c_gen,
     'loci/src/loci_obj_dump.c': c_dump_gen.gen_obj_dump_c,
     'loci/src/loci_obj_show.c': c_show_gen.gen_obj_show_c,
-    'loci/src/loci_validator.c': c_validator_gen.gen_c,
+    'loci/src/loci_validator.c': static,
 
     # Static LOCI code
     'loci/src/loci_int.h': static,
