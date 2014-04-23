@@ -93,7 +93,7 @@ def class_is_message(cls):
     """
     Return True if cls is a message object based on info in unified
     """
-    return "xid" in of_g.unified[cls]["union"] and cls != "of_header"
+    return "xid" in of_g.unified[cls]["union"]
 
 def class_is_tlv16(cls):
     """
