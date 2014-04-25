@@ -16,8 +16,8 @@ ofp.message.bsn_gentable_clear_request(
     checksum_mask=0xFFFFFFFFFFFFFFFFFFFFFFFFFFFF0000)
 -- java
 builder.setXid(0x12345678)
-    .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA990000L))
-    .setChecksumMask(OFChecksum128.of(0xFFFFFFFFFFFFFFFFL, 0xFFFFFFFFFFFF0000L))
+    .setChecksum(U128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA990000L))
+    .setChecksumMask(U128.of(0xFFFFFFFFFFFFFFFFL, 0xFFFFFFFFFFFF0000L))
     .setTableId(GenTableId.of(20))
 -- c
 obj = of_bsn_gentable_clear_request_new(OF_VERSION_1_3);
