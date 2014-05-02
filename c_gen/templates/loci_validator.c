@@ -110,8 +110,11 @@ ${validator_name(ofclass)}(uint8_t *data, int len, int *out_len)
         return -1;
     }
 
+:: if not ofclass.is_fixed_length:
     len = wire_len;
 
+:: #endif
+::
 :: elif type(m) == OFFieldLengthMember:
 :: # Read field length members
 :: field_length_members[m.field_name] = m
