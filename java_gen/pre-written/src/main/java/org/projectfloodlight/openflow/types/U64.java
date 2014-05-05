@@ -27,7 +27,7 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
-public class U64 implements Writeable, OFValueType<U64> {
+public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
     private final static long ZERO_VAL = 0;
     public final static U64 ZERO = new U64(ZERO_VAL);
@@ -110,7 +110,7 @@ public class U64 implements Writeable, OFValueType<U64> {
 
     @Override
     public U64 applyMask(U64 mask) {
-        return ofRaw(raw & mask.raw);
+        return and(mask);
     }
 
     @Override
@@ -128,6 +128,39 @@ public class U64 implements Writeable, OFValueType<U64> {
         sink.putLong(raw);
     }
 
+    @Override
+    public U64 inverse() {
+        return U64.of(~raw);
+    }
+
+    @Override
+    public U64 or(U64 other) {
+        return U64.of(raw | other.raw);
+    }
+
+    @Override
+    public U64 and(U64 other) {
+        return ofRaw(raw & other.raw);
+    }
+    @Override
+    public U64 xor(U64 other) {
+        return U64.of(raw ^ other.raw);
+    }
+
+    /** return the "numBits" highest-order bits of the hash.
+     *  @param numBits number of higest-order bits to return [0-32].
+     *  @return a numberic value of the 0-32 highest-order bits.
+     */
+    @Override
+    public int prefixBits(int numBits) {
+        return HashValueUtils.prefixBits(raw, numBits);
+    }
+
+    @Override
+    public U64 combineWithValue(U64 value, int keyBits) {
+        return U64.of(HashValueUtils.combineWithValue(this.raw, value.raw, keyBits));
+    }
+
     public final static Reader READER = new Reader();
 
     private static class Reader implements OFMessageReader<U64> {
@@ -136,4 +169,6 @@ public class U64 implements Writeable, OFValueType<U64> {
             return U64.ofRaw(bb.readLong());
         }
     }
+
+
 }
