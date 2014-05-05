@@ -24,7 +24,6 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
-import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
@@ -154,13 +153,7 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
      */
     @Override
     public int prefixBits(int numBits) {
-        Preconditions.checkArgument(numBits >= 0 && numBits < 32,
-                "numBits must be in range [0, 32[");
-
-        final int mask = (1 << numBits) -1;
-        final int shiftDown = 64 - numBits;
-
-        return (int) ((raw >>> shiftDown) & mask);
+        return HashValueUtils.prefixBits(raw, numBits);
     }
 
     @Override

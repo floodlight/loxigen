@@ -7,6 +7,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 
@@ -83,6 +84,42 @@ public class U128Test {
         U128 h0_8 = U128.of(0, 0x8000000000000000L);
         U128 h0_81 = U128.of(0, 0x8000000000000001L);
         assertThat(h0_1.xor(h0_8), equalTo(h0_81));
+    }
+
+    @Test
+    public void testKeyBits() {
+        U128 zeroU = U128.of(0,0);
+        assertThat(zeroU.prefixBits(0), equalTo(0));
+        assertThat(zeroU.prefixBits(16), equalTo(0));
+        assertThat(zeroU.prefixBits(32), equalTo(0));
+
+        checkInvalidKeyBitSize(zeroU, 33);
+        checkInvalidKeyBitSize(zeroU, 64);
+        assertThat(zeroU.prefixBits(3), equalTo(0));
+
+        U128 positiveU = U128.of(0x1234_5678_1234_5678L, 0x1234_5678_1234_5678L);
+        assertThat(positiveU.prefixBits(0), equalTo(0));
+        assertThat(positiveU.prefixBits(16), equalTo(0x1234));
+        assertThat(positiveU.prefixBits(32), equalTo(0x12345678));
+        checkInvalidKeyBitSize(positiveU, 33);
+        checkInvalidKeyBitSize(positiveU, 64);
+
+        U128 signedBitU = U128.of(0x8765_4321_8765_4321L, 0x1234_5678_1234_5678L);
+        assertThat(signedBitU.prefixBits(0), equalTo(0));
+        assertThat(signedBitU.prefixBits(16), equalTo(0x8765));
+        assertThat(signedBitU.prefixBits(32), equalTo(0x8765_4321));
+        checkInvalidKeyBitSize(signedBitU, 33);
+        checkInvalidKeyBitSize(signedBitU, 64);
+    }
+
+    private void
+    checkInvalidKeyBitSize(U128 u, int prefixBit) {
+        try {
+            u.prefixBits(prefixBit);
+            fail("Expected exception not thrown for "+prefixBit + " bits");
+        } catch(IllegalArgumentException e) {
+            // expected
+        }
     }
 
     @Test

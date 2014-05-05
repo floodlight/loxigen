@@ -2,7 +2,6 @@ package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 
 public class U128 implements OFValueType<U128>, HashValue<U128> {
@@ -121,15 +120,7 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
 
     @Override
     public int prefixBits(int numBits) {
-        Preconditions.checkArgument(numBits <= 31, "numBits must be <= 31");
-
-        Preconditions.checkArgument(numBits >= 0 && numBits < 32,
-                "numBits must be in range [0, 32[");
-
-        final int mask = (1 << numBits) -1;
-        final int shiftDown = 64 - numBits;
-
-        return (int) ((raw1 >>> shiftDown) & mask);
+        return HashValueUtils.prefixBits(this.raw1, numBits);
     }
 
     @Override

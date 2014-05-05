@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.math.BigInteger;
 
@@ -76,6 +77,42 @@ public class U64Test {
         long tenMask = 0x003FFFFFFFFFFFFFL;
         assertThat(hkey.combineWithValue(hVal, 10),
                 equalTo(U64.of(key & ~tenMask | (key ^ val) & tenMask)));
+    }
+
+    @Test
+    public void testKeyBits() {
+        U64 zeroU = U64.of(0);
+        assertThat(zeroU.prefixBits(0), equalTo(0));
+        assertThat(zeroU.prefixBits(16), equalTo(0));
+        assertThat(zeroU.prefixBits(32), equalTo(0));
+
+        checkInvalidKeyBitSize(zeroU, 33);
+        checkInvalidKeyBitSize(zeroU, 64);
+        assertThat(zeroU.prefixBits(3), equalTo(0));
+
+        U64 positiveU = U64.of(0x1234_5678_1234_5678L);
+        assertThat(positiveU.prefixBits(0), equalTo(0));
+        assertThat(positiveU.prefixBits(16), equalTo(0x1234));
+        assertThat(positiveU.prefixBits(32), equalTo(0x12345678));
+        checkInvalidKeyBitSize(positiveU, 33);
+        checkInvalidKeyBitSize(positiveU, 64);
+
+        U64 signedBitU = U64.of(0x8765_4321_8765_4321L);
+        assertThat(signedBitU.prefixBits(0), equalTo(0));
+        assertThat(signedBitU.prefixBits(16), equalTo(0x8765));
+        assertThat(signedBitU.prefixBits(32), equalTo(0x8765_4321));
+        checkInvalidKeyBitSize(signedBitU, 33);
+        checkInvalidKeyBitSize(signedBitU, 64);
+    }
+
+    private void
+            checkInvalidKeyBitSize(U64 u, int prefixBit) {
+        try {
+            u.prefixBits(prefixBit);
+            fail("Expected exception not thrown for "+prefixBit + " bits");
+        } catch(IllegalArgumentException e) {
+            // expected
+        }
     }
 
 }

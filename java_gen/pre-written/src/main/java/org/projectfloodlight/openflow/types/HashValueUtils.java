@@ -14,4 +14,16 @@ public class HashValueUtils {
         return key ^ (value & valueMask);
     }
 
+    public static int prefixBits(long raw1, int numBits) {
+        Preconditions.checkArgument(numBits >= 0 && numBits <= 32,
+                "numBits must be in range [0, 32]");
+
+        if(numBits == 0)
+            return 0;
+
+        final int shiftDown = 64 - numBits;
+
+        return (int) (raw1 >>> shiftDown);
+    }
+
 }
