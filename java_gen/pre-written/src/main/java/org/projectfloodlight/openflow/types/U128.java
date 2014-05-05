@@ -1,8 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.Nonnull;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.google.common.hash.PrimitiveSink;
+import com.google.common.primitives.UnsignedLongs;
 
 public class U128 implements OFValueType<U128>, HashValue<U128> {
 
@@ -85,11 +88,12 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     }
 
     @Override
-    public int compareTo(U128 o) {
-        long c = this.raw1 - o.raw1;
-        if (c != 0)
-            return Long.signum(c);
-        return Long.signum(this.raw2 - o.raw2);
+    public int compareTo(@Nonnull U128 o) {
+        int msb = UnsignedLongs.compare(this.raw1, o.raw1);
+        if(msb != 0)
+            return msb;
+        else
+            return UnsignedLongs.compare(this.raw2, o.raw2);
     }
 
     @Override

@@ -9,6 +9,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 
 import com.google.common.hash.HashCode;
@@ -119,6 +120,45 @@ public class U128Test {
             fail("Expected exception not thrown for "+prefixBit + " bits");
         } catch(IllegalArgumentException e) {
             // expected
+        }
+    }
+
+
+    @Test
+    public void testCompare() {
+        U128 u0_0 = U128.of(0, 0);
+        U128 u0_1 = U128.of(0, 1);
+        U128 u0_8 = U128.of(0, 0x8765_4321_8765_4321L);
+        U128 u1_0 = U128.of(0x1234_5678_1234_5678L, 0);
+        U128 u8_0 = U128.of(0x8765_4321_8765_4321L, 0);
+        U128 uf_0 = U128.of(0xFFFF_FFFF_FFFF_FFFFL, 0);
+
+        U128[] us = new U128[] { u0_0, u0_1, u0_8, u1_0, u8_0, uf_0 };
+
+        for(int i = 0; i< us.length; i++) {
+            U128 u_base = us[i];
+            assertThat(
+                    String.format("%s should be equal to itself (compareTo)", u_base),
+                    u_base.compareTo(u_base), equalTo(0));
+            assertThat(
+                    String.format("%s should be equal to itself (equals)", u_base),
+                    u_base.equals(u_base), equalTo(true));
+            assertThat(
+                    String.format("%s should be equal to itself (equals, by value)", u_base),
+                    u_base.equals(U128.of(u_base.getMsb(), u_base.getLsb())), equalTo(true));
+
+            for(int j = i+1; j< us.length; j++) {
+                U128 u_greater = us[j];
+                assertThat(
+                        String.format("%s should not be equal to %s", u_base, u_greater),
+                        u_base.equals(u_base), equalTo(true));
+                assertThat(
+                        String.format("%s should be smaller than %s", u_base, u_greater),
+                        u_base.compareTo(u_greater), Matchers.lessThan(0));
+                assertThat(
+                        String.format("%s should be greater than %s", u_greater, u_base),
+                        u_greater.compareTo(u_base), Matchers.greaterThan(0));
+            }
         }
     }
 
