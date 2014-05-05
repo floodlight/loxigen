@@ -311,6 +311,10 @@ u32obj = JType('U32', 'U32') \
 u64 = JType('U64', 'long') \
         .op(read='U64.ofRaw(bb.readLong())', write='bb.writeLong($name.getValue())', default="U64.ZERO", pub_type=True) \
         .op(read='bb.readLong()', write='bb.writeLong($name)', pub_type=False)
+u128 = JType("U128") \
+        .op(read='U128.read16Bytes(bb)',
+            write='$name.write16Bytes(bb)',
+            default='U128.ZERO')
 of_port = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ANY") \
          .op(version=ANY, read="OFPort.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="OFPort.ANY")
@@ -491,10 +495,6 @@ class_id = JType("ClassId") \
          .op(version=ANY, read="ClassId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="ClassId.NONE")
 boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
         .op(read='OFBooleanValue.of(bb.readByte() != 0)', write='bb.writeByte($name.getInt())', default="OFBooleanValue.FALSE")
-checksum = JType("OFChecksum128") \
-        .op(read='OFChecksum128.read16Bytes(bb)',
-            write='$name.write16Bytes(bb)',
-            default='OFChecksum128.ZERO')
 gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
@@ -536,7 +536,7 @@ default_mtype_to_jtype_convert_map = {
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
         'of_bitmap_128_t': port_bitmap,
-        'of_checksum_128_t': checksum,
+        'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         }
 

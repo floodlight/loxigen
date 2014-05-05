@@ -38,7 +38,7 @@ ofp.message.bsn_gentable_entry_add(
     ])
 -- java
 builder.setXid(0x12345678)
-    .setChecksum(OFChecksum128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA998877L))
+    .setChecksum(U128.of(0xFEDCBA9876543210L, 0xFFEECCBBAA998877L))
     .setTableId(GenTableId.of(20))
     .setKey(
         ImmutableList.<OFBsnTlv>of(
