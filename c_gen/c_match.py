@@ -286,39 +286,6 @@ def gen_oxm_defines(out):
 
 """ % dict(key=key, ku=key.upper()))
 
-def gen_wc_convert_literal(out):
-    """
-    A bunch of literal C code that's associated with match conversions
-    @param out The output file handle
-    """
-    out.write("""
-
-/* Some internal macros and utility functions */
-
-/* For counting bits in a uint32 */
-#define _VAL_AND_5s(v)  ((v) & 0x55555555)
-#define _VAL_EVERY_OTHER(v)  (_VAL_AND_5s(v) + _VAL_AND_5s(v >> 1))
-#define _VAL_AND_3s(v)  ((v) & 0x33333333)
-#define _VAL_PAIRS(v)  (_VAL_AND_3s(v) + _VAL_AND_3s(v >> 2))
-#define _VAL_QUADS(v)  (((val) + ((val) >> 4)) & 0x0F0F0F0F)
-#define _VAL_BYTES(v)  ((val) + ((val) >> 8))
-
-/**
- * Counts the number of bits set in an integer
- */
-static inline int
-_COUNT_BITS(unsigned int val)
-{
-    val = _VAL_EVERY_OTHER(val);
-    val = _VAL_PAIRS(val);
-    val = _VAL_QUADS(val);
-    val = _VAL_BYTES(val);
-
-    return (val & 0XFF) + ((val >> 16) & 0xFF);
-}
-""")
-
-
 def gen_unified_match_to_v1(out):
     """
     Generate C code to convert a unified match structure to a V1 match struct
@@ -1133,7 +1100,6 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
 
 def gen_match_conversions(out=sys.stdout):
     match.match_sanity_check()
-    gen_wc_convert_literal(out)
     out.write("""
 /**
  * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
