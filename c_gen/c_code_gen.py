@@ -386,14 +386,6 @@ extern loci_logger_f loci_logger;
 #define OF_OBJECT_VARIABLE_LENGTH(obj) \\
     ((obj)->length - OF_OBJECT_FIXED_LENGTH(obj))
 
-/* FIXME: Where do these go? */
-/* Low level maps btwn wire version + type and object ids */
-extern int of_message_is_stats_request(int type, int w_ver);
-extern int of_message_is_stats_reply(int type, int w_ver);
-extern int of_message_stats_reply_to_object_id(int stats_type, int w_ver);
-extern int of_message_stats_request_to_object_id(int stats_type, int w_ver);
-extern int of_message_type_to_object_id(int type, int w_ver);
-
 extern int of_wire_buffer_of_match_get(of_object_t *obj, int offset,
                                     of_match_t *match);
 extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
@@ -409,33 +401,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
  * Declarations of maps between on-the-wire type values and LOCI identifiers
  *
  ****************************************************************/
-
-/**
- * Generic experimenter type value.  Applies to all except
- * top level message: Action, instruction, error, stats, queue_props, oxm
- */
-#define OF_EXPERIMENTER_TYPE 0xffff
-
-int of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-int of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver);
-
-of_object_id_t of_action_to_object_id(int action, of_version_t version);
-of_object_id_t of_action_id_to_object_id(int action_id, of_version_t version);
-of_object_id_t of_instruction_to_object_id(int instruction, of_version_t version);
-of_object_id_t of_instruction_id_to_object_id(int instruction, of_version_t version);
-of_object_id_t of_queue_prop_to_object_id(int queue_prop, of_version_t version);
-of_object_id_t of_table_feature_prop_to_object_id(int table_feature_prop, of_version_t version);
-of_object_id_t of_meter_band_to_object_id(int meter_band, of_version_t version);
-of_object_id_t of_hello_elem_to_object_id(int hello_elem, of_version_t version);
-of_object_id_t of_stats_reply_to_object_id(int stats_reply, of_version_t version);
-of_object_id_t of_stats_request_to_object_id(int stats_request, of_version_t version);
-of_object_id_t of_error_msg_to_object_id(uint16_t error_msg, of_version_t version);
-of_object_id_t of_flow_mod_to_object_id(int flow_mod, of_version_t version);
-of_object_id_t of_group_mod_to_object_id(int group_mod, of_version_t version);
-of_object_id_t of_oxm_to_object_id(uint32_t type_len, of_version_t version);
-of_object_id_t of_message_experimenter_to_object_id(of_message_t msg, of_version_t version);
-of_object_id_t of_message_to_object_id(of_message_t msg, int length);
-of_object_id_t of_bsn_tlv_to_object_id(int tlv_type, of_version_t version);
 
 int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
 

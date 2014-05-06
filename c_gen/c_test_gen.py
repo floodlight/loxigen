@@ -1093,7 +1093,6 @@ test_%(cls)s_create_%(v_name)s(void)
     %(cls)s_t *obj;
     uint8_t *msg_buf;
     int value;
-    int len;
     of_object_id_t object_id;
 
     obj = %(cls)s_new(%(v_name)s);
@@ -1111,12 +1110,9 @@ test_%(cls)s_create_%(v_name)s(void)
     TEST_ASSERT(value != 0);
 
     /* Grab the underlying buffer from the message */
-    len = obj->length;
     of_object_wire_buffer_steal((of_object_t *)obj, &msg_buf);
     TEST_ASSERT(msg_buf != NULL);
     %(cls)s_delete(obj);
-    /* TODO:  */
-    TEST_ASSERT(of_message_to_object_id(msg_buf, len) == %(enum)s);
     obj = %(cls)s_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf));
 
     TEST_ASSERT(obj != NULL);

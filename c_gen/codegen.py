@@ -173,8 +173,6 @@ def generate_init_map(install_dir):
 def generate_type_maps(install_dir):
     # Collect legacy code
     tmp = StringIO()
-    c_type_maps.gen_type_to_obj_map_functions(tmp)
-    c_type_maps.gen_type_maps(tmp)
     c_type_maps.gen_length_array(tmp)
     c_type_maps.gen_extra_length_array(tmp)
 
