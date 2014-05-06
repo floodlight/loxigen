@@ -968,25 +968,7 @@ test_match_1(void)
     uint32_t exp_value;
 
     /* Verify default values for ip mask map */
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
-        exp_value = (idx < 32) ? ~((1 << idx) - 1) : 0;
-        TEST_ASSERT(of_ip_index_to_mask(idx) == exp_value);
-        if (idx < 32) {
-            TEST_ASSERT(of_ip_mask_to_index(exp_value) == idx);
-        }
-    }
-
-    TEST_ASSERT(of_ip_mask_map_set(17, 0xabcdef00) == OF_ERROR_NONE);
-    TEST_ASSERT(of_ip_mask_to_index(0xabcdef00) == 17);
-    TEST_ASSERT(of_ip_index_to_mask(17) == 0xabcdef00);
-
-    TEST_ASSERT(of_ip_mask_map_set(62, 0xabcdefff) == OF_ERROR_NONE);
-    TEST_ASSERT(of_ip_mask_to_index(0xabcdefff) == 62);
-    TEST_ASSERT(of_ip_index_to_mask(62) == 0xabcdefff);
-
-    /* Test re-init */
-    of_ip_mask_map_init();
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
+    for (idx = 0; idx < 64; idx++) {
         exp_value = (idx < 32) ? ~((1 << idx) - 1) : 0;
         TEST_ASSERT(of_ip_index_to_mask(idx) == exp_value);
         if (idx < 32) {

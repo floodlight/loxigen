@@ -194,36 +194,13 @@ of_memmask(void *value, const void *mask, size_t len)
 }
 
 /**
- * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
- * indices into the map below.
- *
- * of_ip_mask_map: Array mapping index to mask
- * of_ip_mask_use_map: Boolean indication set when map is initialized
- * of_ip_mask_map_init: Initialize to default values; set "use map".
- */
-#define OF_IP_MASK_MAP_COUNT 64
-extern uint32_t of_ip_mask_map[OF_IP_MASK_MAP_COUNT];
-extern int of_ip_mask_map_init_done;
-
-#define OF_IP_MASK_INIT_CHECK \
-    if (!of_ip_mask_map_init_done) of_ip_mask_map_init()
-
-/**
- * Initialize map
- */
-extern void of_ip_mask_map_init(void);
-
-extern int of_ip_mask_map_set(int index, uint32_t mask);
-extern int of_ip_mask_map_get(int index, uint32_t *mask);
-
-/**
- * @brief Map from mask to index
+ * @brief Map from mask to OF 1.0 wildcard
  */
 
 extern int of_ip_mask_to_index(uint32_t mask);
 
 /**
- * @brief Map from index to mask
+ * @brief Map from OF 1.0 wildcard to mask
  */
 
 extern uint32_t of_ip_index_to_mask(int index);
@@ -1102,58 +1079,6 @@ def gen_match_conversions(out=sys.stdout):
     match.match_sanity_check()
     out.write("""
 /**
- * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
- * indices into the map below.
- */
-
-int of_ip_mask_map_init_done = 0;
-uint32_t of_ip_mask_map[OF_IP_MASK_MAP_COUNT];
-void
-of_ip_mask_map_init(void)
-{
-    int idx;
-
-    MEMSET(of_ip_mask_map, 0, sizeof(of_ip_mask_map));
-    for (idx = 0; idx < 32; idx++) {
-        of_ip_mask_map[idx] = ~((1U << idx) - 1);
-    }
-
-    of_ip_mask_map_init_done = 1;
-}
-
-/**
- * @brief Set non-default IP mask for given index
- */
-int
-of_ip_mask_map_set(int index, uint32_t mask)
-{
-    OF_IP_MASK_INIT_CHECK;
-
-    if ((index < 0) || (index >= OF_IP_MASK_MAP_COUNT)) {
-        return OF_ERROR_RANGE;
-    }
-    of_ip_mask_map[index] = mask;
-
-    return OF_ERROR_NONE;
-}
-
-/**
- * @brief Get a non-default IP mask for given index
- */
-int
-of_ip_mask_map_get(int index, uint32_t *mask)
-{
-    OF_IP_MASK_INIT_CHECK;
-
-    if ((mask == NULL) || (index < 0) || (index >= OF_IP_MASK_MAP_COUNT)) {
-        return OF_ERROR_RANGE;
-    }
-    *mask = of_ip_mask_map[index];
-
-    return OF_ERROR_NONE;
-}
-
-/**
  * @brief Return the index (used as the WC field in 1.0 match) given the mask
  */
 
@@ -1161,25 +1086,29 @@ int
 of_ip_mask_to_index(uint32_t mask)
 {
     int idx;
-
-    OF_IP_MASK_INIT_CHECK;
+    uint32_t cmask;
 
     /* Handle most common cases directly */
-    if ((mask == 0) && (of_ip_mask_map[63] == 0)) {
+    if (mask == 0) {
         return 63;
     }
-    if ((mask == 0xffffffff) && (of_ip_mask_map[0] == 0xffffffff)) {
+    if (mask == 0xffffffff) {
         return 0;
     }
 
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
-        if (mask == of_ip_mask_map[idx]) {
-            return idx;
-        }
+    if ((~mask + 1) & ~mask) {
+        LOCI_LOG_INFO("OF 1.0: Could not map IP addr mask 0x%x", mask);
+        return 63;
     }
 
-    LOCI_LOG_INFO("OF 1.0: Could not map IP addr mask 0x%x", mask);
-    return 0x3f;
+    idx = 0;
+    cmask = ~mask;
+    while (cmask) {
+        cmask >>= 1;
+        idx += 1;
+    }
+
+    return idx;
 }
 
 /**
@@ -1189,22 +1118,17 @@ of_ip_mask_to_index(uint32_t mask)
 uint32_t
 of_ip_index_to_mask(int index)
 {
-    OF_IP_MASK_INIT_CHECK;
-
-    if (index >= OF_IP_MASK_MAP_COUNT) {
-        LOCI_LOG_INFO("IP index to map: bad index %d", index);
+    if (index >= 32) {
         return 0;
+    } else {
+        return 0xffffffff << index;
     }
-
-    return of_ip_mask_map[index];
 }
 
 """)
-
     gen_unified_match_to_v1(out)
     gen_unified_match_to_v2(out)
     gen_unified_match_to_v3(out)
     gen_v1_to_unified_match(out)
     gen_v2_to_unified_match(out)
     gen_v3_to_unified_match(out)
-    return
