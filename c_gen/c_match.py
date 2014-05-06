@@ -249,68 +249,6 @@ def gen_oxm_defines(out):
     Generate verbatim definitions for OXM
     """
     out.write("""
-
-/* These are from the OpenFlow 1.2 header file */
-
-/* OXM index values for bitmaps and parsing */
-enum of_oxm_index_e {
-    OF_OXM_INDEX_IN_PORT        = 0,  /* Switch input port. */
-    OF_OXM_INDEX_IN_PHY_PORT    = 1,  /* Switch physical input port. */
-    OF_OXM_INDEX_METADATA       = 2,  /* Metadata passed between tables. */
-    OF_OXM_INDEX_ETH_DST        = 3,  /* Ethernet destination address. */
-    OF_OXM_INDEX_ETH_SRC        = 4,  /* Ethernet source address. */
-    OF_OXM_INDEX_ETH_TYPE       = 5,  /* Ethernet frame type. */
-    OF_OXM_INDEX_VLAN_VID       = 6,  /* VLAN id. */
-    OF_OXM_INDEX_VLAN_PCP       = 7,  /* VLAN priority. */
-    OF_OXM_INDEX_IP_DSCP        = 8,  /* IP DSCP (6 bits in ToS field). */
-    OF_OXM_INDEX_IP_ECN         = 9,  /* IP ECN (2 bits in ToS field). */
-    OF_OXM_INDEX_IP_PROTO       = 10, /* IP protocol. */
-    OF_OXM_INDEX_IPV4_SRC       = 11, /* IPv4 source address. */
-    OF_OXM_INDEX_IPV4_DST       = 12, /* IPv4 destination address. */
-    OF_OXM_INDEX_TCP_SRC        = 13, /* TCP source port. */
-    OF_OXM_INDEX_TCP_DST        = 14, /* TCP destination port. */
-    OF_OXM_INDEX_UDP_SRC        = 15, /* UDP source port. */
-    OF_OXM_INDEX_UDP_DST        = 16, /* UDP destination port. */
-    OF_OXM_INDEX_SCTP_SRC       = 17, /* SCTP source port. */
-    OF_OXM_INDEX_SCTP_DST       = 18, /* SCTP destination port. */
-    OF_OXM_INDEX_ICMPV4_TYPE    = 19, /* ICMP type. */
-    OF_OXM_INDEX_ICMPV4_CODE    = 20, /* ICMP code. */
-    OF_OXM_INDEX_ARP_OP         = 21, /* ARP opcode. */
-    OF_OXM_INDEX_ARP_SPA        = 22, /* ARP source IPv4 address. */
-    OF_OXM_INDEX_ARP_TPA        = 23, /* ARP target IPv4 address. */
-    OF_OXM_INDEX_ARP_SHA        = 24, /* ARP source hardware address. */
-    OF_OXM_INDEX_ARP_THA        = 25, /* ARP target hardware address. */
-    OF_OXM_INDEX_IPV6_SRC       = 26, /* IPv6 source address. */
-    OF_OXM_INDEX_IPV6_DST       = 27, /* IPv6 destination address. */
-    OF_OXM_INDEX_IPV6_FLABEL    = 28, /* IPv6 Flow Label */
-    OF_OXM_INDEX_ICMPV6_TYPE    = 29, /* ICMPv6 type. */
-    OF_OXM_INDEX_ICMPV6_CODE    = 30, /* ICMPv6 code. */
-    OF_OXM_INDEX_IPV6_ND_TARGET = 31, /* Target address for ND. */
-    OF_OXM_INDEX_IPV6_ND_SLL    = 32, /* Source link-layer for ND. */
-    OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
-    OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
-    OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
-
-    OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
-    OF_OXM_INDEX_BSN_LAG_ID = 37,
-    OF_OXM_INDEX_BSN_VRF = 38,
-    OF_OXM_INDEX_BSN_GLOBAL_VRF_ALLOWED = 39,
-    OF_OXM_INDEX_BSN_L3_INTERFACE_CLASS_ID = 40,
-    OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
-    OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
-    OF_OXM_INDEX_BSN_EGR_PORT_GROUP_ID = 43,
-    OF_OXM_INDEX_BSN_UDF0 = 44,
-    OF_OXM_INDEX_BSN_UDF1 = 45,
-    OF_OXM_INDEX_BSN_UDF2 = 46,
-    OF_OXM_INDEX_BSN_UDF3 = 47,
-    OF_OXM_INDEX_BSN_UDF4 = 48,
-    OF_OXM_INDEX_BSN_UDF5 = 49,
-    OF_OXM_INDEX_BSN_UDF6 = 50,
-    OF_OXM_INDEX_BSN_UDF7 = 51,
-};
-
-#define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
-
 /*
  * The generic match structure uses the OXM bit indices for it's
  * bitmasks for active and masked values
@@ -346,46 +284,7 @@ enum of_oxm_index_e {
 #define OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(_match) \\
     OF_VARIABLE_IS_NON_ZERO(&(((_match)->masks).%(key)s))
 
-""" % dict(key=key, bit=match.oxm_index(key), ku=key.upper()))
-
-def gen_incompat_members(out=sys.stdout):
-    """
-    Generate a macro that lists all the unified fields which are
-    incompatible with v1 matches
-    """
-    out.write("""
-/* Identify bits in unified match that are incompatible with V1, V2 matches */
-#define OF_MATCH_V1_INCOMPAT ( (uint64_t)0 """)
-    for key in match.of_match_members:
-        if key in match.of_v1_keys:
-            continue
-        out.write("\\\n    | ((uint64_t)1 << %s)" % match.oxm_index(key))
-    out.write(")\n\n")
-
-    out.write("#define OF_MATCH_V2_INCOMPAT ( (uint64_t)0 ")
-    for key in match.of_match_members:
-        if key in match.of_v2_keys:
-            continue
-        out.write("\\\n    | ((uint64_t)1 << %s)" % match.oxm_index(key))
-    out.write(""")
-
-/* Indexed by version number */
-extern const uint64_t of_match_incompat[4];
-""")
-
-
-# # FIXME:  Make these version specific
-# def name_to_index(a, name, key="name"):
-#     """
-#     Given an array, a, with each entry a dict, and a name,
-#     find the entry with key matching name and return the index
-#     """
-#     count = 0
-#     for e in a:
-#         if e[key] == name:
-#             return count
-#         count += 1
-#     return -1
+""" % dict(key=key, ku=key.upper()))
 
 def gen_wc_convert_literal(out):
     """
@@ -417,15 +316,6 @@ _COUNT_BITS(unsigned int val)
 
     return (val & 0XFF) + ((val >> 16) & 0xFF);
 }
-
-/* Indexed by version number */
-const uint64_t of_match_incompat[4] = {
-    -1,
-    OF_MATCH_V1_INCOMPAT,
-    OF_MATCH_V2_INCOMPAT,
-    0
-};
-
 """)
 
 

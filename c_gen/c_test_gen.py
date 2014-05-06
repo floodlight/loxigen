@@ -255,16 +255,26 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
     match->version = version;
 """)
 
-    for key, entry in match.of_match_members.items():
+    def populate_match_version(wire_version, keys):
         out.write("""
-    if (!(of_match_incompat[version] &
-            OF_OXM_BIT(OF_OXM_INDEX_%(ku)s))) {
+    if (version == %d) {\
+""" % wire_version)
+        for key in keys:
+            entry = match.of_match_members[key]
+            out.write("""
         OF_MATCH_MASK_%(ku)s_EXACT_SET(match);
         VAR_%(u_type)s_INIT(match->fields.%(key)s, value);
         value += 1;
+""" % dict(key=key, u_type=entry["m_type"].upper(), ku=key.upper()))
+        out.write("""
     }
 
-""" % dict(key=key, u_type=entry["m_type"].upper(), ku=key.upper()))
+""")
+
+    populate_match_version(1, match.of_v1_keys)
+    populate_match_version(2, match.of_v2_keys)
+    populate_match_version(3, match.match_keys_sorted)
+    populate_match_version(4, match.match_keys_sorted)
 
     out.write("""
     if (value % 2) {

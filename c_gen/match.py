@@ -586,12 +586,6 @@ of_v2_full_mask = [
     "metadata"
     ]
 
-def oxm_index(key):
-    """
-    What's the index called for a match key
-    """
-    return "OF_OXM_INDEX_" + key.upper()
-
 ##
 # Check that all members in the hash are recognized as match keys
 def match_sanity_check():

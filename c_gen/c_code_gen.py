@@ -313,7 +313,6 @@ def match_h_gen(out, name):
     @param name The name of the file
     """
     c_match.match_h_top_matter(out, name)
-    c_match.gen_incompat_members(out)
     c_match.gen_match_struct(out)
     c_match.gen_match_comp(out)
     out.write("\n#endif /* Match header file */\n")
