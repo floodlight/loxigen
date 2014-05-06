@@ -194,36 +194,13 @@ of_memmask(void *value, const void *mask, size_t len)
 }
 
 /**
- * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
- * indices into the map below.
- *
- * of_ip_mask_map: Array mapping index to mask
- * of_ip_mask_use_map: Boolean indication set when map is initialized
- * of_ip_mask_map_init: Initialize to default values; set "use map".
- */
-#define OF_IP_MASK_MAP_COUNT 64
-extern uint32_t of_ip_mask_map[OF_IP_MASK_MAP_COUNT];
-extern int of_ip_mask_map_init_done;
-
-#define OF_IP_MASK_INIT_CHECK \
-    if (!of_ip_mask_map_init_done) of_ip_mask_map_init()
-
-/**
- * Initialize map
- */
-extern void of_ip_mask_map_init(void);
-
-extern int of_ip_mask_map_set(int index, uint32_t mask);
-extern int of_ip_mask_map_get(int index, uint32_t *mask);
-
-/**
- * @brief Map from mask to index
+ * @brief Map from mask to OF 1.0 wildcard
  */
 
 extern int of_ip_mask_to_index(uint32_t mask);
 
 /**
- * @brief Map from index to mask
+ * @brief Map from OF 1.0 wildcard to mask
  */
 
 extern uint32_t of_ip_index_to_mask(int index);
@@ -249,68 +226,6 @@ def gen_oxm_defines(out):
     Generate verbatim definitions for OXM
     """
     out.write("""
-
-/* These are from the OpenFlow 1.2 header file */
-
-/* OXM index values for bitmaps and parsing */
-enum of_oxm_index_e {
-    OF_OXM_INDEX_IN_PORT        = 0,  /* Switch input port. */
-    OF_OXM_INDEX_IN_PHY_PORT    = 1,  /* Switch physical input port. */
-    OF_OXM_INDEX_METADATA       = 2,  /* Metadata passed between tables. */
-    OF_OXM_INDEX_ETH_DST        = 3,  /* Ethernet destination address. */
-    OF_OXM_INDEX_ETH_SRC        = 4,  /* Ethernet source address. */
-    OF_OXM_INDEX_ETH_TYPE       = 5,  /* Ethernet frame type. */
-    OF_OXM_INDEX_VLAN_VID       = 6,  /* VLAN id. */
-    OF_OXM_INDEX_VLAN_PCP       = 7,  /* VLAN priority. */
-    OF_OXM_INDEX_IP_DSCP        = 8,  /* IP DSCP (6 bits in ToS field). */
-    OF_OXM_INDEX_IP_ECN         = 9,  /* IP ECN (2 bits in ToS field). */
-    OF_OXM_INDEX_IP_PROTO       = 10, /* IP protocol. */
-    OF_OXM_INDEX_IPV4_SRC       = 11, /* IPv4 source address. */
-    OF_OXM_INDEX_IPV4_DST       = 12, /* IPv4 destination address. */
-    OF_OXM_INDEX_TCP_SRC        = 13, /* TCP source port. */
-    OF_OXM_INDEX_TCP_DST        = 14, /* TCP destination port. */
-    OF_OXM_INDEX_UDP_SRC        = 15, /* UDP source port. */
-    OF_OXM_INDEX_UDP_DST        = 16, /* UDP destination port. */
-    OF_OXM_INDEX_SCTP_SRC       = 17, /* SCTP source port. */
-    OF_OXM_INDEX_SCTP_DST       = 18, /* SCTP destination port. */
-    OF_OXM_INDEX_ICMPV4_TYPE    = 19, /* ICMP type. */
-    OF_OXM_INDEX_ICMPV4_CODE    = 20, /* ICMP code. */
-    OF_OXM_INDEX_ARP_OP         = 21, /* ARP opcode. */
-    OF_OXM_INDEX_ARP_SPA        = 22, /* ARP source IPv4 address. */
-    OF_OXM_INDEX_ARP_TPA        = 23, /* ARP target IPv4 address. */
-    OF_OXM_INDEX_ARP_SHA        = 24, /* ARP source hardware address. */
-    OF_OXM_INDEX_ARP_THA        = 25, /* ARP target hardware address. */
-    OF_OXM_INDEX_IPV6_SRC       = 26, /* IPv6 source address. */
-    OF_OXM_INDEX_IPV6_DST       = 27, /* IPv6 destination address. */
-    OF_OXM_INDEX_IPV6_FLABEL    = 28, /* IPv6 Flow Label */
-    OF_OXM_INDEX_ICMPV6_TYPE    = 29, /* ICMPv6 type. */
-    OF_OXM_INDEX_ICMPV6_CODE    = 30, /* ICMPv6 code. */
-    OF_OXM_INDEX_IPV6_ND_TARGET = 31, /* Target address for ND. */
-    OF_OXM_INDEX_IPV6_ND_SLL    = 32, /* Source link-layer for ND. */
-    OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
-    OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
-    OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
-
-    OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
-    OF_OXM_INDEX_BSN_LAG_ID = 37,
-    OF_OXM_INDEX_BSN_VRF = 38,
-    OF_OXM_INDEX_BSN_GLOBAL_VRF_ALLOWED = 39,
-    OF_OXM_INDEX_BSN_L3_INTERFACE_CLASS_ID = 40,
-    OF_OXM_INDEX_BSN_L3_SRC_CLASS_ID = 41,
-    OF_OXM_INDEX_BSN_L3_DST_CLASS_ID = 42,
-    OF_OXM_INDEX_BSN_EGR_PORT_GROUP_ID = 43,
-    OF_OXM_INDEX_BSN_UDF0 = 44,
-    OF_OXM_INDEX_BSN_UDF1 = 45,
-    OF_OXM_INDEX_BSN_UDF2 = 46,
-    OF_OXM_INDEX_BSN_UDF3 = 47,
-    OF_OXM_INDEX_BSN_UDF4 = 48,
-    OF_OXM_INDEX_BSN_UDF5 = 49,
-    OF_OXM_INDEX_BSN_UDF6 = 50,
-    OF_OXM_INDEX_BSN_UDF7 = 51,
-};
-
-#define OF_OXM_BIT(index) (((uint64_t) 1) << (index))
-
 /*
  * The generic match structure uses the OXM bit indices for it's
  * bitmasks for active and masked values
@@ -346,88 +261,7 @@ enum of_oxm_index_e {
 #define OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(_match) \\
     OF_VARIABLE_IS_NON_ZERO(&(((_match)->masks).%(key)s))
 
-""" % dict(key=key, bit=match.oxm_index(key), ku=key.upper()))
-
-def gen_incompat_members(out=sys.stdout):
-    """
-    Generate a macro that lists all the unified fields which are
-    incompatible with v1 matches
-    """
-    out.write("""
-/* Identify bits in unified match that are incompatible with V1, V2 matches */
-#define OF_MATCH_V1_INCOMPAT ( (uint64_t)0 """)
-    for key in match.of_match_members:
-        if key in match.of_v1_keys:
-            continue
-        out.write("\\\n    | ((uint64_t)1 << %s)" % match.oxm_index(key))
-    out.write(")\n\n")
-
-    out.write("#define OF_MATCH_V2_INCOMPAT ( (uint64_t)0 ")
-    for key in match.of_match_members:
-        if key in match.of_v2_keys:
-            continue
-        out.write("\\\n    | ((uint64_t)1 << %s)" % match.oxm_index(key))
-    out.write(""")
-
-/* Indexed by version number */
-extern const uint64_t of_match_incompat[4];
-""")
-
-
-# # FIXME:  Make these version specific
-# def name_to_index(a, name, key="name"):
-#     """
-#     Given an array, a, with each entry a dict, and a name,
-#     find the entry with key matching name and return the index
-#     """
-#     count = 0
-#     for e in a:
-#         if e[key] == name:
-#             return count
-#         count += 1
-#     return -1
-
-def gen_wc_convert_literal(out):
-    """
-    A bunch of literal C code that's associated with match conversions
-    @param out The output file handle
-    """
-    out.write("""
-
-/* Some internal macros and utility functions */
-
-/* For counting bits in a uint32 */
-#define _VAL_AND_5s(v)  ((v) & 0x55555555)
-#define _VAL_EVERY_OTHER(v)  (_VAL_AND_5s(v) + _VAL_AND_5s(v >> 1))
-#define _VAL_AND_3s(v)  ((v) & 0x33333333)
-#define _VAL_PAIRS(v)  (_VAL_AND_3s(v) + _VAL_AND_3s(v >> 2))
-#define _VAL_QUADS(v)  (((val) + ((val) >> 4)) & 0x0F0F0F0F)
-#define _VAL_BYTES(v)  ((val) + ((val) >> 8))
-
-/**
- * Counts the number of bits set in an integer
- */
-static inline int
-_COUNT_BITS(unsigned int val)
-{
-    val = _VAL_EVERY_OTHER(val);
-    val = _VAL_PAIRS(val);
-    val = _VAL_QUADS(val);
-    val = _VAL_BYTES(val);
-
-    return (val & 0XFF) + ((val >> 16) & 0xFF);
-}
-
-/* Indexed by version number */
-const uint64_t of_match_incompat[4] = {
-    -1,
-    OF_MATCH_V1_INCOMPAT,
-    OF_MATCH_V2_INCOMPAT,
-    0
-};
-
-""")
-
+""" % dict(key=key, ku=key.upper()))
 
 def gen_unified_match_to_v1(out):
     """
@@ -1243,60 +1077,7 @@ of_match_overlap(of_match_t *match1, of_match_t *match2)
 
 def gen_match_conversions(out=sys.stdout):
     match.match_sanity_check()
-    gen_wc_convert_literal(out)
     out.write("""
-/**
- * IP Mask map.  IP maks wildcards from OF 1.0 are interpretted as
- * indices into the map below.
- */
-
-int of_ip_mask_map_init_done = 0;
-uint32_t of_ip_mask_map[OF_IP_MASK_MAP_COUNT];
-void
-of_ip_mask_map_init(void)
-{
-    int idx;
-
-    MEMSET(of_ip_mask_map, 0, sizeof(of_ip_mask_map));
-    for (idx = 0; idx < 32; idx++) {
-        of_ip_mask_map[idx] = ~((1U << idx) - 1);
-    }
-
-    of_ip_mask_map_init_done = 1;
-}
-
-/**
- * @brief Set non-default IP mask for given index
- */
-int
-of_ip_mask_map_set(int index, uint32_t mask)
-{
-    OF_IP_MASK_INIT_CHECK;
-
-    if ((index < 0) || (index >= OF_IP_MASK_MAP_COUNT)) {
-        return OF_ERROR_RANGE;
-    }
-    of_ip_mask_map[index] = mask;
-
-    return OF_ERROR_NONE;
-}
-
-/**
- * @brief Get a non-default IP mask for given index
- */
-int
-of_ip_mask_map_get(int index, uint32_t *mask)
-{
-    OF_IP_MASK_INIT_CHECK;
-
-    if ((mask == NULL) || (index < 0) || (index >= OF_IP_MASK_MAP_COUNT)) {
-        return OF_ERROR_RANGE;
-    }
-    *mask = of_ip_mask_map[index];
-
-    return OF_ERROR_NONE;
-}
-
 /**
  * @brief Return the index (used as the WC field in 1.0 match) given the mask
  */
@@ -1305,25 +1086,29 @@ int
 of_ip_mask_to_index(uint32_t mask)
 {
     int idx;
-
-    OF_IP_MASK_INIT_CHECK;
+    uint32_t cmask;
 
     /* Handle most common cases directly */
-    if ((mask == 0) && (of_ip_mask_map[63] == 0)) {
+    if (mask == 0) {
         return 63;
     }
-    if ((mask == 0xffffffff) && (of_ip_mask_map[0] == 0xffffffff)) {
+    if (mask == 0xffffffff) {
         return 0;
     }
 
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
-        if (mask == of_ip_mask_map[idx]) {
-            return idx;
-        }
+    if ((~mask + 1) & ~mask) {
+        LOCI_LOG_INFO("OF 1.0: Could not map IP addr mask 0x%x", mask);
+        return 63;
     }
 
-    LOCI_LOG_INFO("OF 1.0: Could not map IP addr mask 0x%x", mask);
-    return 0x3f;
+    idx = 0;
+    cmask = ~mask;
+    while (cmask) {
+        cmask >>= 1;
+        idx += 1;
+    }
+
+    return idx;
 }
 
 /**
@@ -1333,22 +1118,17 @@ of_ip_mask_to_index(uint32_t mask)
 uint32_t
 of_ip_index_to_mask(int index)
 {
-    OF_IP_MASK_INIT_CHECK;
-
-    if (index >= OF_IP_MASK_MAP_COUNT) {
-        LOCI_LOG_INFO("IP index to map: bad index %d", index);
+    if (index >= 32) {
         return 0;
+    } else {
+        return 0xffffffff << index;
     }
-
-    return of_ip_mask_map[index];
 }
 
 """)
-
     gen_unified_match_to_v1(out)
     gen_unified_match_to_v2(out)
     gen_unified_match_to_v3(out)
     gen_v1_to_unified_match(out)
     gen_v2_to_unified_match(out)
     gen_v3_to_unified_match(out)
-    return

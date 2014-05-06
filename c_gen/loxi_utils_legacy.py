@@ -134,35 +134,6 @@ def class_is_u16_len(cls):
                    "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
                    "of_bsn_gentable_desc_stats_entry"]
 
-def class_is_oxm(cls):
-    """
-    Return True if cls_name is an OXM object
-    """
-    if cls.find("of_oxm") == 0:
-        return True
-    return False
-
-def class_is_action(cls):
-    """
-    Return True if cls_name is an action object
-
-    Note that action_id is not an action object, though it has
-    the same header.  It looks like an action header, but the type
-    is used to identify a kind of action, it does not indicate the
-    type of the object following.
-    """
-    if cls.find("of_action_id") == 0:
-        return False
-    if cls.find("of_action") == 0:
-        return True
-
-    # For each vendor, check for vendor specific action
-    for exp in of_g.experimenter_name_to_id:
-        if cls.find("of_action" + exp) == 0:
-            return True
-
-    return False
-
 def class_is_list(cls):
     """
     Return True if cls_name is a list object
