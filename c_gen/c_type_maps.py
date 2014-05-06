@@ -35,44 +35,6 @@ from generic_utils import *
 import c_gen.type_maps as type_maps
 
 def gen_type_data_header(out):
-
-    out.write("""
-/****************************************************************
- *
- * The following declarations are for type and length calculations.
- * Implementations may be found in of_type_maps.c
- *
- ****************************************************************/
-/*
- * Special case length functions for objects with
- */
-""")
-    for ((cls, name), prev) in of_g.special_offsets.items():
-        s_cls = cls[3:] # take off of_
-        out.write("""
-/**
- * Special length calculation for %(cls)s->%(name)s.
- * @param obj An object of type %(cls)s to check for
- * length of %(name)s
- * @param bytes[out] Where to store the calculated length
- *
- * Preceding data member is %(prev)s.
- */
-extern int of_length_%(s_cls)s_%(name)s_get(
-    %(cls)s_t *obj, int *bytes);
-
-/**
- * Special offset calculation for %(cls)s->%(name)s.
- * @param obj An object of type %(cls)s to check for
- * length of %(name)s
- * @param offset[out] Where to store the calculated length
- *
- * Preceding data member is %(prev)s.
- */
-extern int of_offset_%(s_cls)s_%(name)s_get(
-    %(cls)s_t *obj, int *offset);
-""" % dict(cls=cls, s_cls=s_cls, name=name, prev=prev))
-
     out.write("""
 /****************************************************************
  * Wire type/length functions.
