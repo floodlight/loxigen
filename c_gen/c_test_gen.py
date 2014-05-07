@@ -255,16 +255,26 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
     match->version = version;
 """)
 
-    for key, entry in match.of_match_members.items():
+    def populate_match_version(wire_version, keys):
         out.write("""
-    if (!(of_match_incompat[version] &
-            OF_OXM_BIT(OF_OXM_INDEX_%(ku)s))) {
+    if (version == %d) {\
+""" % wire_version)
+        for key in keys:
+            entry = match.of_match_members[key]
+            out.write("""
         OF_MATCH_MASK_%(ku)s_EXACT_SET(match);
         VAR_%(u_type)s_INIT(match->fields.%(key)s, value);
         value += 1;
+""" % dict(key=key, u_type=entry["m_type"].upper(), ku=key.upper()))
+        out.write("""
     }
 
-""" % dict(key=key, u_type=entry["m_type"].upper(), ku=key.upper()))
+""")
+
+    populate_match_version(1, match.of_v1_keys)
+    populate_match_version(2, match.of_v2_keys)
+    populate_match_version(3, match.match_keys_sorted)
+    populate_match_version(4, match.match_keys_sorted)
 
     out.write("""
     if (value % 2) {
@@ -958,25 +968,7 @@ test_match_1(void)
     uint32_t exp_value;
 
     /* Verify default values for ip mask map */
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
-        exp_value = (idx < 32) ? ~((1 << idx) - 1) : 0;
-        TEST_ASSERT(of_ip_index_to_mask(idx) == exp_value);
-        if (idx < 32) {
-            TEST_ASSERT(of_ip_mask_to_index(exp_value) == idx);
-        }
-    }
-
-    TEST_ASSERT(of_ip_mask_map_set(17, 0xabcdef00) == OF_ERROR_NONE);
-    TEST_ASSERT(of_ip_mask_to_index(0xabcdef00) == 17);
-    TEST_ASSERT(of_ip_index_to_mask(17) == 0xabcdef00);
-
-    TEST_ASSERT(of_ip_mask_map_set(62, 0xabcdefff) == OF_ERROR_NONE);
-    TEST_ASSERT(of_ip_mask_to_index(0xabcdefff) == 62);
-    TEST_ASSERT(of_ip_index_to_mask(62) == 0xabcdefff);
-
-    /* Test re-init */
-    of_ip_mask_map_init();
-    for (idx = 0; idx < OF_IP_MASK_MAP_COUNT; idx++) {
+    for (idx = 0; idx < 64; idx++) {
         exp_value = (idx < 32) ? ~((1 << idx) - 1) : 0;
         TEST_ASSERT(of_ip_index_to_mask(idx) == exp_value);
         if (idx < 32) {
@@ -1093,7 +1085,6 @@ test_%(cls)s_create_%(v_name)s(void)
     %(cls)s_t *obj;
     uint8_t *msg_buf;
     int value;
-    int len;
     of_object_id_t object_id;
 
     obj = %(cls)s_new(%(v_name)s);
@@ -1111,12 +1102,9 @@ test_%(cls)s_create_%(v_name)s(void)
     TEST_ASSERT(value != 0);
 
     /* Grab the underlying buffer from the message */
-    len = obj->length;
     of_object_wire_buffer_steal((of_object_t *)obj, &msg_buf);
     TEST_ASSERT(msg_buf != NULL);
     %(cls)s_delete(obj);
-    /* TODO:  */
-    TEST_ASSERT(of_message_to_object_id(msg_buf, len) == %(enum)s);
     obj = %(cls)s_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf));
 
     TEST_ASSERT(obj != NULL);
