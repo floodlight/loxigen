@@ -154,3 +154,15 @@ struct of_bsn_tlv_vrf : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_queue_id : of_bsn_tlv {
+    uint16_t type == 20;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_queue_weight : of_bsn_tlv {
+    uint16_t type == 21;
+    uint16_t length;
+    uint32_t value;
+};
