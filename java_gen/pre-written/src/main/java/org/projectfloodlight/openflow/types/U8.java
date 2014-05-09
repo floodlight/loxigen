@@ -62,7 +62,7 @@ public class U8 implements Writeable, OFValueType<U8> {
 
     @Override
     public String toString() {
-        return "" + f(raw);
+        return String.format("0x%02x", raw);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class U16 implements Writeable, OFValueType<U16> {
 
     @Override
     public String toString() {
-        return Integer.toString(f(raw));
+        return String.format("0x%04x", raw);
     }
 
     @Override

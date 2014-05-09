@@ -61,7 +61,7 @@ public class U32 implements Writeable, OFValueType<U32> {
 
     @Override
     public String toString() {
-        return "" + f(raw);
+        return String.format("0x%08x", raw);
     }
 
     @Override

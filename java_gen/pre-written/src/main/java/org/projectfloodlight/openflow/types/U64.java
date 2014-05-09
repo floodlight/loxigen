@@ -66,7 +66,7 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
 
     @Override
     public String toString() {
-        return getBigInteger().toString();
+        return String.format("0x%016x", raw);
     }
 
     public static BigInteger f(final long value) {
