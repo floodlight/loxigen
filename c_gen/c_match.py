@@ -290,6 +290,7 @@ enum of_oxm_index_e {
     OF_OXM_INDEX_IPV6_ND_TLL    = 33, /* Target link-layer for ND. */
     OF_OXM_INDEX_MPLS_LABEL     = 34, /* MPLS label. */
     OF_OXM_INDEX_MPLS_TC        = 35, /* MPLS TC. */
+    OF_OXM_INDEX_TUNNEL_ID      = 38, /* Logical Port Metadata. */
 
     OF_OXM_INDEX_BSN_IN_PORTS_128 = 36,
     OF_OXM_INDEX_BSN_LAG_ID = 37,
