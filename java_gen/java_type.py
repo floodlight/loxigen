@@ -501,6 +501,8 @@ gen_table_id = JType("GenTableId") \
            )
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
+error_cause_data = JType("OFErrorCauseData") \
+         .op(version=ANY, read="OFErrorCauseData.read(bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)");
 
 generic_t = JType("T")
 
@@ -716,6 +718,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif field_name == "err_type":
         return JType("OFErrorType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)')
+    elif loxi_utils.class_is(obj_name, "of_error_msg") and field_name == "data":
+        return error_cause_data
     elif field_name == "stats_type":
         return JType("OFStatsType", 'short') \
             .op(read='bb.readShort()', write='bb.writeShort($name)')

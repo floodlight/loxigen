@@ -19,4 +19,4 @@ of_bad_match_error_msg_data_set(obj, &data);
 -- java
 builder.setXid(0x12345678)
     .setCode(OFBadMatchCode.BAD_MASK)
-    .setData(new byte[] { 0x61, 0x62, 0x63 });
+    .setData(OFErrorCauseData.of(new byte[] { 0x61, 0x62, 0x63 }, OFVersion.OF_13));
