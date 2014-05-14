@@ -30,6 +30,12 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     private static final Logger logger =
             LoggerFactory.getLogger(OFErrorCauseData.class);
 
+    /** A default 'empty' cause. Note: the OFVersion OF_13 passed in here is irrelevant,
+     *  because parsing of the 0-byte array will always return null, irrespective of the
+     *  version.
+     */
+    public static final OFErrorCauseData NONE = new OFErrorCauseData(new byte[0], OFVersion.OF_13);
+
     private final byte[] data;
     private final OFVersion version;
 
