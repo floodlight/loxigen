@@ -502,7 +502,7 @@ gen_table_id = JType("GenTableId") \
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
 error_cause_data = JType("OFErrorCauseData") \
-         .op(version=ANY, read="OFErrorCauseData.read(bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)");
+         .op(version=ANY, read="OFErrorCauseData.read(bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)", default="OFErrorCauseData.NONE");
 
 generic_t = JType("T")
 
