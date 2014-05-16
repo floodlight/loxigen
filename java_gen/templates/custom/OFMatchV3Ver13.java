@@ -83,7 +83,7 @@
         return oxm != null && oxm.isMasked();
     }
 
-    private class MatchFieldIterator extends UnmodifiableIterator<MatchField<?>> {
+    private class MatchFieldIterator extends AbstractIterator<MatchField<?>> {
         private Iterator<OFOxm<?>> oxmIterator;
 
         MatchFieldIterator() {
@@ -91,14 +91,14 @@
         }
 
         @Override
-        public boolean hasNext() {
-            return oxmIterator.hasNext();
-        }
-
-        @Override
-        public MatchField<?> next() {
-            OFOxm<?> next = oxmIterator.next();
-            return next.getMatchField();
+        protected MatchField<?> computeNext() {
+            while(oxmIterator.hasNext()) {
+                OFOxm<?> oxm = oxmIterator.next();
+                if(oxm.getMatchField().arePrerequisitesOK(OFMatchV3Ver13.this))
+                   return oxm.getMatchField();
+            }
+            endOfData();
+            return null;
         }
     }
 
