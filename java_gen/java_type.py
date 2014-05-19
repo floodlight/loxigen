@@ -306,6 +306,8 @@ u64_list = JType('List<U64>', 'int[]') \
                 funnel="FunnelUtils.putList($name, sink)")
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
+u16obj = JType('U16', 'U16') \
+        .op(read='U16.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U16.ZERO")
 u32obj = JType('U32', 'U32') \
         .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())', default="U32.ZERO")
 u64 = JType('U64', 'long') \
@@ -641,6 +643,9 @@ exceptions = {
 
         'of_oxm_bsn_udf7' : { 'value' : udf },
         'of_oxm_bsn_udf7_masked' : { 'value' : udf, 'value_mask' : udf },
+
+        'of_oxm_bsn_tcp_flags' : { 'value' : u16obj },
+        'of_oxm_bsn_tcp_flags_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,

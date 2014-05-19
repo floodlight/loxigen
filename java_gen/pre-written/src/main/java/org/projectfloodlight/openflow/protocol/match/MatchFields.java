@@ -54,4 +54,5 @@ public enum MatchFields {
     BSN_UDF5,
     BSN_UDF6,
     BSN_UDF7,
+    BSN_TCP_FLAGS,
 }

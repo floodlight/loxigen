@@ -20,6 +20,7 @@ import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
+import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
@@ -223,6 +224,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<UDF> BSN_UDF7 =
             new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF7);
+
+    public final static MatchField<U16> BSN_TCP_FLAGS =
+            new MatchField<U16>("bsn_tcp_flags", MatchFields.BSN_TCP_FLAGS);
 
     public String getName() {
         return name;
