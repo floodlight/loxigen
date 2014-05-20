@@ -409,5 +409,6 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_flags(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_desc_str_image_checksum(write, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_desc_str_startup_config_checksum(write, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
+#define LOCI_SHOW_u16_bsn_tcp_flags(write, cookie, val) LOCI_SHOW_x16(writer, cookie, val)
 
 #endif /* _LOCI_SHOW_H_ */

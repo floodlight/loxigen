@@ -540,6 +540,15 @@ of_match_members = dict(
         takes_mask_in_spec=True,
         order=1010,
         ),
+
+    bsn_tcp_flags = dict(
+        name="bsn_tcp_flags",
+        m_type="uint16_t",
+        print_type="PRIx16",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=1010,
+        ),
 )
 
 match_keys_sorted = of_match_members.keys()
