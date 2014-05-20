@@ -29,6 +29,10 @@ public class U16 implements Writeable, OFValueType<U16> {
     private final static short ZERO_VAL = 0;
     public final static U16 ZERO = new U16(ZERO_VAL);
 
+    private static final short NO_MASK_VAL = (short)0xFFff;
+    public final static U16 NO_MASK = new U16(NO_MASK_VAL);
+    public static final U16 FULL_MASK = ZERO;
+
     public static int f(final short i) {
         return i & 0xffff;
     }
