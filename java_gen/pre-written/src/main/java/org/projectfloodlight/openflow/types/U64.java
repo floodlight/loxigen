@@ -32,6 +32,10 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     private final static long ZERO_VAL = 0;
     public final static U64 ZERO = new U64(ZERO_VAL);
 
+    private static final long NO_MASK_VAL = 0xFFffFFffFFffFFffL;
+    public final static U64 NO_MASK = new U64(NO_MASK_VAL);
+    public static final U64 FULL_MASK = ZERO;
+
     private final long raw;
 
     protected U64(final long raw) {

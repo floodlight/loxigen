@@ -31,14 +31,14 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
 
     /**
      * Perform a low level AND operation on the bits of two IPAddress<?> objects
-     * @param   IPAddress<?> other
+     * @param   other IPAddress<?>
      * @return  new IPAddress<?> object after the AND oper
      */
     public abstract F and(F other);
 
     /**
      * Perform a low level OR operation on the bits of two IPAddress<?> objects
-     * @param   IPAddress<?> other
+     * @param   other IPAddress<?>
      * @return  new IPAddress<?> object after the AND oper
      */
     public abstract F or(F other);

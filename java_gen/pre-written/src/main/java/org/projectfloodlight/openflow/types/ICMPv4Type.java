@@ -200,4 +200,8 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
         sink.putShort(type);
     }
 
+    @Override
+    public String toString() {
+        return String.valueOf(this.type);
+    }
 }

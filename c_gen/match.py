@@ -396,6 +396,15 @@ of_match_members = dict(
         order=601,
         ),
 
+    tunnel_id = dict(
+        name="tunnel_id",
+        m_type="uint64_t",
+        print_type="PRIu64",
+        conditions="",
+        takes_mask_in_spec=True,
+        order=700,
+        ),
+
     bsn_in_ports_128 = dict(
         name="bsn_in_ports_128",
         m_type="of_bitmap_128_t",
