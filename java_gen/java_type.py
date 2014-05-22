@@ -307,7 +307,7 @@ u64_list = JType('List<U64>', 'int[]') \
 u8obj = JType('U8', 'U8') \
         .op(read='U8.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U8.ZERO")
 u16obj = JType('U16', 'U16') \
-        .op(read='U16.of(bb.readByte())', write='bb.writeByte($name.getRaw())', default="U16.ZERO")
+        .op(read='U16.of(bb.readShort())', write='bb.writeShort($name.getRaw())', default="U16.ZERO")
 u32obj = JType('U32', 'U32') \
         .op(read='U32.of(bb.readInt())', write='bb.writeInt($name.getRaw())', default="U32.ZERO")
 u64 = JType('U64', 'long') \
