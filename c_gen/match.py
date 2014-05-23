@@ -139,7 +139,6 @@ match_keys_sorted = []
 # Generate the of_match_members, match_keys, and match_keys_sorted
 # datastructures from the IR and the v1/v2 tables above
 def build():
-    count = 0
     for uclass in loxi_globals.unified.classes:
         if not uclass.is_oxm or uclass.name == 'of_oxm':
             continue
@@ -169,10 +168,12 @@ def build():
         of_match_members[name] = match_member
 
         for version in uclass.version_classes:
+            assert name not in match_keys[version.wire_version]
             match_keys[version.wire_version].append(name)
 
-    match_keys_sorted.extend(of_match_members.keys())
-    match_keys_sorted.sort(key=lambda entry:of_match_members[entry]["order"])
+    match_keys_sorted.extend(
+        sorted(of_match_members.keys(),
+               key=lambda entry:of_match_members[entry]["order"]))
 
 ##
 # Check that all members in the hash are recognized as match keys
