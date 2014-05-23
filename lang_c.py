@@ -41,6 +41,7 @@ import c_gen.c_dump_gen as c_dump_gen
 import c_gen.c_show_gen as c_show_gen
 import c_gen.util
 import c_gen.codegen
+import c_gen.match
 import loxi_utils.loxi_utils as loxi_utils
 import template_utils
 
@@ -112,6 +113,7 @@ targets = {
 }
 
 def generate(install_dir):
+    c_gen.match.build()
     build_of_g.initialize_versions()
     build_of_g.build_ordered_classes()
     build_of_g.populate_type_maps()
