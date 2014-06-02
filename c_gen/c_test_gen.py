@@ -271,10 +271,8 @@ of_match_populate(of_match_t *match, of_version_t version, int value)
 
 """)
 
-    populate_match_version(1, match.of_v1_keys)
-    populate_match_version(2, match.of_v2_keys)
-    populate_match_version(3, match.match_keys_sorted)
-    populate_match_version(4, match.match_keys_sorted)
+    for wire_version, match_keys in match.match_keys.items():
+        populate_match_version(wire_version, match_keys)
 
     out.write("""
     if (value % 2) {
