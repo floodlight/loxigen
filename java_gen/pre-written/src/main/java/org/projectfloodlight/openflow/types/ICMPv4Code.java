@@ -90,4 +90,9 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     public void putTo(PrimitiveSink sink) {
         sink.putShort(code);
     }
+
+    @Override
+    public String toString() {
+        return String.valueOf(this.code);
+    }
 }
