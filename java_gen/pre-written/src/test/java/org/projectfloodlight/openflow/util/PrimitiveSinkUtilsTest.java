@@ -27,6 +27,23 @@ public class PrimitiveSinkUtilsTest {
     }
 
     @Test
+    public void testPutNullableString() {
+        // test that these different invocations of putNullable
+        // differ pairwise
+        HashCode[] hs = new HashCode[] {
+                calcPutNullableString((String) null),
+                calcPutNullableString(""),
+                calcPutNullableString(null, null),
+                calcPutNullableString(null, ""),
+                calcPutNullableString("", null),
+                calcPutNullableString("a\0a", null),
+                calcPutNullableString(null, "a\0a"),
+        };
+
+        checkPairwiseDifferent(hs);
+    }
+
+    @Test
     public void testPutNullable() {
         // test that these different invocations of putNullable
         // differ pairwise
@@ -80,7 +97,15 @@ public class PrimitiveSinkUtilsTest {
 
         assertThat(calcPutSortedSet(OFPort.of(1), OFPort.of(2)),
                 equalTo(calcPutSortedSet(OFPort.of(2), OFPort.of(1))));
-}
+    }
+
+    private HashCode calcPutNullableString(String... strings) {
+        Hasher h = hash.newHasher();
+        for(String s: strings) {
+            PrimitiveSinkUtils.putNullableStringTo(h, s);
+        }
+        return h.hash();
+    }
 
     private HashCode calcPutSortedSet(OFPort... ports) {
         Hasher h = hash.newHasher();
