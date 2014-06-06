@@ -166,6 +166,7 @@ function p_of.dissector (buf, pkt, root)
             if offset + msg_len > buf:len() then
                 -- we don't have all the data we need yet
                 pkt.desegment_len = offset + msg_len - buf:len()
+                pkt.desegment_offset = offset
                 return
             end
 
@@ -184,6 +185,7 @@ function p_of.dissector (buf, pkt, root)
         else
             -- we don't have all of length field yet
             pkt.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
+            pkt.desegment_offset = offset
             return
         end
     until offset >= buf:len()
