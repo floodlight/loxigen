@@ -154,11 +154,14 @@ function p_of.dissector (buf, pkt, root)
     current_pkt = pkt
     repeat
         if buf:len() - offset >= 4 then
+            local msg_version = buf(offset,1):uint()
+            local msg_type = buf(offset+1,1):uint()
             local msg_len = buf(offset+2,2):uint()
 
-            if msg_len < 8 then
-                break
-            end
+            -- Detect obviously broken messages
+            if msg_version == 0 or msg_version > 4 then break end
+            if msg_type > 29 then break end
+            if msg_len < 8 then break end
 
             if offset + msg_len > buf:len() then
                 -- we don't have all the data we need yet
