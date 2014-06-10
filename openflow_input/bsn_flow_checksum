@@ -110,7 +110,8 @@ struct of_bsn_table_set_buckets_size : of_bsn_header {
     uint32_t xid;
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 61;
-    uint16_t table_id;
+    pad(1);
+    uint8_t table_id;
     pad(2);
     uint32_t buckets_size;
 };
