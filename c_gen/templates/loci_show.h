@@ -220,6 +220,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u32_role(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u16_total_len(writer, cookie, val) LOCI_SHOW_u16(writer, cookie, val)
 #define LOCI_SHOW_port_no_port_no(writer, cookie, val) LOCI_SHOW_port_no(writer, cookie, val)
+#define LOCI_SHOW_port_no_loopback_port_no(writer, cookie, val) LOCI_SHOW_port_no(writer, cookie, val)
 #define LOCI_SHOW_mac_hw_addr(writer, cookie, val) LOCI_SHOW_mac(writer, cookie, val)
 #define LOCI_SHOW_u32_config(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
 #define LOCI_SHOW_u32_advertise(writer, cookie, val) LOCI_SHOW_x32(writer, cookie, val)
