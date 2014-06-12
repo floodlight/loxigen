@@ -1084,6 +1084,7 @@ test_%(cls)s_create_%(v_name)s(void)
     uint8_t *msg_buf;
     int value;
     of_object_id_t object_id;
+    int len;
 
     obj = %(cls)s_new(%(v_name)s);
     TEST_ASSERT(obj != NULL);
@@ -1099,11 +1100,13 @@ test_%(cls)s_create_%(v_name)s(void)
     value = %(cls)s_%(v_name)s_populate_scalars(obj, 1);
     TEST_ASSERT(value != 0);
 
+    len = obj->length;
+
     /* Grab the underlying buffer from the message */
     of_object_wire_buffer_steal((of_object_t *)obj, &msg_buf);
     TEST_ASSERT(msg_buf != NULL);
     %(cls)s_delete(obj);
-    obj = %(cls)s_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf));
+    obj = of_object_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf), len);
 
     TEST_ASSERT(obj != NULL);
 

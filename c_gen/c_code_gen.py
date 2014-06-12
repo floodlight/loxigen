@@ -1951,9 +1951,6 @@ def gen_new_fn_body(cls, out):
  * Initializes the new object with it's default fixed length associating
  * a new underlying wire buffer.
  *
- * Use new_from_message to bind an existing message to a message object,
- * or a _get function for non-message objects.
- *
  * \\ingroup %(cls)s
  */
 
@@ -1995,55 +1992,6 @@ def gen_new_fn_body(cls, out):
 """ % dict(cls=cls))
 
 
-def gen_from_message_fn_body(cls, out):
-    """
-    Generate function body for from_message function
-    @param cls The class name for the function
-    @param out The file to which to write
-    """
-    out.write("""
-/**
- * Create a new %(cls)s object and bind it to an existing message
- *
- * @param msg The message to bind the new object to
- * @return Pointer to the newly create object or NULL on error
- *
- * \ingroup %(cls)s
- */
-
-%(cls)s_t *
-%(cls)s_new_from_message(of_message_t msg)
-{
-    %(cls)s_t *obj = NULL;
-    of_version_t version;
-    int length;
-
-    if (msg == NULL) return NULL;
-
-    version = of_message_version_get(msg);
-    if (!OF_VERSION_OKAY(version)) return NULL;
-
-    length = of_message_length_get(msg);
-
-    if ((obj = (%(cls)s_t *)of_object_new(-1)) == NULL) {
-        return NULL;
-    }
-
-    %(cls)s_init(obj, version, 0, 0);
-
-    if ((of_object_buffer_bind((of_object_t *)obj, OF_MESSAGE_TO_BUFFER(msg),
-                               length, OF_MESSAGE_FREE_FUNCTION)) < 0) {
-       FREE(obj);
-       return NULL;
-    }
-    obj->length = length;
-    obj->version = version;
-
-    return obj;
-}
-""" % dict(cls=cls))
-
-
 ################################################################
 # Now the top level generator functions
 ################################################################
@@ -2060,13 +2008,10 @@ def gen_new_function_declarations(out):
  * New operator declarations
  *
  * _new: Create a new object for writing; includes init
- * _new_from_message: Create a new instance of the object and bind the
- *    message data to the object
  * _init: Initialize and optionally allocate buffer space for an
  *    automatic instance
  *
- * _new and _from_message require a delete operation to be called
- * on the object.
+ * _new and requires a delete operation to be called on the object.
  *
  ****************************************************************/
 """)
@@ -2075,10 +2020,6 @@ def gen_new_function_declarations(out):
         out.write("""
 extern %(cls)s_t *
     %(cls)s_new(of_version_t version);
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message(of_message_t msg);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
     %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
@@ -2132,8 +2073,6 @@ def gen_new_function_definitions(out, cls):
 
     gen_new_fn_body(cls, out)
     gen_init_fn_body(cls, out)
-    if loxi_utils.class_is_message(cls):
-        gen_from_message_fn_body(cls, out)
 
 """
 Document generation functions
