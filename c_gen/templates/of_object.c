@@ -254,7 +254,6 @@ of_object_buffer_bind(of_object_t *obj, uint8_t *buf, int bytes,
  * @param offset The offset at which to attach the child RELATIVE 
  * TO THE PARENT in the buffer
  * @param bytes The amount of the buffer dedicated to the child; see below
- * @param inc_ref_count Should the ref count of the parent be incremented
  * 
  * This is used for 'get' accessors for composite types as well as
  * iterator functions for lists, both read (first/next) and write
@@ -276,14 +275,7 @@ static void
 object_child_attach(of_object_t *parent, of_object_t *child, 
                        int offset, int bytes)
 {
-    of_wire_buffer_t *wbuf; /* Pointer to common wire buffer manager */
-
-    child->parent = parent;
-    wbuf = parent->wbuf;
-
-    /* Set up the child's wire buf to point to same as parent */
-    child->wbuf = wbuf;
-    child->obj_offset = parent->obj_offset + offset;
+    of_object_attach(parent, child, offset, bytes);
 
     /*
      * bytes determines if this is a read or write setup.
@@ -296,8 +288,7 @@ object_child_attach(of_object_t *parent, of_object_t *child,
         /* Set up space for the child in the parent's buffer */
         tot_bytes = parent->obj_offset + offset + bytes;
 
-        of_wire_buffer_grow(wbuf, tot_bytes);
-        child->length = bytes;
+        of_wire_buffer_grow(parent->wbuf, tot_bytes);
     }
     /* if bytes == 0 don't do anything */
 }
