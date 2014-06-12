@@ -77,7 +77,7 @@ def gen_declarations(out):
 extern int of_match_serialize(of_version_t version, of_match_t *match,
                               of_octets_t *octets);
 extern int of_match_deserialize(of_version_t version, of_match_t *match,
-                                of_octets_t *octets);
+                                of_object_t *parent, int offset, int length);
 extern int of_match_v1_to_match(of_match_v1_t *src, of_match_t *dst);
 extern int of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst);
 extern int of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst);
@@ -738,33 +738,18 @@ def gen_deserialize(out):
 
 int
 of_match_deserialize(of_version_t version, of_match_t *match,
-                     of_octets_t *octets)
+                     of_object_t *parent, int offset, int length)
 {
-    if (octets->bytes == 0) { /* No match specified means all wildcards */
-        MEMSET(match, 0, sizeof(*match));
-        match->version = version;
-
-        return OF_ERROR_NONE;
-    }
+    of_object_t obj;
 
     switch (version) {
 """)
     for version in of_g.of_version_range:
         out.write("""
     case %(ver_name)s:
-        { /* FIXME: check init bytes */
-            uint8_t *tmp;
-            of_match_v%(version)d_t wire_match;
-            of_match_v%(version)d_init(&wire_match,
-                   %(ver_name)s, -1, 1);
-            of_object_buffer_bind((of_object_t *)&wire_match,
-                octets->data, octets->bytes, NULL);
-            OF_TRY(of_match_v%(version)d_to_match(&wire_match, match));
-
-            /* Free the wire buffer control block without freeing
-             * octets->bytes. */
-            of_wire_buffer_steal(wire_match.wbuf, &tmp);
-        }
+        of_match_v%(version)d_init(&obj, %(ver_name)s, length, 1);
+        of_object_attach(parent, &obj, offset, length);
+        OF_TRY(of_match_v%(version)d_to_match(&obj, match));
         break;
 """ % dict(version=version, ver_name=of_g.of_version_wire2name[version]))
 

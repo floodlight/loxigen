@@ -1453,9 +1453,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     elif m_type == "of_match_t":
         out.write("""
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
-    match_octets.bytes = cur_len;
-    match_octets.data = OF_OBJECT_BUFFER_INDEX(obj, offset);
-    OF_TRY(of_match_deserialize(ver, %(m_name)s, &match_octets));
+    OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
     elif m_type == "of_oxm_header_t":
         out.write("""
@@ -1504,13 +1502,16 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
 
     elif m_type == "of_match_t":
         out.write("""
-    /* Match object */
-    OF_TRY(of_match_serialize(ver, %(m_name)s, &match_octets));
-    new_len = match_octets.bytes;
-    of_wire_buffer_replace_data(wbuf, abs_offset, cur_len,
-        match_octets.data, new_len);
-    /* Free match serialized octets */
-    FREE(match_octets.data);
+    {
+        /* Match object */
+        of_octets_t match_octets;
+        OF_TRY(of_match_serialize(ver, %(m_name)s, &match_octets));
+        new_len = match_octets.bytes;
+        of_wire_buffer_replace_data(wbuf, abs_offset, cur_len,
+            match_octets.data, new_len);
+        /* Free match serialized octets */
+        FREE(match_octets.data);
+    }
 """ % dict(m_name=m_name))
 
     else:  # Other object type
@@ -1628,12 +1629,6 @@ def gen_unified_acc_body(out, cls, m_name, ver_type_map, a_type, m_type):
         if a_type == "set":
             out.write("""\
     int new_len, delta; /* For set, need new length and delta */
-""")
-
-    # For match, need octet string for set/get
-    if m_type == "of_match_t":
-        out.write("""\
-    of_octets_t match_octets; /* Serialized string for match */
 """)
 
     out.write("""
