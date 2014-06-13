@@ -123,6 +123,7 @@ def generate(install_dir):
     for (name, fn) in targets.items():
         with template_utils.open_output(install_dir, name) as outfile:
             fn(outfile, os.path.basename(name))
+    c_gen.codegen.build_class_metadata()
     c_gen.codegen.generate_classes(install_dir)
     c_gen.codegen.generate_header_classes(install_dir)
     c_gen.codegen.generate_classes_header(install_dir)
