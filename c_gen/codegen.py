@@ -160,10 +160,9 @@ def generate_lists(install_dir):
         cls, e_cls = loxi_utils_legacy.list_name_extract(oftype)
         e_cls = e_cls[:-2]
         e_uclass = loxi_globals.unified.class_by_name(e_cls)
-        has_wire_length = any(isinstance(m, ir.OFLengthMember) for m in e_uclass.members)
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
             util.render_template(out, "list.c", cls=cls, e_cls=e_cls, e_uclass=e_uclass,
-                                 has_wire_length=has_wire_length)
+                                 wire_length_get=class_metadata_dict[e_cls].wire_length_get)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
 

@@ -57,8 +57,8 @@ ${cls}_first(${cls}_t *list, ${e_cls}_t *_obj)
     ${e_cls}_wire_object_id_get(obj, &obj->object_id);
 :: #endif
 
-:: if has_wire_length:
-    loci_class_metadata[obj->object_id].wire_length_get(obj, &obj->length);
+:: if wire_length_get != 'NULL':
+    ${wire_length_get}(obj, &obj->length);
 :: else:
     obj->length = of_object_fixed_len[obj->version][obj->object_id];
 :: #endif
@@ -88,8 +88,8 @@ ${cls}_next(${cls}_t *list, ${e_cls}_t *_obj)
     ${e_cls}_wire_object_id_get(obj, &obj->object_id);
 :: #endif
 
-:: if has_wire_length:
-    loci_class_metadata[obj->object_id].wire_length_get(obj, &obj->length);
+:: if wire_length_get != 'NULL':
+    ${wire_length_get}(obj, &obj->length);
 :: else:
     obj->length = of_object_fixed_len[obj->version][obj->object_id];
 :: #endif
