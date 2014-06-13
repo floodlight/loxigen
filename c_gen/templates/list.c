@@ -53,10 +53,15 @@ ${cls}_first(${cls}_t *list, ${e_cls}_t *_obj)
         return rv;
     }
 
-    of_object_wire_init(obj, ${e_cls.upper()}, list->length);
-    if (obj->length == 0) {
-        return OF_ERROR_PARSE;
-    }
+:: if e_uclass.virtual:
+    ${e_cls}_wire_object_id_get(obj, &obj->object_id);
+:: #endif
+
+:: if has_wire_length:
+    loci_class_metadata[obj->object_id].wire_length_get(obj, &obj->length);
+:: else:
+    obj->length = of_object_fixed_len[obj->version][obj->object_id];
+:: #endif
 
     return rv;
 }
@@ -79,11 +84,15 @@ ${cls}_next(${cls}_t *list, ${e_cls}_t *_obj)
         return rv;
     }
 
-    rv = of_object_wire_init(obj, ${e_cls.upper()}, list->length);
+:: if e_uclass.virtual:
+    ${e_cls}_wire_object_id_get(obj, &obj->object_id);
+:: #endif
 
-    if ((rv == OF_ERROR_NONE) && (obj->length == 0)) {
-        return OF_ERROR_PARSE;
-    }
+:: if has_wire_length:
+    loci_class_metadata[obj->object_id].wire_length_get(obj, &obj->length);
+:: else:
+    obj->length = of_object_fixed_len[obj->version][obj->object_id];
+:: #endif
 
     return rv;
 }
