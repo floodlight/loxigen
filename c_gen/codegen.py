@@ -43,6 +43,7 @@ import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 import c_gen.c_type_maps as c_type_maps
+import c_gen.loxi_utils_legacy as loxi_utils
 
 CLASS_CHUNK_SIZE = 32
 
@@ -147,12 +148,10 @@ def generate_classes_header(install_dir):
 def generate_lists(install_dir):
     for cls in of_g.ordered_list_objects:
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            util.render_template(out, "class.c",
-                push_wire_types_data=None,
-                parse_wire_types_data=None)
+            e_cls = loxi_utils.list_to_entry_type(cls)
+            util.render_template(out, "list.c", cls=cls, e_cls=e_cls)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
-            c_code_gen.gen_list_accessors(out, cls)
 
 def generate_strings(install_dir):
     object_id_strs = []
