@@ -177,3 +177,11 @@ def lookup_ir_wiretype(oftype, version):
         return enum.params['wire_type']
     else:
         return oftype
+
+def oftype_is_list(oftype):
+    return (oftype.find("list(") == 0)
+
+# Converts "list(of_flow_stats_entry_t)" to "of_flow_stats_entry"
+def oftype_list_elem(oftype):
+    assert oftype.find("list(") == 0
+    return oftype[5:-3]

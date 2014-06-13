@@ -43,7 +43,8 @@ import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 import c_gen.c_type_maps as c_type_maps
-import c_gen.loxi_utils_legacy as loxi_utils
+import loxi_utils.loxi_utils as loxi_utils
+import c_gen.loxi_utils_legacy as loxi_utils_legacy
 
 CLASS_CHUNK_SIZE = 32
 
@@ -146,9 +147,19 @@ def generate_classes_header(install_dir):
             legacy_code=tmp.getvalue())
 
 def generate_lists(install_dir):
-    for cls in of_g.ordered_list_objects:
+    # Collect all the lists in use
+    list_oftypes = set()
+    for uclass in loxi_globals.unified.classes:
+        for version, ofclass in sorted(uclass.version_classes.items()):
+            for m in ofclass.members:
+                if isinstance(m, ir.OFDataMember):
+                    if loxi_utils.oftype_is_list(m.oftype):
+                        list_oftypes.add(m.oftype)
+
+    for oftype in sorted(list(list_oftypes)):
+        cls, e_cls = loxi_utils_legacy.list_name_extract(oftype)
+        e_cls = e_cls[:-2]
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            e_cls = loxi_utils.list_to_entry_type(cls)
             util.render_template(out, "list.c", cls=cls, e_cls=e_cls)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)

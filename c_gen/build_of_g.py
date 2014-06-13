@@ -242,6 +242,7 @@ def calculate_offsets_and_lengths(ordered_classes, classes, wire_version):
         of_g.base_length[(cls, wire_version)] = fixed_offset
         if (offset != -1):
             of_g.is_fixed_length.add((cls, wire_version))
+
     for list_type in lists:
         classes[list_type] = []
         of_g.ordered_classes[wire_version].append(list_type)
