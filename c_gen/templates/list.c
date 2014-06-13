@@ -47,7 +47,7 @@ ${cls}_first(${cls}_t *list, ${e_cls}_t *_obj)
     int rv;
     of_object_t *obj = (of_object_t *)_obj;
 
-    ${e_cls}_init(_obj, list->version, 0, 1);
+    ${e_cls}_init(_obj, list->version, -1, 1);
 
     if ((rv = of_list_first(list, obj)) < 0) {
         return rv;
@@ -59,8 +59,6 @@ ${cls}_first(${cls}_t *list, ${e_cls}_t *_obj)
 
 :: if wire_length_get != 'NULL':
     ${wire_length_get}(obj, &obj->length);
-:: else:
-    obj->length = of_object_fixed_len[obj->version][obj->object_id];
 :: #endif
 
     return rv;
@@ -90,8 +88,6 @@ ${cls}_next(${cls}_t *list, ${e_cls}_t *_obj)
 
 :: if wire_length_get != 'NULL':
     ${wire_length_get}(obj, &obj->length);
-:: else:
-    obj->length = of_object_fixed_len[obj->version][obj->object_id];
 :: #endif
 
     return rv;
