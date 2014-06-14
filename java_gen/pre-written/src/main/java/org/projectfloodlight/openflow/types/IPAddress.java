@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 
 import javax.annotation.Nonnull;
@@ -83,10 +85,17 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * Factory function for InetAddress values.
      * @param address the InetAddress you wish to parse into an IPAddress object.
      * @return the IPAddress object.
+     * @throws NullPointerException if address is null
      */
     @Nonnull
     public static IPAddress<?> fromInetAddress(@Nonnull InetAddress address) {
         Preconditions.checkNotNull(address, "address must not be null");
-        return IPAddress.of(address.getHostAddress());
+        byte [] bytes = address.getAddress();
+        if(address instanceof Inet4Address)
+            return IPv4Address.of(bytes);
+        else if (address instanceof Inet6Address)
+            return IPv6Address.of(bytes);
+        else
+            return IPAddress.of(address.getHostAddress());
     }
 }
