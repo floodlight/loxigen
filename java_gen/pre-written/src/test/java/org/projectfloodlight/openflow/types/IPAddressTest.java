@@ -1,6 +1,9 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+
+import java.net.UnknownHostException;
 
 import org.junit.Test;
 
@@ -45,6 +48,16 @@ public class IPAddressTest {
         }
         try {
             IPAddressWithMask.of(null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testFromInetAddressException() throws UnknownHostException {
+        try {
+            IPAddress.fromInetAddress(null);
             fail("Should have thrown NullPointerException");
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
