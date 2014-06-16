@@ -48,6 +48,8 @@ enum ofp_bsn_vport_l2gre_flags(wire_type=uint32_t, bitmask=True) {
     /* DSCP flags are mutually exclusive */
     OF_BSN_VPORT_L2GRE_DSCP_ASSIGN = 0x2,
     OF_BSN_VPORT_L2GRE_DSCP_COPY = 0x4,
+
+    OF_BSN_VPORT_L2GRE_LOOPBACK_IS_VALID = 0x8,
 };
 
 // BSN Virtual port object header
