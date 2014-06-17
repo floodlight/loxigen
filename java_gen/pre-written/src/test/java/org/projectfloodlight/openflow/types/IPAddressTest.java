@@ -94,4 +94,14 @@ public class IPAddressTest {
         assertFalse(mask.contains(invalidIpv4));
     }
 
+    @Test public void testContainsException() {
+        try {
+            IPAddressWithMask<?> mask = IPAddressWithMask.of("1.2.3.4/24");
+            mask.contains(null);
+            fail("Should have thrown NullPointerException");
+        } catch (NullPointerException e) {
+            assertNotNull(e.getMessage());
+        }
+    }
+
 }
