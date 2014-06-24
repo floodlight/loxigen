@@ -80,14 +80,18 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
             return IPv4AddressWithMask.of(ipv4, IPv4Address.of(mask));
         }
     }
-    
+
     @Override
     public boolean contains(IPAddress<?> ip) {
         if (ip == null) {
             throw new NullPointerException("ip must not be null");
         }
-        
-        IPv4Address ipv4 = (IPv4Address) ip;
-        return this.matches(ipv4);
+
+        if(ip.getIpVersion() == IPVersion.IPv4) {
+            IPv4Address ipv4 = (IPv4Address) ip;
+            return this.matches(ipv4);
+        }
+
+        return false;
     }
 }
