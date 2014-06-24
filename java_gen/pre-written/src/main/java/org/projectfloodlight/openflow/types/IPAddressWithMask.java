@@ -10,6 +10,8 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
     }
 
     public abstract IPVersion getIpVersion();
+    
+    public abstract boolean contains(IPAddress<?> ip);
 
     public F getSubnetBroadcastAddress() {
         if (!mask.isCidrMask()) {
@@ -50,23 +52,4 @@ public abstract class IPAddressWithMask<F extends IPAddress<F>> extends Masked<F
 
         return res.toString();
     }
-
-    public boolean contains(IPAddress<?> ip) {
-        Preconditions.checkNotNull(ip, "ip must not be null");
-
-        // Ensure mask and IP of the same version
-        if(getIpVersion() == ip.getIpVersion()) {
-            if(getIpVersion() == IPVersion.IPv4) {
-                IPv4AddressWithMask ipv4mask = (IPv4AddressWithMask) this;
-                IPv4Address ipv4 = (IPv4Address) ip;
-                return ipv4mask.matches(ipv4);
-            } else {
-                IPv6AddressWithMask ipv6mask = (IPv6AddressWithMask) this;
-                IPv6Address ipv6 = (IPv6Address) ip;
-                return ipv6mask.matches(ipv6);
-            }
-        }
-        return false;
-    }
-
 }

@@ -88,5 +88,14 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         }
     }
 
+    @Override
+    public boolean contains(IPAddress<?> ip) {
+        if (string == null) {
+            throw new NullPointerException("String must not be null");
+        }
+        
+        IPv6Address ipv6 = (IPv6Address) ip;
+        return this.matches(ipv6);
+    }
 
 }
