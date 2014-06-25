@@ -10,6 +10,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.hamcrest.Matchers;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 
 import com.google.common.hash.HashCode;
@@ -24,6 +26,22 @@ public class U128Test {
 
         assertThat(U128.of(1, 2).getMsb(), equalTo(1L));
         assertThat(U128.of(1, 2).getLsb(), equalTo(2L));
+    }
+
+    @Test
+    public void testReadBytes() {
+        ChannelBuffer empty = ChannelBuffers.wrappedBuffer(new byte[16]);
+        U128 uEmpty = U128.read16Bytes(empty);
+        assertThat(uEmpty.getMsb(), equalTo(0L));
+        assertThat(uEmpty.getLsb(), equalTo(0L));
+
+        ChannelBuffer value = ChannelBuffers.wrappedBuffer(
+                new byte[] { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte) 0x88,
+                        (byte) 0x99, (byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd,
+                        (byte) 0xee, (byte) 0xff, 0x11 });
+        U128 uValue = U128.read16Bytes(value);
+        assertThat(uValue.getMsb(), equalTo(0x1122334455667788L));
+        assertThat(uValue.getLsb(), equalTo(0x99aabbccddeeff11L));
     }
 
     @Test
