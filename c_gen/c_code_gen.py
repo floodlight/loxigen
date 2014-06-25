@@ -1453,19 +1453,14 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     elif m_type == "of_match_t":
         out.write("""
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
-    match_octets.bytes = cur_len;
-    match_octets.data = OF_OBJECT_BUFFER_INDEX(obj, offset);
-    OF_TRY(of_match_deserialize(ver, %(m_name)s, &match_octets));
+    OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
     elif m_type == "of_oxm_header_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
-    %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wbuf = obj->wbuf;
-    %(m_name)s->obj_offset = abs_offset;
-    %(m_name)s->length = cur_len;
+    of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
     elif m_type == "of_bsn_vport_header_t":
@@ -1473,10 +1468,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
-    %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wbuf = obj->wbuf;
-    %(m_name)s->obj_offset = abs_offset;
-    %(m_name)s->length = cur_len;
+    of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_BSN_VPORT, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
     else:
@@ -1484,10 +1476,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
     /* Attach to parent */
-    %(m_name)s->parent = (of_object_t *)obj;
-    %(m_name)s->wbuf = obj->wbuf;
-    %(m_name)s->obj_offset = abs_offset;
-    %(m_name)s->length = cur_len;
+    of_object_attach(obj, %(m_name)s, offset, cur_len);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
 
 
@@ -1513,13 +1502,16 @@ def gen_set_accessor_body(out, cls, m_type, m_name):
 
     elif m_type == "of_match_t":
         out.write("""
-    /* Match object */
-    OF_TRY(of_match_serialize(ver, %(m_name)s, &match_octets));
-    new_len = match_octets.bytes;
-    of_wire_buffer_replace_data(wbuf, abs_offset, cur_len,
-        match_octets.data, new_len);
-    /* Free match serialized octets */
-    FREE(match_octets.data);
+    {
+        /* Match object */
+        of_octets_t match_octets;
+        OF_TRY(of_match_serialize(ver, %(m_name)s, &match_octets));
+        new_len = match_octets.bytes;
+        of_wire_buffer_replace_data(wbuf, abs_offset, cur_len,
+            match_octets.data, new_len);
+        /* Free match serialized octets */
+        FREE(match_octets.data);
+    }
 """ % dict(m_name=m_name))
 
     else:  # Other object type
@@ -1637,12 +1629,6 @@ def gen_unified_acc_body(out, cls, m_name, ver_type_map, a_type, m_type):
         if a_type == "set":
             out.write("""\
     int new_len, delta; /* For set, need new length and delta */
-""")
-
-    # For match, need octet string for set/get
-    if m_type == "of_match_t":
-        out.write("""\
-    of_octets_t match_octets; /* Serialized string for match */
 """)
 
     out.write("""
@@ -1951,9 +1937,6 @@ def gen_new_fn_body(cls, out):
  * Initializes the new object with it's default fixed length associating
  * a new underlying wire buffer.
  *
- * Use new_from_message to bind an existing message to a message object,
- * or a _get function for non-message objects.
- *
  * \\ingroup %(cls)s
  */
 
@@ -1995,55 +1978,6 @@ def gen_new_fn_body(cls, out):
 """ % dict(cls=cls))
 
 
-def gen_from_message_fn_body(cls, out):
-    """
-    Generate function body for from_message function
-    @param cls The class name for the function
-    @param out The file to which to write
-    """
-    out.write("""
-/**
- * Create a new %(cls)s object and bind it to an existing message
- *
- * @param msg The message to bind the new object to
- * @return Pointer to the newly create object or NULL on error
- *
- * \ingroup %(cls)s
- */
-
-%(cls)s_t *
-%(cls)s_new_from_message(of_message_t msg)
-{
-    %(cls)s_t *obj = NULL;
-    of_version_t version;
-    int length;
-
-    if (msg == NULL) return NULL;
-
-    version = of_message_version_get(msg);
-    if (!OF_VERSION_OKAY(version)) return NULL;
-
-    length = of_message_length_get(msg);
-
-    if ((obj = (%(cls)s_t *)of_object_new(-1)) == NULL) {
-        return NULL;
-    }
-
-    %(cls)s_init(obj, version, 0, 0);
-
-    if ((of_object_buffer_bind((of_object_t *)obj, OF_MESSAGE_TO_BUFFER(msg),
-                               length, OF_MESSAGE_FREE_FUNCTION)) < 0) {
-       FREE(obj);
-       return NULL;
-    }
-    obj->length = length;
-    obj->version = version;
-
-    return obj;
-}
-""" % dict(cls=cls))
-
-
 ################################################################
 # Now the top level generator functions
 ################################################################
@@ -2060,13 +1994,10 @@ def gen_new_function_declarations(out):
  * New operator declarations
  *
  * _new: Create a new object for writing; includes init
- * _new_from_message: Create a new instance of the object and bind the
- *    message data to the object
  * _init: Initialize and optionally allocate buffer space for an
  *    automatic instance
  *
- * _new and _from_message require a delete operation to be called
- * on the object.
+ * _new and requires a delete operation to be called on the object.
  *
  ****************************************************************/
 """)
@@ -2075,10 +2006,6 @@ def gen_new_function_declarations(out):
         out.write("""
 extern %(cls)s_t *
     %(cls)s_new(of_version_t version);
-""" % dict(cls=cls))
-        if loxi_utils.class_is_message(cls):
-            out.write("""extern %(cls)s_t *
-    %(cls)s_new_from_message(of_message_t msg);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
     %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
@@ -2132,8 +2059,6 @@ def gen_new_function_definitions(out, cls):
 
     gen_new_fn_body(cls, out)
     gen_init_fn_body(cls, out)
-    if loxi_utils.class_is_message(cls):
-        gen_from_message_fn_body(cls, out)
 
 """
 Document generation functions
