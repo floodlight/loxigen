@@ -150,11 +150,11 @@ def generate_lists(install_dir):
     # Collect all the lists in use
     list_oftypes = set()
     for uclass in loxi_globals.unified.classes:
-        for version, ofclass in sorted(uclass.version_classes.items()):
+        for ofclass in uclass.version_classes.values():
             for m in ofclass.members:
-                if isinstance(m, ir.OFDataMember):
-                    if loxi_utils.oftype_is_list(m.oftype):
-                        list_oftypes.add(m.oftype)
+                if isinstance(m, ir.OFDataMember) and \
+                        loxi_utils.oftype_is_list(m.oftype):
+                    list_oftypes.add(m.oftype)
 
     for oftype in sorted(list(list_oftypes)):
         cls, e_cls = loxi_utils_legacy.list_name_extract(oftype)
