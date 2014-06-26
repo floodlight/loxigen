@@ -47,5 +47,5 @@ struct of_bsn_log : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 63;
     enum ofp_bsn_loglevel loglevel;
-    of_octets_t data;
+    of_octets_t data; /* US-ASCII string, no null terminator */
 };
