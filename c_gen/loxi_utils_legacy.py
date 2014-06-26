@@ -132,7 +132,7 @@ def class_is_u16_len(cls):
                    "of_flow_stats_entry", "of_bucket", "of_table_features",
                    "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
                    "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
-                   "of_bsn_gentable_desc_stats_entry"]
+                   "of_bsn_gentable_desc_stats_entry", "of_bsn_vrf_counter_stats_entry"]
 
 def class_is_list(cls):
     """
