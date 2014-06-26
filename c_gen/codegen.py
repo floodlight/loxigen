@@ -43,6 +43,8 @@ import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 import c_gen.c_type_maps as c_type_maps
+import loxi_utils.loxi_utils as loxi_utils
+import c_gen.loxi_utils_legacy as loxi_utils_legacy
 
 CLASS_CHUNK_SIZE = 32
 
@@ -145,14 +147,24 @@ def generate_classes_header(install_dir):
             legacy_code=tmp.getvalue())
 
 def generate_lists(install_dir):
-    for cls in of_g.ordered_list_objects:
+    # Collect all the lists in use
+    list_oftypes = set()
+    for uclass in loxi_globals.unified.classes:
+        for ofclass in uclass.version_classes.values():
+            for m in ofclass.members:
+                if isinstance(m, ir.OFDataMember) and \
+                        loxi_utils.oftype_is_list(m.oftype):
+                    list_oftypes.add(m.oftype)
+
+    for oftype in sorted(list(list_oftypes)):
+        cls, e_cls = loxi_utils_legacy.list_name_extract(oftype)
+        e_cls = e_cls[:-2]
+        e_uclass = loxi_globals.unified.class_by_name(e_cls)
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            util.render_template(out, "class.c",
-                push_wire_types_data=None,
-                parse_wire_types_data=None)
+            util.render_template(out, "list.c", cls=cls, e_cls=e_cls, e_uclass=e_uclass,
+                                 wire_length_get=class_metadata_dict[e_cls].wire_length_get)
             # Append legacy generated code
             c_code_gen.gen_new_function_definitions(out, cls)
-            c_code_gen.gen_list_accessors(out, cls)
 
 def generate_strings(install_dir):
     object_id_strs = []
@@ -182,159 +194,165 @@ def generate_type_maps(install_dir):
 ClassMetadata = namedtuple('ClassMetadata',
     ['name', 'wire_length_get', 'wire_length_set', 'wire_type_get', 'wire_type_set'])
 
+class_metadata = []
+class_metadata_dict = {}
+
+def build_class_metadata():
+    for uclass in loxi_globals.unified.classes:
+        wire_length_get = 'NULL'
+        wire_length_set = 'NULL'
+        wire_type_get = 'NULL'
+        wire_type_set = 'NULL'
+
+        if uclass and not uclass.virtual and uclass.has_type_members:
+            wire_type_set = '%s_push_wire_types' % uclass.name
+
+        if uclass.is_message:
+            wire_length_get = 'of_object_message_wire_length_get'
+            wire_length_set = 'of_object_message_wire_length_set'
+        elif uclass.is_action:
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_action_wire_object_id_get'
+        elif uclass.is_instanceof('of_bsn_vport'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_bsn_vport_wire_object_id_get'
+        elif uclass.is_action_id:
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_action_id_wire_object_id_get'
+        elif uclass.is_instruction:
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_instruction_wire_object_id_get'
+        elif uclass.is_instanceof('of_instruction_id'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_instruction_id_wire_object_id_get'
+        elif uclass.is_instanceof('of_queue_prop'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_queue_prop_wire_object_id_get'
+        elif uclass.is_instanceof('of_table_feature_prop'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_table_feature_prop_wire_object_id_get'
+        elif uclass.is_instanceof('of_meter_band'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_meter_band_wire_object_id_get'
+        elif uclass.is_instanceof('of_hello_elem'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_hello_elem_wire_object_id_get'
+        elif uclass.is_instanceof('of_bsn_tlv'):
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_get = 'of_bsn_tlv_wire_object_id_get'
+        elif uclass.is_oxm:
+            wire_length_get = 'of_oxm_wire_length_get'
+            wire_type_get = 'of_oxm_wire_object_id_get'
+        elif uclass.name == "of_packet_queue":
+            wire_length_get = 'of_packet_queue_wire_length_get'
+            wire_length_set = 'of_packet_queue_wire_length_set'
+        elif uclass.name == "of_meter_stats":
+            wire_length_get = 'of_meter_stats_wire_length_get'
+            wire_length_set = 'of_meter_stats_wire_length_set'
+        elif uclass.name in ["of_group_desc_stats_entry", "of_group_stats_entry",
+                "of_flow_stats_entry", "of_bucket", "of_table_features",
+                "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
+                "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
+                "of_bsn_gentable_desc_stats_entry"]:
+            wire_length_get = "of_u16_len_wire_length_get"
+            wire_length_set = "of_u16_len_wire_length_set"
+        elif uclass.name == 'of_match_v3':
+            wire_length_set = 'of_tlv16_wire_length_set'
+            wire_length_get = 'of_tlv16_wire_length_get'
+            wire_type_set = 'of_match_v3_push_wire_types'
+
+        class_metadata.append(ClassMetadata(
+            name=uclass.name,
+            wire_length_get=wire_length_get,
+            wire_length_set=wire_length_set,
+            wire_type_get=wire_type_get,
+            wire_type_set=wire_type_set))
+
+    class_metadata.extend([
+        ClassMetadata(
+            name="of_action_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_action_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_action_id_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_action_id_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_bsn_vport_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_bsn_vport_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_instruction_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_instruction_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_instruction_id_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_instruction_id_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_queue_prop_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_queue_prop_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_table_feature_prop_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_table_feature_prop_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_meter_band_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_meter_band_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_hello_elem_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_hello_elem_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_bsn_tlv_header",
+            wire_length_set='of_tlv16_wire_length_set',
+            wire_length_get='of_tlv16_wire_length_get',
+            wire_type_get='of_bsn_tlv_wire_object_id_get',
+            wire_type_set='NULL'),
+        ClassMetadata(
+            name="of_oxm_header",
+            wire_length_set='NULL',
+            wire_length_get='of_oxm_wire_length_get',
+            wire_type_get='of_oxm_wire_object_id_get',
+            wire_type_set='NULL'),
+    ])
+
+    for metadata in class_metadata:
+        class_metadata_dict[metadata.name] = metadata
+
 def generate_class_metadata(install_dir):
     with template_utils.open_output(install_dir, "loci/inc/loci/loci_class_metadata.h") as out:
         util.render_template(out, "loci_class_metadata.h")
 
     with template_utils.open_output(install_dir, "loci/src/loci_class_metadata.c") as out:
-        class_metadata = []
-        for uclass in loxi_globals.unified.classes:
-            wire_length_get = 'NULL'
-            wire_length_set = 'NULL'
-            wire_type_get = 'NULL'
-            wire_type_set = 'NULL'
-
-            if uclass and not uclass.virtual and uclass.has_type_members:
-                wire_type_set = '%s_push_wire_types' % uclass.name
-
-            if uclass.is_message and uclass.name != "of_header":
-                wire_length_get = 'of_object_message_wire_length_get'
-                wire_length_set = 'of_object_message_wire_length_set'
-            elif uclass.is_action:
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_action_wire_object_id_get'
-            elif uclass.is_instanceof('of_bsn_vport'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_bsn_vport_wire_object_id_get'
-            elif uclass.is_action_id:
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_action_id_wire_object_id_get'
-            elif uclass.is_instruction:
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_instruction_wire_object_id_get'
-            elif uclass.is_instanceof('of_instruction_id'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_instruction_id_wire_object_id_get'
-            elif uclass.is_instanceof('of_queue_prop'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_queue_prop_wire_object_id_get'
-            elif uclass.is_instanceof('of_table_feature_prop'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_table_feature_prop_wire_object_id_get'
-            elif uclass.is_instanceof('of_meter_band'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_meter_band_wire_object_id_get'
-            elif uclass.is_instanceof('of_hello_elem'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_hello_elem_wire_object_id_get'
-            elif uclass.is_instanceof('of_bsn_tlv'):
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_get = 'of_bsn_tlv_wire_object_id_get'
-            elif uclass.is_oxm:
-                wire_length_get = 'of_oxm_wire_length_get'
-                wire_type_get = 'of_oxm_wire_object_id_get'
-            elif uclass.name == "of_packet_queue":
-                wire_length_get = 'of_packet_queue_wire_length_get'
-                wire_length_set = 'of_packet_queue_wire_length_set'
-            elif uclass.name == "of_meter_stats":
-                wire_length_get = 'of_meter_stats_wire_length_get'
-                wire_length_set = 'of_meter_stats_wire_length_set'
-            elif uclass.name in ["of_group_desc_stats_entry", "of_group_stats_entry",
-                   "of_flow_stats_entry", "of_bucket", "of_table_features",
-                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
-                   "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
-                   "of_bsn_gentable_desc_stats_entry"]:
-                wire_length_get = "of_u16_len_wire_length_get"
-                wire_length_set = "of_u16_len_wire_length_set"
-            elif uclass.name == 'of_match_v3':
-                wire_length_set = 'of_tlv16_wire_length_set'
-                wire_length_get = 'of_tlv16_wire_length_get'
-                wire_type_set = 'of_match_v3_push_wire_types'
-
-            class_metadata.append(ClassMetadata(
-                name=uclass.name,
-                wire_length_get=wire_length_get,
-                wire_length_set=wire_length_set,
-                wire_type_get=wire_type_get,
-                wire_type_set=wire_type_set))
-
-        class_metadata.extend([
-            ClassMetadata(
-                name="of_action_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_action_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_action_id_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_action_id_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_bsn_vport_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_bsn_vport_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_instruction_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_instruction_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_instruction_id_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_instruction_id_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_queue_prop_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_queue_prop_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_table_feature_prop_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_table_feature_prop_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_meter_band_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_meter_band_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_hello_elem_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_hello_elem_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_bsn_tlv_header",
-                wire_length_set='of_tlv16_wire_length_set',
-                wire_length_get='of_tlv16_wire_length_get',
-                wire_type_get='of_bsn_tlv_wire_object_id_get',
-                wire_type_set='NULL'),
-            ClassMetadata(
-                name="of_oxm_header",
-                wire_length_set='NULL',
-                wire_length_get='of_oxm_wire_length_get',
-                wire_type_get='of_oxm_wire_object_id_get',
-                wire_type_set='NULL'),
-        ])
-
         util.render_template(out, "loci_class_metadata.c", class_metadata=class_metadata)

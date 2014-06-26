@@ -37,9 +37,6 @@
 #include <loci/loci.h>
 #include <loci/of_message.h>
 
-#define OF_INSTRUCTION_EXPERIMENTER_ID_OFFSET 4
-#define OF_INSTRUCTION_EXPERIMENTER_SUBTYPE_OFFSET 8
-
 ${legacy_code}
 
 /****************************************************************
@@ -307,54 +304,4 @@ of_meter_stats_wire_length_set(of_object_t *obj, int bytes)
 
     of_wire_buffer_u16_set(wbuf, 
         OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_METER_STATS_LENGTH_OFFSET), bytes);
-}
-
-int
-of_experimenter_stats_request_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
-{
-    switch (experimenter) {
-    case OF_EXPERIMENTER_ID_BSN:
-        switch (subtype) {
-        case 1: return OF_BSN_LACP_STATS_REQUEST;
-        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REQUEST;
-        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REQUEST;
-        case 4: return OF_BSN_GENTABLE_DESC_STATS_REQUEST;
-        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REQUEST;
-        case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REQUEST;
-        case 7: return OF_BSN_GENTABLE_STATS_REQUEST;
-        case 8: return OF_BSN_PORT_COUNTER_STATS_REQUEST;
-        case 9: return OF_BSN_VLAN_COUNTER_STATS_REQUEST;
-        case 10: return OF_BSN_FLOW_CHECKSUM_BUCKET_STATS_REQUEST;
-        case 11: return OF_BSN_TABLE_CHECKSUM_STATS_REQUEST;
-        case 12: return OF_BSN_DEBUG_COUNTER_STATS_REQUEST;
-        case 13: return OF_BSN_DEBUG_COUNTER_DESC_STATS_REQUEST;
-        case 14: return OF_BSN_IMAGE_DESC_STATS_REQUEST;
-        }
-    }
-    return OF_OBJECT_INVALID;
-}
-
-int
-of_experimenter_stats_reply_to_object_id(uint32_t experimenter, uint32_t subtype, int ver)
-{
-    switch (experimenter) {
-    case OF_EXPERIMENTER_ID_BSN:
-        switch (subtype) {
-        case 1: return OF_BSN_LACP_STATS_REPLY;
-        case 2: return OF_BSN_GENTABLE_ENTRY_DESC_STATS_REPLY;
-        case 3: return OF_BSN_GENTABLE_ENTRY_STATS_REPLY;
-        case 4: return OF_BSN_GENTABLE_DESC_STATS_REPLY;
-        case 5: return OF_BSN_GENTABLE_BUCKET_STATS_REPLY;
-        case 6: return OF_BSN_SWITCH_PIPELINE_STATS_REPLY;
-        case 7: return OF_BSN_GENTABLE_STATS_REPLY;
-        case 8: return OF_BSN_PORT_COUNTER_STATS_REPLY;
-        case 9: return OF_BSN_VLAN_COUNTER_STATS_REPLY;
-        case 10: return OF_BSN_FLOW_CHECKSUM_BUCKET_STATS_REPLY;
-        case 11: return OF_BSN_TABLE_CHECKSUM_STATS_REPLY;
-        case 12: return OF_BSN_DEBUG_COUNTER_STATS_REPLY;
-        case 13: return OF_BSN_DEBUG_COUNTER_DESC_STATS_REPLY;
-        case 14: return OF_BSN_IMAGE_DESC_STATS_REPLY;
-        }
-    }
-    return OF_OBJECT_INVALID;
 }

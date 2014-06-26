@@ -455,7 +455,7 @@ of_list_first(of_object_t *parent, of_object_t *child)
         return OF_ERROR_RANGE;
     }
 
-    object_child_attach(parent, child, 0, 0);
+    of_object_attach(parent, child, 0, child->length);
 
     return OF_ERROR_NONE;
 }
@@ -508,7 +508,7 @@ of_list_next(of_object_t *parent, of_object_t *child)
     /* Offset is relative to parent start */
     offset = (child->obj_offset - parent->obj_offset) +
         child->length;
-    object_child_attach(parent, child, offset, 0);
+    of_object_attach(parent, child, offset, child->length);
 
     return OF_ERROR_NONE;
 }
