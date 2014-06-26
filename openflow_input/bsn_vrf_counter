@@ -31,7 +31,7 @@
 #version 4
 
 enum ofp_bsn_vrf_counter_constants {
-    OFP_BSN_VRF_ALL = 0xffff,
+    OFP_BSN_VRF_ALL = 0xffffffff,
 };
 
 enum of_bsn_vrf_counter_t(wire_type=uint8_t, complete=False) {
