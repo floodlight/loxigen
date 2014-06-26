@@ -46,5 +46,7 @@ test_ext_objs(void)
     TEST_ASSERT(obj != NULL);
     TEST_ASSERT(obj->object_id == OF_ACTION_BSN_MIRROR);
 
+    of_object_delete(obj);
+
     return TEST_PASS;
 }

@@ -132,4 +132,22 @@ struct of_object_storage_s {
     of_wire_buffer_t wbuf;
 };
 
+/**
+ * Connect a child to a parent at the wire buffer level
+ *
+ * @param parent The top level object to bind to
+ * @param child The sub-object connecting to the parent
+ * @param offset The offset at which to attach the child RELATIVE
+ * TO THE PARENT in the buffer
+ * @param bytes The amount of the buffer dedicated to the child
+ */
+static inline void
+of_object_attach(of_object_t *parent, of_object_t *child, int offset, int length)
+{
+    child->parent = parent;
+    child->wbuf = parent->wbuf;
+    child->obj_offset = parent->obj_offset + offset;
+    child->length = length;
+}
+
 #endif /* _OF_OBJECT_H_ */

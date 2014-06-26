@@ -48,6 +48,8 @@ enum ofp_bsn_vport_l2gre_flags(wire_type=uint32_t, bitmask=True) {
     /* DSCP flags are mutually exclusive */
     OF_BSN_VPORT_L2GRE_DSCP_ASSIGN = 0x2,
     OF_BSN_VPORT_L2GRE_DSCP_COPY = 0x4,
+
+    OF_BSN_VPORT_L2GRE_LOOPBACK_IS_VALID = 0x8,
 };
 
 // BSN Virtual port object header
@@ -79,16 +81,17 @@ struct of_bsn_vport_l2gre : of_bsn_vport {
     uint16_t type == 1;
     uint16_t length;
     enum ofp_bsn_vport_l2gre_flags flags;
-    of_port_no_t port_no;       /* OF port number of parent */
-    of_mac_addr_t local_mac;    /* Local MAC */
-    of_mac_addr_t nh_mac;       /* Next Hop MAC */
-    of_ipv4_t src_ip;           /* Source IP */
-    of_ipv4_t dst_ip;           /* Destination IP */
+    of_port_no_t port_no;           /* OF port number of parent */
+    of_port_no_t loopback_port_no;  /* OF port number of loopback */
+    of_mac_addr_t local_mac;        /* Local MAC */
+    of_mac_addr_t nh_mac;           /* Next Hop MAC */
+    of_ipv4_t src_ip;               /* Source IP */
+    of_ipv4_t dst_ip;               /* Destination IP */
     uint8_t dscp;
     uint8_t ttl;
     pad(2);
-    uint32_t vpn;               /* VPN ID (for GRE Key) */
-    of_port_name_t if_name;     /* Virtual Interface Name */
+    uint32_t vpn;                   /* VPN ID (for GRE Key) */
+    of_port_name_t if_name;         /* Virtual Interface Name */
 };
 
 

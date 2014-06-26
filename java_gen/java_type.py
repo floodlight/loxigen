@@ -681,6 +681,7 @@ exceptions = {
         'of_bucket' : { 'watch_group': of_group },
 
         'of_bsn_tlv_vlan_vid' : { 'value' : vlan_vid },
+        'of_bsn_table_set_buckets_size' : { 'table_id' : table_id },
         'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},

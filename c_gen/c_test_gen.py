@@ -1027,6 +1027,9 @@ test_match_3(void)
     of_match_t match2;
     int value = 1;
     of_octets_t octets;
+    of_object_storage_t storage;
+    memset(&storage, 0, sizeof(storage));
+    storage.obj.wbuf = &storage.wbuf;
 """)
     for version in of_g.of_version_range:
         out.write("""
@@ -1034,7 +1037,10 @@ test_match_3(void)
     TEST_ASSERT((value = of_match_populate(&match1, %(v_name)s, value)) > 0);
     TEST_ASSERT(of_match_serialize(%(v_name)s, &match1, &octets) ==
         OF_ERROR_NONE);
-    TEST_ASSERT(of_match_deserialize(%(v_name)s, &match2, &octets) ==
+    storage.obj.wbuf->buf = octets.data;
+    storage.obj.wbuf->alloc_bytes = octets.bytes;
+    storage.obj.wbuf->current_bytes = octets.bytes;
+    TEST_ASSERT(of_match_deserialize(%(v_name)s, &match2, &storage.obj, 0, octets.bytes) ==
         OF_ERROR_NONE);
     TEST_ASSERT(memcmp(&match1, &match2, sizeof(match1)) == 0);
     FREE(octets.data);
@@ -1084,6 +1090,7 @@ test_%(cls)s_create_%(v_name)s(void)
     uint8_t *msg_buf;
     int value;
     of_object_id_t object_id;
+    int len;
 
     obj = %(cls)s_new(%(v_name)s);
     TEST_ASSERT(obj != NULL);
@@ -1099,11 +1106,13 @@ test_%(cls)s_create_%(v_name)s(void)
     value = %(cls)s_%(v_name)s_populate_scalars(obj, 1);
     TEST_ASSERT(value != 0);
 
+    len = obj->length;
+
     /* Grab the underlying buffer from the message */
     of_object_wire_buffer_steal((of_object_t *)obj, &msg_buf);
     TEST_ASSERT(msg_buf != NULL);
     %(cls)s_delete(obj);
-    obj = %(cls)s_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf));
+    obj = of_object_new_from_message(OF_BUFFER_TO_MESSAGE(msg_buf), len);
 
     TEST_ASSERT(obj != NULL);
 

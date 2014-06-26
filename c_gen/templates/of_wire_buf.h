@@ -119,12 +119,6 @@ typedef struct of_wire_buffer_s {
 #define OF_OBJECT_TO_WBUF(obj) ((obj)->wbuf)
 
 
-
-/**
- * Minimum allocation size for wire buffer object
- */
-#define OF_WIRE_BUFFER_MIN_ALLOC_BYTES 128
-
 /**
  * Allocate a wire buffer object and the underlying data buffer.
  * The wire buffer is initally empty (current_bytes == 0).
@@ -141,10 +135,6 @@ of_wire_buffer_new(int a_bytes)
         return NULL;
     }
     MEMSET(wbuf, 0, sizeof(of_wire_buffer_t));
-
-    if (a_bytes < OF_WIRE_BUFFER_MIN_ALLOC_BYTES) {
-        a_bytes = OF_WIRE_BUFFER_MIN_ALLOC_BYTES;
-    }
 
     if ((wbuf->buf = (uint8_t *)MALLOC(a_bytes)) == NULL) {
         FREE(wbuf);
