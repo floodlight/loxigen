@@ -3,6 +3,8 @@ package org.projectfloodlight.openflow.types;
 import java.math.BigInteger;
 import java.util.Arrays;
 
+import com.google.common.base.Preconditions;
+
 public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
     public final static IPv6AddressWithMask NONE = of(IPv6Address.NONE, IPv6Address.NONE);
 
@@ -16,20 +18,15 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
     }
 
     public static IPv6AddressWithMask of(IPv6Address value, IPv6Address mask) {
-        if (value == null) {
-            throw new NullPointerException("Value must not be null");
-        }
-        if (mask == null) {
-            throw new NullPointerException("Mask must not be null");
-        }
+        Preconditions.checkNotNull(value, "value must not be null");
+        Preconditions.checkNotNull(mask, "mask must not be null");
         return new IPv6AddressWithMask(value, mask);
     }
 
 
     public static IPv6AddressWithMask of(final String string) {
-        if (string == null) {
-            throw new NullPointerException("String must not be null");
-        }
+        Preconditions.checkNotNull(string, "string must not be null");
+
         int slashPos;
         String ip = string;
         int maskBits = 128;
@@ -88,5 +85,15 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         }
     }
 
+    @Override
+    public boolean contains(IPAddress<?> ip) {
+        Preconditions.checkNotNull(ip, "ip must not be null");
 
+        if(ip.getIpVersion() == IPVersion.IPv6) {
+            IPv6Address ipv6 = (IPv6Address) ip;
+            return this.matches(ipv6);
+        }
+
+        return false;
+    }
 }

@@ -6,6 +6,7 @@ import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
+import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
@@ -78,19 +79,17 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     @Override
     public IPv4Address and(IPv4Address other) {
-        if (other == null) {
-            throw new NullPointerException("Other IP Address must not be null");
-        }
-        IPv4Address otherIp = (IPv4Address) other;
+        Preconditions.checkNotNull(other, "other must not be null");
+
+        IPv4Address otherIp = other;
         return IPv4Address.of(rawValue & otherIp.rawValue);
     }
 
     @Override
     public IPv4Address or(IPv4Address other) {
-        if (other == null) {
-            throw new NullPointerException("Other IP Address must not be null");
-        }
-        IPv4Address otherIp = (IPv4Address) other;
+        Preconditions.checkNotNull(other, "other must not be null");
+
+        IPv4Address otherIp = other;
         return IPv4Address.of(rawValue | otherIp.rawValue);
     }
 
@@ -100,9 +99,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     public static IPv4Address of(final byte[] address) {
-        if (address == null) {
-            throw new NullPointerException("Address must not be null");
-        }
+        Preconditions.checkNotNull(address, "address must not be null");
+
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv4Address address: " + address.length);
@@ -135,9 +133,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
      */
     @Nonnull
     public static IPv4Address of(@Nonnull final String string) throws IllegalArgumentException {
-        if (string == null) {
-            throw new NullPointerException("String must not be null");
-        }
+        Preconditions.checkNotNull(string, "string must not be null");
+
         int start = 0;
         int shift = 24;
 

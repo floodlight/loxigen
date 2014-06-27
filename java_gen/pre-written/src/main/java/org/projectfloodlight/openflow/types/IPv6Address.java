@@ -8,6 +8,7 @@ import javax.annotation.Nonnull;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
+import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -102,19 +103,17 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
     @Override
     public IPv6Address and(IPv6Address other) {
-        if (other == null) {
-            throw new NullPointerException("Other IP Address must not be null");
-        }
-        IPv6Address otherIp = (IPv6Address) other;
+        Preconditions.checkNotNull(other, "other must not be null");
+
+        IPv6Address otherIp = other;
         return IPv6Address.of((raw1 & otherIp.raw1), (raw2 & otherIp.raw2));
     }
 
     @Override
     public IPv6Address or(IPv6Address other) {
-        if (other == null) {
-            throw new NullPointerException("Other IP Address must not be null");
-        }
-        IPv6Address otherIp = (IPv6Address) other;
+        Preconditions.checkNotNull(other, "other must not be null");
+
+        IPv6Address otherIp = other;
         return IPv6Address.of((raw1 | otherIp.raw1), (raw2 | otherIp.raw2));
     }
 
@@ -124,9 +123,8 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     }
 
     public static IPv6Address of(final byte[] address) {
-        if (address == null) {
-            throw new NullPointerException("Address must not be null");
-        }
+        Preconditions.checkNotNull(address, "address must not be null");
+
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv6 address: " + address.length);
@@ -187,9 +185,8 @@ public class IPv6Address extends IPAddress<IPv6Address> {
      */
     @Nonnull
     public static IPv6Address of(@Nonnull final String string) throws IllegalArgumentException {
-        if (string == null) {
-            throw new NullPointerException("String must not be null");
-        }
+        Preconditions.checkNotNull(string, "string must not be null");
+
         IPv6Builder builder = new IPv6Builder();
         String[] parts = colonPattern.split(string, -1);
 
