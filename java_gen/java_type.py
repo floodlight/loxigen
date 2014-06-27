@@ -506,6 +506,13 @@ udf = JType("UDF") \
 error_cause_data = JType("OFErrorCauseData") \
          .op(version=ANY, read="OFErrorCauseData.read(bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)", default="OFErrorCauseData.NONE");
 
+var_string = JType('String').op(
+              read='ChannelUtils.readFixedLengthString(bb, $length)',
+              write='ChannelUtils.writeFixedLengthString(bb, $name, $name.length())',
+              default='""',
+              funnel='sink.putUnencodedChars($name)'
+            )
+
 generic_t = JType("T")
 
 
@@ -683,6 +690,7 @@ exceptions = {
         'of_bsn_tlv_vlan_vid' : { 'value' : vlan_vid },
         'of_bsn_table_set_buckets_size' : { 'table_id' : table_id },
         'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
+        'of_bsn_log': { 'data': var_string },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
 }
