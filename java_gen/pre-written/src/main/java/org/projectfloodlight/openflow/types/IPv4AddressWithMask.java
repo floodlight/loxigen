@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import com.google.common.base.Preconditions;
+
 
 public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     public final static IPv4AddressWithMask NONE = of(IPv4Address.NONE, IPv4Address.NONE);
@@ -22,19 +24,15 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     }
 
     public static IPv4AddressWithMask of(IPv4Address value, IPv4Address mask) {
-        if (value == null) {
-            throw new NullPointerException("Value must not be null");
-        }
-        if (mask == null) {
-            throw new NullPointerException("Mask must not be null");
-        }
+        Preconditions.checkNotNull(value, "value must not be null");
+        Preconditions.checkNotNull(mask, "mask must not be null");
+
         return new IPv4AddressWithMask(value, mask);
     }
 
     public static IPv4AddressWithMask of(final String string) {
-        if (string == null) {
-            throw new NullPointerException("String must not be null");
-        }
+        Preconditions.checkNotNull(string, "string must not be null");
+
         int slashPos;
         String ip = string;
         int maskBits = 32;
@@ -81,4 +79,15 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
         }
     }
 
+    @Override
+    public boolean contains(IPAddress<?> ip) {
+        Preconditions.checkNotNull(ip, "ip must not be null");
+
+        if(ip.getIpVersion() == IPVersion.IPv4) {
+            IPv4Address ipv4 = (IPv4Address) ip;
+            return this.matches(ipv4);
+        }
+
+        return false;
+    }
 }
