@@ -45,4 +45,58 @@ public interface HashValue<H extends HashValue<H>> {
 
     /** xor this value with another value value of the same type */
     H xor(H other);
+
+    /** create and return a builder */
+    Builder<H> builder();
+
+    /** a mutator for HashValues. Allows perfomring a series of
+     *  operations on a hashv value without the associated cost of object
+     *  reallocation.
+     *
+     * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+     *
+     * @param <H> - the hashvalue
+     */
+    public interface Builder<H> {
+        /** perform an arithmetic addition of this value and other. Wraps around on
+         * overflow of the defined word size.
+         *
+         * @param other
+         * @return this mutator
+         */
+        Builder<H> add(H other);
+
+        /**
+         * arithmetically substract the given 'other' value from the value stored in this mutator.
+         * around on overflow.
+         *
+         * @param other
+         * @return this mutator
+         */
+        Builder<H> subtract(H other);
+
+        /** bitwise invert the value stored in this mutator
+         *
+         * @return this mutator
+         */
+        Builder<H> invert();
+
+        /** or the value stored in this mutator with another value value of the same type
+        * @return this mutator
+        */
+        Builder<H> or(H other);
+
+        /** and the value stored in this mutator with another value value of the same type
+        * @return this mutator
+        */
+        Builder<H> and(H other);
+
+        /** xor the value stored in this mutator with another value value of the same type
+        * @return this mutator
+        */
+        Builder<H> xor(H other);
+
+        /** @return the hash value */
+        public H build();
+    }
 }

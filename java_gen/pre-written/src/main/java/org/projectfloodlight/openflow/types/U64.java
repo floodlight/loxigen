@@ -179,4 +179,59 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
         }
     }
 
+    @Override
+    public HashValue.Builder<U64> builder() {
+        return new U64Builder(raw);
+    }
+
+    static class U64Builder implements Builder<U64> {
+        long raw;
+
+        public U64Builder(long raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public Builder<U64> add(U64 other) {
+            raw += other.raw;
+            return this;
+        }
+
+        @Override
+        public Builder<U64> subtract(
+                U64 other) {
+            raw -= other.raw;
+            return this;
+        }
+
+        @Override
+        public Builder<U64> invert() {
+            raw = ~raw;
+            return this;
+        }
+
+        @Override
+        public Builder<U64> or(U64 other) {
+            raw |= other.raw;
+            return this;
+        }
+
+        @Override
+        public Builder<U64> and(U64 other) {
+            raw &= other.raw;
+            return this;
+        }
+
+        @Override
+        public Builder<U64> xor(U64 other) {
+            raw ^= other.raw;
+            return this;
+        }
+
+        @Override
+        public U64 build() {
+            return U64.of(raw);
+        }
+    }
+
 }

@@ -11,9 +11,12 @@ import static org.junit.Assert.fail;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class U64Test {
+
+    private Triple[] triples;
 
     @Test
     public void testPositiveRaws() {
@@ -106,8 +109,8 @@ public class U64Test {
         }
     }
 
-    @Test
-    public void testAddSubtract() {
+    @Before
+    public void setup() {
         U64 u0 = U64.of(0);
         U64 u1 = U64.of(1);
 
@@ -117,7 +120,7 @@ public class U64Test {
 
         U64 uf = U64.of(-1L);
 
-        Triple[] triples = new Triple[] {
+        triples = new Triple[] {
               Triple.of(u0, u0, u0),
               Triple.of(u0, u1, u1),
 
@@ -134,13 +137,27 @@ public class U64Test {
                         U64.of(0xedcb_a987_6543_210fL),
                         U64.ZERO)
         };
+    }
 
+    @Test
+    public void testAddSubtract() {
         for(Triple t: triples) {
             assertThat(t.msg("{0} + {1} = {2}"), t.a.add(t.b), equalTo(t.c));
             assertThat(t.msg("{1} + {0} = {2}"), t.b.add(t.a), equalTo(t.c));
 
             assertThat(t.msg("{2} - {0} = {1}"), t.c.subtract(t.a), equalTo(t.b));
             assertThat(t.msg("{2} - {1} = {0}"), t.c.subtract(t.b), equalTo(t.a));
+        }
+    }
+
+    @Test
+    public void testAddSubtractBuilder() {
+        for(Triple t: triples) {
+            assertThat(t.msg("{0} + {1} = {2}"), t.a.builder().add(t.b).build(), equalTo(t.c));
+            assertThat(t.msg("{1} + {0} = {2}"), t.b.builder().add(t.a).build(), equalTo(t.c));
+
+            assertThat(t.msg("{2} - {0} = {1}"), t.c.builder().subtract(t.a).build(), equalTo(t.b));
+            assertThat(t.msg("{2} - {1} = {0}"), t.c.builder().subtract(t.b).build(), equalTo(t.a));
         }
     }
 
@@ -154,4 +171,25 @@ public class U64Test {
         }
     }
 
+    @Test
+    public void testBitwiseOperators() {
+        U64 notPi = U64.of(0x3141_5926_5358_9793L);
+        U64 notE =  U64.of(0x2718_2818_8459_4523L);
+
+        assertThat(notPi.inverse(), equalTo(U64.of(0xcebe_a6d9_aca7_686cL)));
+        assertThat(notPi.and(notE), equalTo(U64.of(0x2100_0800_0058_0503L)));
+        assertThat(notPi.or(notE),  equalTo(U64.of(0x3759_793e_d759_d7b3L)));
+        assertThat(notPi.xor(notE), equalTo(U64.of(0x1659_713e_d701_d2b0L)));
+    }
+
+    @Test
+    public void testBitwiseOperatorsBuilder() {
+        U64 notPi = U64.of(0x3141_5926_5358_9793L);
+        U64 notE =  U64.of(0x2718_2818_8459_4523L);
+
+        assertThat(notPi.builder().invert().build(), equalTo(U64.of(0xcebe_a6d9_aca7_686cL)));
+        assertThat(notPi.builder().and(notE).build(), equalTo(U64.of(0x2100_0800_0058_0503L)));
+        assertThat(notPi.builder().or(notE).build(),  equalTo(U64.of(0x3759_793e_d759_d7b3L)));
+        assertThat(notPi.builder().xor(notE).build(), equalTo(U64.of(0x1659_713e_d701_d2b0L)));
+    }
 }

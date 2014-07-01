@@ -14,6 +14,7 @@ import java.text.MessageFormat;
 import org.hamcrest.Matchers;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.hash.HashCode;
@@ -21,6 +22,9 @@ import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 
 public class U128Test {
+    private Triple[] triples;
+
+
     @Test
     public void testPositiveRaws() {
         assertThat(U128.of(0, 0).getMsb(), equalTo(0L));
@@ -161,8 +165,8 @@ public class U128Test {
         }
     }
 
-    @Test
-    public void testAddSubtract() {
+    @Before
+    public void setup() {
         U128 u0_0 = U128.of(0, 0);
         U128 u0_1 = U128.of(0, 1);
         U128 u1_0 = U128.of(1, 0);
@@ -174,7 +178,7 @@ public class U128Test {
         U128 u0_f = U128.of(0, -1L);
         U128 uf_0 = U128.of(-1L, 0);
 
-        Triple[] triples = new Triple[] {
+        triples = new Triple[] {
               Triple.of(u0_0, u0_0, u0_0),
               Triple.of(u0_0, u0_1, u0_1),
               Triple.of(u0_0, u1_0, u1_0),
@@ -194,13 +198,27 @@ public class U128Test {
                         U128.of(0xedcb_a987_6543_210eL, 0xedcb_a987_6543_210fL),
                         U128.ZERO)
         };
+    }
 
+    @Test
+    public void testAddSubtract() {
         for(Triple t: triples) {
             assertThat(t.msg("{0} + {1} = {2}"), t.a.add(t.b), equalTo(t.c));
             assertThat(t.msg("{1} + {0} = {2}"), t.b.add(t.a), equalTo(t.c));
 
             assertThat(t.msg("{2} - {0} = {1}"), t.c.subtract(t.a), equalTo(t.b));
             assertThat(t.msg("{2} - {1} = {0}"), t.c.subtract(t.b), equalTo(t.a));
+        }
+    }
+
+    @Test
+    public void testAddSubtractBuilder() {
+        for(Triple t: triples) {
+            assertThat(t.msg("{0} + {1} = {2}"), t.a.builder().add(t.b).build(), equalTo(t.c));
+            assertThat(t.msg("{1} + {0} = {2}"), t.b.builder().add(t.a).build(), equalTo(t.c));
+
+            assertThat(t.msg("{2} - {0} = {1}"), t.c.builder().subtract(t.a).build(), equalTo(t.b));
+            assertThat(t.msg("{2} - {1} = {0}"), t.c.builder().subtract(t.b).build(), equalTo(t.a));
         }
     }
 
@@ -240,6 +258,28 @@ public class U128Test {
                         u_greater.compareTo(u_base), Matchers.greaterThan(0));
             }
         }
+    }
+
+    @Test
+    public void testBitwiseOperators() {
+        U128 one =   U128.of(0x5, 0x8);
+        U128 two = U128.of(0x7, 0x3);
+
+        assertThat(one.inverse(), equalTo(U128.of(0xfffffffffffffffaL, 0xfffffffffffffff7L)));
+        assertThat(one.and(two), equalTo(U128.of(0x5L, 0x0L)));
+        assertThat(one.or(two), equalTo(U128.of(0x7L, 0xbL)));
+        assertThat(one.xor(two), equalTo(U128.of(0x2L, 0xbL)));
+    }
+
+    @Test
+    public void testBitwiseOperatorsBuilder() {
+        U128 one =   U128.of(0x5, 0x8);
+        U128 two = U128.of(0x7, 0x3);
+
+        assertThat(one.builder().invert().build(), equalTo(U128.of(0xfffffffffffffffaL, 0xfffffffffffffff7L)));
+        assertThat(one.builder().and(two).build(), equalTo(U128.of(0x5L, 0x0L)));
+        assertThat(one.builder().or(two).build(), equalTo(U128.of(0x7L, 0xbL)));
+        assertThat(one.builder().xor(two).build(), equalTo(U128.of(0x2L, 0xbL)));
     }
 
 }

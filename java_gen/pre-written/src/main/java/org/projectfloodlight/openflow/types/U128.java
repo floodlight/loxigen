@@ -147,4 +147,76 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
         return HashValueUtils.prefixBits(this.raw1, numBits);
     }
 
+    @Override
+    public HashValue.Builder<U128> builder() {
+        return new U128Builder(raw1, raw2);
+    }
+
+    static class U128Builder implements HashValue.Builder<U128> {
+        private long raw1, raw2;
+
+        public U128Builder(long raw1, long raw2) {
+            this.raw1 = raw1;
+            this.raw2 = raw2;
+        }
+
+        @Override
+        public Builder<U128> add(U128 other) {
+            raw2 += other.raw2;
+            raw1 += other.raw1;
+            if(UnsignedLongs.compare(raw2, other.raw2) < 0) {
+                // raw2 overflow
+                raw1+=1;
+            }
+            return this;
+        }
+
+        @Override
+        public Builder<U128> subtract(
+                U128 other) {
+            if(UnsignedLongs.compare(this.raw2, other.raw2) >= 0) {
+                raw2 -= other.raw2;
+                raw1 -= other.raw1;
+            } else {
+                // raw2 overflow
+                raw2 -= other.raw2;
+                raw1 = this.raw1 - other.raw1 - 1;
+            }
+            return this;
+        }
+
+        @Override
+        public Builder<U128> invert() {
+            raw1 = ~raw1;
+            raw2 = ~raw2;
+            return this;
+        }
+
+        @Override
+        public Builder<U128> or(U128 other) {
+            raw1 |= other.raw1;
+            raw2 |= other.raw2;
+            return this;
+        }
+
+        @Override
+        public Builder<U128> and(U128 other) {
+            raw1 &= other.raw1;
+            raw2 &= other.raw2;
+            return this;
+        }
+
+        @Override
+        public Builder<U128> xor(U128 other) {
+            raw1 ^= other.raw1;
+            raw2 ^= other.raw2;
+            return this;
+        }
+
+        @Override
+        public U128 build() {
+            return U128.of(raw1, raw2);
+        }
+    }
+
 }
