@@ -33,7 +33,7 @@
 // Retrieves the checksum for every bucket in a table. The entries are ordered
 // by bucket index.
 //
-// The checksum of a bucket is the XOR of the cookies of all entries in the
+// The checksum of a bucket is the sum of the cookies of all entries in the
 // bucket. Flows are bucketed based on a prefix of the cookie.
 struct of_bsn_flow_checksum_bucket_stats_request : of_bsn_stats_request {
     uint8_t version;
@@ -68,7 +68,7 @@ struct of_bsn_flow_checksum_bucket_stats_reply : of_bsn_stats_reply {
 
 // Retrieves the checksum for every table.
 //
-// The checksum of a table is the XOR of the cookies of all entries in the
+// The checksum of a table is the sum of the cookies of all entries in the
 // table.
 struct of_bsn_table_checksum_stats_request : of_bsn_stats_request {
     uint8_t version;

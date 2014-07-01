@@ -282,7 +282,7 @@ struct of_bsn_gentable_desc_stats_reply : of_bsn_stats_reply {
 // Retrieves stats for every table. This includes the total checksum, so the
 // controller can quickly check whether the whole table is in sync.
 //
-// The checksum of a table is the XOR of the checksums of all entries in the
+// The checksum of a table is the sum of the checksums of all entries in the
 // table.
 struct of_bsn_gentable_stats_request : of_bsn_stats_request {
     uint8_t version;
@@ -320,7 +320,7 @@ struct of_bsn_gentable_stats_reply : of_bsn_stats_reply {
 // Retrieves the checksum for every bucket in a table. The entries are ordered
 // by bucket index.
 //
-// The checksum of a bucket is the XOR of the checksums of all entries in the
+// The checksum of a bucket is the sum of the checksums of all entries in the
 // bucket.
 struct of_bsn_gentable_bucket_stats_request : of_bsn_stats_request {
     uint8_t version;
