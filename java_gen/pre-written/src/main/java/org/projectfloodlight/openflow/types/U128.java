@@ -123,15 +123,29 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     }
 
     @Override
+    public U128 add(U128 other) {
+        long newRaw2 = this.raw2 + other.raw2;
+        long newRaw1 = this.raw1 + other.raw1;
+        if (UnsignedLongs.compare(newRaw2, this.raw2) < 0 ||
+            UnsignedLongs.compare(newRaw2, other.raw2) < 0) {
+            // raw2 overflow
+            newRaw1+=1;
+        }
+        return U128.of(newRaw1, newRaw2);
+    }
+
+    @Override
+    public U128 subtract(U128 other) {
+        long newRaw2 = this.raw2 - other.raw2;
+        long newRaw1 = this.raw1 - other.raw1;
+        if (UnsignedLongs.compare(this.raw2, other.raw2) < 0) {
+            newRaw1 -= 1;
+        }
+        return U128.of(newRaw1, newRaw2);
+    }
+    @Override
     public int prefixBits(int numBits) {
         return HashValueUtils.prefixBits(this.raw1, numBits);
     }
 
-    @Override
-    public U128 combineWithValue(U128 value, int keyBits) {
-        return U128.of(
-                HashValueUtils.combineWithValue(this.raw1, value.raw1, Math.min(64, keyBits)),
-                HashValueUtils.combineWithValue(this.raw2, value.raw2, Math.max(0,keyBits-64))
-        );
-    }
 }

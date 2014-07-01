@@ -151,6 +151,16 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
         return U64.of(raw ^ other.raw);
     }
 
+    @Override
+    public U64 add(U64 other) {
+        return U64.of(this.raw + other.raw);
+    }
+
+    @Override
+    public U64 subtract(U64 other) {
+        return U64.of(this.raw - other.raw);
+    }
+
     /** return the "numBits" highest-order bits of the hash.
      *  @param numBits number of higest-order bits to return [0-32].
      *  @return a numberic value of the 0-32 highest-order bits.
@@ -158,11 +168,6 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     @Override
     public int prefixBits(int numBits) {
         return HashValueUtils.prefixBits(raw, numBits);
-    }
-
-    @Override
-    public U64 combineWithValue(U64 value, int keyBits) {
-        return U64.of(HashValueUtils.combineWithValue(this.raw, value.raw, keyBits));
     }
 
     public final static Reader READER = new Reader();
@@ -173,6 +178,5 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
             return U64.ofRaw(bb.readLong());
         }
     }
-
 
 }

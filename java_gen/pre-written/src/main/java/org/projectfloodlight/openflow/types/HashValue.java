@@ -17,6 +17,23 @@ public interface HashValue<H extends HashValue<H>> {
      */
     int prefixBits(int numBits);
 
+    /** perform an arithmetic addition of this value and other. Wraps around on
+     * overflow of the defined word size.
+     *
+     * @param other
+     * @return this + other
+     */
+    H add(H other);
+
+    /**
+     * arithmetically substract the given 'other' value from this value.
+     * around on overflow.
+     *
+     * @param other
+     * @return this - other
+     */
+    H subtract(H other);
+
     /** @return the bitwise inverse of this value */
     H inverse();
 
@@ -28,27 +45,4 @@ public interface HashValue<H extends HashValue<H>> {
 
     /** xor this value with another value value of the same type */
     H xor(H other);
-
-    /** calculate a combined hash value of this hash value (the <b>Key</b>) and the hash value
-     *  specified as a parameter (the <b>Value</b>).
-     *  <p>
-     *  The value is constructed as follows:
-     *  <ul>
-     *   <li>the first keyBits bits are taken only from the Key
-     *   <li>the other bits are taken from key xor value.
-     *  </ul>
-     *  The overall result looks like this:
-     *  <pre>
-     *  MSB                      LSB
-     *   +---------+--------------+
-     *   | key     | key ^ value  |
-     *   +---------+--------------+
-     *   |-keyBits-|
-     *  </pre>
-     *
-     * @param value - hash value to be compared with this value (the key)
-     * @param keyBits number of prefix bits that are just taken from key
-     * @return the combined value.
-     */
-    H combineWithValue(H value, int keyBits);
 }

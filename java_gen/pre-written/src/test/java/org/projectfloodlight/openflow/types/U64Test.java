@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.math.BigInteger;
+import java.text.MessageFormat;
 
 import org.junit.Test;
 
@@ -24,10 +25,10 @@ public class U64Test {
 
     @Test
     public void testNegativeRaws() {
-        long minus_1 = 0xFFFF_FFFF_FFFF_FFFFL;
-        assertEquals(minus_1, U64.ofRaw(minus_1).getValue());
-        assertEquals(new BigInteger("FFFF_FFFF_FFFF_FFFF".replace("_", ""), 16),  U64.ofRaw(minus_1).getBigInteger());
-        assertEquals(new BigInteger("18446744073709551615"),  U64.ofRaw(minus_1).getBigInteger());
+        long minu1 = 0xFFFF_FFFF_FFFF_FFFFL;
+        assertEquals(minu1, U64.ofRaw(minu1).getValue());
+        assertEquals(new BigInteger("FFFF_FFFF_FFFF_FFFF".replace("_", ""), 16),  U64.ofRaw(minu1).getBigInteger());
+        assertEquals(new BigInteger("18446744073709551615"),  U64.ofRaw(minu1).getBigInteger());
     }
 
     @Test
@@ -62,24 +63,6 @@ public class U64Test {
     }
 
     @Test
-    public void testCombine() {
-        long key = 0x1234567890abcdefL;
-        long val = 0xdeafbeefdeadbeefL;
-        U64 hkey = U64.of(key);
-        U64 hVal = U64.of(val);
-
-        assertThat(hkey.combineWithValue(hVal, 0), equalTo(hkey.xor(hVal)));
-        assertThat(hkey.combineWithValue(hVal, 64), equalTo(hkey));
-        long mask32 = 0x00000000FFFFFFFFL;
-        assertThat(hkey.combineWithValue(hVal, 32),
-                equalTo(U64.of(key & ~mask32| (key ^ val) & mask32)));
-
-        long tenMask = 0x003FFFFFFFFFFFFFL;
-        assertThat(hkey.combineWithValue(hVal, 10),
-                equalTo(U64.of(key & ~tenMask | (key ^ val) & tenMask)));
-    }
-
-    @Test
     public void testKeyBits() {
         U64 zeroU = U64.of(0);
         assertThat(zeroU.prefixBits(0), equalTo(0));
@@ -103,6 +86,62 @@ public class U64Test {
         assertThat(signedBitU.prefixBits(32), equalTo(0x8765_4321));
         checkInvalidKeyBitSize(signedBitU, 33);
         checkInvalidKeyBitSize(signedBitU, 64);
+    }
+
+    public static class Triple {
+        U64 a, b, c;
+
+        public Triple(U64 a, U64 b, U64 c) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+
+        public static Triple of(U64 a, U64 b, U64 c) {
+            return new Triple(a, b, c);
+        }
+
+        public String msg(String string) {
+            return MessageFormat.format(string, a,b,c);
+        }
+    }
+
+    @Test
+    public void testAddSubtract() {
+        U64 u0 = U64.of(0);
+        U64 u1 = U64.of(1);
+
+        U64 u2 = U64.of(2);
+        U64 u7f = U64.of(0x7fff_ffff_ffff_ffffL);
+        U64 u8 = U64.of(0x8000_0000_0000_0000L);
+
+        U64 uf = U64.of(-1L);
+
+        Triple[] triples = new Triple[] {
+              Triple.of(u0, u0, u0),
+              Triple.of(u0, u1, u1),
+
+              Triple.of(u1, u1, u2),
+
+              Triple.of(u1, uf, u0),
+
+              Triple.of(uf, uf, U64.of(0xffff_ffff_ffff_fffeL)),
+              Triple.of(u0, uf, uf),
+
+              Triple.of(u7f, u1, u8),
+
+              Triple.of(U64.of(0x1234_5678_9abc_def1L),
+                        U64.of(0xedcb_a987_6543_210fL),
+                        U64.ZERO)
+        };
+
+        for(Triple t: triples) {
+            assertThat(t.msg("{0} + {1} = {2}"), t.a.add(t.b), equalTo(t.c));
+            assertThat(t.msg("{1} + {0} = {2}"), t.b.add(t.a), equalTo(t.c));
+
+            assertThat(t.msg("{2} - {0} = {1}"), t.c.subtract(t.a), equalTo(t.b));
+            assertThat(t.msg("{2} - {1} = {0}"), t.c.subtract(t.b), equalTo(t.a));
+        }
     }
 
     private void

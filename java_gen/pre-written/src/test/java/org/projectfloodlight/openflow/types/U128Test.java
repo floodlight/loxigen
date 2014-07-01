@@ -9,6 +9,8 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.text.MessageFormat;
+
 import org.hamcrest.Matchers;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
@@ -141,6 +143,66 @@ public class U128Test {
         }
     }
 
+    public static class Triple {
+        U128 a, b, c;
+
+        public Triple(U128 a, U128 b, U128 c) {
+            this.a = a;
+            this.b = b;
+            this.c = c;
+        }
+
+        public static Triple of(U128 a, U128 b, U128 c) {
+            return new Triple(a, b, c);
+        }
+
+        public String msg(String string) {
+            return MessageFormat.format(string, a,b,c);
+        }
+    }
+
+    @Test
+    public void testAddSubtract() {
+        U128 u0_0 = U128.of(0, 0);
+        U128 u0_1 = U128.of(0, 1);
+        U128 u1_0 = U128.of(1, 0);
+        U128 u1_1 = U128.of(1, 1);
+
+        U128 u0_2 = U128.of(0, 2);
+        U128 u2_0 = U128.of(2, 0);
+
+        U128 u0_f = U128.of(0, -1L);
+        U128 uf_0 = U128.of(-1L, 0);
+
+        Triple[] triples = new Triple[] {
+              Triple.of(u0_0, u0_0, u0_0),
+              Triple.of(u0_0, u0_1, u0_1),
+              Triple.of(u0_0, u1_0, u1_0),
+              Triple.of(u0_1, u1_0, u1_1),
+
+              Triple.of(u0_1, u0_1, u0_2),
+              Triple.of(u1_0, u1_0, u2_0),
+
+              Triple.of(u0_1, u0_f, u1_0),
+
+              Triple.of(u0_1, u0_f, u1_0),
+              Triple.of(u0_f, u0_f, U128.of(1, 0xffff_ffff_ffff_fffeL)),
+              Triple.of(uf_0, u0_f, U128.of(-1, -1)),
+              Triple.of(uf_0, u1_0, U128.ZERO),
+
+              Triple.of(U128.of(0x1234_5678_9abc_def1L, 0x1234_5678_9abc_def1L),
+                        U128.of(0xedcb_a987_6543_210eL, 0xedcb_a987_6543_210fL),
+                        U128.ZERO)
+        };
+
+        for(Triple t: triples) {
+            assertThat(t.msg("{0} + {1} = {2}"), t.a.add(t.b), equalTo(t.c));
+            assertThat(t.msg("{1} + {0} = {2}"), t.b.add(t.a), equalTo(t.c));
+
+            assertThat(t.msg("{2} - {0} = {1}"), t.c.subtract(t.a), equalTo(t.b));
+            assertThat(t.msg("{2} - {1} = {0}"), t.c.subtract(t.b), equalTo(t.a));
+        }
+    }
 
     @Test
     public void testCompare() {
@@ -178,23 +240,6 @@ public class U128Test {
                         u_greater.compareTo(u_base), Matchers.greaterThan(0));
             }
         }
-    }
-
-    @Test
-    public void testCombine() {
-        long key = 0x1234567890abcdefL;
-        long val = 0xdeafbeefdeadbeefL;
-        U128 hkey = U128.of(key, key*2);
-        U128 hVal = U128.of(val, val/2);
-
-        assertThat(hkey.combineWithValue(hVal, 0), equalTo(hkey.xor(hVal)));
-        assertThat(hkey.combineWithValue(hVal, 64), equalTo(U128.of(hkey.getMsb(), hkey.getLsb() ^ hVal.getLsb())));
-        assertThat(hkey.combineWithValue(hVal, 128), equalTo(hkey));
-
-        long mask8 = 0xFF00_0000_0000_0000L;
-
-        assertThat(hkey.combineWithValue(hVal, 8), equalTo(U128.of(hkey.getMsb() & mask8 |  hkey.getMsb() ^ hVal.getMsb() & ~mask8,
-                                                                   hkey.getLsb() ^ hVal.getLsb() )));
     }
 
 }
