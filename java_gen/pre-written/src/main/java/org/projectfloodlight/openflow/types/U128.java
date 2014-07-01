@@ -126,8 +126,7 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     public U128 add(U128 other) {
         long newRaw2 = this.raw2 + other.raw2;
         long newRaw1 = this.raw1 + other.raw1;
-        if (UnsignedLongs.compare(newRaw2, this.raw2) < 0 ||
-            UnsignedLongs.compare(newRaw2, other.raw2) < 0) {
+        if(UnsignedLongs.compare(newRaw2, this.raw2) < 0) {
             // raw2 overflow
             newRaw1+=1;
         }
@@ -138,7 +137,7 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     public U128 subtract(U128 other) {
         long newRaw2 = this.raw2 - other.raw2;
         long newRaw1 = this.raw1 - other.raw1;
-        if (UnsignedLongs.compare(this.raw2, other.raw2) < 0) {
+        if(UnsignedLongs.compare(this.raw2, other.raw2) < 0) {
             newRaw1 -= 1;
         }
         return U128.of(newRaw1, newRaw2);
