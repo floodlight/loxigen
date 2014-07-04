@@ -1,5 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -250,6 +251,36 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         if(raw1==NONE_VAL1 && raw2 == NONE_VAL2)
             return NONE;
         return new IPv6Address(raw1, raw2);
+    }
+
+    public static IPv6Address ofCidrMaskLength(int cidrMaskLength) {
+        Preconditions.checkArgument(
+                cidrMaskLength >= 0 && cidrMaskLength <= 128,
+                "Invalid IPv6 CIDR mask length: %s", cidrMaskLength);
+
+        if (cidrMaskLength == 128) {
+            return IPv6Address.NO_MASK;
+        } else if (cidrMaskLength == 0) {
+            return IPv6Address.FULL_MASK;
+        } else {
+            BigInteger mask
+                    = BigInteger.ONE.negate().shiftLeft(128 - cidrMaskLength);
+            byte[] maskBytesTemp = mask.toByteArray();
+            byte[] maskBytes;
+            if (maskBytesTemp.length < 16) {
+                maskBytes = new byte[16];
+                System.arraycopy(maskBytesTemp, 0,
+                        maskBytes, 16 - maskBytesTemp.length,
+                        maskBytesTemp.length);
+                Arrays.fill(maskBytes, 0, 16 - maskBytesTemp.length, (byte)(0xFF));
+            } else if (maskBytesTemp.length > 16) {
+                maskBytes = new byte[16];
+                System.arraycopy(maskBytesTemp, 0, maskBytes, 0, maskBytes.length);
+            } else {
+                maskBytes = maskBytesTemp;
+            }
+            return IPv6Address.of(maskBytes);
+        }
     }
 
     private volatile byte[] bytesCache = null;
