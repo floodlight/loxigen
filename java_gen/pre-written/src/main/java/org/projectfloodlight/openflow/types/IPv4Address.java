@@ -158,6 +158,21 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPv4Address.of(raw);
     }
 
+    public static IPv4Address ofCidrMaskLength(final int cidrMaskLength) {
+        Preconditions.checkArgument(
+                cidrMaskLength >= 0 && cidrMaskLength <= 32,
+                "Invalid IPv4 CIDR mask length: %s", cidrMaskLength);
+
+        if (cidrMaskLength == 32) {
+            return IPv4Address.NO_MASK;
+        } else if (cidrMaskLength == 0) {
+            return IPv4Address.FULL_MASK;
+        } else {
+            int mask = (-1) << (32 - cidrMaskLength);
+            return IPv4Address.of(mask);
+        }
+    }
+
     public int getInt() {
         return rawValue;
     }
