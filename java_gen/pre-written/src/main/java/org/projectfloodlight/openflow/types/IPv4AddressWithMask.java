@@ -35,7 +35,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
 
         int slashPos;
         String ip = string;
-        int maskBits = 32;
+        int cidrMaskLength = 32;
         IPv4Address maskAddress = null;
 
         // Read mask suffix
@@ -50,12 +50,9 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
                     maskAddress = IPv4Address.of(suffix);
                 } else {
                     // CIDR Suffix
-                    maskBits = Integer.parseInt(suffix);
+                    cidrMaskLength = Integer.parseInt(suffix);
                 }
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("IP Address not well formed: " + string);
-            }
-            if (maskBits < 0 || maskBits > 32) {
                 throw new IllegalArgumentException("IP Address not well formed: " + string);
             }
         }
@@ -66,16 +63,9 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
         if (maskAddress != null) {
             // Full address mask
             return IPv4AddressWithMask.of(ipv4, maskAddress);
-        } else if (maskBits == 32) {
-            // No mask
-            return IPv4AddressWithMask.of(ipv4, IPv4Address.NO_MASK);
-        } else if (maskBits == 0) {
-            // No mask
-            return IPv4AddressWithMask.of(ipv4, IPv4Address.FULL_MASK);
         } else {
-            // With mask
-            int mask = (-1) << (32 - maskBits);
-            return IPv4AddressWithMask.of(ipv4, IPv4Address.of(mask));
+            return IPv4AddressWithMask.of(
+                    ipv4, IPv4Address.ofCidrMaskLength(cidrMaskLength));
         }
     }
 
