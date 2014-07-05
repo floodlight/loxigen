@@ -31,8 +31,11 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
      * @return          an {@code IPv4AddressWithMask} object that represents
      *                  the given raw IP address masked by the given raw IP
      *                  address mask
+     * @deprecated      replaced by {@link IPv4Address#of(int)} followed by
+     *                  {@link IPv4Address#withMask(int)}
      */
     @Nonnull
+    @Deprecated
     public static IPv4AddressWithMask of(final int rawValue, final int rawMask) {
         return new IPv4AddressWithMask(rawValue, rawMask);
     }
