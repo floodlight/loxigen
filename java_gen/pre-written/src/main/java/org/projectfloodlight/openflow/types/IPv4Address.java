@@ -1,5 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
+import java.net.Inet4Address;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
@@ -98,7 +99,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPv4Address.of(~rawValue);
     }
 
-    public static IPv4Address of(final byte[] address) {
+    @Nonnull
+    public static IPv4Address of(@Nonnull final byte[] address) {
         Preconditions.checkNotNull(address, "address must not be null");
 
         if (address.length != LENGTH) {
@@ -117,6 +119,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
      * @param raw the IPAdress represented as a 32-bit integer
      * @return the constructed IPv4Address
      */
+    @Nonnull
     public static IPv4Address of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
@@ -158,6 +161,13 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         return IPv4Address.of(raw);
     }
 
+    @Nonnull
+    public static IPv4Address of(@Nonnull final Inet4Address address) {
+        Preconditions.checkNotNull(address, "address must not be null");
+        return IPv4Address.of(address.getAddress());
+    }
+
+    @Nonnull
     public static IPv4Address ofCidrMaskLength(final int cidrMaskLength) {
         Preconditions.checkArgument(
                 cidrMaskLength >= 0 && cidrMaskLength <= 32,
@@ -171,6 +181,27 @@ public class IPv4Address extends IPAddress<IPv4Address> {
             int mask = (-1) << (32 - cidrMaskLength);
             return IPv4Address.of(mask);
         }
+    }
+
+    public IPv4AddressWithMask withMask(@Nonnull byte[] mask) {
+        return IPv4AddressWithMask.of(this, IPv4Address.of(mask));
+    }
+
+    public IPv4AddressWithMask withMask(int mask) {
+        return IPv4AddressWithMask.of(this, IPv4Address.of(mask));
+    }
+
+    public IPv4AddressWithMask withMask(@Nonnull String mask) {
+        return IPv4AddressWithMask.of(this, IPv4Address.of(mask));
+    }
+
+    public IPv4AddressWithMask withMask(@Nonnull Inet4Address mask) {
+        return IPv4AddressWithMask.of(this, IPv4Address.of(mask));
+    }
+
+    public IPv4AddressWithMask withMaskOfLength(int cidrMaskLength) {
+        return IPv4AddressWithMask.of(this,
+                IPv4Address.ofCidrMaskLength(cidrMaskLength));
     }
 
     public int getInt() {

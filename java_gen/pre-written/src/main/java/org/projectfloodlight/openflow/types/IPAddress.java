@@ -55,6 +55,8 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract F not();
 
+    public abstract byte[] getBytes();
+
     @Override
     public abstract boolean equals(Object other);
 
@@ -88,7 +90,7 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @throws NullPointerException if address is null
      */
     @Nonnull
-    public static IPAddress<?> fromInetAddress(@Nonnull InetAddress address) {
+    public static IPAddress<?> of(@Nonnull InetAddress address) {
         Preconditions.checkNotNull(address, "address must not be null");
         byte [] bytes = address.getAddress();
         if(address instanceof Inet4Address)
@@ -97,5 +99,11 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
             return IPv6Address.of(bytes);
         else
             return IPAddress.of(address.getHostAddress());
+    }
+
+    @Deprecated
+    @Nonnull
+    public static IPAddress<?> fromInetAddress(@Nonnull InetAddress address) {
+        return of(address);
     }
 }
