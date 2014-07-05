@@ -9,6 +9,9 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+
 import org.hamcrest.CoreMatchers;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
@@ -266,6 +269,38 @@ public class IPv4AddressTest {
         assertEquals(IPv4Address.ofCidrMaskLength(30).getInt(), 0xFFFF_FFFC);
         assertEquals(IPv4Address.ofCidrMaskLength(31).getInt(), 0xFFFF_FFFE);
         assertEquals(IPv4Address.ofCidrMaskLength(32).getInt(), 0xFFFF_FFFF);
+    }
+
+    @Test
+    public void testWithMask() throws Exception {
+        // Sanity tests for the withMask*() syntactic sugars
+
+        IPv4Address original = IPv4Address.of("192.168.1.101");
+        IPv4Address expectedValue = IPv4Address.of("192.168.1.0");
+        IPv4Address expectedMask = IPv4Address.of("255.255.255.0");
+
+        IPv4AddressWithMask v;
+
+        v = original.withMask(new byte[] {-1, -1, -1, 0});
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMask(0xFFFF_FF00);
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMask("255.255.255.0");
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        Inet4Address i4a = (Inet4Address) InetAddress.getByName("255.255.255.0");
+        v = original.withMask(i4a);
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMaskOfLength(24);
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
     }
 
     @Test
