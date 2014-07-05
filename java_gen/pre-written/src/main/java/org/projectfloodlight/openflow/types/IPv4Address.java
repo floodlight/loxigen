@@ -231,6 +231,20 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents this
+     * IP address masked by the given IP address mask.
+     *
+     * @param mask  the {@code IPv4Address} object that represents the mask
+     * @return      an {@code IPv4AddressWithMask} object that represents this
+     *              IP address masked by the given mask
+     * @throws NullPointerException  if the given mask was {@code null}
+     */
+    @Nonnull
+    public IPv4AddressWithMask withMask(@Nonnull final IPv4Address mask) {
+        return IPv4AddressWithMask.of(this, mask);
+    }
+
+    /**
+     * Returns an {@code IPv4AddressWithMask} object that represents this
      * IP address masked by the given raw IP address mask. The argument is in
      * network byte order: the highest order byte of the address is in
      * {@code mask[0]}.

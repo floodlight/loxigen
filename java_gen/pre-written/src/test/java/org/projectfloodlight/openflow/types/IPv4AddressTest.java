@@ -281,6 +281,10 @@ public class IPv4AddressTest {
 
         IPv4AddressWithMask v;
 
+        v = original.withMask(expectedMask);
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
         v = original.withMask(new byte[] {-1, -1, -1, 0});
         assertEquals(v.getValue(), expectedValue);
         assertEquals(v.getMask(), expectedMask);
