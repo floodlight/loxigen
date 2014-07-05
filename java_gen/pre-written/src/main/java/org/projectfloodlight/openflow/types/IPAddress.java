@@ -10,6 +10,11 @@ import com.google.common.base.Preconditions;
 
 public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F> {
 
+    /**
+     * Returns the Internet Protocol (IP) version of this object
+     *
+     * @return  the Internet Protocol (IP) version of this object
+     */
     public abstract IPVersion getIpVersion();
 
     /**
@@ -55,7 +60,20 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract F not();
 
+    /**
+     * Returns the raw IP address of this {@code IPAddress} object. The result
+     * is in network byte order: the highest order byte of the address is in
+     * {@code getBytes()[0]}.
+     * <p>
+     * Similar to {@link InetAddress#getAddress()}
+     *
+     * @return  the raw IP address of this object
+     * @see InetAddress#getAddress()
+     */
     public abstract byte[] getBytes();
+
+    @Override
+    public abstract String toString();
 
     @Override
     public abstract boolean equals(Object other);
@@ -101,6 +119,13 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
             return IPAddress.of(address.getHostAddress());
     }
 
+    /**
+     * Factory function for InetAddress values.
+     * @param address the InetAddress you wish to parse into an IPAddress object.
+     * @return the IPAddress object.
+     * @throws NullPointerException if address is null
+     * @deprecated  replaced by {@link #of(InetAddress)}
+     */
     @Deprecated
     @Nonnull
     public static IPAddress<?> fromInetAddress(@Nonnull InetAddress address) {

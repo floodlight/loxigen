@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Preconditions;
 
 
@@ -19,18 +21,69 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
         return IPVersion.IPv4;
     }
 
-    public static IPv4AddressWithMask of(int rawValue, int rawMask) {
+    /**
+     * Returns an {@code IPv4AddressWithMask} object that represents the given
+     * raw IP address masked by the given raw IP address mask, with both
+     * represented as 32-bit integers.
+     *
+     * @param rawValue  the raw IP address to be masked
+     * @param rawMask   the raw IP address mask
+     * @return          an {@code IPv4AddressWithMask} object that represents
+     *                  the given raw IP address masked by the given raw IP
+     *                  address mask
+     */
+    @Nonnull
+    public static IPv4AddressWithMask of(final int rawValue, final int rawMask) {
         return new IPv4AddressWithMask(rawValue, rawMask);
     }
 
-    public static IPv4AddressWithMask of(IPv4Address value, IPv4Address mask) {
+    /**
+     * Returns an {@code IPv4AddressWithMask} object that represents the given
+     * IP address masked by the given IP address mask, with both represented
+     * as {@code IPv4Address} objects.
+     *
+     * @param value  the IP address to be masked
+     * @param mask   the IP address mask
+     * @return       an {@code IPv4AddressWithMask} object that represents
+     *               the given IP address masked by the given IP address mask
+     * @throws NullPointerException  if any of the given {@code IPv4Address}
+     *                               objects were {@code null}
+     */
+    @Nonnull
+    public static IPv4AddressWithMask of(
+            @Nonnull final IPv4Address value,
+            @Nonnull final IPv4Address mask) {
         Preconditions.checkNotNull(value, "value must not be null");
         Preconditions.checkNotNull(mask, "mask must not be null");
 
         return new IPv4AddressWithMask(value, mask);
     }
 
-    public static IPv4AddressWithMask of(final String string) {
+    /**
+     * Returns an {@code IPv4AddressWithMask} object that corresponds to
+     * the given string in CIDR notation or other notations as specified
+     * below
+     * <p>
+     * The following notations are accepted.
+     * <table><tr>
+     * <th>Notation</th><th>Example</th><th>Notes</th>
+     * </tr><tr>
+     * <td>IPv4 address only</td><td>{@code 1.2.3.4}</td><td>The subnet mask of
+     * prefix length 32 (i.e. {@code 255.255.255.255}) is assumed.</td>
+     * </tr><tr>
+     * <td>IPv4 address/mask</td><td>{@code 1.2.3.4/255.255.255.0}</td>
+     * </tr><tr>
+     * <td>CIDR notation</td><td>{@code 1.2.3.4/24}</td>
+     * </tr></table>
+     *
+     * @param string  the string in acceptable notations
+     * @return        an {@code IPv4AddressWithMask} object that corresponds to
+     *                the given string in acceptable notations
+     * @throws NullPointerException      if the given string was {@code null}
+     * @throws IllegalArgumentException  if the given string was malformed
+     */
+    @Nonnull
+    public static IPv4AddressWithMask of(@Nonnull final String string) {
         Preconditions.checkNotNull(string, "string must not be null");
 
         int slashPos;
