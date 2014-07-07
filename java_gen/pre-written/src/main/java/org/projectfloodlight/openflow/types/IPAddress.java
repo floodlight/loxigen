@@ -110,11 +110,10 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     @Nonnull
     public static IPAddress<?> of(@Nonnull InetAddress address) {
         Preconditions.checkNotNull(address, "address must not be null");
-        byte [] bytes = address.getAddress();
         if(address instanceof Inet4Address)
-            return IPv4Address.of(bytes);
+            return IPv4Address.of(address);
         else if (address instanceof Inet6Address)
-            return IPv6Address.of(bytes);
+            return IPv6Address.of(address);
         else
             return IPAddress.of(address.getHostAddress());
     }
