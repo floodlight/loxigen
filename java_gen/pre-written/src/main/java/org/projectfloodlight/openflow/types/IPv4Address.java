@@ -190,7 +190,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
      * Returns an {@code IPv4Address} object that represents the given
      * IP address. The argument is given as an {@code Inet4Address} object.
      *
-     * @param address  the {@code Inet4Address} object
+     * @param address  the IP address as an {@code Inet4Address} object
      * @return         an {@code IPv4Address} object that represents the
      *                 given IP address
      * @throws NullPointerException  if the given {@code Inet4Address} was
@@ -301,7 +301,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
      * IP address masked by the given IP address mask. The argument is given as
      * an {@code Inet4Address} object.
      *
-     * @param mask  the {@code Inet4Address} object
+     * @param mask  the IP address mask as an {@code Inet4Address} object
      * @return      an {@code IPv4AddressWithMask} object that represents this
      *              IP address masked by the given IP address mask
      * @throws NullPointerException  if the given {@code Inet4Address} was

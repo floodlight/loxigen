@@ -23,8 +23,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents the given
-     * raw IP address masked by the given raw IP address mask, with both
-     * represented as 32-bit integers.
+     * raw IP address masked by the given raw IP address mask.
      *
      * @param rawValue  the raw IP address to be masked
      * @param rawMask   the raw IP address mask
@@ -42,7 +41,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents the given
-     * IP address masked by the given IP address mask, with both represented
+     * IP address masked by the given IP address mask. Both arguments are given
      * as {@code IPv4Address} objects.
      *
      * @param value  the IP address to be masked
@@ -64,8 +63,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that corresponds to
-     * the given string in CIDR notation or other notations as specified
-     * below
+     * the given string in CIDR notation or other acceptable notations.
      * <p>
      * The following notations are accepted.
      * <table><tr>
