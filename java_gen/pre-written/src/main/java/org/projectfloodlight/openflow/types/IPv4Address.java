@@ -134,7 +134,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4Address} object that represents the given
-     * raw IP address represented as a 32-bit integer.
+     * raw IP address.
      *
      * @param raw  the raw IP address represented as a 32-bit integer
      * @return     an {@code IPv4Address} object that represents the given
@@ -149,12 +149,12 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4Address} object that represents the given
-     * IP address in the canonical dotted-quad notation. For example,
-     * {@code 1.2.3.4}.
+     * IP address. The argument is in the canonical quad-dotted notation.
+     * For example, {@code 1.2.3.4}.
      *
-     * @param string  the IP address in the dotted-quad notation
+     * @param string  the IP address in the canonical quad-dotted notation
      * @return        an {@code IPv4Address} object that represents the given
-     *                dotted-quad textual IP address
+     *                IP address
      * @throws NullPointerException      if given string was {@code null}
      * @throws IllegalArgumentException  if given string was not a valid
      *                                   IPv4 address
@@ -187,14 +187,14 @@ public class IPv4Address extends IPAddress<IPv4Address> {
     }
 
     /**
-     * Returns an {@code IPv4Address} object that represents the
-     * IP address represented by the given {@code Inet4Address} object.
+     * Returns an {@code IPv4Address} object that represents the given
+     * IP address. The argument is given as an {@code Inet4Address} object.
      *
      * @param address  the {@code Inet4Address} object
      * @return         an {@code IPv4Address} object that represents the
      *                 given IP address
-     * @throws NullPointerException  if the {@code Inet4Address} object
-     *                               was {@code null}
+     * @throws NullPointerException  if the given {@code Inet4Address} was
+     *                               {@code null}
      */
     @Nonnull
     public static IPv4Address of(@Nonnull final Inet4Address address) {
@@ -266,8 +266,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents this
-     * IP address masked by the given raw IP address mask represented as a
-     * 32-bit integer.
+     * IP address masked by the given raw IP address mask.
      *
      * @param mask  the raw IP address mask represented as a 32-bit integer
      * @return      an {@code IPv4AddressWithMask} object that represents this
@@ -281,16 +280,15 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents this
-     * IP address masked by the given IP address mask in the canonical
-     * dotted-quad notation. For example, {@code 255.255.255.0}.
+     * IP address masked by the given IP address mask. The argument is in
+     * the canonical quad-dotted notation. For example, {@code 255.255.255.0}.
      *
-     * @param mask  the IP address mask in the dotted-quad notation
+     * @param mask  the IP address mask in the canonical quad-dotted notation
      * @return      an {@code IPv4AddressWithMask} object that represents this
-     *              IP address masked by the given dotted-quad textual IP
-     *              address mask
+     *              IP address masked by the given IP address mask
      * @throws NullPointerException      if the given string was {@code null}
      * @throws IllegalArgumentException  if the given string was not a valid
-     *                                   IPv4 address mask
+     *                                   IPv4 address
      * @see #of(String)
      */
     @Nonnull
@@ -300,14 +298,14 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4AddressWithMask} object that represents this
-     * IP address masked by the IP address mask represented by the given
-     * {@code Inet4Address} object.
+     * IP address masked by the IP address mask. The argument is given as
+     * an {@code Inet4Address} object.
      *
      * @param mask  the {@code Inet4Address} object
      * @return      an {@code IPv4AddressWithMask} object that represents this
      *              IP address masked by the given IP address mask
-     * @throws NullPointerException  if the {@code Inet4Address} object
-     *                               was {@code null}
+     * @throws NullPointerException  if the given {@code Inet4Address} was
+     *                               {@code null}
      * @see #of(Inet4Address)
      */
     @Nonnull
