@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import java.math.BigInteger;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -123,7 +125,25 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         return IPv6Address.of(~raw1, ~raw2);
     }
 
-    public static IPv6Address of(final byte[] address) {
+    /**
+     * Returns an {@code IPv6Address} object that represents the given
+     * IP address. The argument is in network byte order: the highest
+     * order byte of the address is in {@code address[0]}.
+     * <p>
+     * The address byte array must be 16 bytes long (128 bits long).
+     * <p>
+     * Similar to {@link InetAddress#getByAddress(byte[])}.
+     *
+     * @param address  the raw IP address in network byte order
+     * @return         an {@code IPv6Address} object that represents the given
+     *                 raw IP address
+     * @throws NullPointerException      if the given address was {@code null}
+     * @throws IllegalArgumentException  if the given address was of an invalid
+     *                                   byte array length
+     * @see InetAddress#getByAddress(byte[])
+     */
+    @Nonnull
+    public static IPv6Address of(@Nonnull final byte[] address) {
         Preconditions.checkNotNull(address, "address must not be null");
 
         if (address.length != LENGTH) {
@@ -170,19 +190,25 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
     private final static Pattern colonPattern = Pattern.compile(":");
 
-    /** parse an IPv6Address from its conventional string representation.
-     *  <p>
-     *  Expects up to 8 groups of 16-bit hex words seperated by colons
-     *  (e.g., 2001:db8:85a3:8d3:1319:8a2e:370:7348).
-     *  <p>
-     *  Supports zero compression (e.g., 2001:db8::7348).
-     *  Does <b>not</b> currently support embedding a dotted-quad IPv4 address
-     *  into the IPv6 address (e.g., 2001:db8::192.168.0.1).
+    /**
+     * Returns an {@code IPv6Address} object that represents the given
+     * IP address. The argument is in the conventional string representation
+     * of IPv6 addresses.
+     * <p>
+     * Expects up to 8 groups of 16-bit hex words seperated by colons
+     * (e.g., 2001:db8:85a3:8d3:1319:8a2e:370:7348).
+     * <p>
+     * Supports zero compression (e.g., 2001:db8::7348).
+     * Does <b>not</b> currently support embedding a dotted-quad IPv4 address
+     * into the IPv6 address (e.g., 2001:db8::192.168.0.1).
      *
-     * @param string a string representation of an IPv6 address
-     * @return the parsed IPv6 address
-     * @throws NullPointerException if string is null
-     * @throws IllegalArgumentException if string is not a valid IPv6Address
+     * @param string  the IP address in the conventional string representation
+     *                of IPv6 addresses
+     * @return        an {@code IPv6Address} object that represents the given
+     *                IP address
+     * @throws NullPointerException      if the given string was {@code null}
+     * @throws IllegalArgumentException  if the given string was not a valid
+     *                                   IPv6 address
      */
     @Nonnull
     public static IPv6Address of(@Nonnull final String string) throws IllegalArgumentException {
@@ -240,20 +266,53 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         return builder.getIPv6();
     }
 
-    /** construct an IPv6 adress from two 64 bit integers representing the first and
-     *  second 8-byte blocks of the address.
+    /**
+     * Returns an {@code IPv6Address} object that represents the given
+     * IP address. The arguments are the two 64-bit integers representing
+     * the first (higher-order) and second (lower-order) 64-bit blocks
+     * of the IP address.
      *
-     * @param raw1 - the first 8 byte block of the address
-     * @param raw2 - the second 8 byte block of the address
-     * @return the constructed IPv6Address
+     * @param raw1  the first (higher-order) 64-bit block of the IP address
+     * @param raw2  the second (lower-order) 64-bit block of the IP address
+     * @return      an {@code IPv6Address} object that represents the given
+     *              raw IP address
      */
+    @Nonnull
     public static IPv6Address of(final long raw1, final long raw2) {
         if(raw1==NONE_VAL1 && raw2 == NONE_VAL2)
             return NONE;
         return new IPv6Address(raw1, raw2);
     }
 
-    public static IPv6Address ofCidrMaskLength(int cidrMaskLength) {
+    /**
+     * Returns an {@code IPv6Address} object that represents the given
+     * IP address. The argument is given as an {@code Inet6Address} object.
+     *
+     * @param address  the IP address as an {@code Inet6Address} object
+     * @return         an {@code IPv6Address} object that represents the
+     *                 given IP address
+     * @throws NullPointerException  if the given {@code Inet6Address} was
+     *                               {@code null}
+     */
+    @Nonnull
+    public static IPv6Address of(@Nonnull final Inet6Address address) {
+        Preconditions.checkNotNull(address, "address must not be null");
+        return IPv6Address.of(address.getAddress());
+    }
+
+    /**
+     * Returns an {@code IPv6Address} object that represents the
+     * CIDR subnet mask of the given prefix length.
+     *
+     * @param cidrMaskLength  the prefix length of the CIDR subnet mask
+     *                        (i.e. the number of leading one-bits),
+     *                        where {@code 0 <= cidrMaskLength <= 128}
+     * @return                an {@code IPv6Address} object that represents the
+     *                        CIDR subnet mask of the given prefix length
+     * @throws IllegalArgumentException  if the given prefix length was invalid
+     */
+    @Nonnull
+    public static IPv6Address ofCidrMaskLength(final int cidrMaskLength) {
         Preconditions.checkArgument(
                 cidrMaskLength >= 0 && cidrMaskLength <= 128,
                 "Invalid IPv6 CIDR mask length: %s", cidrMaskLength);
