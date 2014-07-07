@@ -204,10 +204,10 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     /**
      * Returns an {@code IPv4Address} object that represents the
-     * CIDR subnet mask of the given prefix length, that is, the
-     * number of leading one-bits.
+     * CIDR subnet mask of the given prefix length.
      *
-     * @param cidrMaskLength  the prefix length of the CIDR subnet mask,
+     * @param cidrMaskLength  the prefix length of the CIDR subnet mask
+     *                        (i.e. the number of leading one-bits),
      *                        where {@code 0 <= cidrMaskLength <= 32}
      * @return                an {@code IPv4Address} object that represents the
      *                        CIDR subnet mask of the given prefix length
