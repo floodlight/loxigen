@@ -123,7 +123,7 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
         if (address.length != LENGTH) {
             throw new IllegalArgumentException(
-                    "Invalid byte array length for IPv4Address address: " + address.length);
+                    "Invalid byte array length for IPv4 address: " + address.length);
         }
 
         int raw =
