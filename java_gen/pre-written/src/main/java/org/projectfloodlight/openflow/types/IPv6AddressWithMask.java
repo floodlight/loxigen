@@ -1,8 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import java.math.BigInteger;
-import java.util.Arrays;
-
 import com.google.common.base.Preconditions;
 
 public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
@@ -23,13 +20,12 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         return new IPv6AddressWithMask(value, mask);
     }
 
-
     public static IPv6AddressWithMask of(final String string) {
         Preconditions.checkNotNull(string, "string must not be null");
 
         int slashPos;
         String ip = string;
-        int maskBits = 128;
+        int cidrMaskLength = 128;
         IPv6Address maskAddress = null;
 
         // Read mask suffix
@@ -44,12 +40,9 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
                     maskAddress = IPv6Address.of(suffix);
                 } else {
                     // CIDR Suffix
-                    maskBits = Integer.parseInt(suffix);
+                    cidrMaskLength = Integer.parseInt(suffix);
                 }
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("IPv6 Address not well formed: " + string);
-            }
-            if (maskBits < 0 || maskBits > 128) {
                 throw new IllegalArgumentException("IPv6 Address not well formed: " + string);
             }
         }
@@ -60,28 +53,9 @@ public class IPv6AddressWithMask extends IPAddressWithMask<IPv6Address> {
         if (maskAddress != null) {
             // Full address mask
             return IPv6AddressWithMask.of(ipv6, maskAddress);
-        } else if (maskBits == 128) {
-            // No mask
-            return IPv6AddressWithMask.of(ipv6, IPv6Address.NO_MASK);
-        } else if (maskBits == 0) {
-            // Entirely masked out
-            return IPv6AddressWithMask.of(ipv6, IPv6Address.FULL_MASK);
-        }else {
-            // With mask
-            BigInteger mask = BigInteger.ONE.negate().shiftLeft(128 - maskBits);
-            byte[] maskBytesTemp = mask.toByteArray();
-            byte[] maskBytes;
-            if (maskBytesTemp.length < 16) {
-                maskBytes = new byte[16];
-                System.arraycopy(maskBytesTemp, 0, maskBytes, 16 - maskBytesTemp.length, maskBytesTemp.length);
-                Arrays.fill(maskBytes, 0, 16 - maskBytesTemp.length, (byte)(0xFF));
-            } else if (maskBytesTemp.length > 16) {
-                maskBytes = new byte[16];
-                System.arraycopy(maskBytesTemp, 0, maskBytes, 0, maskBytes.length);
-            } else {
-                maskBytes = maskBytesTemp;
-            }
-            return IPv6AddressWithMask.of(ipv6, IPv6Address.of(maskBytes));
+        } else {
+            return IPv6AddressWithMask.of(ipv6,
+                    IPv6Address.ofCidrMaskLength(cidrMaskLength));
         }
     }
 
