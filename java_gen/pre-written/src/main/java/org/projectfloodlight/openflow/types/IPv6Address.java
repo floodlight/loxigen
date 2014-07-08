@@ -1,6 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import java.math.BigInteger;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.util.Arrays;
@@ -322,23 +321,11 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         } else if (cidrMaskLength == 0) {
             return IPv6Address.FULL_MASK;
         } else {
-            BigInteger mask
-                    = BigInteger.ONE.negate().shiftLeft(128 - cidrMaskLength);
-            byte[] maskBytesTemp = mask.toByteArray();
-            byte[] maskBytes;
-            if (maskBytesTemp.length < 16) {
-                maskBytes = new byte[16];
-                System.arraycopy(maskBytesTemp, 0,
-                        maskBytes, 16 - maskBytesTemp.length,
-                        maskBytesTemp.length);
-                Arrays.fill(maskBytes, 0, 16 - maskBytesTemp.length, (byte)(0xFF));
-            } else if (maskBytesTemp.length > 16) {
-                maskBytes = new byte[16];
-                System.arraycopy(maskBytesTemp, 0, maskBytes, 0, maskBytes.length);
-            } else {
-                maskBytes = maskBytesTemp;
-            }
-            return IPv6Address.of(maskBytes);
+            int shift1 = Math.min(cidrMaskLength, 64);
+            long raw1 = shift1 == 0 ? 0 : (long) -1 << (64 - shift1);
+            int shift2 = Math.max(cidrMaskLength - 64, 0);
+            long raw2 = shift2 == 0 ? 0 : (long) -1 << (64 - shift2);
+            return IPv6Address.of(raw1, raw2);
         }
     }
 
