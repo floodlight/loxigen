@@ -31,7 +31,7 @@ public class IPAddressTest {
             // expected
         }
         try {
-            IPAddress.of(null);
+            IPAddress.of((String) null);
             fail("Should have thrown NullPointerException");
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
@@ -43,7 +43,7 @@ public class IPAddressTest {
             assertNotNull(e.getMessage());
         }
         try {
-            IPAddress.of(null);
+            IPAddress.of((String) null);
             fail("Should have thrown NullPointerException");
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
@@ -56,6 +56,7 @@ public class IPAddressTest {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Test
     public void testFromInetAddressException() throws UnknownHostException {
         try {
