@@ -61,6 +61,37 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract F not();
 
     /**
+     * Returns an {@code IPAddressWithMask<F>} object that represents this
+     * IP address masked by the given IP address mask.
+     *
+     * @param mask  the {@code F} object that represents the mask
+     * @return      an {@code IPAddressWithMask<F>} object that represents this
+     *              IP address masked by the given mask
+     * @throws NullPointerException  if the given mask was {@code null}
+     */
+    @Nonnull
+    public abstract IPAddressWithMask<F> withMask(@Nonnull final F mask);
+
+    /**
+     * Returns an {@code IPAddressWithMask<F>} object that represents this
+     * IP address masked by the CIDR subnet mask of the given prefix length.
+     *
+     * @param cidrMaskLength  the prefix length of the CIDR subnet mask
+     *                        (i.e. the number of leading one-bits),
+     *                        where <code>
+     *                        0 <= cidrMaskLength <= (F.getLength() * 8)
+     *                        </code>
+     * @return                an {@code IPAddressWithMask<F>} object that
+     *                        represents this IP address masked by the CIDR
+     *                        subnet mask of the given prefix length
+     * @throws IllegalArgumentException  if the given prefix length was invalid
+     * @see #ofCidrMaskLength(int)
+     */
+    @Nonnull
+    public abstract IPAddressWithMask<F> withMaskOfLength(
+            final int cidrMaskLength);
+
+    /**
      * Returns the raw IP address of this {@code IPAddress} object. The result
      * is in network byte order: the highest order byte of the address is in
      * {@code getBytes()[0]}.

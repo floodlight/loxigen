@@ -237,6 +237,41 @@ public class IPv6AddressTest {
     }
 
     @Test
+    public void testWithMask() throws Exception {
+        // Sanity tests for the withMask*() syntactic sugars
+
+        IPv6Address original = IPv6Address.of("fd12:3456:ABCD:7890::1");
+        IPv6Address expectedValue = IPv6Address.of("fd12:3456:ABCD::");
+        IPv6Address expectedMask = IPv6Address.of("ffff:ffff:ffff::");
+
+        IPv6AddressWithMask v;
+
+        v = original.withMask(IPv6Address.of(new byte[] {
+                -1, -1, -1, -1, -1, -1, 0, 0,
+                0, 0, 0, 0, 0, 0, 0, 0 }));
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMask(IPv6Address.of(
+                0xFFFF_FFFF_FFFF_0000L, 0x0000_0000_0000_0000L));
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMask(IPv6Address.of("ffff:ffff:ffff::"));
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        Inet6Address i6a = (Inet6Address) InetAddress.getByName("ffff:ffff:ffff::");
+        v = original.withMask(IPv6Address.of(i6a));
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+
+        v = original.withMaskOfLength(48);
+        assertEquals(v.getValue(), expectedValue);
+        assertEquals(v.getMask(), expectedMask);
+    }
+
+    @Test
     public void testReadFrom() throws OFParseError, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();

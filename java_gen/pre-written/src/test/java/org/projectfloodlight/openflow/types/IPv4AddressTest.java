@@ -281,24 +281,20 @@ public class IPv4AddressTest {
 
         IPv4AddressWithMask v;
 
-        v = original.withMask(expectedMask);
+        v = original.withMask(IPv4Address.of(new byte[] {-1, -1, -1, 0}));
         assertEquals(v.getValue(), expectedValue);
         assertEquals(v.getMask(), expectedMask);
 
-        v = original.withMask(new byte[] {-1, -1, -1, 0});
+        v = original.withMask(IPv4Address.of(0xFFFF_FF00));
         assertEquals(v.getValue(), expectedValue);
         assertEquals(v.getMask(), expectedMask);
 
-        v = original.withMask(0xFFFF_FF00);
-        assertEquals(v.getValue(), expectedValue);
-        assertEquals(v.getMask(), expectedMask);
-
-        v = original.withMask("255.255.255.0");
+        v = original.withMask(IPv4Address.of("255.255.255.0"));
         assertEquals(v.getValue(), expectedValue);
         assertEquals(v.getMask(), expectedMask);
 
         Inet4Address i4a = (Inet4Address) InetAddress.getByName("255.255.255.0");
-        v = original.withMask(i4a);
+        v = original.withMask(IPv4Address.of(i4a));
         assertEquals(v.getValue(), expectedValue);
         assertEquals(v.getMask(), expectedMask);
 

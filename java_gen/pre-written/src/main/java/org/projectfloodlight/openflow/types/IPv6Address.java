@@ -342,6 +342,40 @@ public class IPv6Address extends IPAddress<IPv6Address> {
         }
     }
 
+    /**
+     * Returns an {@code IPv6AddressWithMask} object that represents this
+     * IP address masked by the given IP address mask.
+     *
+     * @param mask  the {@code IPv6Address} object that represents the mask
+     * @return      an {@code IPv6AddressWithMask} object that represents this
+     *              IP address masked by the given mask
+     * @throws NullPointerException  if the given mask was {@code null}
+     */
+    @Nonnull
+    @Override
+    public IPv6AddressWithMask withMask(@Nonnull final IPv6Address mask) {
+        return IPv6AddressWithMask.of(this, mask);
+    }
+
+    /**
+     * Returns an {@code IPv6AddressWithMask} object that represents this
+     * IP address masked by the CIDR subnet mask of the given prefix length.
+     *
+     * @param cidrMaskLength  the prefix length of the CIDR subnet mask
+     *                        (i.e. the number of leading one-bits),
+     *                        where {@code 0 <= cidrMaskLength <= 128}
+     * @return                an {@code IPv6AddressWithMask} object that
+     *                        represents this IP address masked by the CIDR
+     *                        subnet mask of the given prefix length
+     * @throws IllegalArgumentException  if the given prefix length was invalid
+     * @see #ofCidrMaskLength(int)
+     */
+    @Nonnull
+    @Override
+    public IPv6AddressWithMask withMaskOfLength(final int cidrMaskLength) {
+        return this.withMask(IPv6Address.ofCidrMaskLength(cidrMaskLength));
+    }
+
     private volatile byte[] bytesCache = null;
 
     public byte[] getBytes() {
