@@ -322,9 +322,9 @@ public class IPv6Address extends IPAddress<IPv6Address> {
             return IPv6Address.FULL_MASK;
         } else {
             int shift1 = Math.min(cidrMaskLength, 64);
-            long raw1 = shift1 == 0 ? 0 : (long) -1 << (64 - shift1);
+            long raw1 = shift1 == 0 ? 0 : -1L << (64 - shift1);
             int shift2 = Math.max(cidrMaskLength - 64, 0);
-            long raw2 = shift2 == 0 ? 0 : (long) -1 << (64 - shift2);
+            long raw2 = shift2 == 0 ? 0 : -1L << (64 - shift2);
             return IPv6Address.of(raw1, raw2);
         }
     }
