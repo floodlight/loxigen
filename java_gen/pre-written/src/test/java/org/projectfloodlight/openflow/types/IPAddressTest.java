@@ -1,10 +1,12 @@
 package org.projectfloodlight.openflow.types;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.junit.Test;
@@ -54,6 +56,28 @@ public class IPAddressTest {
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
         }
+    }
+
+    @Test
+    public void testOfString() {
+        IPAddress<?> ip0 = IPAddress.of("1.2.3.4");
+        IPAddress<?> ip1 = IPAddress.of("abcd::1234");
+        assertTrue(ip0 instanceof IPv4Address);
+        assertTrue(ip1 instanceof IPv6Address);
+        assertEquals(ip0, IPv4Address.of("1.2.3.4"));
+        assertEquals(ip1, IPv6Address.of("abcd::1234"));
+    }
+
+    @Test
+    public void testOfInetAddress() throws Exception {
+        InetAddress ia0 = InetAddress.getByName("192.168.1.123");
+        InetAddress ia1 = InetAddress.getByName("fd00::4321");
+        IPAddress<?> ip0 = IPAddress.of(ia0);
+        IPAddress<?> ip1 = IPAddress.of(ia1);
+        assertTrue(ip0 instanceof IPv4Address);
+        assertTrue(ip1 instanceof IPv6Address);
+        assertEquals(ip0, IPv4Address.of(ia0));
+        assertEquals(ip1, IPv6Address.of(ia1));
     }
 
     @SuppressWarnings("deprecation")

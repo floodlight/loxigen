@@ -142,9 +142,9 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public static IPAddress<?> of(@Nonnull InetAddress address) {
         Preconditions.checkNotNull(address, "address must not be null");
         if(address instanceof Inet4Address)
-            return IPv4Address.of(address);
+            return IPv4Address.of((Inet4Address) address);
         else if (address instanceof Inet6Address)
-            return IPv6Address.of(address);
+            return IPv6Address.of((Inet6Address) address);
         else
             return IPAddress.of(address.getHostAddress());
     }
