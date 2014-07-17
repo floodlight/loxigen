@@ -341,7 +341,6 @@ struct of_experimenter : of_header {
     uint16_t length;
     uint32_t xid;
     uint32_t experimenter == ?;
-    uint32_t subtype;
     of_octets_t data;
 };
 
