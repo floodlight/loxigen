@@ -173,3 +173,14 @@ function read_of_bsn_vport_q_in_q_t(reader, version, subtree, field_name)
     local info = of_bsn_vport_q_in_q_dissectors[version](reader, child_subtree)
     child_subtree:set_text(info)
 end
+
+function read_openflow(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    child_subtree:set_text("OpenFlow message")
+    pcall(function () -- Message may be truncated, ignore errors dissecting
+        p_of.dissector:call(reader.read_all():tvb(), current_pkt, child_subtree)
+    end)
+end
