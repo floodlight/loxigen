@@ -408,6 +408,7 @@ int of_object_show(loci_writer_f writer, void *cookie, of_object_t *obj);
 #define LOCI_SHOW_u8_dscp(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u8_ttl(writer, cookie, val) LOCI_SHOW_u8(writer, cookie, val)
 #define LOCI_SHOW_u32_vpn(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
+#define LOCI_SHOW_u32_rate_limit(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_u32_flags(writer, cookie, val) LOCI_SHOW_u32(writer, cookie, val)
 #define LOCI_SHOW_desc_str_image_checksum(write, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
 #define LOCI_SHOW_desc_str_startup_config_checksum(write, cookie, val) LOCI_SHOW_desc_str(writer, cookie, val)
