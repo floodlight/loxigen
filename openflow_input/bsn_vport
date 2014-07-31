@@ -50,6 +50,8 @@ enum ofp_bsn_vport_l2gre_flags(wire_type=uint32_t, bitmask=True) {
     OF_BSN_VPORT_L2GRE_DSCP_COPY = 0x4,
 
     OF_BSN_VPORT_L2GRE_LOOPBACK_IS_VALID = 0x8,
+
+    OF_BSN_VPORT_L2GRE_RATE_LIMIT_IS_VALID = 0x10,
 };
 
 // BSN Virtual port object header
@@ -91,6 +93,7 @@ struct of_bsn_vport_l2gre : of_bsn_vport {
     uint8_t ttl;
     pad(2);
     uint32_t vpn;                   /* VPN ID (for GRE Key) */
+    uint32_t rate_limit;            /* Rate limit in Kbps */
     of_port_name_t if_name;         /* Virtual Interface Name */
 };
 
