@@ -399,4 +399,10 @@ public class IPv6AddressTest {
             assertNotNull(e.getMessage());
         }
     }
+
+    @Test
+    public void testZoneId() throws OFParseError {
+        assertEquals("::", IPv6Address.of("::%eth0").toString(true, false));
+        assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8%2").toString(true, false));
+    }
 }
