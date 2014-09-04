@@ -105,6 +105,8 @@ def var_name_map(m_type):
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
         of_checksum_128_t="checksum_128",
+	#Circuit extensions
+        oxm_of_och_sig_id_t="sig_id",		
         )
 
     if m_type.find("of_list_") == 0:
