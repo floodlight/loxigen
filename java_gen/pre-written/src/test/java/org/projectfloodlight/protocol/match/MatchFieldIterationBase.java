@@ -25,7 +25,7 @@ import com.google.common.collect.Iterables;
 
 public class MatchFieldIterationBase {
 
-    private OFFactory factory;
+    protected OFFactory factory;
 
     protected MatchFieldIterationBase(OFFactory factory) {
         this.factory = factory;

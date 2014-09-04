@@ -40,3 +40,19 @@ struct of_oxm_tunnel_id_masked : of_oxm {
     uint64_t value;
     uint64_t value_mask;
 };
+
+struct of_oxm_och_sigtype : of_oxm {
+    uint32_t type_len == 0x80005c08;
+    uint64_t value;
+};
+
+
+struct of_oxm_och_sigid : of_oxm {
+    uint32_t type_len == 0x80005d10;
+    uint64_t value;
+};
+
+
+
+
+

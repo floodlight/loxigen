@@ -1,0 +1,104 @@
+#version 4
+
+/* WDM grid types */
+enum ofp_grid_type {
+    OFPGRIDT_RES    = 0,
+    OFPGRIDT_DWDM   = 1,
+    OFPGRIDT_CWDM   = 2,
+    OFPGRIDT_FLEX   = 3,
+};
+
+/* WDM grid channel spacing */
+enum ofp_channel_spacing {
+    OFPCS_RES       = 0,
+    OFPCS_GHZ_100    = 1,
+    OFPCS_GHZ_50     = 2,
+    OFPCS_GHZ_24     = 3,
+    OFPCS_GHZ_12P5   = 4,        /* 12.5 GHZ */
+    OFPCS_GHZ_6P25   = 5,        /* 6.25 GHZ */
+};
+
+/* Layer classes (families) supported for optical transport port. */
+enum ofp_port_optical_transport_layer_class {
+    OFPPOTL_PORT   = 1,           /* Class of base port layer signal types */
+    OFPPOTL_OCH    = 2,           /* Class of OCH layer signal types*/
+    OFPPOTL_ODU    = 3,           /* Class of ODU layer signal types*/
+    OFPPOTL_ODUCLT = 4,           /* Class of ODU client layer signal types*/
+};
+
+/* Base port layer signal types */
+enum ofp_otport_signal_type {
+    OFPOTPT_OTSn           = 1,
+    OFPOTPT_OMSn           = 2,
+    OFPOTPT_OPSn           = 3,
+    OFPOTPT_OPSM           = 4,
+    OFPOTPT_OCH            = 5,
+    OFPOTPT_OTU1           = 11,
+    OFPOTPT_OTU2           = 12,
+    OFPOTPT_OTU3           = 13,
+    OFPOTPT_OTU4           = 14,
+};
+
+/* OCH layer signal types */
+enum ofp_och_signal_type {
+    OFPOCHT_FIX_GRID       = 1,
+    OFPOCHT_FLEX_GRID      = 2,
+};
+
+
+struct oxm_of_och_sig_id {
+     
+     uint8_t grid;            //Type of WDM grid - OFPGRIDT_*
+     uint8_t cs;              //Channel Spacing - OFPCS_*
+     uint16_t n;             // Used to calculate frequency as in [ITU G.694.1]
+                             // Frequency(THz)= 193.1 THz + n * chan_spacing
+     uint16_t m;             // Used to calculate spectral width [ITU G.694.1]
+                             // Spectral Width (GHz) = m * 12.5
+                            // For fix grid networks, m=1
+};
+
+// circuit extension message
+struct of_circuit_header : of_experimenter {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0xffff;
+    uint32_t subtype == ?;
+    uint8_t sigtype;	
+    oxm_of_och_sig_id_t sig_id; 
+};
+
+
+
+// circuit extension action
+struct of_action_circuit: of_action_experimenter {
+    uint16_t type == 65535;
+    uint16_t len;
+    uint32_t experimenter == 0xffff;
+    	
+};
+
+struct of_circuit_ports_request : of_experimenter_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x5c16c8;
+    uint32_t subtype == 15;
+};
+
+struct of_circuit_ports_reply : of_experimenter_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x5c16c8;
+    uint32_t subtype == ?;
+};
