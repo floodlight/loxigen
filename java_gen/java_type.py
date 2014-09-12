@@ -360,10 +360,20 @@ ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
             default='IPv4Address.NONE')
+ipv4_list =  JType('List<IPv4Address>') \
+        .op(read='ChannelUtils.readList(bb, $length, IPv4Address.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<IPv4Address>of()',
+            funnel="FunnelUtils.putList($name, sink)")
 ipv6 = JType("IPv6Address") \
         .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
+ipv6_list =  JType('List<IPv46ddress>') \
+        .op(read='ChannelUtils.readList(bb, $length, IPv6Address.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<IPv6Address>of()',
+            funnel="FunnelUtils.putList($name, sink)")
 packetin_reason = gen_enum_jtype("OFPacketInReason")
 transport_port = JType("TransportPort")\
         .op(read="TransportPort.read2Bytes(bb)",
@@ -531,6 +541,8 @@ default_mtype_to_jtype_convert_map = {
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
+        'list(of_ipv4_t)' : ipv4_list,
+        'list(of_ipv6_t)' : ipv6_list,
         'of_octets_t' : octets,
         'of_match_t': of_match,
         'of_fm_cmd_t': flow_mod_cmd,
