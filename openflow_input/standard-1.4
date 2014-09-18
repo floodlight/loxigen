@@ -764,7 +764,7 @@ struct of_table_mod : of_header {
     uint8_t table_id;
     pad(3);
     uint32_t config;
-    list(of_table_mod_prop_header) properties;
+    list(of_table_mod_prop_header_t) properties;
 };
 
 struct ofp_port_desc_prop_header {
@@ -831,7 +831,7 @@ struct of_port_mod : of_header {
     pad(2);
     uint32_t config;
     uint32_t mask;
-    list(of_port_mod_prop_header) properties;
+    list(of_port_mod_prop_header_t) properties;
 };
 
 // FIXME Does this need to be v4?
@@ -1564,7 +1564,7 @@ struct of_queue_stats_entry {
     uint32_t duration_nsec;
                           
 
-    list(of_queue_stats_prop_header) properties;
+    list(of_queue_stats_prop_header_t) properties;
 };
 
 struct of_bucket_counter {
