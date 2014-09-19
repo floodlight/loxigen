@@ -45,9 +45,8 @@ enum ofp_och_signal_type {
     OFPOCHT_FLEX_GRID      = 2,
 };
 
-
-struct oxm_of_och_sig_id {
-     
+// Not used .. just for info on structure.
+struct ofp_och_signal_id {
      uint8_t grid;            //Type of WDM grid - OFPGRIDT_*
      uint8_t cs;              //Channel Spacing - OFPCS_*
      uint16_t n;             // Used to calculate frequency as in [ITU G.694.1]
@@ -57,26 +56,35 @@ struct oxm_of_och_sig_id {
                             // For fix grid networks, m=1
 };
 
-// circuit extension message
-struct of_circuit_header : of_experimenter {
-    uint8_t version;
-    uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
-    uint32_t experimenter == 0xffff;
-    uint32_t subtype == ?;
-    uint8_t sigtype;	
-    oxm_of_och_sig_id_t sig_id; 
+struct of_oxm_och_sigtype : of_oxm {
+    uint32_t type_len == 0x00085801; 	
+    uint8_t value;
+};
+
+struct of_oxm_och_sigid : of_oxm {
+    uint32_t type_len == 0x00085A06; 
+    of_sig_id_t value;
+};
+
+struct of_oxm_och_sigtype_basic : of_oxm {
+    uint32_t type_len == 0x80005801; 	
+    uint8_t value;
+};
+
+struct of_oxm_och_sigid_basic : of_oxm {
+    uint32_t type_len == 0x80005A06; 
+    of_sig_id_t value;
 };
 
 
-
-// circuit extension action
-struct of_action_circuit: of_action_experimenter {
+struct of_action_circuit : of_action_experimenter {
     uint16_t type == 65535;
     uint16_t len;
-    uint32_t experimenter == 0xffff;
-    	
+    uint32_t experimenter == 0x748771;
+    uint16_t subtype == 25;
+    uint16_t hlength == 16; // fix length of OXM field
+    of_oxm_t field;
+    pad(2);
 };
 
 

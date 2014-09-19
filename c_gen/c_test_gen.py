@@ -106,10 +106,8 @@ def var_name_map(m_type):
         of_bitmap_128_t="bitmap_128",
         of_checksum_128_t="checksum_128",
 	#Circuit extensions
-        oxm_of_och_sig_id_t="sig_id",
         of_app_code_t="app_code",
-        #of_port_optical_transport_application_code_t="tappcode",
-        of_port_desc_prop_optical_transport_t="desc1",		
+	of_sig_id_t="sig_id",
         )
 
     if m_type.find("of_list_") == 0:

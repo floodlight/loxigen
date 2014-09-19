@@ -89,6 +89,7 @@ ofp_constants = dict(
     OF_DESC_STR_LEN   = 256,
     OF_SERIAL_NUM_LEN = 32,
     OF_APP_CODE_LEN = 15, 	
+    OF_SIGID_LEN=6, 	
 )
 
 ## List of mixed data types
@@ -211,7 +212,8 @@ of_base_types = dict(
     of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
     of_app_code_t = dict(bytes=ofp_constants["OF_APP_CODE_LEN"],
                           short_name="app_code"),
-
+    of_sig_id_t = dict(bytes=ofp_constants["OF_SIGID_LEN"],
+                          short_name="sig_id"),
 )
 
 of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",

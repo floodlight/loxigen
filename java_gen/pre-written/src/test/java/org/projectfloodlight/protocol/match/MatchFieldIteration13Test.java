@@ -5,7 +5,7 @@ import org.projectfloodlight.openflow.protocol.OFFactories;
 import org.projectfloodlight.openflow.protocol.OFVersion;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
-import org.projectfloodlight.openflow.types.U64;
+import org.projectfloodlight.openflow.types.U8;
 
 public class MatchFieldIteration13Test extends MatchFieldIterationBase {
     public MatchFieldIteration13Test() {
@@ -16,7 +16,7 @@ public class MatchFieldIteration13Test extends MatchFieldIterationBase {
     public void matchCircuitFields()
     {
         Match.Builder builder = factory.buildMatchV3().setExact(MatchField
-                                                                        .OCH_SIGTYPE, U64.ZERO);
+                                                                        .OCH_SIGTYPE, U8.ZERO);
 
     }
 }

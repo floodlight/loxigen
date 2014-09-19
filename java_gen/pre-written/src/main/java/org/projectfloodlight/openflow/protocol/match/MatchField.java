@@ -27,6 +27,7 @@ import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
+import org.projectfloodlight.openflow.types.CircuitSignalID;
 
 @SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
@@ -235,15 +236,24 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
 
-
-    public final static MatchField<U64> OCH_SIGID =
-            new MatchField<U64>("och_sigid",
+    
+    public final static MatchField<CircuitSignalID> OCH_SIGID =
+            new MatchField<CircuitSignalID>("och_sigid",
                                     MatchFields.OCH_SIGID);
 
-    public final static MatchField<U64> OCH_SIGTYPE =
-            new MatchField<U64>("och_sigid",
+    public final static MatchField<U8> OCH_SIGTYPE =
+            new MatchField<U8>("och_sigtype",
                                     MatchFields.OCH_SIGTYPE);
+    
+    public final static MatchField<CircuitSignalID> OCH_SIGID_BASIC =
+            new MatchField<CircuitSignalID>("och_sigid_basic",
+                                    MatchFields.OCH_SIGID);
 
+    public final static MatchField<U8> OCH_SIGTYPE_BASIC =
+            new MatchField<U8>("och_sigtype_basic",
+                                    MatchFields.OCH_SIGTYPE_BASIC);
+	 
+    
     public String getName() {
         return name;
     }
