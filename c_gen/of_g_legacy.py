@@ -87,7 +87,8 @@ ofp_constants = dict(
     OF_MAX_PORT_NAME_LEN  = 16,
     OF_ETH_ALEN = 6,
     OF_DESC_STR_LEN   = 256,
-    OF_SERIAL_NUM_LEN = 32
+    OF_SERIAL_NUM_LEN = 32,
+    OF_APP_CODE_LEN = 15, 	
 )
 
 ## List of mixed data types
@@ -208,6 +209,9 @@ of_base_types = dict(
     of_octets_t = dict(bytes=-1, short_name="octets"),
     of_bitmap_128_t = dict(bytes=16, short_name="bitmap_128"),
     of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
+    of_app_code_t = dict(bytes=ofp_constants["OF_APP_CODE_LEN"],
+                          short_name="app_code"),
+
 )
 
 of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",

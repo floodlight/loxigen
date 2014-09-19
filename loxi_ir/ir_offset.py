@@ -25,7 +25,8 @@ ofp_constants = dict(
     OF_MAX_PORT_NAME_LEN  = 16,
     OF_ETH_ALEN = 6,
     OF_DESC_STR_LEN   = 256,
-    OF_SERIAL_NUM_LEN = 32
+    OF_SERIAL_NUM_LEN = 32,
+    OF_APP_CODE_LEN = 15 	
 )
 
 
@@ -102,6 +103,7 @@ of_base_lengths = dict(
     of_octets_t = (0, False),
     of_bitmap_128_t = (16, True),
     of_checksum_128_t = (16, True),
+    of_app_code_t = (15,True),
 )
 
 def type_dec_to_count_base(m_type):

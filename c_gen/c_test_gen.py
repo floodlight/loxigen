@@ -106,7 +106,10 @@ def var_name_map(m_type):
         of_bitmap_128_t="bitmap_128",
         of_checksum_128_t="checksum_128",
 	#Circuit extensions
-        oxm_of_och_sig_id_t="sig_id",		
+        oxm_of_och_sig_id_t="sig_id",
+        of_app_code_t="app_code",
+        #of_port_optical_transport_application_code_t="tappcode",
+        of_port_desc_prop_optical_transport_t="desc1",		
         )
 
     if m_type.find("of_list_") == 0:
@@ -121,7 +124,7 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                 "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
-                "of_str64_t"]
+                "of_str64_t","of_app_code_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)

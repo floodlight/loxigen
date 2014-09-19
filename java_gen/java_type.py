@@ -352,6 +352,7 @@ mac_addr = JType('MacAddress') \
             default="MacAddress.NONE")
 
 port_name = gen_fixed_length_string_jtype(16)
+app_code = gen_fixed_length_string_jtype(15)
 desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
@@ -549,6 +550,7 @@ default_mtype_to_jtype_convert_map = {
         'of_bitmap_128_t': port_bitmap,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
+        'of_app_code_t': app_code,  
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
