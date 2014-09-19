@@ -215,7 +215,7 @@ public class IPv6Address extends IPAddress<IPv6Address> {
 
         // remove the zone id
         int zoneDelimIndex = string.indexOf("%");
-        String substring = null;
+        String substring;
         if (zoneDelimIndex != -1) {
             substring = string.substring(0, zoneDelimIndex);
         } else {
