@@ -225,8 +225,17 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     public static IPv6Address of(@Nonnull final String string) throws IllegalArgumentException {
         Preconditions.checkNotNull(string, "string must not be null");
 
+        // remove the zone id
+        int zoneDelimIndex = string.indexOf("%");
+        String substring;
+        if (zoneDelimIndex != -1) {
+            substring = string.substring(0, zoneDelimIndex);
+        } else {
+            substring = string;
+        }
+
         IPv6Builder builder = new IPv6Builder();
-        String[] parts = colonPattern.split(string, -1);
+        String[] parts = colonPattern.split(substring, -1);
 
         int leftWord = 0;
         int leftIndex = 0;
