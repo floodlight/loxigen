@@ -172,3 +172,39 @@ struct of_bsn_tlv_crc_enabled : of_bsn_tlv {
     uint16_t length;
     uint8_t value;
 };
+
+struct of_bsn_tlv_external_ip : of_bsn_tlv {
+    uint16_t type == 23;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_external_mac : of_bsn_tlv {
+    uint16_t type == 24;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_external_netmask : of_bsn_tlv {
+    uint16_t type == 25;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_external_gateway_ip : of_bsn_tlv {
+    uint16_t type == 26;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_internal_mac : of_bsn_tlv {
+    uint16_t type == 27;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_internal_gateway_mac : of_bsn_tlv {
+    uint16_t type == 28;
+    uint16_t length;
+    of_mac_addr_t value;
+};
