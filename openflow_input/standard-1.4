@@ -751,8 +751,8 @@ struct of_set_config : of_header {
     uint16_t miss_send_len;
 };
 
-struct ofp_table_mod_prop_header {
-    uint16_t type; /* One of OFPTMPT_*. */
+struct of_table_mod_prop {
+    uint16_t type == ?; /* One of OFPTMPT_*. */
     uint16_t length; /* Length in bytes of this property. */
 };
 
@@ -764,11 +764,11 @@ struct of_table_mod : of_header {
     uint8_t table_id;
     pad(3);
     uint32_t config;
-    list(of_table_mod_prop_header_t) properties;
+    list(of_table_mod_prop_t) properties;
 };
 
-struct ofp_port_desc_prop_header {
-    uint16_t type; /* One of OFPPDPT_*. */
+struct of_port_desc_prop {
+    uint16_t type == ?; /* One of OFPPDPT_*. */
     uint16_t length; /* Length in bytes of this property. */
 };
 
@@ -781,7 +781,7 @@ struct of_port_desc {
     of_port_name_t name;
     enum ofp_port_config config; /* Bitmap of OFPPC_* flags. */
     enum ofp_port_state state; /* Bitmap of OFPPS_* flags. */
-    list(of_port_desc_prop_header_t) properties;
+    list(of_port_desc_prop_t) properties;
 };
 
 struct of_features_request : of_header {
@@ -815,8 +815,8 @@ struct of_port_status : of_header {
     of_port_desc_t desc;
 };
 
-struct of_port_mod_prop_header {
-    uint16_t type; /* One of OFPPMPT_*. */
+struct of_port_mod_prop {
+    uint16_t type == ?; /* One of OFPPMPT_*. */
     uint16_t length; /* Length in bytes of this property. */
 };
 
@@ -831,7 +831,7 @@ struct of_port_mod : of_header {
     pad(2);
     uint32_t config;
     uint32_t mask;
-    list(of_port_mod_prop_header_t) properties;
+    list(of_port_mod_prop_t) properties;
 };
 
 // FIXME Does this need to be v4?
@@ -846,7 +846,7 @@ struct of_match_v4(align=8, length_includes_align=False) {
 struct of_action_id {
     uint16_t type;
     uint16_t len;
-    list(uint8_t) exp_data;
+    of_octets_t exp_data;
 };
 
 struct of_action_output : of_action {
@@ -979,7 +979,7 @@ struct of_instruction {
 struct of_instruction_goto_table : of_instruction {
     uint16_t type == 1;
     uint16_t len;
-    list(uint8_t) exp_data;
+    of_octets_t exp_data;
 };
 
 struct of_instruction_write_metadata : of_instruction {
@@ -1485,14 +1485,14 @@ struct of_table_stats_entry {
 };
 
 /* Common header for all port stats properties. */
-struct ofp_port_stats_prop_header {
-    uint16_t         type;    /* One of OFPPSPT_*. */
+struct of_port_stats_prop {
+    uint16_t         type == ?; /* One of OFPPSPT_*. */
     uint16_t         length;  /* Length in bytes of this property. */
 };
 
 /* Ethernet port stats property. */
-struct ofp_port_stats_prop_ethernet {
-    uint16_t         type;    /* OFPPSPT_ETHERNET. */
+struct of_port_stats_prop_ethernet : of_port_stats_prop {
+    uint16_t         type == 0; /* OFPPSPT_ETHERNET. */
     uint16_t         length;  /* Length in bytes of this property. */
     pad(4);
 
@@ -1503,8 +1503,8 @@ struct ofp_port_stats_prop_ethernet {
 };
 
 /* Optical port stats property. */
-struct ofp_port_stats_prop_optical {
-    uint16_t         type;
+struct of_port_stats_prop_optical : of_port_stats_prop {
+    uint16_t         type == 1;
     uint16_t         length;
     pad(4);
 
@@ -1522,12 +1522,12 @@ struct ofp_port_stats_prop_optical {
 };
 
 /* Experimenter port stats property. */
-struct ofp_port_stats_prop_experimenter {
-    uint16_t         type; 
+struct of_port_stats_prop_experimenter : of_port_stats_prop {
+    uint16_t         type == 0xffff;
     uint16_t         length; 
-    uint32_t         experimenter;
+    uint32_t         experimenter == ?;
     uint32_t         exp_type;
-    list(uint32_t)         experimenter_data;
+    of_octets_t      experimenter_data;
 };
 
 struct of_port_stats_entry {
@@ -1544,11 +1544,11 @@ struct of_port_stats_entry {
     uint64_t tx_errors;
     uint32_t duration_sec;
     uint32_t duration_nsec;
-    list(of_port_desc_prop_header_t) properties;
+    list(of_port_stats_prop_t) properties;
 };
 
-struct of_queue_stats_prop_header {
-    uint16_t         type;
+struct of_queue_stats_prop {
+    uint16_t         type == ?;
     uint16_t         length;
 };
 
@@ -1564,7 +1564,7 @@ struct of_queue_stats_entry {
     uint32_t duration_nsec;
                           
 
-    list(of_queue_stats_prop_header_t) properties;
+    list(of_queue_stats_prop_t) properties;
 };
 
 struct of_bucket_counter {
@@ -1842,7 +1842,7 @@ struct of_table_feature_prop_apply_setfield_miss : of_table_feature_prop {
 struct of_table_feature_prop_experimenter : of_table_feature_prop {
     uint16_t         type == 65534;
     uint16_t         length;
-    uint32_t         experimenter;
+    uint32_t         experimenter == ?;
     uint32_t         subtype;
     of_octets_t      experimenter_data;
 };
@@ -1850,7 +1850,7 @@ struct of_table_feature_prop_experimenter : of_table_feature_prop {
 struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
     uint16_t         type == 65535;
     uint16_t         length;
-    uint32_t         experimenter;
+    uint32_t         experimenter == ?;
     uint32_t         subtype;
     of_octets_t      experimenter_data;
 };
