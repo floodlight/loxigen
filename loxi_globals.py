@@ -37,12 +37,14 @@ class OFVersions:
     VERSION_1_1 = OFVersion("1.1", 2)
     VERSION_1_2 = OFVersion("1.2", 3)
     VERSION_1_3 = OFVersion("1.3", 4)
+    VERSION_1_4 = OFVersion("1.4", 5)
 
     all_supported = (
         VERSION_1_0,
         VERSION_1_1,
         VERSION_1_2,
         VERSION_1_3,
+        VERSION_1_4,
     )
 
     wire_version_map   = { v.wire_version : v for v in all_supported }
