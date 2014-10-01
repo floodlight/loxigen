@@ -208,3 +208,9 @@ struct of_bsn_tlv_internal_gateway_mac : of_bsn_tlv {
     uint16_t length;
     of_mac_addr_t value;
 };
+
+struct of_bsn_tlv_external_gateway_mac : of_bsn_tlv {
+    uint16_t type == 29;
+    uint16_t length;
+    of_mac_addr_t value;
+};
