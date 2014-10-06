@@ -214,3 +214,63 @@ struct of_bsn_tlv_external_gateway_mac : of_bsn_tlv {
     uint16_t length;
     of_mac_addr_t value;
 };
+
+struct of_bsn_tlv_sampling_rate : of_bsn_tlv {
+    uint16_t type == 30;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_header_size : of_bsn_tlv {
+    uint16_t type == 31;
+    uint16_t length;
+    uint32_t value; /* bytes */
+};
+
+struct of_bsn_tlv_eth_src : of_bsn_tlv {
+    uint16_t type == 32;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_eth_dst : of_bsn_tlv {
+    uint16_t type == 33;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_ipv4_src : of_bsn_tlv {
+    uint16_t type == 34;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_ipv4_dst : of_bsn_tlv {
+    uint16_t type == 35;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_udp_src : of_bsn_tlv {
+    uint16_t type == 36;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_udp_dst : of_bsn_tlv {
+    uint16_t type == 37;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_sub_agent_id : of_bsn_tlv {
+    uint16_t type == 38;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_tx_bytes : of_bsn_tlv {
+    uint16_t type == 39;
+    uint16_t length;
+    uint64_t value;
+};
