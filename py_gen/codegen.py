@@ -26,15 +26,12 @@
 # under the EPL.
 
 from collections import defaultdict
+import os
 import loxi_globals
-import struct
 import template_utils
 import loxi_utils.loxi_utils as utils
 import util
-import oftype
 from loxi_ir import *
-
-modules_by_version = {}
 
 # Map from inheritance root to module name
 roots = {
@@ -69,63 +66,36 @@ def build_ofclasses(version):
         modules[module_name].append(ofclass)
     return modules
 
-def generate_init(out, name, version):
-    util.render_template(out, 'init.py', version=version)
+def codegen(install_dir):
+    def render(name, template_name=None, **ctx):
+        if template_name is None:
+            template_name = os.path.basename(name)
+        with template_utils.open_output(install_dir, name) as out:
+            util.render_template(out, template_name, **ctx)
 
-def generate_action(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['action'],
-                         version=version)
+    render('__init__.py', template_name='toplevel_init.py')
+    render('pp.py')
+    render('generic_util.py')
 
-def generate_action_id(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['action_id'],
-                         version=version)
+    for version in loxi_globals.OFVersions.all_supported:
+        subdir = 'of' + version.version.replace('.', '')
+        modules = build_ofclasses(version)
 
-def generate_oxm(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['oxm'],
-                         version=version)
+        render(os.path.join(subdir, '__init__.py'), template_name='init.py',
+               version=version, modules=modules.keys())
 
-def generate_common(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['common'],
-                         version=version,
-                         extra_template='_common_extra.py')
+        render(os.path.join(subdir, 'util.py'), version=version)
 
-def generate_const(out, name, version):
-    util.render_template(out, 'const.py', version=version,
-                         enums=loxi_globals.ir[version].enums)
+        render(os.path.join(subdir, 'const.py'), version=version,
+               enums=loxi_globals.ir[version].enums)
 
-def generate_instruction(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['instruction'],
-                         version=version)
+        args_by_module = {
+            'common': { 'extra_template' : '_common_extra.py' },
+            'message': { 'extra_template' : '_message_extra.py' },
+        }
 
-def generate_instruction_id(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['instruction_id'],
-                         version=version)
-
-def generate_message(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['message'],
-                         version=version,
-                         extra_template='_message_extra.py')
-
-def generate_meter_band(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['meter_band'],
-                         version=version)
-
-def generate_util(out, name, version):
-    util.render_template(out, 'util.py', version=version)
-
-def generate_bsn_tlv(out, name, version):
-    util.render_template(out, 'module.py',
-                         ofclasses=modules_by_version[version]['bsn_tlv'],
-                         version=version)
-
-def init():
-    for version in loxi_globals.OFVersions.target_versions:
-        modules_by_version[version] = build_ofclasses(version)
+        for name, ofclasses in modules.items():
+            args = args_by_module.get(name, {})
+            render(os.path.join(subdir, name + '.py'), template_name='module.py',
+                   version=version, ofclasses=ofclasses, modules=modules.keys(),
+                   **args)

@@ -34,20 +34,9 @@
 import struct
 import loxi
 import const
-import common
-import action
-:: if version >= OFVersions.VERSION_1_1:
-import instruction
-:: #endif
-:: if version >= OFVersions.VERSION_1_2:
-import oxm
-:: #endif
-:: if version >= OFVersions.VERSION_1_3:
-import action_id
-import instruction_id
-import meter_band
-import bsn_tlv
-:: #endif
+:: for module in modules:
+import ${module}
+:: #endfor
 import util
 import loxi.generic_util
 
