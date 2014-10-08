@@ -33,14 +33,6 @@ import loxi_utils.loxi_utils as utils
 import util
 from loxi_ir import *
 
-# Map from wire version to directory name
-versions = {
-    1: "of10",
-    2: "of11",
-    3: "of12",
-    4: "of13",
-}
-
 # Map from inheritance root to module name
 roots = {
     'of_header': 'message',
@@ -85,8 +77,8 @@ def codegen(install_dir):
     render('pp.py')
     render('generic_util.py')
 
-    for wire_version, subdir in versions.items():
-        version = loxi_globals.OFVersions.from_wire(wire_version)
+    for version in loxi_globals.OFVersions.all_supported:
+        subdir = 'of' + version.version.replace('.', '')
         modules = build_ofclasses(version)
 
         render(os.path.join(subdir, '__init__.py'), template_name='init.py',
