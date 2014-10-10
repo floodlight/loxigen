@@ -28,12 +28,6 @@
 """
 Python backend for LOXI
 
-This language specific file defines a dictionary 'targets' that
-defines the generated files and the functions used to generate them.
-
-For each generated file there is a generate_* function in py_gen.codegen
-and a Tenjin template under py_gen/templates.
-
 Target directory structure:
     pyloxi:
         loxi:
@@ -64,51 +58,9 @@ the const module directly into their namespace so the user can access
 """
 
 import os
-from loxi_globals import OFVersions
-import loxi_globals
-import loxi_utils.loxi_utils as loxi_utils
-import py_gen
-import py_gen.util
 import py_gen.codegen
-import template_utils
 
-versions = {
-    1: "of10",
-    2: "of11",
-    3: "of12",
-    4: "of13",
-}
-
-prefix = 'pyloxi/loxi'
-
-modules = {
-    1: ["action", "common", "const", "message", "util"],
-    2: ["action", "common", "const", "instruction", "message", "util"],
-    3: ["action", "common", "const", "instruction", "message", "oxm", "util"],
-    4: ["action", "action_id", "common", "const", "instruction", "instruction_id", "message", "meter_band", "oxm", "bsn_tlv", "util"],
-}
-
-def make_gen(name, version):
-    fn = getattr(py_gen.codegen, "generate_" + name)
-    return lambda out, name: fn(out, name, version)
-
-def static(template_name):
-    return lambda out, name: py_gen.util.render_template(out, template_name)
-
-targets = {
-    prefix+'/__init__.py': static('toplevel_init.py'),
-    prefix+'/pp.py': static('pp.py'),
-    prefix+'/generic_util.py': static('generic_util.py'),
-}
-
-for version, subdir in versions.items():
-    targets['%s/%s/__init__.py' % (prefix, subdir)] = make_gen('init', version)
-    for module in modules[version]:
-        filename = '%s/%s/%s.py' % (prefix, subdir, module)
-        targets[filename] = make_gen(module, OFVersions.from_wire(version))
+PREFIX = 'pyloxi/loxi'
 
 def generate(install_dir):
-    py_gen.codegen.init()
-    for (name, fn) in targets.items():
-        with template_utils.open_output(install_dir, name) as outfile:
-            fn(outfile, os.path.basename(name))
+    py_gen.codegen.codegen(os.path.join(install_dir, PREFIX))

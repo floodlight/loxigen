@@ -52,7 +52,7 @@ local openflow_versions = {
 
 :: for version, ofproto in ir.items():
 :: for enum in ofproto.enums:
-local enum_v${version.wire_version}_${enum.name} = {
+enum_v${version.wire_version}_${enum.name} = {
 :: for (name, value) in enum.values:
     [${value}] = "${name}",
 :: #endfor

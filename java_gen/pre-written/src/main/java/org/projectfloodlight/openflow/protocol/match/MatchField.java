@@ -178,6 +178,10 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
+    public final static MatchField<OFBooleanValue> MPLS_BOS =
+            new MatchField<OFBooleanValue>("mpls_bos", MatchFields.MPLS_BOS,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+
     public final static MatchField<U64> TUNNEL_ID = 
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
 

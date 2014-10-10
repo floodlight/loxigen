@@ -124,7 +124,7 @@ def generate_classes(install_dir):
 # TODO remove header classes and use the corresponding class instead
 def generate_header_classes(install_dir):
     for cls in of_g.standard_class_order:
-        if cls.find("_header") < 0 or cls in ["of_header", "of_bsn_header", "of_nicira_header"]:
+        if not cls.endswith("_header") or cls in ["of_header", "of_bsn_header", "of_nicira_header"]:
             continue
         with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
             util.render_template(out, "class.c",
