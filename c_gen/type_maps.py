@@ -150,7 +150,7 @@ def class_is_virtual(cls):
     """
     Returns True if cls is a virtual class
     """
-    if cls.find("header") > 0:
+    if cls.endswith("header"):
         return True
     if loxi_utils.class_is_list(cls):
         return True

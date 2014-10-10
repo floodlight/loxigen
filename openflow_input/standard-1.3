@@ -1700,7 +1700,7 @@ struct of_table_feature_prop_apply_setfield_miss : of_table_feature_prop {
 struct of_table_feature_prop_experimenter : of_table_feature_prop {
     uint16_t         type == 65534;
     uint16_t         length;
-    uint32_t         experimenter;
+    uint32_t         experimenter == ?;
     uint32_t         subtype;
     of_octets_t      experimenter_data;
 };
@@ -1708,7 +1708,7 @@ struct of_table_feature_prop_experimenter : of_table_feature_prop {
 struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
     uint16_t         type == 65535;
     uint16_t         length;
-    uint32_t         experimenter;
+    uint32_t         experimenter == ?;
     uint32_t         subtype;
     of_octets_t      experimenter_data;
 };
