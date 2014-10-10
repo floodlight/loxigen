@@ -617,7 +617,6 @@ exceptions = {
         'of_oxm_mpls_bos' : { 'value' : boolean_value },
         'of_oxm_mpls_bos_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
-
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
 
@@ -629,6 +628,7 @@ exceptions = {
 
         'of_oxm_bsn_global_vrf_allowed' : { 'value' : boolean_value },
         'of_oxm_bsn_global_vrf_allowed_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
         'of_oxm_bsn_l3_interface_class_id' : { 'value' : class_id },
         'of_oxm_bsn_l3_interface_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
