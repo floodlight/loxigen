@@ -978,7 +978,8 @@ struct of_instruction {
 struct of_instruction_goto_table : of_instruction {
     uint16_t type == 1;
     uint16_t len;
-    of_octets_t exp_data;
+    uint8_t table_id;
+    pad(3);
 };
 
 struct of_instruction_write_metadata : of_instruction {
