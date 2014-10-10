@@ -1,0 +1,7 @@
+-- binary
+80 00 # class
+48 # type/masked
+01 # length
+01 # value
+-- python
+ofp.oxm.mpls_bos(value=01)
