@@ -834,8 +834,7 @@ struct of_port_mod : of_header {
     list(of_port_mod_prop_t) properties;
 };
 
-// FIXME Does this need to be v4?
-struct of_match_v4(align=8, length_includes_align=False) {
+struct of_match_v3(align=8, length_includes_align=False) {
     uint16_t type == 1;
     uint16_t length;
     list(of_oxm_t) oxm_list;
