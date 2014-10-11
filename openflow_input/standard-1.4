@@ -772,6 +772,18 @@ struct of_port_desc_prop {
     uint16_t length; /* Length in bytes of this property. */
 };
 
+struct of_port_desc_prop_ethernet : of_port_desc_prop {
+    uint16_t type == 0;
+    uint16_t length;
+    pad(4);
+    uint32_t curr;
+    uint32_t advertised;
+    uint32_t supported;
+    uint32_t peer;
+    uint32_t curr_speed;
+    uint32_t max_speed;
+};
+
 struct of_port_desc {
     of_port_no_t port_no;
     uint16_t length;
@@ -834,8 +846,7 @@ struct of_port_mod : of_header {
     list(of_port_mod_prop_t) properties;
 };
 
-// FIXME Does this need to be v4?
-struct of_match_v4(align=8, length_includes_align=False) {
+struct of_match_v3(align=8, length_includes_align=False) {
     uint16_t type == 1;
     uint16_t length;
     list(of_oxm_t) oxm_list;
@@ -979,7 +990,8 @@ struct of_instruction {
 struct of_instruction_goto_table : of_instruction {
     uint16_t type == 1;
     uint16_t len;
-    of_octets_t exp_data;
+    uint8_t table_id;
+    pad(3);
 };
 
 struct of_instruction_write_metadata : of_instruction {
@@ -1534,6 +1546,8 @@ struct of_port_stats_entry {
     uint16_t length;
     pad(2);
     of_port_no_t port_no;
+    uint32_t duration_sec;
+    uint32_t duration_nsec;
     uint64_t rx_packets;
     uint64_t tx_packets;
     uint64_t rx_bytes;
@@ -1542,8 +1556,6 @@ struct of_port_stats_entry {
     uint64_t tx_dropped;
     uint64_t rx_errors;
     uint64_t tx_errors;
-    uint32_t duration_sec;
-    uint32_t duration_nsec;
     list(of_port_stats_prop_t) properties;
 };
 

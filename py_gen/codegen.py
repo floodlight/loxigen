@@ -43,6 +43,12 @@ roots = {
     'of_instruction_id': 'instruction_id',
     'of_meter_band': 'meter_band',
     'of_bsn_tlv': 'bsn_tlv',
+    'of_port_desc_prop': 'port_desc_prop',
+    'of_port_stats_prop': 'port_stats_prop',
+    'of_port_mod_prop': 'port_mod_prop',
+    'of_table_mod_prop': 'table_mod_prop',
+    'of_queue_desc_prop': 'queue_desc_prop',
+    'of_queue_stats_prop': 'queue_stats_prop',
 }
 
 # Return the module and class names for the generated Python class
