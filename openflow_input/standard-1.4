@@ -2189,25 +2189,6 @@ struct of_packet_queue {
     list(of_queue_prop_t) properties;
 };
 
-struct of_queue_get_config_request : of_header {
-    uint8_t version;
-    uint8_t type == 22;
-    uint16_t length;
-    uint32_t xid;
-    of_port_no_t port;
-    pad(4);
-};
-
-struct of_queue_get_config_reply : of_header {
-    uint8_t version;
-    uint8_t type == 23;
-    uint16_t length;
-    uint32_t xid;
-    of_port_no_t port;
-    pad(4);
-    list(of_packet_queue_t) queues;
-};
-
 struct of_role_request : of_header {
     uint8_t version;
     uint8_t type == 24;
