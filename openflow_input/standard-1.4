@@ -772,6 +772,18 @@ struct of_port_desc_prop {
     uint16_t length; /* Length in bytes of this property. */
 };
 
+struct of_port_desc_prop_ethernet : of_port_desc_prop {
+    uint16_t type == 0;
+    uint16_t length;
+    pad(4);
+    uint32_t curr;
+    uint32_t advertised;
+    uint32_t supported;
+    uint32_t peer;
+    uint32_t curr_speed;
+    uint32_t max_speed;
+};
+
 struct of_port_desc {
     of_port_no_t port_no;
     uint16_t length;
