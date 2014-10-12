@@ -361,48 +361,6 @@ def populate_type_maps():
     """
     Use the type members in the IR to fill out the legacy type_maps.
     """
-
-    def split_inherited_cls(cls):
-        if cls == 'of_meter_band_stats': # HACK not a subtype of of_meter_band
-            return None, None
-        for parent in sorted(type_maps.inheritance_data.keys(), reverse=True):
-            if cls.startswith(parent):
-                return (parent, cls[len(parent)+1:])
-        return None, None
-
-    def find_experimenter(parent, cls):
-        for experimenter in sorted(of_g.experimenter_name_to_id.keys(), reverse=True):
-            prefix = parent + '_' + experimenter
-            if cls.startswith(prefix) and cls != prefix:
-                return experimenter
-        return None
-
-    def find_type_value(ofclass, m_name):
-        for m in ofclass.members:
-            if isinstance(m, OFTypeMember) and m.name == m_name:
-                return m.value
-        raise KeyError("ver=%d, cls=%s, m_name=%s" % (wire_version, cls, m_name))
-
-    # Most inheritance classes: actions, instructions, etc
-    for version, protocol in loxi_globals.ir.items():
-        wire_version = version.wire_version
-        for ofclass in protocol.classes:
-            cls = ofclass.name
-            parent, subcls = split_inherited_cls(cls)
-            if not (parent and subcls):
-                continue
-            if parent == 'of_oxm':
-                type_len = find_type_value(ofclass, 'type_len')
-                oxm_class = (type_len >> 16) & 0xffff
-                if oxm_class != 0x8000:
-                    # Do not include experimenter OXMs in the main table
-                    val = type_maps.invalid_type
-                else:
-                    val = (type_len >> 8) & 0xff
-            else:
-                val = find_type_value(ofclass, 'type')
-            type_maps.inheritance_data[parent][wire_version][subcls] = val
-
     type_maps.generate_maps()
 
 def analyze_input():

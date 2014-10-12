@@ -53,98 +53,19 @@ invalid_type = "invalid_type"
 #
 ################################################################
 
-instruction_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict()
-    }
-
-instruction_id_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict()
-    }
-
-action_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-action_id_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-queue_prop_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict()
-    }
-
-bsn_vport_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-oxm_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-hello_elem_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-table_feature_prop_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-meter_band_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-bsn_tlv_types = {
-    of_g.VERSION_1_0:dict(),
-    of_g.VERSION_1_1:dict(),
-    of_g.VERSION_1_2:dict(),
-    of_g.VERSION_1_3:dict(),
-    }
-
-# All inheritance data for non-messages
-inheritance_data = dict(
-    of_instruction = instruction_types,
-    of_instruction_id = instruction_id_types,
-    of_action = action_types,
-    of_action_id = action_id_types,
-    of_oxm = oxm_types,
-    of_queue_prop = queue_prop_types,
-    of_hello_elem = hello_elem_types,
-    of_table_feature_prop = table_feature_prop_types,
-    of_meter_band = meter_band_types,
-    # BSN specific inheritance extensions
-    of_bsn_vport = bsn_vport_types,
-    of_bsn_tlv = bsn_tlv_types,
-    )
+inheritance_roots = [
+    'of_instruction',
+    'of_instruction_id',
+    'of_action',
+    'of_action_id',
+    'of_oxm',
+    'of_queue_prop',
+    'of_hello_elem',
+    'of_table_feature_prop',
+    'of_meter_band',
+    'of_bsn_vport',
+    'of_bsn_tlv',
+]
 
 def class_is_virtual(cls):
     """
@@ -156,32 +77,41 @@ def class_is_virtual(cls):
         return True
     return loxi_globals.unified.class_by_name(cls).virtual
 
-################################################################
-#
-# type_val is the primary data structure that maps an
-# (class_name, version) pair to the wire data type value
-#
-################################################################
+# map from root class name to (map from wire version to set of subclass names)
+inheritance_data = {}
 
-type_val = dict()
+# map from parent class name to set of subclass names
 inheritance_map = dict()
 
 def generate_maps():
-    for parent, versioned in inheritance_data.items():
-        inheritance_map[parent] = set()
-        for ver, subclasses in versioned.items():
-            for subcls in subclasses:
-                inheritance_map[parent].add(subcls)
+    def inheritance_root(ofclass):
+        if not ofclass.superclass:
+            if ofclass.name in inheritance_roots:
+                return ofclass
+            else:
+                return None
+        else:
+            return inheritance_root(ofclass.superclass)
 
-    for parent, versioned in inheritance_data.items():
-        for version, subclasses in versioned.items():
-            for subcls, value in subclasses.items():
-                name = parent + "_" + subcls
-                type_val[(name, version)] = value
+    for version, protocol in loxi_globals.ir.items():
+        wire_version = version.wire_version
+        for ofclass in protocol.classes:
+            root = inheritance_root(ofclass)
+            if not root or root == ofclass:
+                continue
 
-    # Special case OF-1.2 match type
-    type_val[("of_match_v3", of_g.VERSION_1_2)] = 1
-    type_val[("of_match_v3", of_g.VERSION_1_3)] = 1
+            assert ofclass.name.startswith(root.name + '_')
+            subcls = ofclass.name[len(root.name)+1:]
+
+            if root.name not in inheritance_data:
+                inheritance_data[root.name] = {}
+            if wire_version not in inheritance_data[root.name]:
+                inheritance_data[root.name][wire_version] = set()
+            inheritance_data[root.name][wire_version].add(subcls)
+
+            if root.name not in inheritance_map:
+                inheritance_map[root.name] = set()
+            inheritance_map[root.name].add(subcls)
 
 def sub_class_map(base_type, version):
     """
