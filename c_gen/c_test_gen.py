@@ -1682,13 +1682,13 @@ def gen_dup_inheritance(out, cls, version):
 """ % dict(cls=cls, ver_name=ver_name))
 
     # For each subclass, check if this is an instance of that subclass
-    version_classes = type_maps.inheritance_data[cls][version]
-    for sub_cls in version_classes:
-        sub_enum = (cls + "_" + sub_cls).upper()
+    sub_classes = type_maps.sub_class_map(cls, version)
+    for (_, sub_cls) in sub_classes:
+        sub_enum = sub_cls.upper()
         out.write("""
     if (src->header.object_id == %(sub_enum)s) {
-        return (%(cls)s_t *)%(cls)s_%(sub_cls)s_%(ver_name)s_dup(
-            &src->%(sub_cls)s);
+        return (%(cls)s_t *)%(sub_cls)s_%(ver_name)s_dup(
+            (of_object_t *)src);
     }
 """ % dict(sub_cls=sub_cls, ver_name=ver_name, sub_enum=sub_enum, cls=cls))
 
