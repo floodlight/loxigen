@@ -77,9 +77,6 @@ def class_is_virtual(cls):
         return True
     return loxi_globals.unified.class_by_name(cls).virtual
 
-# map from root class name to (map from wire version to set of subclass names)
-inheritance_data = {}
-
 # map from parent class name to set of subclass names
 inheritance_map = dict()
 
@@ -102,12 +99,6 @@ def generate_maps():
 
             assert ofclass.name.startswith(root.name + '_')
             subcls = ofclass.name[len(root.name)+1:]
-
-            if root.name not in inheritance_data:
-                inheritance_data[root.name] = {}
-            if wire_version not in inheritance_data[root.name]:
-                inheritance_data[root.name][wire_version] = set()
-            inheritance_data[root.name][wire_version].add(subcls)
 
             if root.name not in inheritance_map:
                 inheritance_map[root.name] = set()
