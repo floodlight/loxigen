@@ -183,46 +183,6 @@ def generate_maps():
     type_val[("of_match_v3", of_g.VERSION_1_2)] = 1
     type_val[("of_match_v3", of_g.VERSION_1_3)] = 1
 
-# Utility function
-def dict_to_array(d, m_val, def_val=-1):
-    """
-    Given a dictionary, d, with each value a small integer,
-    produce an array indexed by the integer whose value is the key.
-    @param d The dictionary
-    @param m_val Ignore values greater than m_val
-    @param def_val The default value (for indices not in range of d)
-    """
-
-    # Get the max value in range for hash
-    max_val = 0
-    for key in d:
-        if (d[key] > max_val) and (d[key] < m_val):
-            max_val = d[key]
-    ar = []
-    for x in range(0, max_val + 1):
-        ar.append(def_val)
-    for key in d:
-        if (d[key] < m_val):
-            ar[d[key]] = key
-    return ar
-
-def type_array_len(version_indexed, max_val):
-    """
-    Given versioned information about a type, calculate how long
-    the unified array should be.
-
-    @param version_indexed A dict indexed by version. Each value is a
-    dict indexed by a name and whose value is an integer
-    @param max_val Ignore values greater than this for length calcs
-    """
-    # First, find the max length of all arrays
-    arr_len = 0
-    for version, val_dict in version_indexed.items():
-        ar = dict_to_array(val_dict, max_val, invalid_type)
-        if arr_len < len(ar):
-            arr_len = len(ar)
-    return arr_len
-
 def sub_class_map(base_type, version):
     """
     Returns an iterable object giving the instance nameys and subclass types
