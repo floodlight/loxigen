@@ -283,7 +283,7 @@ def version_to_name(version):
     """
     Convert an integer version to the C macro name
     """
-    return "OF_" + of_g.version_names[version]
+    return of_g.of_version_wire2name[version]
 
 def gen_c_copy_license(out):
     """
