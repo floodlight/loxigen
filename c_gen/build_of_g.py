@@ -403,39 +403,6 @@ def populate_type_maps():
                 val = find_type_value(ofclass, 'type')
             type_maps.inheritance_data[parent][wire_version][subcls] = val
 
-            # Extensions (only actions for now)
-            experimenter = find_experimenter(parent, cls)
-            if parent == 'of_action' and experimenter:
-                val = find_type_value(ofclass, 'subtype')
-                type_maps.extension_action_subtype[wire_version][experimenter][cls] = val
-                if wire_version >= of_g.VERSION_1_3:
-                    cls2 = parent + "_id" + cls[len(parent):]
-                    type_maps.extension_action_id_subtype[wire_version][experimenter][cls2] = val
-            elif parent == 'of_instruction' and experimenter:
-                val = find_type_value(ofclass, 'subtype')
-                type_maps.extension_instruction_subtype[wire_version][experimenter][cls] = val
-
-    # Messages
-    for version, protocol in loxi_globals.ir.items():
-        wire_version = version.wire_version
-        for ofclass in protocol.classes:
-            cls = ofclass.name
-            # HACK (though this is what loxi_utils.class_is_message() does)
-            if not [x for x in ofclass.members if isinstance(x, OFDataMember) and x.name == 'xid']:
-                continue
-            if type_maps.class_is_virtual(cls):
-                continue
-            subcls = cls[3:]
-            val = find_type_value(ofclass, 'type')
-            if not val in type_maps.message_types[wire_version].values():
-                type_maps.message_types[wire_version][subcls] = val
-
-            # Extensions
-            experimenter = find_experimenter('of', cls)
-            if experimenter and ofclass.is_subclassof("of_experimenter"):
-                val = find_type_value(ofclass, 'subtype')
-                type_maps.extension_message_subtype[wire_version][experimenter][cls] = val
-
     type_maps.generate_maps()
 
 def analyze_input():
