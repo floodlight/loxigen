@@ -310,3 +310,9 @@ struct of_bsn_tlv_convergence_status: of_bsn_tlv {
     uint16_t length;
     uint8_t value;
 };
+
+struct of_bsn_tlv_lacp_enabled: of_bsn_tlv {
+    uint16_t type == 46;
+    uint16_t length;
+    uint8_t value;
+};
