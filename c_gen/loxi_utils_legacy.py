@@ -219,6 +219,10 @@ def instance_to_class(instance, parent):
     """
     return parent + "_" + instance
 
+def class_to_instance(cls, base_cls):
+    assert cls.startswith(base_cls + '_')
+    return cls[len(base_cls)+1:]
+
 def class_is_var_len(cls, version):
     # Match is special case.  Only version 1.2 (wire version 3) is var
     if cls == "of_match":

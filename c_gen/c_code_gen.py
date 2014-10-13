@@ -1055,7 +1055,8 @@ union %(cls)s_u {
     %(cls)s_header_t header; /* Generic instance */
 """ % dict(cls=cls))
         for subcls in sorted(subclasses):
-            out.write("    %s_%s_t %s;\n" % (cls, subcls, subcls))
+            instance = loxi_utils.class_to_instance(subcls, cls)
+            out.write("    %s_%s_t %s;\n" % (cls, instance, instance))
         out.write("};\n")
 
 def gen_struct_typedefs(out):

@@ -76,12 +76,9 @@ def generate_maps():
             if not root or root == ofclass:
                 continue
 
-            assert ofclass.name.startswith(root.name + '_')
-            subcls = ofclass.name[len(root.name)+1:]
-
             if root.name not in inheritance_map:
                 inheritance_map[root.name] = set()
-            inheritance_map[root.name].add(subcls)
+            inheritance_map[root.name].add(ofclass.name)
 
 def sub_class_map(base_type, version):
     """
@@ -92,10 +89,10 @@ def sub_class_map(base_type, version):
     if base_type not in inheritance_map:
         return rv
 
-    for instance in inheritance_map[base_type]:
-        subcls = loxi_utils.instance_to_class(instance, base_type)
+    for subcls in inheritance_map[base_type]:
         if not loxi_utils.class_in_version(subcls, version):
             continue
+        instance = loxi_utils.class_to_instance(subcls, base_type)
         rv.append((instance, subcls))
 
     return rv
