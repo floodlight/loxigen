@@ -145,6 +145,15 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
     def is_subclassof(self, super_class_name):
         return self.name != super_class_name and self.is_instanceof(super_class_name)
 
+    def inheritance_root(self):
+        if not self.superclass:
+            if self.virtual:
+                return self
+            else:
+                return None
+        else:
+            return self.superclass.inheritance_root()
+
     @property
     def is_message(self):
         return self.is_instanceof("of_header")
