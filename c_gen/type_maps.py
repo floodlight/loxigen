@@ -29,19 +29,8 @@ from generic_utils import *
 import c_gen.loxi_utils_legacy as loxi_utils
 import loxi_globals
 
-inheritance_roots = [
-    'of_instruction',
-    'of_instruction_id',
-    'of_action',
-    'of_action_id',
-    'of_oxm',
-    'of_queue_prop',
-    'of_hello_elem',
-    'of_table_feature_prop',
-    'of_meter_band',
-    'of_bsn_vport',
-    'of_bsn_tlv',
-]
+# map from inheritance root class name to set of subclass names
+inheritance_map = {}
 
 def class_is_virtual(cls):
     """
@@ -54,26 +43,14 @@ def class_is_virtual(cls):
     return loxi_globals.unified.class_by_name(cls).virtual
 
 def class_is_inheritance_root(cls):
-    return cls in inheritance_roots
-
-# map from parent class name to set of subclass names
-inheritance_map = dict()
+    return cls in inheritance_map
 
 def generate_maps():
-    def inheritance_root(ofclass):
-        if not ofclass.superclass:
-            if ofclass.name in inheritance_roots:
-                return ofclass
-            else:
-                return None
-        else:
-            return inheritance_root(ofclass.superclass)
-
     for version, protocol in loxi_globals.ir.items():
         wire_version = version.wire_version
         for ofclass in protocol.classes:
-            root = inheritance_root(ofclass)
-            if not root or root == ofclass:
+            root = ofclass.inheritance_root()
+            if not root or root == ofclass or root.name == "of_header":
                 continue
 
             if root.name not in inheritance_map:
