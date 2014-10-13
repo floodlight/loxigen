@@ -372,7 +372,7 @@ extern int test_datafiles(void);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             out.write("""
 extern int %(cls)s_%(v_name)s_populate(
@@ -507,7 +507,7 @@ def gen_message_scalar_test(out, name):
  */
 """ % v_name)
         for cls in of_g.standard_class_order:
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if version in of_g.unified[cls]:
                 message_scalar_test(out, version, cls)
@@ -520,7 +520,7 @@ run_scalar_acc_tests(void)
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
         for cls in of_g.standard_class_order:
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if version in of_g.unified[cls]:
                 test_name = "%s_%s" % (cls, v_name)
@@ -1565,7 +1565,7 @@ def gen_unified_accessor_funs(out):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             elif loxi_utils.class_is_list(cls):
                 gen_list_setup_check(out, cls, version)
@@ -1588,7 +1588,7 @@ def gen_unified_accessor_tests(out, name):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             unified_accessor_test_case(out, cls, version)
 
@@ -1602,7 +1602,7 @@ run_unified_accessor_tests(void)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             test_name = "%s_%s" % (cls, v_name)
             out.write("    RUN_TEST(%s);\n" % test_name)
@@ -1814,7 +1814,7 @@ def gen_version_dup(out=sys.stdout):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 gen_dup_inheritance(out, cls, version)
             elif loxi_utils.class_is_list(cls):
                 gen_dup_list(out, cls, version)
@@ -1836,7 +1836,7 @@ def gen_dup(out=sys.stdout):
         for version in of_g.of_version_range:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            hdr = "header." if cls in type_maps.inheritance_map else ""
+            hdr = "header." if type_maps.class_is_inheritance_root(cls) else ""
 
             ver_name = loxi_utils.version_to_name(version)
             out.write("""
@@ -1940,7 +1940,7 @@ test_dump_objs(void)
         for j, cls in enumerate(of_g.all_class_order):
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if cls == "of_bsn_virtual_port_create_request": # test q_in_q
                 out.write("""

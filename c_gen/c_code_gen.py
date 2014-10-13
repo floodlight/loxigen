@@ -1069,7 +1069,7 @@ def gen_struct_typedefs(out):
         out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
@@ -1109,7 +1109,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1629,7 +1629,7 @@ def gen_init_fn_body(cls, out):
     @param cls The class name for the function
     @param out The file to which to write
     """
-    if cls in type_maps.inheritance_map:
+    if type_maps.class_is_inheritance_root(cls):
         param = "obj_p"
     else:
         param = "obj"
@@ -1659,7 +1659,7 @@ void
 """ % dict(cls=cls, param=param))
 
     # Use an extra pointer to deal with inheritance classes
-    if cls in type_maps.inheritance_map:
+    if type_maps.class_is_inheritance_root(cls):
         out.write("""\
     %s_header_t *obj;
 
@@ -1862,7 +1862,7 @@ extern %(cls)s_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if cls in type_maps.inheritance_map:
+#        if type_maps.class_is_inheritance_root(cls):
 #            continue
         out.write("""
 /**
@@ -1921,7 +1921,7 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             pass # Check this
 
         out.write("""

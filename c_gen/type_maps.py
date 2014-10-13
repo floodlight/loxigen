@@ -53,6 +53,9 @@ def class_is_virtual(cls):
         return True
     return loxi_globals.unified.class_by_name(cls).virtual
 
+def class_is_inheritance_root(cls):
+    return cls in inheritance_roots
+
 # map from parent class name to set of subclass names
 inheritance_map = dict()
 

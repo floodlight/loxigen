@@ -373,7 +373,7 @@ def analyze_input():
     for wire_version, ordered_classes in of_g.ordered_classes.items():
         classes = versions[of_g.of_version_wire2name[wire_version]]['classes']
         for cls in ordered_classes:
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 new_cls = cls + '_header'
                 of_g.ordered_classes[wire_version].append(new_cls)
                 classes[new_cls] = classes[cls]
