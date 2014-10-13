@@ -25,33 +25,9 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-#
-# Miscellaneous type information
-#
-# Define the map between sub-class types and wire values.  In each
-# case, an array indexed by wire version gives a hash from identifier
-# to wire value.
-#
-
-import c_gen.of_g_legacy as of_g
-import sys
 from generic_utils import *
-import loxi_utils.loxi_utils as loxi_utils
 import c_gen.loxi_utils_legacy as loxi_utils
 import loxi_globals
-
-invalid_type = "invalid_type"
-
-################################################################
-#
-# Define type data for inheritance classes:
-#   instructions, actions, queue properties and OXM
-#
-# Messages are not in this group; they're treated specially for now
-#
-# These are indexed by wire protocol number
-#
-################################################################
 
 inheritance_roots = [
     'of_instruction',
