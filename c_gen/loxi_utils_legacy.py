@@ -37,6 +37,8 @@ import sys
 import c_gen.of_g_legacy as of_g
 import tenjin
 from generic_utils import find, memoize
+import loxi_globals
+from loxi_ir import ir
 
 def class_signature(members):
     """
@@ -99,30 +101,27 @@ def class_is_tlv16(cls):
     """
     Return True if cls_name is an object which uses uint16 for type and length
     """
-    if cls.find("of_action") == 0: # Includes of_action_id classes
-        return True
-    if cls.find("of_instruction") == 0:
-        return True
-    if cls.find("of_queue_prop") == 0:
-        return True
-    if cls.find("of_table_feature_prop") == 0:
-        return True
-    # *sigh*
-    if cls.find("of_meter_band_stats") == 0:  # NOT A TLV
+
+    ofclass = loxi_globals.unified.class_by_name(cls)
+    if not ofclass:
         return False
-    if cls.find("of_meter_band") == 0:
-        return True
-    if cls.find("of_hello_elem") == 0:
-        return True
-    if cls == "of_match_v3":
-        return True
-    if cls == "of_match_v4":
-        return True
-    if cls.find("of_bsn_tlv") == 0:
-        return True
-    if cls.find("of_bsn_vport") == 0:
-        return True
-    return False
+
+    if len(ofclass.members) < 2:
+        return False
+
+    m1 = ofclass.members[0]
+    m2 = ofclass.members[1]
+
+    if not (isinstance(m1, ir.OFTypeMember) or isinstance(m1, ir.OFDiscriminatorMember)):
+        return False
+
+    if not isinstance(m2, ir.OFLengthMember):
+        return False
+
+    if m1.oftype != "uint16_t" or m2.oftype != "uint16_t":
+        return False
+
+    return True
 
 def class_is_u16_len(cls):
     """
