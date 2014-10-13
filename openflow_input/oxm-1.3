@@ -40,3 +40,14 @@ struct of_oxm_tunnel_id_masked : of_oxm {
     uint64_t value;
     uint64_t value_mask;
 };
+
+struct of_oxm_mpls_bos : of_oxm {
+    uint32_t type_len == 0x80004801;
+    uint8_t value;
+};
+
+struct of_oxm_mpls_bos_masked : of_oxm {
+    uint32_t type_len == 0x80004902;
+    uint8_t value;
+    uint8_t value_mask;
+};
