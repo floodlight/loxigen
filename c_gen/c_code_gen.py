@@ -874,61 +874,6 @@ extern const char *const of_object_id_str[];
 #define OF_MESSAGE_OBJECT_COUNT %d
 """ % ((last + 1), msg_count))
 
-    # Generate object type range checking for inheritance classes
-
-    # @fixme These should be determined algorithmicly
-    out.write("""
-/*
- * Macros to check if an object ID is within an inheritance class range
- */
-""")
-    # Alphabetical order for 'last'
-    last_ids = dict(of_action="OF_ACTION_STRIP_VLAN",
-                    of_oxm="OF_OXM_VLAN_VID_MASKED",
-                    of_instruction="OF_INSTRUCTION_WRITE_METADATA",
-                    of_queue_prop="OF_QUEUE_PROP_MIN_RATE",
-                    of_table_feature_prop="OF_TABLE_FEATURE_PROP_WRITE_SETFIELD_MISS",
-                    # @FIXME add meter_band ?
-                    )
-    for cls, last in last_ids.items():
-        out.write("""
-#define %(enum)s_FIRST_ID      (%(enum)s + 1)
-#define %(enum)s_LAST_ID       %(last)s
-#define %(enum)s_VALID_ID(id) \\
-    ((id) >= %(enum)s_FIRST_ID && \\
-     (id) <= %(enum)s_LAST_ID)
-""" % dict(enum=enum_name(cls), last=last))
-    out.write("""
-/**
- * Function to check a wire ID
- * @param object_id The ID to check
- * @param base_object_id The inheritance parent, if applicable
- * @returns boolean: If base_object_id is an inheritance class, check if
- * object_id is valid as a subclass.  Otherwise return 1.
- *
- * Note: Could check that object_id == base_object_id in the
- * second case.
- */
-static inline int
-of_wire_id_valid(int object_id, int base_object_id) {
-    switch (base_object_id) {
-    case OF_ACTION:
-        return OF_ACTION_VALID_ID(object_id);
-    case OF_OXM:
-        return OF_OXM_VALID_ID(object_id);
-    case OF_QUEUE_PROP:
-        return OF_QUEUE_PROP_VALID_ID(object_id);
-    case OF_TABLE_FEATURE_PROP:
-        return OF_TABLE_FEATURE_PROP_VALID_ID(object_id);
-    case OF_INSTRUCTION:
-        return OF_INSTRUCTION_VALID_ID(object_id);
-    default:
-        break;
-    }
-    return 1;
-}
-""")
-
 ################################################################
 #
 # Internal Utility Functions
