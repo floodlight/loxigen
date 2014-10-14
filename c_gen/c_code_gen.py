@@ -530,7 +530,7 @@ typedef int (*loci_writer_f)(void *cookie, const char *fmt, ...);
 /**
  * Check if a version is supported
  */
-#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_3)
+#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_4)
 
 """)
     gen_version_enum(out)
