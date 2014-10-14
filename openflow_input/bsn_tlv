@@ -275,31 +275,31 @@ struct of_bsn_tlv_tx_bytes : of_bsn_tlv {
     uint64_t value;
 };
 
-struct of_bsn_tlv_system_priority: of_bsn_tlv {
+struct of_bsn_tlv_actor_system_priority: of_bsn_tlv {
     uint16_t type == 40;
     uint16_t length;
     uint16_t value;
 };
 
-struct of_bsn_tlv_system_mac: of_bsn_tlv {
+struct of_bsn_tlv_actor_system_mac: of_bsn_tlv {
     uint16_t type == 41;
     uint16_t length;
     of_mac_addr_t value;
 };
 
-struct of_bsn_tlv_port_priority: of_bsn_tlv {
+struct of_bsn_tlv_actor_port_priority: of_bsn_tlv {
     uint16_t type == 42;
     uint16_t length;
     uint16_t value;
 };
 
-struct of_bsn_tlv_port_num: of_bsn_tlv {
+struct of_bsn_tlv_actor_port_num: of_bsn_tlv {
     uint16_t type == 43;
     uint16_t length;
     uint16_t value;
 };
 
-struct of_bsn_tlv_port_key: of_bsn_tlv {
+struct of_bsn_tlv_actor_key: of_bsn_tlv {
     uint16_t type == 44;
     uint16_t length;
     uint16_t value;
@@ -309,4 +309,34 @@ struct of_bsn_tlv_convergence_status: of_bsn_tlv {
     uint16_t type == 45;
     uint16_t length;
     uint8_t value;
+};
+
+struct of_bsn_tlv_partner_system_priority: of_bsn_tlv {
+    uint16_t type == 47;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_system_mac: of_bsn_tlv {
+    uint16_t type == 48;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_partner_port_priority: of_bsn_tlv {
+    uint16_t type == 49;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_port_num: of_bsn_tlv {
+    uint16_t type == 50;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_key: of_bsn_tlv {
+    uint16_t type == 51;
+    uint16_t length;
+    uint16_t value;
 };
