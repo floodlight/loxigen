@@ -1700,8 +1700,7 @@ def gen_new_fn_body(cls, out):
         # Init length field for match object
         out.write("""
     /* Initialize match TLV for 1.2 */
-    /* FIXME: Check 1.3 below */
-    if ((version == OF_VERSION_1_2) || (version == OF_VERSION_1_3)) {
+    if ((version >= OF_VERSION_1_2)) {
         of_object_u16_set((of_object_t *)obj, %(match_offset)d + 2, 4);
     }
 """ % dict(match_offset=match_offset))
