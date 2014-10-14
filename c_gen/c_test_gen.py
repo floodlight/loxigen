@@ -773,13 +773,15 @@ list_setup_%(cls)s_%(v_name)s(
     out.write("""
     %(base_type)s_t elt;
     int cur_len = 0;
+    (void) elt;
+    (void) cur_len;
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
     sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
-    if len(sub_classes) == 0:
+    if not type_maps.class_is_virtual(base_type):
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
         out.write("\n    elt_p = &elt;\n")
@@ -791,7 +793,7 @@ list_setup_%(cls)s_%(v_name)s(
         for instance, subcls in sub_classes:
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
-    if len(sub_classes) == 0: # No inheritance case
+    if not type_maps.class_is_virtual(base_type): # No inheritance case
         setup_instance(out, cls, base_type, "elt_p", v_name, version)
     else:
         for instance, subcls in sub_classes:
@@ -819,13 +821,14 @@ list_check_%(cls)s_%(v_name)s(
     base_type = loxi_utils.list_to_entry_type(cls)
     out.write("""
     %(base_type)s_t elt;
+    (void) elt;
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
     sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
-    if len(sub_classes) == 0:
+    if not type_maps.class_is_virtual(base_type):
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
         out.write("\n    elt_p = &elt;\n")
@@ -837,8 +840,10 @@ list_check_%(cls)s_%(v_name)s(
         for instance, subcls in sub_classes:
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
-    out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
-    if len(sub_classes) == 0: # No inheritance case
+    if not type_maps.class_is_virtual(base_type) or sub_classes:
+        out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
+
+    if not type_maps.class_is_virtual(base_type): # No inheritance case
         check_instance(out, cls, base_type, "elt_p", v_name, version, True)
     else:
         count = 0
@@ -1173,13 +1178,15 @@ int
     out.write("""
     %(base_type)s_t elt;
     int cur_len = 0;
+    (void) elt;
+    (void) cur_len;
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
     sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
-    if len(sub_classes) == 0:
+    if not type_maps.class_is_virtual(base_type):
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
         out.write("\n    elt_p = &elt;\n")
@@ -1191,7 +1198,7 @@ int
         for instance, subcls in sub_classes:
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
-    if len(sub_classes) == 0: # No inheritance case
+    if not type_maps.class_is_virtual(base_type): # No inheritance case
         setup_instance(out, cls, base_type, "elt_p", v_name, version)
     else:
         for instance, subcls in sub_classes:
@@ -1225,7 +1232,7 @@ int
     sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
     v_name = loxi_utils.version_to_name(version)
 
-    if len(sub_classes) == 0:
+    if not type_maps.class_is_virtual(base_type):
         entry_count = 2
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
@@ -1239,8 +1246,10 @@ int
         for instance, subcls in sub_classes:
             out.write("    %s = &elt.%s;\n" % (instance, instance))
 
-    out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
-    if len(sub_classes) == 0: # No inheritance case
+    if not type_maps.class_is_virtual(base_type) or sub_classes:
+        out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
+
+    if not type_maps.class_is_virtual(base_type): # No inheritance case
         check_instance(out, cls, base_type, "elt_p", v_name,
                        version, True)
     else:
