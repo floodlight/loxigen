@@ -311,20 +311,20 @@ static const loci_obj_show_f show_funs_v%(version)s[OF_OBJECT_COUNT] = {
         out.write("};\n\n")
 
     out.write("""
-static const loci_obj_show_f *const show_funs[5] = {
-    NULL,
-    show_funs_v1,
-    show_funs_v2,
-    show_funs_v3,
-    show_funs_v4
+static const loci_obj_show_f *const show_funs[] = {
+""")
+
+    for version in of_g.of_version_range:
+        out.write("    [%(v)d] = show_funs_v%(v)d,\n" % dict(v=version))
+
+    out.write("""\
 };
 
 int
 of_object_show(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     if ((obj->object_id > 0) && (obj->object_id < OF_OBJECT_COUNT)) {
-        if (((obj)->version > 0) && ((obj)->version <= OF_VERSION_1_2)) {
-            /* @fixme VERSION */
+        if (OF_VERSION_OKAY(obj->version)) {
             return show_funs[obj->version][obj->object_id](writer, cookie, (of_object_t *)obj);
         } else {
             return writer(cookie, "Bad version %d\\n", obj->version);
