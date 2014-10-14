@@ -1637,41 +1637,6 @@ void
 
 """)
 
-def gen_wire_push_fn(cls, out):
-    """
-    Generate the calls to push values into the wire buffer
-    """
-    if type_maps.class_is_virtual(cls):
-        print "Push fn gen called for virtual class " + cls
-        return
-
-    from codegen import class_metadata_dict
-    metadata = class_metadata_dict[cls]
-
-    out.write("""
-/**
- * Helper function to push values into the wire buffer
- */
-static inline int
-%(cls)s_push_wire_values(%(cls)s_t *obj)
-{
-""" % dict(cls=cls))
-
-    if metadata.wire_type_set != 'NULL':
-        out.write("""
-    %s(obj);
-""" % metadata.wire_type_set)
-
-    if metadata.wire_length_set != 'NULL':
-        out.write("""
-    %s(obj, obj->length);
-""" % metadata.wire_length_set)
-
-    out.write("""
-    return OF_ERROR_NONE;
-}
-""")
-
 def gen_new_fn_body(cls, out):
     """
     Generate function body for new function
@@ -1684,9 +1649,6 @@ def gen_new_fn_body(cls, out):
  * \\defgroup %(cls)s %(cls)s
  */
 """ % dict(cls=cls))
-
-    if not type_maps.class_is_virtual(cls):
-        gen_wire_push_fn(cls, out)
 
     uclass = loxi_globals.unified.class_by_name(cls)
     is_fixed_length = uclass and uclass.is_fixed_length
@@ -1720,12 +1682,18 @@ def gen_new_fn_body(cls, out):
     %(cls)s_init(obj, version, bytes, 0);
 """ % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
-        out.write("""
-    if (%(cls)s_push_wire_values(obj) < 0) {
-        FREE(obj);
-        return NULL;
-    }
-""" % dict(cls=cls))
+        from codegen import class_metadata_dict
+        metadata = class_metadata_dict[cls]
+
+        if metadata.wire_type_set != 'NULL':
+            out.write("""\
+    %s(obj);
+""" % metadata.wire_type_set)
+
+        if metadata.wire_length_set != 'NULL':
+            out.write("""\
+    %s(obj, obj->length);
+""" % metadata.wire_length_set)
 
     match_offset = v3_match_offset_get(cls)
     if match_offset >= 0:
