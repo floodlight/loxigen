@@ -43,6 +43,78 @@ import c_gen.loxi_utils_legacy as loxi_utils
 import c_gen.identifiers as identifiers
 from c_test_gen import var_name_map
 
+show_override = {
+    ('uint32_t', 'arp_tpa'): 'ipv4',
+    ('uint32_t', 'arp_spa'): 'ipv4',
+    ('uint32_t', 'nw_addr'): 'ipv4',
+    ('uint32_t', 'dst'): 'ipv4',
+}
+
+show_hex = set([
+    ('uint8_t', 'icmpv6_code'),
+    ('uint8_t', 'mpls_tc'),
+    ('uint16_t', 'eth_type'),
+    ('uint8_t', 'ip_dscp'),
+    ('uint64_t', 'metadata'),
+    ('uint16_t', 'ingress_tpid'),
+    ('uint16_t', 'egress_tpid'),
+    ('uint32_t', 'xid'),
+    ('uint16_t', 'flags'),
+    ('uint32_t', 'experimenter'),
+    ('uint32_t', 'mask'),
+    ('uint8_t', 'report_mirror_ports'),
+    ('uint64_t', 'datapath_id'),
+    ('uint32_t', 'capabilities'),
+    ('uint32_t', 'actions'),
+    ('uint64_t', 'cookie'),
+    ('uint8_t', 'reason'),
+    ('uint32_t', 'role'),
+    ('uint32_t', 'config'),
+    ('uint32_t', 'advertise'),
+    ('uint32_t', 'advertised'),
+    ('uint32_t', 'supported'),
+    ('uint32_t', 'peer'),
+    ('uint64_t', 'cookie_mask'),
+    ('uint32_t', 'reserved'),
+    ('uint16_t', 'ethertype'),
+    ('uint64_t', 'metadata_mask'),
+    ('uint32_t', 'instructions'),
+    ('uint32_t', 'write_actions'),
+    ('uint32_t', 'apply_actions'),
+    ('uint32_t', 'types'),
+    ('uint32_t', 'actions_all'),
+    ('uint32_t', 'actions_select'),
+    ('uint32_t', 'actions_indirect'),
+    ('uint32_t', 'actions_ff'),
+    ('uint64_t', 'generation_id'),
+    ('uint16_t', 'value_mask'),
+    ('uint32_t', 'value_mask'),
+    ('uint32_t', 'oxm_header'),
+    ('uint8_t', 'value_mask'),
+    ('uint64_t', 'value_mask'),
+    ('uint64_t', 'write_setfields'),
+    ('uint64_t', 'apply_setfields'),
+    ('uint64_t', 'metadata_match'),
+    ('uint64_t', 'metadata_write'),
+    ('uint32_t', 'packet_in_mask_equal_master'),
+    ('uint32_t', 'packet_in_mask_slave'),
+    ('uint32_t', 'port_status_mask_equal_master'),
+    ('uint32_t', 'port_status_mask_slave'),
+    ('uint32_t', 'flow_removed_mask_equal_master'),
+    ('uint32_t', 'flow_removed_mask_slave'),
+    ('uint32_t', 'band_types'),
+    ('uint16_t', 'bsn_tcp_flags'),
+])
+
+def gen_emitter(cls, m_name, m_type):
+    if (m_type, m_name) in show_override:
+        short_type = show_override[(m_type, m_name)]
+    elif (m_type, m_name) in show_hex:
+        short_type = loxi_utils.type_to_short_name(m_type).replace('u', 'x')
+    else:
+        short_type = loxi_utils.type_to_short_name(m_type)
+    return "LOCI_SHOW_" + short_type;
+
 def gen_obj_show_h(out, name):
     loxi_utils.gen_c_copy_license(out)
     out.write("""
@@ -155,8 +227,7 @@ int
             for member in members:
                 m_type = member["m_type"]
                 m_name = member["name"]
-                #emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type)
-                emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + m_name;
+                emitter = gen_emitter(cls, m_name, m_type)
                 if loxi_utils.skip_member_name(m_name):
                     continue
                 if (loxi_utils.type_is_scalar(m_type) or
@@ -204,8 +275,7 @@ loci_show_match(loci_writer_f writer, void* cookie, of_match_t *match)
 
     for key, entry in match.of_match_members.items():
         m_type = entry["m_type"]
-        #emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type)
-        emitter = "LOCI_SHOW_" + loxi_utils.type_to_short_name(m_type) + "_" + key;
+        emitter = gen_emitter('of_match', key, m_type)
         out.write("""
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(match)) {
         out += writer(cookie, "%(key)s active=");
