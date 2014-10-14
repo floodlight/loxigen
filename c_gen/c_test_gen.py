@@ -968,10 +968,12 @@ def gen_match_test(out, name):
 static int
 test_match_1(void)
 {
-    of_match_v1_t *m_v1;
-    of_match_v2_t *m_v2;
-    of_match_v3_t *m_v3;
-    of_match_v4_t *m_v4;
+""")
+
+    for version in of_g.of_version_range:
+        out.write("    of_match_v%(v)d_t *m_v%(v)d;\n" % dict(v=version))
+
+    out.write("""\
     of_match_t match;
     int value = 1;
     int idx;
@@ -1006,10 +1008,12 @@ test_match_1(void)
 static int
 test_match_2(void)
 {
-    of_match_v1_t *m_v1;
-    of_match_v2_t *m_v2;
-    of_match_v3_t *m_v3;
-    of_match_v3_t *m_v4;
+""")
+
+    for version in of_g.of_version_range:
+        out.write("    of_match_v%(v)d_t *m_v%(v)d;\n" % dict(v=version))
+
+    out.write("""\
     of_match_t match1;
     of_match_t match2;
     int value = 1;
