@@ -1637,8 +1637,6 @@ void
 
 """)
 
-## @fixme This should also be updated once there is a map from
-# class instance to wire length/type accessors
 def gen_wire_push_fn(cls, out):
     """
     Generate the calls to push values into the wire buffer
@@ -1646,6 +1644,9 @@ def gen_wire_push_fn(cls, out):
     if type_maps.class_is_virtual(cls):
         print "Push fn gen called for virtual class " + cls
         return
+
+    from codegen import class_metadata_dict
+    metadata = class_metadata_dict[cls]
 
     out.write("""
 /**
@@ -1656,39 +1657,15 @@ static inline int
 {
 """ % dict(cls=cls))
 
-    import loxi_globals
-    uclass = loxi_globals.unified.class_by_name(cls)
-    if uclass and not uclass.virtual and uclass.has_type_members:
+    if metadata.wire_type_set != 'NULL':
         out.write("""
-    %(cls)s_push_wire_types(obj);
-""" % dict(cls=cls))
+    %s(obj);
+""" % metadata.wire_type_set)
 
-    if loxi_utils.class_is_message(cls):
+    if metadata.wire_length_set != 'NULL':
         out.write("""
-    /* Message obj; set length */
-    of_message_t msg;
-
-    if ((msg = OF_OBJECT_TO_MESSAGE(obj)) != NULL) {
-        of_message_length_set(msg, obj->length);
-    }
-""" % dict(name = enum_name(cls)))
-
-    else: # Not a message
-        if loxi_utils.class_is_tlv16(cls):
-            out.write("""
-    /* TLV obj; set length */
-    of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-        if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
-            out.write("""
-    of_object_wire_length_set((of_object_t *)obj, obj->length);
-""")
-
-        if cls == "of_meter_stats":
-            out.write("""
-    of_meter_stats_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
+    %s(obj, obj->length);
+""" % metadata.wire_length_set)
 
     out.write("""
     return OF_ERROR_NONE;
