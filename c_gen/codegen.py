@@ -197,6 +197,13 @@ ClassMetadata = namedtuple('ClassMetadata',
 class_metadata = []
 class_metadata_dict = {}
 
+# These classes have handwritten C code to get/set their length fields
+# See templates/of_type_maps.c
+special_length_classes = set([
+    'of_packet_queue', 'of_meter_stats', 'of_port_desc',
+    'of_port_stats_entry', 'of_queue_stats_entry',
+])
+
 def build_class_metadata():
     for uclass in loxi_globals.unified.classes:
         wire_length_get = 'NULL'
@@ -216,14 +223,9 @@ def build_class_metadata():
             wire_length_set = 'of_object_message_wire_length_set'
         elif uclass.is_oxm:
             wire_length_get = 'of_oxm_wire_length_get'
-        elif uclass.name == "of_packet_queue":
-            # u16 len, but at offset 4
-            wire_length_get = 'of_packet_queue_wire_length_get'
-            wire_length_set = 'of_packet_queue_wire_length_set'
-        elif uclass.name == "of_meter_stats":
-            # u16 len, but at offset 4
-            wire_length_get = 'of_meter_stats_wire_length_get'
-            wire_length_set = 'of_meter_stats_wire_length_set'
+        elif uclass.name in special_length_classes:
+            wire_length_get = '%s_wire_length_get' % uclass.name
+            wire_length_set = '%s_wire_length_set' % uclass.name
         elif loxi_utils_legacy.class_is_tlv16(uclass.name):
             wire_length_set = 'of_tlv16_wire_length_set'
             wire_length_get = 'of_tlv16_wire_length_get'

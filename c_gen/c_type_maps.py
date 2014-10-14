@@ -64,6 +64,15 @@ extern void of_list_meter_band_stats_wire_length_get(of_object_t *obj,
 extern void of_meter_stats_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_meter_stats_wire_length_set(of_object_t *obj, int bytes);
 
+extern void of_port_desc_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_port_desc_wire_length_set(of_object_t *obj, int bytes);
+
+extern void of_port_stats_entry_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_port_stats_entry_wire_length_set(of_object_t *obj, int bytes);
+
+extern void of_queue_stats_entry_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_queue_stats_entry_wire_length_set(of_object_t *obj, int bytes);
+
 """)
 
 
