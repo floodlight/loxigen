@@ -124,6 +124,13 @@ string_types = [ "of_port_name_t", "of_table_name_t",
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
 
+# When embedding an object inside of another object we have to pick a single
+# subclass to use, unlike lists where we use all subclasses.
+embedded_subclasses = {
+    'of_oxm_header_t': 'of_oxm_eth_type',
+    'of_bsn_vport_header_t': 'of_bsn_vport_q_in_q',
+}
+
 def ignore_member(cls, version, m_name, m_type):
     """
     Filter out names or types that either don't have accessors
@@ -1301,8 +1308,9 @@ int
     for m_type in member_types:
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t":
-            out.write("    of_bsn_vport_q_in_q_t *%s;\n" % var_name_map(m_type))
+        elif m_type in embedded_subclasses:
+            subcls = embedded_subclasses[m_type]
+            out.write("    %s_t *%s;\n" % (subcls, var_name_map(m_type)))
         else:
             out.write("    %s *%s;\n" % (m_type, var_name_map(m_type)))
     out.write("""
@@ -1313,7 +1321,7 @@ int
         m_name = member["name"]
         if loxi_utils.skip_member_name(m_name):
             continue
-        if m_type == "of_bsn_vport_header_t":
+        if m_type in embedded_subclasses:
             continue
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("""\
@@ -1363,8 +1371,8 @@ int
         FREE(octets.data);
     }
 """ % dict(var_name=var_name_map(m_type), cls=cls, m_name=m_name))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""\
     %(var_name)s = %(sub_cls)s_new(%(v_name)s);
     TEST_ASSERT(%(var_name)s != NULL);
@@ -1443,8 +1451,8 @@ int
     value = of_octets_check(&%(var_name)s, value);
 """ % dict(cls=cls, var_name=var_name_map(m_type), m_name=m_name,
            v_name=loxi_utils.version_to_name(version)))
-        elif m_type == "of_bsn_vport_header_t": # tests only q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
     { /* Use get/delete to access on check */
         %(sub_cls)s_t *%(m_name)s_ptr;
@@ -1728,11 +1736,12 @@ def gen_dup_cls(out, cls, version):
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             # Declare instance of these
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
-    of_bsn_vport_q_in_q_t src_%(v_name)s;
-    of_bsn_vport_q_in_q_t *dst_%(v_name)s;
-""" % dict(v_name=var_name_map(m_type)))
+    %(sub_cls)s_t src_%(v_name)s;
+    %(sub_cls)s_t *dst_%(v_name)s;
+""" % dict(v_name=var_name_map(m_type), sub_cls=sub_cls))
         else:
             out.write("""
     %(m_type)s src_%(v_name)s;
@@ -1760,8 +1769,8 @@ def gen_dup_cls(out, cls, version):
     %(cls)s_%(m_name)s_get(src, &%(v_name)s);
     %(cls)s_%(m_name)s_set(dst, &%(v_name)s);
 """ % dict(cls=cls, m_name=m_name, v_name=var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
     %(cls)s_%(m_name)s_bind(
         src, &src_%(v_name)s);
