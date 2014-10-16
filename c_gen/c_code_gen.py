@@ -725,24 +725,6 @@ typedef uint64_t of_match_bmap_t;
 #define U64_HTON(val) U64_NTOH(val)
 #define IPV6_HTON(dst, src) /* NOTE different syntax; currently no-op */
 #endif
-
-/****************************************************************
- *
- * The following are internal definitions used by the automatically
- * generated code.  Users should not reference these definitions
- * as they may change between versions of this code
- *
- ****************************************************************/
-
-#define OF_MESSAGE_IN_MATCH_POINTER(obj)                            \\
-    (WIRE_BUF_POINTER(&((obj)->wire_buffer), OF_MESSAGE_IN_MATCH_OFFSET))
-#define OF_MESSAGE_IN_MATCH_LEN(ptr) BUF_U16_GET(&ptr[2])
-#define OF_MESSAGE_IN_DATA_OFFSET(obj) \\
-    (FIXED_LEN + OF_MESSAGE_IN_MATCH_LEN(OF_MESSAGE_IN_MATCH_POINTER(obj)) + 2)
-
-#define OF_MESSAGE_OUT_DATA_OFFSET(obj) \\
-    (FIXED_LEN + of_message_out_actions_len_get(obj))
-
 """)
 
 def external_h_top_matter(out, name):
