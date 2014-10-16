@@ -187,6 +187,8 @@ def member_length(version, fe_class, fe_member, existing_classes, existing_enums
         member_ir_class = existing_classes[base_class]
         bytes = member_ir_class.base_length
         length_fixed = member_ir_class.is_fixed_length
+        if member_ir_class.has_external_alignment:
+            bytes = (bytes + 7) & ~7
     else:
         if base_type in existing_enums:
             enum = existing_enums[base_type]
