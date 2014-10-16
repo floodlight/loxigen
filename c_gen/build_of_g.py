@@ -163,6 +163,11 @@ def update_offset(cls, wire_version, name, offset, m_type):
             # but is variable length
             bytes = -1
             len_update = 4
+        elif base_type == "of_port_desc_t":
+            # This is a special case: it has non-zero min length
+            # but is variable length
+            bytes = -1
+            len_update = of_g.base_length[(base_class, wire_version)]
         elif base_type in of_g.of_base_types:
             bytes = of_g.of_base_types[base_type]["bytes"]
         else:
