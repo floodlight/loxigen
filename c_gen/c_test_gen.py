@@ -124,6 +124,13 @@ string_types = [ "of_port_name_t", "of_table_name_t",
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
 
+# When embedding an object inside of another object we have to pick a single
+# subclass to use, unlike lists where we use all subclasses.
+embedded_subclasses = {
+    'of_oxm_header_t': 'of_oxm_eth_type',
+    'of_bsn_vport_header_t': 'of_bsn_vport_q_in_q',
+}
+
 def ignore_member(cls, version, m_name, m_type):
     """
     Filter out names or types that either don't have accessors
@@ -372,7 +379,7 @@ extern int test_datafiles(void);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             out.write("""
 extern int %(cls)s_%(v_name)s_populate(
@@ -507,7 +514,7 @@ def gen_message_scalar_test(out, name):
  */
 """ % v_name)
         for cls in of_g.standard_class_order:
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if version in of_g.unified[cls]:
                 message_scalar_test(out, version, cls)
@@ -520,7 +527,7 @@ run_scalar_acc_tests(void)
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
         for cls in of_g.standard_class_order:
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if version in of_g.unified[cls]:
                 test_name = "%s_%s" % (cls, v_name)
@@ -1301,8 +1308,9 @@ int
     for m_type in member_types:
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t":
-            out.write("    of_bsn_vport_q_in_q_t *%s;\n" % var_name_map(m_type))
+        elif m_type in embedded_subclasses:
+            subcls = embedded_subclasses[m_type]
+            out.write("    %s_t *%s;\n" % (subcls, var_name_map(m_type)))
         else:
             out.write("    %s *%s;\n" % (m_type, var_name_map(m_type)))
     out.write("""
@@ -1313,7 +1321,7 @@ int
         m_name = member["name"]
         if loxi_utils.skip_member_name(m_name):
             continue
-        if m_type == "of_bsn_vport_header_t":
+        if m_type in embedded_subclasses:
             continue
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             out.write("""\
@@ -1363,8 +1371,8 @@ int
         FREE(octets.data);
     }
 """ % dict(var_name=var_name_map(m_type), cls=cls, m_name=m_name))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""\
     %(var_name)s = %(sub_cls)s_new(%(v_name)s);
     TEST_ASSERT(%(var_name)s != NULL);
@@ -1443,8 +1451,8 @@ int
     value = of_octets_check(&%(var_name)s, value);
 """ % dict(cls=cls, var_name=var_name_map(m_type), m_name=m_name,
            v_name=loxi_utils.version_to_name(version)))
-        elif m_type == "of_bsn_vport_header_t": # tests only q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
     { /* Use get/delete to access on check */
         %(sub_cls)s_t *%(m_name)s_ptr;
@@ -1565,7 +1573,7 @@ def gen_unified_accessor_funs(out):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             elif loxi_utils.class_is_list(cls):
                 gen_list_setup_check(out, cls, version)
@@ -1588,7 +1596,7 @@ def gen_unified_accessor_tests(out, name):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             unified_accessor_test_case(out, cls, version)
 
@@ -1602,7 +1610,7 @@ run_unified_accessor_tests(void)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             test_name = "%s_%s" % (cls, v_name)
             out.write("    RUN_TEST(%s);\n" % test_name)
@@ -1682,13 +1690,13 @@ def gen_dup_inheritance(out, cls, version):
 """ % dict(cls=cls, ver_name=ver_name))
 
     # For each subclass, check if this is an instance of that subclass
-    version_classes = type_maps.inheritance_data[cls][version]
-    for sub_cls in version_classes:
-        sub_enum = (cls + "_" + sub_cls).upper()
+    sub_classes = type_maps.sub_class_map(cls, version)
+    for (_, sub_cls) in sub_classes:
+        sub_enum = sub_cls.upper()
         out.write("""
     if (src->header.object_id == %(sub_enum)s) {
-        return (%(cls)s_t *)%(cls)s_%(sub_cls)s_%(ver_name)s_dup(
-            &src->%(sub_cls)s);
+        return (%(cls)s_t *)%(sub_cls)s_%(ver_name)s_dup(
+            (of_object_t *)src);
     }
 """ % dict(sub_cls=sub_cls, ver_name=ver_name, sub_enum=sub_enum, cls=cls))
 
@@ -1728,11 +1736,12 @@ def gen_dup_cls(out, cls, version):
         if loxi_utils.type_is_scalar(m_type) or m_type in ["of_match_t", "of_octets_t"]:
             # Declare instance of these
             out.write("    %s %s;\n" % (m_type, var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
-    of_bsn_vport_q_in_q_t src_%(v_name)s;
-    of_bsn_vport_q_in_q_t *dst_%(v_name)s;
-""" % dict(v_name=var_name_map(m_type)))
+    %(sub_cls)s_t src_%(v_name)s;
+    %(sub_cls)s_t *dst_%(v_name)s;
+""" % dict(v_name=var_name_map(m_type), sub_cls=sub_cls))
         else:
             out.write("""
     %(m_type)s src_%(v_name)s;
@@ -1760,8 +1769,8 @@ def gen_dup_cls(out, cls, version):
     %(cls)s_%(m_name)s_get(src, &%(v_name)s);
     %(cls)s_%(m_name)s_set(dst, &%(v_name)s);
 """ % dict(cls=cls, m_name=m_name, v_name=var_name_map(m_type)))
-        elif m_type == "of_bsn_vport_header_t": # test q_in_q
-            sub_cls = "of_bsn_vport_q_in_q"
+        elif m_type in embedded_subclasses:
+            sub_cls = embedded_subclasses[m_type]
             out.write("""
     %(cls)s_%(m_name)s_bind(
         src, &src_%(v_name)s);
@@ -1814,7 +1823,7 @@ def gen_version_dup(out=sys.stdout):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 gen_dup_inheritance(out, cls, version)
             elif loxi_utils.class_is_list(cls):
                 gen_dup_list(out, cls, version)
@@ -1836,7 +1845,7 @@ def gen_dup(out=sys.stdout):
         for version in of_g.of_version_range:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            hdr = "header." if cls in type_maps.inheritance_map else ""
+            hdr = "header." if type_maps.class_is_inheritance_root(cls) else ""
 
             ver_name = loxi_utils.version_to_name(version)
             out.write("""
@@ -1940,7 +1949,7 @@ test_dump_objs(void)
         for j, cls in enumerate(of_g.all_class_order):
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_inheritance_root(cls):
                 continue
             if cls == "of_bsn_virtual_port_create_request": # test q_in_q
                 out.write("""
