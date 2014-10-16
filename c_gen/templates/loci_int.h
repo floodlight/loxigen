@@ -30,6 +30,8 @@
 :: flow_mod = of_g.base_length[("of_flow_modify",of_g.VERSION_1_2)]
 :: packet_in = of_g.base_length[("of_packet_in",of_g.VERSION_1_2)]
 :: packet_in_1_3 = of_g.base_length[("of_packet_in",of_g.VERSION_1_3)]
+:: packet_in_1_4 = of_g.base_length[("of_packet_in",of_g.VERSION_1_4)]
+:: assert packet_in_1_3 == packet_in_1_4
 :: flow_stats = of_g.base_length[("of_flow_stats_entry", of_g.VERSION_1_2)]
 :: match1 = of_g.base_length[("of_match_v1",of_g.VERSION_1_0)]
 :: match2 = of_g.base_length[("of_match_v2",of_g.VERSION_1_1)]
