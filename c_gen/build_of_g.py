@@ -119,140 +119,6 @@ def add_class(wire_version, cls, members):
         if not m_name in of_g.ordered_members[cls]:
             of_g.ordered_members[cls].append(m_name)
 
-def update_offset(cls, wire_version, name, offset, m_type):
-    """
-    Update (and return) the offset based on type.
-    @param cls The parent class
-    @param wire_version The wire version being processed
-    @param name The name of the data member
-    @param offset The current offset
-    @param m_type The type declaration being processed
-    @returns A pair (next_offset, len_update)  next_offset is the new offset
-    of the next object or -1 if this is a var-length object.  len_update
-    is the increment that should be added to the length.  Note that (for
-    of_match_v3) it is variable length, but it adds 8 bytes to the fixed
-    length of the object
-    If offset is already -1, do not update
-    Otherwise map to base type and count and update (if possible)
-    """
-    if offset < 0:    # Don't update offset once set to -1
-        return offset, 0
-
-    count, base_type = loxi_utils.type_dec_to_count_base(m_type)
-
-    len_update = 0
-    if base_type in of_g.of_mixed_types:
-        base_type = of_g.of_mixed_types[base_type][wire_version]
-
-    base_class = base_type[:-2]
-    if (base_class, wire_version) in of_g.is_fixed_length:
-        bytes = of_g.base_length[(base_class, wire_version)]
-    else:
-        if base_type == "of_match_v3_t":
-            # This is a special case: it has non-zero min length
-            # but is variable length
-            bytes = -1
-            len_update = 8
-        elif base_type == "of_oxm_header_t":
-            # This is a special case: it has non-zero min length
-            # but is variable length
-            bytes = -1
-            len_update = 4
-        elif base_type == "of_bsn_vport_header_t":
-            # This is a special case: it has non-zero min length
-            # but is variable length
-            bytes = -1
-            len_update = 4
-        elif base_type == "of_port_desc_t":
-            # This is a special case: it has non-zero min length
-            # but is variable length
-            bytes = -1
-            len_update = of_g.base_length[(base_class, wire_version)]
-        elif base_type in of_g.of_base_types:
-            bytes = of_g.of_base_types[base_type]["bytes"]
-        else:
-            print "UNKNOWN TYPE for %s %s: %s" % (cls, name, base_type)
-            log("UNKNOWN TYPE for %s %s: %s" % (cls, name, base_type))
-            bytes = -1
-
-    # If bytes
-    if bytes > 0:
-        len_update = count * bytes
-
-    if bytes == -1:
-        return -1, len_update
-
-    return offset + (count * bytes), len_update
-
-def calculate_offsets_and_lengths(ordered_classes, classes, wire_version):
-    """
-    Generate the offsets for fixed offset class members
-    Also calculate the class_sizes when possible.
-
-    @param classes The classes to process
-    @param wire_version The wire version for this set of classes
-
-    Updates global variables
-    """
-
-    lists = set()
-
-    # Generate offsets
-    for cls in ordered_classes:
-        fixed_offset = 0 # The last "good" offset seen
-        offset = 0
-        last_offset = 0
-        last_name = "-"
-        for member in classes[cls]:
-            m_type = member["m_type"]
-            name = member["name"]
-            if last_offset == -1:
-                if name == "pad":
-                    log("Skipping pad for special offset for %s" % cls)
-                else:
-                    log("SPECIAL OFS: Member %s (prev %s), class %s ver %d" %
-                          (name, last_name, cls, wire_version))
-                    if (((cls, name) in of_g.special_offsets) and
-                        (of_g.special_offsets[(cls, name)] != last_name)):
-                        debug("ERROR: special offset prev name changed")
-                        debug("  cls %s. name %s. version %d. was %s. now %s" %
-                              cls, name, wire_version,
-                              of_g.special_offsets[(cls, name)], last_name)
-                        sys.exit(1)
-                    of_g.special_offsets[(cls, name)] = last_name
-
-            member["offset"] = offset
-            if m_type.find("list(") == 0:
-                (list_name, base_type) = loxi_utils.list_name_extract(m_type)
-                lists.add(list_name)
-                member["m_type"] = list_name + "_t"
-                offset = -1
-            elif m_type.find("struct") == 0:
-                debug("ERROR found struct: %s.%s " % (cls, name))
-                sys.exit(1)
-            elif m_type == "octets":
-                log("offset gen skipping octets: %s.%s " % (cls, name))
-                offset = -1
-            else:
-                offset, len_update = update_offset(cls, wire_version, name,
-                                                  offset, m_type)
-                if offset != -1:
-                    fixed_offset = offset
-                else:
-                    fixed_offset += len_update
-                    log("offset is -1 for %s.%s version %d " %
-                        (cls, name, wire_version))
-            last_offset = offset
-            last_name = name
-        of_g.base_length[(cls, wire_version)] = fixed_offset
-        if (offset != -1):
-            of_g.is_fixed_length.add((cls, wire_version))
-
-    for list_type in lists:
-        classes[list_type] = []
-        of_g.ordered_classes[wire_version].append(list_type)
-        of_g.base_length[(list_type, wire_version)] = 0
-
 def order_and_assign_object_ids():
     """
     Order all classes and assign object ids to all classes.
@@ -334,11 +200,7 @@ def build_ordered_classes():
             pad_count = 0
             for m in ofclass.members:
                 if type(m) == OFPadMember:
-                    m_name = 'pad%d' % pad_count
-                    if m_name == 'pad0': m_name = 'pad'
-                    legacy_members.append(dict(m_type='uint8_t[%d]' % m.length,
-                                               name=m_name))
-                    pad_count += 1
+                    continue
                 else:
                     # HACK the C backend does not yet support of_oxm_t
                     if m.oftype == 'of_oxm_t':
@@ -346,14 +208,27 @@ def build_ordered_classes():
                     # HACK the C backend does not yet support of_bsn_vport_t
                     elif m.oftype == 'of_bsn_vport_t':
                         m_type = 'of_bsn_vport_header_t'
+                    elif m.oftype.find("list(") == 0:
+                        (list_name, base_type) = loxi_utils.list_name_extract(m.oftype)
+                        m_type = list_name + "_t"
                     else:
                         enum = find(lambda e: e.name == m.oftype, protocol.enums)
                         if enum and "wire_type" in enum.params:
                             m_type = enum.params["wire_type"]
                         else:
                             m_type = m.oftype
-                    legacy_members.append(dict(m_type=m_type, name=m.name))
+
+                    if m.offset is None:
+                        m_offset = -1
+                    else:
+                        m_offset = m.offset
+
+                    legacy_members.append(dict(m_type=m_type, name=m.name, offset=m_offset))
             versions[version_name]['classes'][ofclass.name] = legacy_members
+
+            of_g.base_length[(ofclass.name, version.wire_version)] = ofclass.base_length
+            if ofclass.is_fixed_length:
+                of_g.is_fixed_length.add((ofclass.name, version.wire_version))
 
         for enum in protocol.enums:
             for entry in enum.entries:
@@ -382,13 +257,42 @@ def analyze_input():
                 new_cls = cls + '_header'
                 of_g.ordered_classes[wire_version].append(new_cls)
                 classes[new_cls] = classes[cls]
+                of_g.base_length[(new_cls, wire_version)] = of_g.base_length[(cls, wire_version)]
+                if (cls, wire_version) in of_g.is_fixed_length:
+                    of_g.is_fixed_length.add((cls, wire_version))
 
-    for wire_version in of_g.wire_ver_map.keys():
-        version_name = of_g.of_version_wire2name[wire_version]
-        calculate_offsets_and_lengths(
-            of_g.ordered_classes[wire_version],
-            versions[version_name]['classes'],
-            wire_version)
+    # Create lists
+    for version, protocol in loxi_globals.ir.items():
+        lists = set()
+        classes = versions[of_g.of_version_wire2name[version.wire_version]]['classes']
+
+        for ofclass in protocol.classes:
+            for m in ofclass.members:
+                if isinstance(m, OFDataMember) and m.oftype.find("list(") == 0:
+                    (list_name, base_type) = loxi_utils.list_name_extract(m.oftype)
+                    lists.add(list_name)
+
+        for list_type in lists:
+            classes[list_type] = []
+            of_g.ordered_classes[version.wire_version].append(list_type)
+            of_g.base_length[(list_type, version.wire_version)] = 0
+
+    # Find special offsets
+    # These are defined as members (except padding) that don't have a fixed
+    # offset. The special_offsets map stores the name of the previous member.
+    for version, protocol in loxi_globals.ir.items():
+        for ofclass in protocol.classes:
+            prev_member = None
+            for m in ofclass.members:
+                if isinstance(m, OFPadMember):
+                    continue
+                if m.offset == None:
+                    old = of_g.special_offsets.get((ofclass.name, m.name))
+                    if old and old != prev_member.name:
+                        raise Exception("Error: special offset changed: version=%s cls=%s member=%s old=%s new=%s" %
+                                        (version, ofclass.name, m.name, old, prev_member.name))
+                    of_g.special_offsets[(ofclass.name, m.name)] = prev_member.name
+                prev_member = m
 
 def unify_input():
     """
