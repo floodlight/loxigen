@@ -815,7 +815,7 @@ class JavaMember(object):
             entry = enum.entry_by_version_value(self.msg.version, self.value)
             return "%s.%s" % ( enum.name, entry.name)
         except KeyError, e:
-            logger.debug("No enum found", e)
+            logger.debug("No enum found for type %s version %s value %s", java_type, self.msg.version, self.value)
             return self.value
 
     @property
