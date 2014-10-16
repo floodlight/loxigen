@@ -874,61 +874,6 @@ extern const char *const of_object_id_str[];
 #define OF_MESSAGE_OBJECT_COUNT %d
 """ % ((last + 1), msg_count))
 
-    # Generate object type range checking for inheritance classes
-
-    # @fixme These should be determined algorithmicly
-    out.write("""
-/*
- * Macros to check if an object ID is within an inheritance class range
- */
-""")
-    # Alphabetical order for 'last'
-    last_ids = dict(of_action="OF_ACTION_STRIP_VLAN",
-                    of_oxm="OF_OXM_VLAN_VID_MASKED",
-                    of_instruction="OF_INSTRUCTION_WRITE_METADATA",
-                    of_queue_prop="OF_QUEUE_PROP_MIN_RATE",
-                    of_table_feature_prop="OF_TABLE_FEATURE_PROP_WRITE_SETFIELD_MISS",
-                    # @FIXME add meter_band ?
-                    )
-    for cls, last in last_ids.items():
-        out.write("""
-#define %(enum)s_FIRST_ID      (%(enum)s + 1)
-#define %(enum)s_LAST_ID       %(last)s
-#define %(enum)s_VALID_ID(id) \\
-    ((id) >= %(enum)s_FIRST_ID && \\
-     (id) <= %(enum)s_LAST_ID)
-""" % dict(enum=enum_name(cls), last=last))
-    out.write("""
-/**
- * Function to check a wire ID
- * @param object_id The ID to check
- * @param base_object_id The inheritance parent, if applicable
- * @returns boolean: If base_object_id is an inheritance class, check if
- * object_id is valid as a subclass.  Otherwise return 1.
- *
- * Note: Could check that object_id == base_object_id in the
- * second case.
- */
-static inline int
-of_wire_id_valid(int object_id, int base_object_id) {
-    switch (base_object_id) {
-    case OF_ACTION:
-        return OF_ACTION_VALID_ID(object_id);
-    case OF_OXM:
-        return OF_OXM_VALID_ID(object_id);
-    case OF_QUEUE_PROP:
-        return OF_QUEUE_PROP_VALID_ID(object_id);
-    case OF_TABLE_FEATURE_PROP:
-        return OF_TABLE_FEATURE_PROP_VALID_ID(object_id);
-    case OF_INSTRUCTION:
-        return OF_INSTRUCTION_VALID_ID(object_id);
-    default:
-        break;
-    }
-    return 1;
-}
-""")
-
 ################################################################
 #
 # Internal Utility Functions
@@ -1055,7 +1000,8 @@ union %(cls)s_u {
     %(cls)s_header_t header; /* Generic instance */
 """ % dict(cls=cls))
         for subcls in sorted(subclasses):
-            out.write("    %s_%s_t %s;\n" % (cls, subcls, subcls))
+            instance = loxi_utils.class_to_instance(subcls, cls)
+            out.write("    %s_%s_t %s;\n" % (cls, instance, instance))
         out.write("};\n")
 
 def gen_struct_typedefs(out):
@@ -1069,7 +1015,7 @@ def gen_struct_typedefs(out):
         out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
@@ -1109,7 +1055,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1629,7 +1575,7 @@ def gen_init_fn_body(cls, out):
     @param cls The class name for the function
     @param out The file to which to write
     """
-    if cls in type_maps.inheritance_map:
+    if type_maps.class_is_inheritance_root(cls):
         param = "obj_p"
     else:
         param = "obj"
@@ -1659,7 +1605,7 @@ void
 """ % dict(cls=cls, param=param))
 
     # Use an extra pointer to deal with inheritance classes
-    if cls in type_maps.inheritance_map:
+    if type_maps.class_is_inheritance_root(cls):
         out.write("""\
     %s_header_t *obj;
 
@@ -1862,7 +1808,7 @@ extern %(cls)s_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if cls in type_maps.inheritance_map:
+#        if type_maps.class_is_inheritance_root(cls):
 #            continue
         out.write("""
 /**
@@ -1921,7 +1867,7 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_inheritance_root(cls):
             pass # Check this
 
         out.write("""

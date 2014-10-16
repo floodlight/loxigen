@@ -37,6 +37,8 @@ import sys
 import c_gen.of_g_legacy as of_g
 import tenjin
 from generic_utils import find, memoize
+import loxi_globals
+from loxi_ir import ir
 
 def class_signature(members):
     """
@@ -99,40 +101,49 @@ def class_is_tlv16(cls):
     """
     Return True if cls_name is an object which uses uint16 for type and length
     """
-    if cls.find("of_action") == 0: # Includes of_action_id classes
-        return True
-    if cls.find("of_instruction") == 0:
-        return True
-    if cls.find("of_queue_prop") == 0:
-        return True
-    if cls.find("of_table_feature_prop") == 0:
-        return True
-    # *sigh*
-    if cls.find("of_meter_band_stats") == 0:  # NOT A TLV
+
+    ofclass = loxi_globals.unified.class_by_name(cls)
+    if not ofclass:
         return False
-    if cls.find("of_meter_band") == 0:
-        return True
-    if cls.find("of_hello_elem") == 0:
-        return True
-    if cls == "of_match_v3":
-        return True
-    if cls == "of_match_v4":
-        return True
-    if cls.find("of_bsn_tlv") == 0:
-        return True
-    if cls.find("of_bsn_vport") == 0:
-        return True
-    return False
+
+    if len(ofclass.members) < 2:
+        return False
+
+    m1 = ofclass.members[0]
+    m2 = ofclass.members[1]
+
+    if not (isinstance(m1, ir.OFTypeMember) or isinstance(m1, ir.OFDiscriminatorMember)):
+        return False
+
+    if not isinstance(m2, ir.OFLengthMember):
+        return False
+
+    if m1.oftype != "uint16_t" or m2.oftype != "uint16_t":
+        return False
+
+    return True
 
 def class_is_u16_len(cls):
     """
     Return True if cls_name is an object which uses initial uint16 length
     """
-    return cls in ["of_group_desc_stats_entry", "of_group_stats_entry",
-                   "of_flow_stats_entry", "of_bucket", "of_table_features",
-                   "of_bsn_port_counter_stats_entry", "of_bsn_vlan_counter_stats_entry",
-                   "of_bsn_gentable_entry_desc_stats_entry", "of_bsn_gentable_entry_stats_entry",
-                   "of_bsn_gentable_desc_stats_entry", "of_bsn_vrf_counter_stats_entry"]
+
+    ofclass = loxi_globals.unified.class_by_name(cls)
+    if not ofclass:
+        return False
+
+    if len(ofclass.members) < 1:
+        return False
+
+    m = ofclass.members[0]
+
+    if not isinstance(m, ir.OFLengthMember):
+        return False
+
+    if m.oftype != "uint16_t":
+        return False
+
+    return True
 
 def class_is_list(cls):
     """
@@ -219,6 +230,10 @@ def instance_to_class(instance, parent):
     """
     return parent + "_" + instance
 
+def class_to_instance(cls, base_cls):
+    assert cls.startswith(base_cls + '_')
+    return cls[len(base_cls)+1:]
+
 def class_is_var_len(cls, version):
     # Match is special case.  Only version 1.2 (wire version 3) is var
     if cls == "of_match":
@@ -283,7 +298,7 @@ def version_to_name(version):
     """
     Convert an integer version to the C macro name
     """
-    return "OF_" + of_g.version_names[version]
+    return of_g.of_version_wire2name[version]
 
 def gen_c_copy_license(out):
     """
