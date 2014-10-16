@@ -273,13 +273,6 @@ all_class_order = []
 ## Map from class, wire_version to size of fixed part of class
 base_length = {}
 
-## Map from class, wire_version to size of variable-offset, fixed length part of class
-extra_length = {
-    ("of_packet_in", 3): 2,
-    ("of_packet_in", 4): 2,
-    ("of_packet_in", 5): 2,
-}
-
 ## Boolean indication of variable length, per class, wire_version,
 is_fixed_length = set()
 

@@ -186,7 +186,6 @@ def generate_type_maps(install_dir):
     # Collect legacy code
     tmp = StringIO()
     c_type_maps.gen_length_array(tmp)
-    c_type_maps.gen_extra_length_array(tmp)
 
     with template_utils.open_output(install_dir, "loci/src/of_type_maps.c") as out:
         util.render_template(out, "of_type_maps.c", legacy_code=tmp.getvalue())

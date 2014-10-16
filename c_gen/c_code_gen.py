@@ -403,7 +403,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
 int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
 
 extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];
-extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
 """)
     c_type_maps.gen_type_data_header(out)
     c_match.gen_declarations(out)
@@ -1600,7 +1599,7 @@ void
         MEMSET(obj, 0, sizeof(*obj));
     }
     if (bytes < 0) {
-        bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+        bytes = of_object_fixed_len[version][%(enum)s];
     }
     obj->version = version;
     obj->length = bytes;
@@ -1655,7 +1654,7 @@ def gen_new_fn_body(cls, out):
     %(cls)s_t *obj;
     int bytes;
 
-    bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+    bytes = of_object_fixed_len[version][%(enum)s];
 
     if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
         return NULL;
