@@ -340,3 +340,9 @@ struct of_bsn_tlv_partner_key: of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_name : of_bsn_tlv {
+    uint16_t type == 52;
+    uint16_t length;
+    of_octets_t value; /* UTF-8 encoded. Not null terminated. */
+};
