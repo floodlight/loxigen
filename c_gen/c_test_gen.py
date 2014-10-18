@@ -101,6 +101,7 @@ def var_name_map(m_type):
         of_match_t="match",
         of_oxm_header_t="oxm",
         of_bsn_vport_header_t="bsn_vport",
+        of_table_desc_t="table_desc",
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
