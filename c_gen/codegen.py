@@ -201,6 +201,7 @@ class_metadata_dict = {}
 special_length_classes = set([
     'of_packet_queue', 'of_meter_stats', 'of_port_desc',
     'of_port_stats_entry', 'of_queue_stats_entry',
+    'of_queue_desc',
 ])
 
 def build_class_metadata():
