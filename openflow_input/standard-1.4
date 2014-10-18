@@ -101,7 +101,7 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_METER_MOD = 29,
     OFPT_ROLE_STATUS = 30,
     OFPT_TABLE_STATUS = 31,
-    OFPT_REQUESTFORWARD = 32, 
+    OFPT_REQUESTFORWARD = 32,
     OFPT_BUNDLE_CONTROL = 33,
     OFPT_BUNDLE_ADD_MESSAGE = 34,
 };
@@ -886,7 +886,7 @@ struct of_port_desc {
     of_port_no_t port_no;
     uint16_t length;
     pad(2);
-    of_mac_addr_t hw_addr;    
+    of_mac_addr_t hw_addr;
     pad(2);
     of_port_name_t name;
     enum ofp_port_config config; /* Bitmap of OFPPC_* flags. */
@@ -973,7 +973,7 @@ struct of_match_v3(align=8, length_includes_align=False) {
     list(of_oxm_t) oxm_list;
 };
 
-// This looks like an action header, but is standalone.  See 
+// This looks like an action header, but is standalone.  See
 // ofp_table_features_prop_actions
 struct of_action_id {
     uint16_t type;
@@ -1235,7 +1235,7 @@ struct of_flow_modify_strict : of_flow_mod {
     of_port_no_t out_port;
     uint32_t out_group;
     enum ofp_flow_mod_flags flags;
-    uint16_t importance;    
+    uint16_t importance;
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -1364,7 +1364,7 @@ struct of_packet_in : of_header {
     uint64_t cookie;
     of_match_t match;
     pad(2);
-    of_octets_t data; /* FIXME: Ensure total_len gets updated */
+    of_octets_t data;
 };
 
 struct of_flow_removed : of_header {
@@ -1643,12 +1643,12 @@ struct of_port_stats_prop_optical : of_port_stats_prop {
 
     uint32_t flags;       
     uint32_t tx_freq_lmda;
-    uint32_t tx_offset;  
+    uint32_t tx_offset;
     uint32_t tx_grid_span;
     uint32_t rx_freq_lmda;
     uint32_t rx_offset;
     uint32_t rx_grid_span;
-    uint16_t tx_pwr; 
+    uint16_t tx_pwr;
     uint16_t rx_pwr;
     uint16_t bias_current;
     uint16_t temperature;
@@ -1657,7 +1657,7 @@ struct of_port_stats_prop_optical : of_port_stats_prop {
 /* Experimenter port stats property. */
 struct of_port_stats_prop_experimenter : of_port_stats_prop {
     uint16_t         type == 0xffff;
-    uint16_t         length; 
+    uint16_t         length;
     uint32_t         experimenter == ?;
     uint32_t         exp_type;
     of_octets_t      experimenter_data;
@@ -1693,17 +1693,15 @@ struct of_queue_stats_prop_experimenter : of_queue_stats_prop {
 };
 
 struct of_queue_stats_entry {
-    uint16_t length;  
-    pad(6);         
+    uint16_t length;
+    pad(6);
     of_port_no_t port_no;
-    uint32_t queue_id;  
-    uint64_t tx_bytes; 
+    uint32_t queue_id;
+    uint64_t tx_bytes;
     uint64_t tx_packets;
     uint64_t tx_errors;
     uint32_t duration_sec;
     uint32_t duration_nsec;
-                          
-
     list(of_queue_stats_prop_t) properties;
 };
 
@@ -1733,7 +1731,7 @@ struct of_group_desc_stats_entry {
     list(of_bucket_t) buckets;
 };
 
-// STATS: 
+// STATS:
 //  Desc, flow, agg, table, port, queue, group, group_desc, group_feat, experi
 
 struct of_stats_request : of_header {
