@@ -143,6 +143,7 @@ embedded_structs = {
     'of_port_desc_t': 'common.port_desc',
     'of_meter_features_t': 'common.meter_features',
     'of_bsn_vport_t': 'common.bsn_vport',
+    'of_table_desc_t': 'common.table_desc',
 }
 
 for (cls, pyclass) in embedded_structs.items():
@@ -190,6 +191,7 @@ def gen_unpack_expr(oftype, reader_expr, version):
     elif oftype_is_list(oftype):
         ofproto = loxi_globals.ir[version]
         ofclass = ofproto.class_by_name(oftype_list_elem(oftype))
+        assert ofclass, "No class named %r" % oftype_list_elem(oftype)
         module_name, class_name = py_gen.codegen.generate_pyname(ofclass)
         return 'loxi.generic_util.unpack_list(%s, %s.%s.unpack)' % \
             (reader_expr, module_name, class_name)

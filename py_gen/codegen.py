@@ -49,6 +49,12 @@ roots = {
     'of_table_mod_prop': 'table_mod_prop',
     'of_queue_desc_prop': 'queue_desc_prop',
     'of_queue_stats_prop': 'queue_stats_prop',
+    'of_async_config_prop': 'async_config_prop',
+    'of_bundle_prop': 'bundle_prop',
+    #'of_queue_prop': 'queue_prop',
+    'of_role_prop': 'role_prop',
+    #'of_table_feature_prop': 'table_feature_prop',
+    'of_table_mod_prop': 'table_mod_prop',
 }
 
 # Return the module and class names for the generated Python class
