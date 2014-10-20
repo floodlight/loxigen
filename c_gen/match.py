@@ -131,6 +131,7 @@ match_keys = {
     2: of_v2_keys,
     3: [],
     4: [],
+    5: [],
 }
 
 # Complete list of match keys, sorted by the standard order

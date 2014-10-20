@@ -403,7 +403,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
 int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
 
 extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];
-extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
 """)
     c_type_maps.gen_type_data_header(out)
     c_match.gen_declarations(out)
@@ -530,7 +529,7 @@ typedef int (*loci_writer_f)(void *cookie, const char *fmt, ...);
 /**
  * Check if a version is supported
  */
-#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_3)
+#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_4)
 
 """)
     gen_version_enum(out)
@@ -725,24 +724,6 @@ typedef uint64_t of_match_bmap_t;
 #define U64_HTON(val) U64_NTOH(val)
 #define IPV6_HTON(dst, src) /* NOTE different syntax; currently no-op */
 #endif
-
-/****************************************************************
- *
- * The following are internal definitions used by the automatically
- * generated code.  Users should not reference these definitions
- * as they may change between versions of this code
- *
- ****************************************************************/
-
-#define OF_MESSAGE_IN_MATCH_POINTER(obj)                            \\
-    (WIRE_BUF_POINTER(&((obj)->wire_buffer), OF_MESSAGE_IN_MATCH_OFFSET))
-#define OF_MESSAGE_IN_MATCH_LEN(ptr) BUF_U16_GET(&ptr[2])
-#define OF_MESSAGE_IN_DATA_OFFSET(obj) \\
-    (FIXED_LEN + OF_MESSAGE_IN_MATCH_LEN(OF_MESSAGE_IN_MATCH_POINTER(obj)) + 2)
-
-#define OF_MESSAGE_OUT_DATA_OFFSET(obj) \\
-    (FIXED_LEN + of_message_out_actions_len_get(obj))
-
 """)
 
 def external_h_top_matter(out, name):
@@ -1618,7 +1599,7 @@ void
         MEMSET(obj, 0, sizeof(*obj));
     }
     if (bytes < 0) {
-        bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+        bytes = of_object_fixed_len[version][%(enum)s];
     }
     obj->version = version;
     obj->length = bytes;
@@ -1637,64 +1618,6 @@ void
 
 """)
 
-## @fixme This should also be updated once there is a map from
-# class instance to wire length/type accessors
-def gen_wire_push_fn(cls, out):
-    """
-    Generate the calls to push values into the wire buffer
-    """
-    if type_maps.class_is_virtual(cls):
-        print "Push fn gen called for virtual class " + cls
-        return
-
-    out.write("""
-/**
- * Helper function to push values into the wire buffer
- */
-static inline int
-%(cls)s_push_wire_values(%(cls)s_t *obj)
-{
-""" % dict(cls=cls))
-
-    import loxi_globals
-    uclass = loxi_globals.unified.class_by_name(cls)
-    if uclass and not uclass.virtual and uclass.has_type_members:
-        out.write("""
-    %(cls)s_push_wire_types(obj);
-""" % dict(cls=cls))
-
-    if loxi_utils.class_is_message(cls):
-        out.write("""
-    /* Message obj; set length */
-    of_message_t msg;
-
-    if ((msg = OF_OBJECT_TO_MESSAGE(obj)) != NULL) {
-        of_message_length_set(msg, obj->length);
-    }
-""" % dict(name = enum_name(cls)))
-
-    else: # Not a message
-        if loxi_utils.class_is_tlv16(cls):
-            out.write("""
-    /* TLV obj; set length */
-    of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-        if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
-            out.write("""
-    of_object_wire_length_set((of_object_t *)obj, obj->length);
-""")
-
-        if cls == "of_meter_stats":
-            out.write("""
-    of_meter_stats_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-    out.write("""
-    return OF_ERROR_NONE;
-}
-""")
-
 def gen_new_fn_body(cls, out):
     """
     Generate function body for new function
@@ -1707,9 +1630,6 @@ def gen_new_fn_body(cls, out):
  * \\defgroup %(cls)s %(cls)s
  */
 """ % dict(cls=cls))
-
-    if not type_maps.class_is_virtual(cls):
-        gen_wire_push_fn(cls, out)
 
     uclass = loxi_globals.unified.class_by_name(cls)
     is_fixed_length = uclass and uclass.is_fixed_length
@@ -1734,7 +1654,7 @@ def gen_new_fn_body(cls, out):
     %(cls)s_t *obj;
     int bytes;
 
-    bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+    bytes = of_object_fixed_len[version][%(enum)s];
 
     if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
         return NULL;
@@ -1743,20 +1663,25 @@ def gen_new_fn_body(cls, out):
     %(cls)s_init(obj, version, bytes, 0);
 """ % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
-        out.write("""
-    if (%(cls)s_push_wire_values(obj) < 0) {
-        FREE(obj);
-        return NULL;
-    }
-""" % dict(cls=cls))
+        from codegen import class_metadata_dict
+        metadata = class_metadata_dict[cls]
+
+        if metadata.wire_type_set != 'NULL':
+            out.write("""\
+    %s(obj);
+""" % metadata.wire_type_set)
+
+        if metadata.wire_length_set != 'NULL':
+            out.write("""\
+    %s(obj, obj->length);
+""" % metadata.wire_length_set)
 
     match_offset = v3_match_offset_get(cls)
     if match_offset >= 0:
         # Init length field for match object
         out.write("""
     /* Initialize match TLV for 1.2 */
-    /* FIXME: Check 1.3 below */
-    if ((version == OF_VERSION_1_2) || (version == OF_VERSION_1_3)) {
+    if ((version >= OF_VERSION_1_2)) {
         of_object_u16_set((of_object_t *)obj, %(match_offset)d + 2, 4);
     }
 """ % dict(match_offset=match_offset))

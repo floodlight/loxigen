@@ -832,6 +832,22 @@ struct of_port_mod_prop {
     uint16_t length; /* Length in bytes of this property. */
 };
 
+struct of_port_mod_prop_ethernet : of_port_mod_prop {
+    uint16_t type == 0;
+    uint16_t length;
+    uint32_t advertise;
+};
+
+struct of_port_mod_prop_optical : of_port_mod_prop {
+    uint16_t type == 1;
+    uint16_t length;
+    uint32_t configure;
+    uint32_t freq_ldma;
+    uint32_t fl_offset; /* TODO signed */
+    uint32_t grid_span;
+    uint32_t tx_pwr;
+};
+
 struct of_port_mod : of_header {
     uint8_t version;
     uint8_t type == 16;

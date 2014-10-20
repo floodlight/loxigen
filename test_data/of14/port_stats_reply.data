@@ -65,7 +65,23 @@ obj = of_port_stats_reply_new(OF_VERSION_1_4);
         of_port_stats_entry_tx_dropped_set(obj, 0);
         of_port_stats_entry_rx_errors_set(obj, 0);
         of_port_stats_entry_tx_errors_set(obj, 2);
-        /* TODO append property */
+
+        /* Append property */
+        {
+            of_object_t list;
+            of_port_stats_entry_properties_bind(obj, &list);
+            {
+                of_object_t *obj = of_port_stats_prop_ethernet_new(OF_VERSION_1_4);
+                of_port_stats_prop_ethernet_rx_frame_err_set(obj, 1);
+                of_port_stats_prop_ethernet_rx_over_err_set(obj, 2);
+                of_port_stats_prop_ethernet_rx_crc_err_set(obj, 3);
+                of_port_stats_prop_ethernet_collisions_set(obj, 4);
+                of_list_append(&list, obj);
+                of_object_delete(obj);
+            }
+        }
+
+
         of_list_append(&list, obj);
         of_object_delete(obj);
     }

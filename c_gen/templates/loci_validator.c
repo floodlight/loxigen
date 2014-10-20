@@ -199,7 +199,7 @@ of_validate_message(of_message_t msg, int len)
         return ${validator_name(proto.class_by_name('of_header'))}(msg, len, &out_len);
 :: #endfor
     default:
-        VALIDATOR_LOG("Bad version %d", OF_VERSION_1_3);
+        VALIDATOR_LOG("Bad version %d", version);
         return -1;
     }
 }
