@@ -1,0 +1,72 @@
+-- binary
+05 0c # version, type
+00 58 # length
+12 34 56 78 # xid
+02 # reason
+00 00 00 00 00 00 00 # pad
+00 00 00 04 # port_no
+00 48 # length
+00 00 # pad
+01 02 03 04 05 06 # hw_addr
+00 00 # pad
+66 6f 6f 00 00 00 00 00 # name
+00 00 00 00 00 00 00 00 # ...
+00 00 00 24 # config
+00 00 00 02 # state
+00 00 # properties[0].type (ethernet)
+00 20 # properties[0].length
+00 00 00 00 # pad
+00 00 00 01 # properties[0].curr
+00 00 00 02 # properties[0].advertised
+00 00 00 04 # properties[0].supported
+00 00 00 08 # properties[0].peer
+00 00 00 0a # properties[0].curr_speed
+00 00 00 14 # properties[0].max_speed
+-- python
+ofp.message.port_status(
+    xid=0x12345678,
+    reason=ofp.OFPPR_MODIFY,
+    desc=ofp.port_desc(
+        port_no=4,
+        hw_addr=[1,2,3,4,5,6],
+        name="foo",
+        config=ofp.OFPPC_NO_FWD|ofp.OFPPC_NO_RECV,
+        state=ofp.OFPPS_BLOCKED,
+        properties=[
+            ofp.port_desc_prop.ethernet(
+                curr=ofp.OFPPF_10MB_HD,
+                advertised=ofp.OFPPF_10MB_FD,
+                supported=ofp.OFPPF_100MB_HD,
+                peer=ofp.OFPPF_100MB_FD,
+                curr_speed=10,
+                max_speed=20)]))
+-- c
+obj = of_port_status_new(OF_VERSION_1_4);
+of_port_status_xid_set(obj, 0x12345678);
+of_port_status_reason_set(obj, OF_PORT_CHANGE_REASON_MODIFY);
+{
+    of_object_t desc;
+    of_port_status_desc_bind(obj, &desc);
+    of_port_desc_port_no_set(&desc, 4);
+    of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
+    of_port_desc_hw_addr_set(&desc, hw_addr);
+    of_port_name_t name = "foo";
+    of_port_desc_name_set(&desc, name);
+    of_port_desc_config_set(&desc, OF_PORT_CONFIG_FLAG_NO_FWD|OF_PORT_CONFIG_FLAG_NO_RECV);
+    of_port_desc_state_set(&desc, OF_PORT_STATE_FLAG_BLOCKED);
+    {
+        of_list_port_desc_prop_t list;
+        of_port_desc_properties_bind(&desc, &list);
+        {
+            of_object_t *obj = of_port_desc_prop_ethernet_new(OF_VERSION_1_4);
+            of_port_desc_prop_ethernet_curr_set(obj, OF_PORT_FEATURE_FLAG_10MB_HD);
+            of_port_desc_prop_ethernet_advertised_set(obj, OF_PORT_FEATURE_FLAG_10MB_FD);
+            of_port_desc_prop_ethernet_supported_set(obj, OF_PORT_FEATURE_FLAG_100MB_HD);
+            of_port_desc_prop_ethernet_peer_set(obj, OF_PORT_FEATURE_FLAG_100MB_FD);
+            of_port_desc_prop_ethernet_curr_speed_set(obj, 10);
+            of_port_desc_prop_ethernet_max_speed_set(obj, 20);
+            of_list_append(&list, obj);
+            of_object_delete(obj);
+        }
+    }
+}

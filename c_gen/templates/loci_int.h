@@ -30,6 +30,8 @@
 :: flow_mod = of_g.base_length[("of_flow_modify",of_g.VERSION_1_2)]
 :: packet_in = of_g.base_length[("of_packet_in",of_g.VERSION_1_2)]
 :: packet_in_1_3 = of_g.base_length[("of_packet_in",of_g.VERSION_1_3)]
+:: packet_in_1_4 = of_g.base_length[("of_packet_in",of_g.VERSION_1_4)]
+:: assert packet_in_1_3 == packet_in_1_4
 :: flow_stats = of_g.base_length[("of_flow_stats_entry", of_g.VERSION_1_2)]
 :: match1 = of_g.base_length[("of_match_v1",of_g.VERSION_1_0)]
 :: match2 = of_g.base_length[("of_match_v2",of_g.VERSION_1_1)]
@@ -239,13 +241,16 @@ wire_match_len(of_object_t *obj, int match_offset) {
  * @param obj An object of type of_packet_in_t
  *
  * Get length of preceding match object and add to fixed length
- * Applies only to version 1.2 and 1.3
- * The +2 comes from the 2 bytes of padding between the match and packet data.
+ * Applies only to version 1.2+
+ * There are 2 bytes of padding between the match and data. The
+ * _OFFSET_FOLLOWING_MATCH_V3 macro assumes the match is at the end of the
+ * fixed length, so we need to subtract 2 from the fixed length we pass and
+ * then add 2 to the resulting offset.
  */
 
 #define _PACKET_IN_DATA_OFFSET(obj) \
     (_OFFSET_FOLLOWING_MATCH_V3((obj), (obj)->version == OF_VERSION_1_2 ? \
-${packet_in} : ${packet_in_1_3}) + 2)
+(${packet_in} - 2) : (${packet_in_1_3} - 2)) + 2)
 
 /**
  * Macro to calculate variable offset of data (packet) member in packet_out

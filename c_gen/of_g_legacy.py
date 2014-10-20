@@ -111,6 +111,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint32_t",
         4: "uint32_t",
+        5: "uint32_t",
         "short_name":"port_no"
         },
     of_port_desc_t = {
@@ -118,6 +119,7 @@ of_mixed_types = dict(
         2: "of_port_desc_t",
         3: "of_port_desc_t",
         4: "of_port_desc_t",
+        5: "of_port_desc_t",
         "short_name":"port_desc"
         },
     of_bsn_vport_t = {
@@ -125,6 +127,7 @@ of_mixed_types = dict(
         2: "of_bsn_vport_t",
         3: "of_bsn_vport_t",
         4: "of_bsn_vport_t",
+        5: "of_bsn_vport_t",
         "short_name":"bsn_vport"
         },
     of_fm_cmd_t = { # Flow mod command went from u16 to u8
@@ -132,6 +135,7 @@ of_mixed_types = dict(
         2: "uint8_t",
         3: "uint8_t",
         4: "uint8_t",
+        5: "uint8_t",
         "short_name":"fm_cmd"
         },
     of_wc_bmap_t = { # Wildcard bitmap
@@ -139,6 +143,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"wc_bmap"
         },
     of_match_bmap_t = { # Match bitmap
@@ -146,6 +151,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"match_bmap"
         },
     of_match_t = { # Match object
@@ -153,6 +159,7 @@ of_mixed_types = dict(
         2: "of_match_v2_t",
         3: "of_match_v3_t",
         4: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
+        5: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
         "short_name":"match"
         },
 )
@@ -265,12 +272,6 @@ all_class_order = []
 
 ## Map from class, wire_version to size of fixed part of class
 base_length = {}
-
-## Map from class, wire_version to size of variable-offset, fixed length part of class
-extra_length = {
-    ("of_packet_in", 3): 2,
-    ("of_packet_in", 4): 2,
-}
 
 ## Boolean indication of variable length, per class, wire_version,
 is_fixed_length = set()

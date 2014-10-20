@@ -1,0 +1,54 @@
+-- binary
+05 13 # version/type
+00 58 # length
+00 00 00 05 # xid
+00 0d # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 00 00 01 # entries[0].port_no
+00 48 # entries[0].length
+00 00 # pad
+01 02 03 04 05 06 # entries[0].hw_addr
+00 00 # pad
+69 6e 74 65 72 66 61 63 65 31 32 33 34 35 36 37 # entries[0].name
+00 00 00 60 # entries[0].config
+00 00 00 03 # entries[0].state
+00 00 # entries[0].properties[0].type (ethernet)
+00 20 # entries[0].properties[0].length 
+00 00 00 00 # pad
+00 00 00 70 # entries[0].properties[0].curr
+00 00 00 00 # entries[0].properties[0].advertised
+00 00 00 00 # entries[0].properties[0].supported
+00 00 00 00 # entries[0].properties[0].peer
+00 00 00 00 # entries[0].properties[0].curr_speed
+00 00 00 80 # entries[0].properties[0].max_speed
+-- python
+ofp.message.port_desc_stats_reply(
+    xid=5, flags=0, entries=[
+        ofp.port_desc(
+            port_no=1,
+            hw_addr=[1,2,3,4,5,6],
+            name="interface1234567",
+            config=0x60,
+            state=0x03,
+            properties=[
+                ofp.port_desc_prop.ethernet(
+                    curr=0x70,
+                    max_speed=0x80)])])
+-- java
+builder
+        .setXid(5)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of())
+        .setEntries(ImmutableList.of(
+                factory.buildPortDesc()
+                   .setPortNo(OFPort.of(1))
+                   .setHwAddr(MacAddress.of("01:02:03:04:05:06"))
+                   .setName("interface1234567")
+                   .setConfig(Sets.immutableEnumSet(OFPortConfig.NO_FWD, OFPortConfig.NO_PACKET_IN))
+                   .setState(Sets.immutableEnumSet(OFPortState.LINK_DOWN, OFPortState.BLOCKED))
+                   .setProperties(ImmutableList.<OFPortDescProp>of(factory.buildPortDescPropEthernet()
+                                                         .setCurr(0x70)
+                                                         .setMaxSpeed(0x80)
+                                                         .build()))
+                   .build())
+         );

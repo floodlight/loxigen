@@ -35,6 +35,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint32_t",
         4: "uint32_t",
+        5: "uint32_t",
         "short_name":"port_no"
         },
     of_port_desc_t = {
@@ -42,6 +43,7 @@ of_mixed_types = dict(
         2: "of_port_desc_t",
         3: "of_port_desc_t",
         4: "of_port_desc_t",
+        5: "of_port_desc_t",
         "short_name":"port_desc"
         },
     of_bsn_vport_t = {
@@ -49,6 +51,7 @@ of_mixed_types = dict(
         2: "of_bsn_vport_t",
         3: "of_bsn_vport_t",
         4: "of_bsn_vport_t",
+        5: "of_bsn_vport_t",
         "short_name":"bsn_vport"
         },
     of_fm_cmd_t = { # Flow mod command went from u16 to u8
@@ -56,6 +59,7 @@ of_mixed_types = dict(
         2: "uint8_t",
         3: "uint8_t",
         4: "uint8_t",
+        5: "uint8_t",
         "short_name":"fm_cmd"
         },
     of_wc_bmap_t = { # Wildcard bitmap
@@ -63,6 +67,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"wc_bmap"
         },
     of_match_bmap_t = { # Match bitmap
@@ -70,6 +75,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"match_bmap"
         },
     of_match_t = { # Match object
@@ -77,6 +83,7 @@ of_mixed_types = dict(
         2: "of_match_v2_t",
         3: "of_match_v3_t",
         4: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
+        5: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
         "short_name":"match"
         },
 )
@@ -180,6 +187,8 @@ def member_length(version, fe_class, fe_member, existing_classes, existing_enums
         member_ir_class = existing_classes[base_class]
         bytes = member_ir_class.base_length
         length_fixed = member_ir_class.is_fixed_length
+        if member_ir_class.has_external_alignment:
+            bytes = (bytes + 7) & ~7
     else:
         if base_type in existing_enums:
             enum = existing_enums[base_type]
