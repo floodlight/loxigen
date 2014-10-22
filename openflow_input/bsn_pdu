@@ -32,7 +32,7 @@
 
 // When the slot_num field has this value, the message applies
 // to all currently used slots on the switch for the given port
-enum of_bsn_pdu_slot_num_t(wire_type=uint8_t, complete=False) {
+enum of_bsn_pdu_slot_num(wire_type=uint8_t, complete=False) {
     BSN_PDU_SLOT_NUM_ANY = 0xff
 };
 
