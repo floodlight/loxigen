@@ -34,7 +34,7 @@ enum ofp_bsn_vlan_counter_constants {
     OFP_BSN_VLAN_ALL = 0xffff,
 };
 
-enum of_bsn_vlan_counter(wire_type=uint8_t, complete=False) {
+enum of_bsn_vlan_counter(wire_type=uint8_t, complete=False, stable=True) {
   OFP_BSN_VLAN_COUNTER_RX_BYTES = 0,
   OFP_BSN_VLAN_COUNTER_RX_PACKETS = 1,
   OFP_BSN_VLAN_COUNTER_TX_BYTES = 2,
