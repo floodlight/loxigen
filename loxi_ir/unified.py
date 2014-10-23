@@ -98,6 +98,9 @@ def build_unified_ir(name_protocol_map):
                     self.entries[e.name] = ir.OFEnumEntry(e.name, e.value, copy.copy(e.params))
                 else:
                     entry = self.entries[e.name]
+                    if v_enum.params.get('stable') == 'True' and e.value != entry.value:
+                        raise Exception("Error unifying stable ir enum {} - adding entry {} version {} value {} <-> {}".format(
+                            self.name, e.name, version, entry.value, e.value))
                     for name, value in e.params.items():
                         if not name in entry.params:
                             entry.params[name] = value
