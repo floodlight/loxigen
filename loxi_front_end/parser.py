@@ -68,7 +68,7 @@ struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_li
          s('}') - s(';')
 
 # Enums
-enum_param_name = kw("wire_type") | kw("bitmask") | kw("complete")
+enum_param_name = kw("wire_type") | kw("bitmask") | kw("complete") | kw("stable")
 enum_param = P.Group(enum_param_name  - s('=') - word)
 enum_param_list = P.Forward()
 enum_param_list << enum_param + P.Optional(s(',') + P.Optional(enum_param_list))
