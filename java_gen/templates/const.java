@@ -37,7 +37,7 @@ package ${package};
 public enum ${class_name} {
 //:: for i, entry in enumerate(enum.entries):
 //::    if enum.metadata.properties:
-//::        params = "({})".format(", ".join(entry.constructor_params))
+//::        params = "({})".format(", ".join(type.format_value(value) for (type, value) in entry.constructor_params))
 //::    else:
 //::        params = ""
 //::    #endif
