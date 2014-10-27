@@ -346,3 +346,15 @@ struct of_bsn_tlv_name : of_bsn_tlv {
     uint16_t length;
     of_octets_t value; /* UTF-8 encoded. Not null terminated. */
 };
+
+struct of_bsn_tlv_actor_state: of_bsn_tlv {
+    uint16_t type == 53;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_partner_state: of_bsn_tlv {
+    uint16_t type == 54;
+    uint16_t length;
+    uint8_t value;
+};
