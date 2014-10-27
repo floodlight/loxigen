@@ -346,3 +346,26 @@ struct of_bsn_tlv_name : of_bsn_tlv {
     uint16_t length;
     of_octets_t value; /* UTF-8 encoded. Not null terminated. */
 };
+
+enum ofp_bsn_lacp_state(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_LACP_STATE_ACTIVITY = 0x01,
+    OFP_BSN_LACP_STATE_TIMEOUT = 0x02,
+    OFP_BSN_LACP_STATE_AGGREGATION = 0x04,
+    OFP_BSN_LACP_STATE_SYNCHRONIZATION = 0x08,
+    OFP_BSN_LACP_STATE_COLLECTING = 0x10,
+    OFP_BSN_LACP_STATE_DISTRIBUTING = 0x20,
+    OFP_BSN_LACP_STATE_DEFAULTED = 0x40,
+    OFP_BSN_LACP_STATE_EXPIRED = 0x80,
+};
+
+struct of_bsn_tlv_actor_state: of_bsn_tlv {
+    uint16_t type == 53;
+    uint16_t length;
+    enum ofp_bsn_lacp_state value;
+};
+
+struct of_bsn_tlv_partner_state: of_bsn_tlv {
+    uint16_t type == 54;
+    uint16_t length;
+    enum ofp_bsn_lacp_state value;
+};
