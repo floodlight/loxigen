@@ -31,8 +31,7 @@
 # @fixme This needs to be refactored and brought into the 21st century.
 #
 
-import sys
-# @fixme Replace with argparse
+import loxi_globals
 
 ################################################################
 #
@@ -286,25 +285,21 @@ unified = {}
 # Indexed by (cls, version, member-name) and value is prev-member-name
 special_offsets = {}
 
-## Define Python variables with integer wire version values
-VERSION_1_0 = 1
-VERSION_1_1 = 2
-VERSION_1_2 = 3
-VERSION_1_3 = 4
-
-version_names = {1:"VERSION_1_0", 2:"VERSION_1_1", 3:"VERSION_1_2",
-                 4:"VERSION_1_3"}
-short_version_names = {1:"OF_1_0", 2:"OF_1_1", 3:"OF_1_2", 4:"OF_1_3"}
+# Map from wire version to OF_1_x
+short_version_names = {}
 
 # The iteration object that gives the wire versions supported
-of_version_range = [VERSION_1_0, VERSION_1_1, VERSION_1_2, VERSION_1_3]
+of_version_range = []
 
-of_version_wire2name = {
-    VERSION_1_0:"OF_VERSION_1_0",
-    VERSION_1_1:"OF_VERSION_1_1",
-    VERSION_1_2:"OF_VERSION_1_2",
-    VERSION_1_3:"OF_VERSION_1_3"
-    }
+# Map from wire version to OF_VERSION_1_x
+of_version_wire2name = {}
+
+for version in loxi_globals.OFVersions.all_supported:
+    v = version.version.replace('.', '_')
+    short_version_names[version.wire_version] = 'OF_' + v
+    of_version_range.append(version.wire_version)
+    of_version_wire2name[version.wire_version] = 'OF_VERSION_' + v
+    globals()['VERSION_' + v] = version.wire_version
 
 
 ################################################################
