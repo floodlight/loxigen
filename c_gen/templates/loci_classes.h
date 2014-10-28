@@ -36,6 +36,22 @@ void ${uclass.name}_wire_object_id_get(of_object_t *obj, of_object_id_t *id);
 void ${uclass.name}_push_wire_types(of_object_t *obj);
 :: #endfor
 
+/*
+ * Transparent union used for list iteration
+ *
+ * This will be removed when all callers are converted to of_object_t.
+ */
+union of_list_iter_u {
+    of_object_t *obj;
+:: for uclass in loxi_globals.unified.classes:
+:: if uclass.virtual and not uclass.superclass:
+    union ${uclass.name}_u *${uclass.name};
+:: #endif
+:: #endfor
+} __attribute__ ((__transparent_union__));
+
+typedef union of_list_iter_u of_list_iter_t;
+
 ${legacy_code}
 
 #endif
