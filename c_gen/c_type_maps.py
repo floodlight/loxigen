@@ -64,6 +64,18 @@ extern void of_list_meter_band_stats_wire_length_get(of_object_t *obj,
 extern void of_meter_stats_wire_length_get(of_object_t *obj, int *bytes);
 extern void of_meter_stats_wire_length_set(of_object_t *obj, int bytes);
 
+extern void of_port_desc_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_port_desc_wire_length_set(of_object_t *obj, int bytes);
+
+extern void of_port_stats_entry_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_port_stats_entry_wire_length_set(of_object_t *obj, int bytes);
+
+extern void of_queue_stats_entry_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_queue_stats_entry_wire_length_set(of_object_t *obj, int bytes);
+
+extern void of_queue_desc_wire_length_get(of_object_t *obj, int *bytes);
+extern void of_queue_desc_wire_length_set(of_object_t *obj, int bytes);
+
 """)
 
 
@@ -103,47 +115,6 @@ const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX] = {
 """)
     for version in of_g.of_version_range:
         out.write("    of_object_fixed_len_v%d,\n" % version)
-    out.write("""
-};
-""")
-
-
-def gen_extra_length_array(out):
-    """
-    Generate an array giving the extra lengths of all objects/versions
-    @param out The file handle to which to write
-    """
-    out.write("""
-/**
- * An array with the number of bytes in the extra length part
- * of each OF object
- */
-""")
-
-    for version in of_g.of_version_range:
-        out.write("""
-static const int\nof_object_extra_len_v%d[OF_OBJECT_COUNT] = {
-    -1,   /* of_object is not instantiable */
-""" % version)
-        for i, cls in enumerate(of_g.all_class_order):
-            comma = ","
-            if i == len(of_g.all_class_order) - 1:
-                comma = ""
-            val = "-1" + comma
-            if (cls, version) in of_g.base_length:
-                val = str(of_g.extra_length.get((cls, version), 0)) + comma
-            out.write("    %-5s /* %d: %s */\n" % (val, i + 1, cls))
-        out.write("};\n")
-
-    out.write("""
-/**
- * Unified map of extra length part of each object
- */
-const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX] = {
-    NULL,
-""")
-    for version in of_g.of_version_range:
-        out.write("    of_object_extra_len_v%d,\n" % version)
     out.write("""
 };
 """)

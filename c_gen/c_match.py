@@ -104,6 +104,13 @@ def gen_v4_match_compat(out):
 #define of_match_v4_to_match of_match_v3_to_match
 #define of_match_to_wire_match_v4 of_match_to_wire_match_v3
 #define of_match_v4_delete of_match_v3_delete
+
+#define of_match_v5_t of_match_v3_t
+#define of_match_v5_init of_match_v3_init
+#define of_match_v5_new of_match_v3_new
+#define of_match_v5_to_match of_match_v3_to_match
+#define of_match_to_wire_match_v5 of_match_to_wire_match_v3
+#define of_match_v5_delete of_match_v3_delete
 """)
 
 def gen_match_macros(out):

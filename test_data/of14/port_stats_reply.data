@@ -1,0 +1,104 @@
+-- binary
+05 13 # version/type
+00 d8 # length
+00 00 00 05 # xid
+00 04 # stats_type
+00 00 # flags
+00 00 00 00 # pad
+00 78 # entries[0].length
+00 00 # pad
+00 00 00 01 # entries[0].port_no
+00 00 00 00 # entries[0].duration_sec
+00 00 00 00 # entries[0].duration_nsec
+00 00 00 00 00 00 00 01 # entries[0].rx_packets
+00 00 00 00 00 00 00 00 # entries[0].tx_packets
+00 00 00 00 00 00 00 00 # entries[0].rx_bytes
+00 00 00 00 00 00 00 00 # entries[0].tx_bytes
+00 00 00 00 00 00 00 00 # entries[0].rx_dropped
+00 00 00 00 00 00 00 00 # entries[0].tx_dropped
+00 00 00 00 00 00 00 00 # entries[0].rx_errors
+00 00 00 00 00 00 00 02 # entries[0].tx_errors
+00 00 # entries[0].properties[0].type (ethernet)
+00 28 # entries[0].properties[0].length 
+00 00 00 00 # pad
+00 00 00 00 00 00 00 01 # entries[0].properties[0].rx_frame_err
+00 00 00 00 00 00 00 02 # entries[0].properties[0].rx_over_err
+00 00 00 00 00 00 00 03 # entries[0].properties[0].rx_crc_err
+00 00 00 00 00 00 00 04 # entries[0].properties[0].collisions
+00 50 # entries[1].length
+00 00 # pad
+ff ff ff fe # entries[1].port_no
+00 00 00 00 # entries[1].duration_sec
+00 00 00 00 # entries[1].duration_nsec
+00 00 00 00 00 00 00 03 # entries[1].rx_packets
+00 00 00 00 00 00 00 00 # entries[1].tx_packets
+00 00 00 00 00 00 00 00 # entries[1].rx_bytes
+00 00 00 00 00 00 00 00 # entries[1].tx_bytes
+00 00 00 00 00 00 00 00 # entries[1].rx_dropped
+00 00 00 00 00 00 00 00 # entries[1].tx_dropped
+00 00 00 00 00 00 00 00 # entries[1].rx_errors
+00 00 00 00 00 00 00 04 # entries[1].tx_errors
+-- python
+ofp.message.port_stats_reply(
+    xid=5, flags=0, entries=[
+        ofp.port_stats_entry(port_no=1, rx_packets=1, tx_errors=2,
+            properties=[
+                ofp.port_stats_prop.ethernet(
+                    rx_frame_err=1,
+                    rx_over_err=2,
+                    rx_crc_err=3,
+                    collisions=4)]),
+        ofp.port_stats_entry(port_no=ofp.OFPP_LOCAL, rx_packets=3, tx_errors=4)])
+-- c
+obj = of_port_stats_reply_new(OF_VERSION_1_4);
+{
+    of_object_t list;
+    of_port_stats_reply_entries_bind(obj, &list);
+    {
+        of_object_t *obj = of_port_stats_entry_new(OF_VERSION_1_4);
+        of_port_stats_entry_port_no_set(obj, 1);
+        of_port_stats_entry_rx_packets_set(obj, 1);
+        of_port_stats_entry_tx_packets_set(obj, 0);
+        of_port_stats_entry_rx_bytes_set(obj, 0);
+        of_port_stats_entry_tx_bytes_set(obj, 0);
+        of_port_stats_entry_rx_dropped_set(obj, 0);
+        of_port_stats_entry_tx_dropped_set(obj, 0);
+        of_port_stats_entry_rx_errors_set(obj, 0);
+        of_port_stats_entry_tx_errors_set(obj, 2);
+
+        /* Append property */
+        {
+            of_object_t list;
+            of_port_stats_entry_properties_bind(obj, &list);
+            {
+                of_object_t *obj = of_port_stats_prop_ethernet_new(OF_VERSION_1_4);
+                of_port_stats_prop_ethernet_rx_frame_err_set(obj, 1);
+                of_port_stats_prop_ethernet_rx_over_err_set(obj, 2);
+                of_port_stats_prop_ethernet_rx_crc_err_set(obj, 3);
+                of_port_stats_prop_ethernet_collisions_set(obj, 4);
+                of_list_append(&list, obj);
+                of_object_delete(obj);
+            }
+        }
+
+
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+    {
+        of_object_t *obj = of_port_stats_entry_new(OF_VERSION_1_4);
+        of_port_stats_entry_port_no_set(obj, OF_PORT_DEST_LOCAL);
+        of_port_stats_entry_rx_packets_set(obj, 3);
+        of_port_stats_entry_tx_packets_set(obj, 0);
+        of_port_stats_entry_rx_bytes_set(obj, 0);
+        of_port_stats_entry_tx_bytes_set(obj, 0);
+        of_port_stats_entry_rx_dropped_set(obj, 0);
+        of_port_stats_entry_tx_dropped_set(obj, 0);
+        of_port_stats_entry_rx_errors_set(obj, 0);
+        of_port_stats_entry_tx_errors_set(obj, 4);
+        of_list_append(&list, obj);
+        of_object_delete(obj);
+    }
+}
+of_port_stats_reply_flags_set(obj, 0);
+of_port_stats_reply_xid_set(obj, 5);

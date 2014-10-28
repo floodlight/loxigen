@@ -242,20 +242,20 @@ static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
         out.write("};\n\n")
 
     out.write("""
-static const loci_obj_dump_f *const dump_funs[5] = {
-    NULL,
-    dump_funs_v1,
-    dump_funs_v2,
-    dump_funs_v3,
-    dump_funs_v4
+static const loci_obj_dump_f *const dump_funs[] = {
+""")
+
+    for version in of_g.of_version_range:
+        out.write("    [%(v)d] = dump_funs_v%(v)d,\n" % dict(v=version))
+
+    out.write("""\
 };
 
 int
 of_object_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     if ((obj->object_id > 0) && (obj->object_id < OF_OBJECT_COUNT)) {
-        if (((obj)->version > 0) && ((obj)->version <= OF_VERSION_1_3)) {
-            /* @fixme VERSION */
+        if (OF_VERSION_OKAY(obj->version)) {
             return dump_funs[obj->version][obj->object_id](writer, cookie, (of_object_t *)obj);
         } else {
             return writer(cookie, "Bad version %d\\n", obj->version);

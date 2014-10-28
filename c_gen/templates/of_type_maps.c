@@ -305,3 +305,173 @@ of_meter_stats_wire_length_set(of_object_t *obj, int bytes)
     of_wire_buffer_u16_set(wbuf, 
         OF_OBJECT_ABSOLUTE_OFFSET(obj, OF_METER_STATS_LENGTH_OFFSET), bytes);
 }
+
+/**
+ * Get the wire length for a port desc object
+ * @param obj The object being referenced
+ * @param bytes Pointer to location to store length
+ *
+ * The length is only present for OF 1.4+.
+ */
+void
+of_port_desc_wire_length_get(of_object_t *obj, int *bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    uint16_t u16;
+
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_get(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 4),
+                               &u16);
+        *bytes = u16;
+    } else {
+        *bytes = OF_OBJECT_FIXED_LENGTH(obj);
+    }
+}
+
+/**
+ * Set the wire length for a port desc object
+ * @param obj The object being referenced
+ * @param bytes The length of the object
+ *
+ * The length is only present for OF 1.4+.
+ */
+
+void
+of_port_desc_wire_length_set(of_object_t *obj, int bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_set(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 4),
+                               bytes);
+    } else {
+        LOCI_ASSERT(obj->length == OF_OBJECT_FIXED_LENGTH(obj));
+    }
+}
+
+/**
+ * Get the wire length for a port stats_entry object
+ * @param obj The object being referenced
+ * @param bytes Pointer to location to store length
+ *
+ * The length is only present for OF 1.4+.
+ */
+void
+of_port_stats_entry_wire_length_get(of_object_t *obj, int *bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    uint16_t u16;
+
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_get(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 0),
+                               &u16);
+        *bytes = u16;
+    } else {
+        *bytes = OF_OBJECT_FIXED_LENGTH(obj);
+    }
+}
+
+/**
+ * Set the wire length for a port stats_entry object
+ * @param obj The object being referenced
+ * @param bytes The length of the object
+ *
+ * The length is only present for OF 1.4+.
+ */
+
+void
+of_port_stats_entry_wire_length_set(of_object_t *obj, int bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_set(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 0),
+                               bytes);
+    } else {
+        LOCI_ASSERT(obj->length == OF_OBJECT_FIXED_LENGTH(obj));
+    }
+}
+
+/**
+ * Get the wire length for a queue stats_entry object
+ * @param obj The object being referenced
+ * @param bytes Pointer to location to store length
+ *
+ * The length is only present for OF 1.4+.
+ */
+void
+of_queue_stats_entry_wire_length_get(of_object_t *obj, int *bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    uint16_t u16;
+
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_get(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 0),
+                               &u16);
+        *bytes = u16;
+    } else {
+        *bytes = OF_OBJECT_FIXED_LENGTH(obj);
+    }
+}
+
+/**
+ * Set the wire length for a queue stats_entry object
+ * @param obj The object being referenced
+ * @param bytes The length of the object
+ *
+ * The length is only present for OF 1.4+.
+ */
+
+void
+of_queue_stats_entry_wire_length_set(of_object_t *obj, int bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    LOCI_ASSERT(wbuf != NULL);
+
+    if (obj->version >= OF_VERSION_1_4) {
+        of_wire_buffer_u16_set(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 0),
+                               bytes);
+    } else {
+        LOCI_ASSERT(obj->length == OF_OBJECT_FIXED_LENGTH(obj));
+    }
+}
+
+/**
+ * Get the wire length for a queue_desc object
+ * @param obj The object being referenced
+ * @param bytes Pointer to location to store length
+ */
+void
+of_queue_desc_wire_length_get(of_object_t *obj, int *bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    uint16_t u16;
+
+    LOCI_ASSERT(wbuf != NULL);
+
+    of_wire_buffer_u16_get(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 8), &u16);
+    *bytes = u16;
+}
+
+/**
+ * Set the wire length for a queue_desc object
+ * @param obj The object being referenced
+ * @param bytes The length of the object
+ */
+
+void
+of_queue_desc_wire_length_set(of_object_t *obj, int bytes)
+{
+    of_wire_buffer_t *wbuf = OF_OBJECT_TO_WBUF(obj);
+    LOCI_ASSERT(wbuf != NULL);
+
+    of_wire_buffer_u16_set(wbuf, OF_OBJECT_ABSOLUTE_OFFSET(obj, 8), bytes);
+}

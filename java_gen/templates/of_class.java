@@ -88,7 +88,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     //:: include("_field_accessors.java", msg=msg, generate_setters=False, builder=False, has_parent=False)
 
     //:: if os.path.exists("%s/custom/%s.java" % (template_dir, msg.name)):
-    //:: include("custom/%s.java" % msg.name, msg=msg)
+    //:: include("custom/%s.java" % msg.name, msg=msg, version=version)
     //:: #endif
 
     //:: if msg.data_members:
@@ -124,7 +124,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
                 //
                 //:: if os.path.exists("%s/custom/%s.Builder_normalize_stanza.java" % (template_dir, msg.name)):
-                //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+                //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, version=version, has_parent=False)
                 //:: #endif
                 return new ${impl_class}(
                 //:: for i, prop in enumerate(msg.data_members):
@@ -134,7 +134,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
-        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, has_parent=True)
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, version=version, has_parent=True)
         //:: #endif
 
     }
@@ -164,7 +164,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: #endfor
 
             //:: if os.path.exists("%s/custom/%s.Builder_normalize_stanza.java" % (template_dir, msg.name)):
-            //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+            //:: include("custom/%s.Builder_normalize_stanza.java" % msg.name, msg=msg, version=version, has_parent=False)
             //:: #endif
 
             return new ${impl_class}(
@@ -175,7 +175,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
                 );
         }
         //:: if os.path.exists("%s/custom/%s.Builder.java" % (template_dir, msg.name)):
-        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, has_parent=False)
+        //:: include("custom/%s.Builder.java" % msg.name, msg=msg, version=version, has_parent=False)
         //:: #endif
 
     }
@@ -249,7 +249,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
             //:: if msg.data_members:
             //:: if os.path.exists("%s/custom/%s.Reader_normalize_stanza.java" % (template_dir, msg.name)):
-            //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, has_parent=False)
+            //:: include("custom/%s.Reader_normalize_stanza.java" % msg.name, msg=msg, version=version, has_parent=False)
             //:: #endif
             ${impl_class} ${msg.variable_name} = new ${impl_class}(
                     ${",\n                      ".join(
@@ -364,7 +364,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     }
 
     //:: if os.path.exists("%s/custom/%s_toString.java" % (template_dir, msg.name)):
-    //:: include("custom/%s_toString.java" % msg.name, msg=msg, has_parent=False)
+    //:: include("custom/%s_toString.java" % msg.name, msg=msg, version=version, has_parent=False)
     //:: else:
     @Override
     public String toString() {

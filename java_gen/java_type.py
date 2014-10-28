@@ -528,6 +528,10 @@ var_string = JType('String').op(
 
 generic_t = JType("T")
 
+table_desc = JType('OFTableDesc') \
+        .op(read='OFTableDescVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
 
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,
@@ -564,6 +568,7 @@ default_mtype_to_jtype_convert_map = {
         'of_bitmap_128_t': port_bitmap,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
+        'of_table_desc_t': table_desc,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
