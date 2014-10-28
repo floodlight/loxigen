@@ -93,7 +93,7 @@ int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj);
             if type_maps.class_is_inheritance_root(cls):
                 continue
             out.write("""\
-int %(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, %(cls)s_t *obj);
+int %(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, of_object_t *obj);
 """ % dict(cls=cls, ver_name=loxi_utils.version_to_name(version)))
 
     out.write("""
@@ -133,7 +133,7 @@ unknown_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
                 continue
             out.write("""
 int
-%(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, %(cls)s_t *obj)
+%(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     int out = 0;
 """ % dict(cls=cls, ver_name=ver_name))
@@ -150,7 +150,7 @@ int
 """  % dict(m_type=m_type, v_name=var_name_map(m_type)))
                     if loxi_utils.class_is_list(m_type):
                         base_type = loxi_utils.list_to_entry_type(m_type)
-                        out.write("    %s elt;\n    int rv;\n" % base_type)
+                        out.write("    of_object_t elt;\n    int rv;\n")
             out.write("""
     out += writer(cookie, "Object of type %(cls)s\\n");
 """ % dict(cls=cls))

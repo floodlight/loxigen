@@ -54,7 +54,7 @@
 int
 of_action_list_has_out_port(of_list_action_t *actions, of_port_no_t outport)
 {
-    of_action_t elt;
+    of_object_t elt;
     of_action_output_t *output;
     int loop_rv;
     of_port_no_t port_no;
@@ -64,7 +64,7 @@ of_action_list_has_out_port(of_list_action_t *actions, of_port_no_t outport)
         return 1;
     }
 
-    output = &elt.output;
+    output = &elt;
     OF_LIST_ACTION_ITER(actions, &elt, loop_rv) {
         if (output->object_id == OF_ACTION_OUTPUT) {
             of_action_output_port_get(output, &port_no);
