@@ -43,12 +43,8 @@ int
 test_has_outport(void)
 {
     of_list_action_t *list;
-    of_action_t elt;
-    of_action_set_dl_src_t *set_dl_src;
-    of_action_output_t *output;
-
-    set_dl_src = &elt.set_dl_src;
-    output = &elt.output;
+    of_object_t set_dl_src;
+    of_object_t output;
 
     list = of_list_action_new(OF_VERSION_1_0);
     TEST_ASSERT(list != NULL);
@@ -57,25 +53,25 @@ test_has_outport(void)
     TEST_ASSERT(!of_action_list_has_out_port(list, 1));
 
     /* Add some other action */
-    of_action_set_dl_src_init(set_dl_src, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)set_dl_src));
+    of_action_set_dl_src_init(&set_dl_src, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &set_dl_src));
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(!of_action_list_has_out_port(list, 1));
 
     /* Add port 2 */
-    of_action_output_init(output, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)output));
-    of_action_output_port_set(output, 2);
+    of_action_output_init(&output, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &output));
+    of_action_output_port_set(&output, 2);
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(!of_action_list_has_out_port(list, 1));
     TEST_ASSERT(of_action_list_has_out_port(list, 2));
 
     /* Add port 1 */
-    of_action_output_init(output, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)output));
-    of_action_output_port_set(output, 1);
+    of_action_output_init(&output, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &output));
+    of_action_output_port_set(&output, 1);
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(of_action_list_has_out_port(list, 1));
@@ -88,26 +84,26 @@ test_has_outport(void)
     TEST_ASSERT(list != NULL);
 
     /* Add port 2 */
-    of_action_output_init(output, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)output));
-    of_action_output_port_set(output, 2);
+    of_action_output_init(&output, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &output));
+    of_action_output_port_set(&output, 2);
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(!of_action_list_has_out_port(list, 1));
     TEST_ASSERT(of_action_list_has_out_port(list, 2));
 
     /* Add some other action */
-    of_action_set_dl_src_init(set_dl_src, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)set_dl_src));
+    of_action_set_dl_src_init(&set_dl_src, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &set_dl_src));
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(!of_action_list_has_out_port(list, 1));
     TEST_ASSERT(of_action_list_has_out_port(list, 2));
 
     /* Add port 1 */
-    of_action_output_init(output, OF_VERSION_1_0, -1, 1);
-    TEST_OK(of_list_action_append_bind(list, (of_action_t *)output));
-    of_action_output_port_set(output, 1);
+    of_action_output_init(&output, OF_VERSION_1_0, -1, 1);
+    TEST_OK(of_list_action_append_bind(list, &output));
+    of_action_output_port_set(&output, 1);
 
     TEST_ASSERT(of_action_list_has_out_port(list, OF_PORT_DEST_WILDCARD));
     TEST_ASSERT(of_action_list_has_out_port(list, 1));
