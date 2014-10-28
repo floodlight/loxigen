@@ -53,9 +53,12 @@ def format_primitive_literal(t, value):
         signed-craziness
     """
     signed, bits, cast_needed = java_primitives_info[t]
+    if t == 'boolean':
+        return "true" if bool(value) and value not in("False", "false") else "false"
+
     max = (1 << bits)-1
     if value > max:
-        raise Exception("Value %d to large for type %s" % (value, t))
+        raise Exception("Value %s to large for type %s" % (value, t))
 
     if signed:
         max_pos = (1 << (bits-1)) - 1

@@ -184,14 +184,25 @@ class JavaModel(object):
     @memoize
     def enums(self):
         name_version_enum_map = OrderedDefaultDict(lambda: OrderedDict())
+        name_stable_map = {}
 
         for version in self.versions:
-            logger.info("version: {}".format(version.ir_version))
+            logger.debug("version: {}".format(version.ir_version))
             of_protocol = loxi_globals.ir[version.ir_version]
             for enum in of_protocol.enums:
                 name_version_enum_map[enum.name][version] = enum
+                stable = (enum.params.get('stable') == 'True')
 
-        enums = [ JavaEnum(name, version_enum_map) for name, version_enum_map,
+                logger.debug("Enum: %s stable: %s", enum.name, stable)
+
+                if not enum.name in name_stable_map:
+                    name_stable_map[enum.name] = stable
+                else:
+                    if name_stable_map[enum.name] != stable:
+                        raise Exception("Inconsistent enum stability (should be caught " +\
+                            " by IR)")
+
+        enums = [ JavaEnum(name, name_stable_map[name], version_enum_map) for name, version_enum_map,
                         in name_version_enum_map.items() ]
 
         # inelegant - need java name here
@@ -1041,8 +1052,9 @@ class JavaUnitTest(object):
 #######################################################################
 
 class JavaEnum(object):
-    def __init__(self, c_name, version_enum_map):
+    def __init__(self, c_name, stable, version_enum_map):
         self.c_name = c_name
+        self.stable = stable
 
         self.name   = "OF" + java_type.name_c_to_caps_camel("_".join(c_name.split("_")[1:]))
 
@@ -1062,7 +1074,23 @@ class JavaEnum(object):
         self.entries = [ e for e in self.entries if e.name not in model.enum_entry_blacklist[self.name] ]
         self.package = "org.projectfloodlight.openflow.protocol"
 
-        self.metadata = model.enum_metadata_map[self.name]
+        static_metadata = model.enum_metadata_map[self.name]
+        if self.stable:
+            # need this to look up wire_type, which does not matter
+            any_version = version_enum_map.keys()[0]
+            # if this is a 'stable' enum, i.e., its value won't change, add
+            # a "Metadata" (virtual) field "StableValue" to it that returns
+            # its wirevalue.
+            stable_value = JavaModel.OFEnumPropertyMetadata("StableValue",
+                    self.wire_type(any_version),
+                    value = lambda entry: entry.stable_value)
+
+            self.metadata = JavaModel.OFEnumMetadata(
+                              properties=static_metadata.properties + (stable_value, ),
+                              to_string=static_metadata.to_string
+                            )
+        else:
+            self.metadata = static_metadata
 
     def wire_type(self, version):
         ir_enum = self.version_enums[version]
@@ -1113,7 +1141,7 @@ class JavaEnumEntry(object):
 
     @property
     def constructor_params(self):
-        return [ m.value(self) for m in self.enum.metadata.properties ]
+        return [ (m.type, m.value(self)) for m in self.enum.metadata.properties ]
 
     def has_value(self, version):
         return version in self.values
@@ -1127,6 +1155,13 @@ class JavaEnumEntry(object):
 
     def all_values(self, versions, not_present=None):
         return [ self.values[version] if version in self.values else not_present for version in versions ]
+
+    @property
+    def stable_value(self):
+        if self.enum.stable:
+            return self.values.values()[0]
+        else:
+            raise Exception("Enum {} not stable".format(self.enum.name))
 
     @property
     @memoize

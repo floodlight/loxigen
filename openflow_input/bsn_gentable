@@ -351,3 +351,13 @@ struct of_bsn_gentable_bucket_stats_reply : of_bsn_stats_reply {
     uint32_t subtype == 5;
     list(of_bsn_gentable_bucket_stats_entry_t) entries;
 };
+
+// Reference a gentable entry from an action list
+struct of_action_bsn_gentable : of_action_bsn {
+    uint16_t type == 65535;
+    uint16_t len;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 5;
+    uint32_t table_id;
+    list(of_bsn_tlv_t) key;
+};
