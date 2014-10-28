@@ -101,7 +101,7 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_METER_MOD = 29,
     OFPT_ROLE_STATUS = 30,
     OFPT_TABLE_STATUS = 31,
-    OFPT_REQUESTFORWARD = 32, 
+    OFPT_REQUESTFORWARD = 32,
     OFPT_BUNDLE_CONTROL = 33,
     OFPT_BUNDLE_ADD_MESSAGE = 34,
 };
@@ -645,6 +645,60 @@ enum ofp_hello_elem_type(wire_type=uint16_t) {
     OFPHET_VERSIONBITMAP = 1,
 };
 
+enum ofp_optical_port_features(wire_type=uint32_t, bitmask=True) {
+    OFPOPF_RX_TUNE = 0x1,
+    OFPOPF_TX_TUNE = 0x2,
+    OFPOPF_TX_PWR = 0x4,
+    OFPOPF_USE_FREQ = 0x8,
+};
+
+enum ofp_table_mod_prop_eviction_flag(wire_type=uint32_t, bitmask=True) {
+    OFPTMPEF_OTHER = 0x1,
+    OFPTMPEF_IMPORTANCE = 0x2,
+    OFPTMPEF_LIFETIME = 0x4,
+};
+
+enum ofp_port_stats_optical_flags(wire_type=uint32_t, bitmask=True) {
+    OFPOSF_RX_TUNE = 0x1,
+    OFPOSF_TX_TUNE = 0x2,
+    OFPOSF_TX_PWR = 0x4,
+    OFPOSF_RX_PWR = 0x10,
+    OFPOSF_TX_BIAS = 0x20,
+    OFPOSF_TX_TEMP = 0x40,
+};
+
+enum ofp_bundle_ctrl_type(wire_type=uint16_t) {
+    OFPBCT_OPEN_REQUEST = 0,
+    OFPBCT_OPEN_REPLY = 1,
+    OFPBCT_CLOSE_REQUEST = 2,
+    OFPBCT_CLOSE_REPLY = 3,
+    OFPBCT_COMMIT_REQUEST = 4,
+    OFPBCT_COMMIT_REPLY = 5,
+    OFPBCT_DISCARD_REQUEST = 6,
+    OFPBCT_DISCARD_REPLY = 7,
+};
+
+enum ofp_bundle_flags(wire_type=uint16_t, bitmask=True) {
+    OFPBF_ATOMIC = 1,
+    OFPBF_ORDERED = 2,
+};
+
+enum ofp_controller_role_reason(wire_type=uint8_t) {
+    OFPCRR_MASTER_REQUEST = 0,
+    OFPCRR_CONFIG = 1,
+    OFPCRR_EXPERIMENTER = 2,
+};
+
+enum ofp_table_reason(wire_type=uint8_t) {
+    OFPTR_VACANCY_DOWN = 3,
+    OFPTR_VACANCY_UP = 4,
+};
+
+enum ofp_requestforward_reason {
+    OFPRFR_GROUP_MOD = 0,
+    OFPRFR_METER_MOD = 1,
+};
+
 /* XXX rename to of_message */
 struct of_header {
     uint8_t version;
@@ -756,6 +810,28 @@ struct of_table_mod_prop {
     uint16_t length; /* Length in bytes of this property. */
 };
 
+struct of_table_mod_prop_eviction {
+    uint16_t type == 2;
+    uint16_t length;
+    enum ofp_table_mod_prop_eviction_flag flags;
+};
+
+struct of_table_mod_prop_vacancy {
+    uint16_t type == 3;
+    uint16_t length;
+    uint8_t vacancy_down;
+    uint8_t vacancy_up;
+    uint8_t vacancy;
+    pad(1);
+};
+
+struct of_table_mod_prop_experimenter {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
 struct of_table_mod : of_header {
     uint8_t version;
     uint8_t type == 17;
@@ -784,11 +860,33 @@ struct of_port_desc_prop_ethernet : of_port_desc_prop {
     uint32_t max_speed;
 };
 
+struct of_port_desc_prop_optical : of_port_desc_prop {
+    uint16_t type == 1;
+    uint16_t length;
+    pad(4);
+    uint32_t supported;
+    uint32_t tx_min_freq_lmda;
+    uint32_t tx_max_freq_lmda;
+    uint32_t tx_grid_freq_lmda;
+    uint32_t rx_min_freq_lmda;
+    uint32_t rx_max_freq_lmda;
+    uint32_t rx_grid_freq_lmda;
+    uint32_t tx_pwr_min;
+    uint32_t tx_pwr_max;
+};
+
+struct of_port_desc_prop_experimenter : of_port_desc_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
 struct of_port_desc {
     of_port_no_t port_no;
     uint16_t length;
     pad(2);
-    of_mac_addr_t hw_addr;    
+    of_mac_addr_t hw_addr;
     pad(2);
     of_port_name_t name;
     enum ofp_port_config config; /* Bitmap of OFPPC_* flags. */
@@ -848,6 +946,13 @@ struct of_port_mod_prop_optical : of_port_mod_prop {
     uint32_t tx_pwr;
 };
 
+struct of_port_mod_prop_experimenter : of_port_mod_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
 struct of_port_mod : of_header {
     uint8_t version;
     uint8_t type == 16;
@@ -868,7 +973,7 @@ struct of_match_v3(align=8, length_includes_align=False) {
     list(of_oxm_t) oxm_list;
 };
 
-// This looks like an action header, but is standalone.  See 
+// This looks like an action header, but is standalone.  See
 // ofp_table_features_prop_actions
 struct of_action_id {
     uint16_t type;
@@ -1130,7 +1235,7 @@ struct of_flow_modify_strict : of_flow_mod {
     of_port_no_t out_port;
     uint32_t out_group;
     enum ofp_flow_mod_flags flags;
-    uint16_t importance;    
+    uint16_t importance;
     of_match_t match;
     list(of_instruction_t) instructions;
 };
@@ -1259,7 +1364,7 @@ struct of_packet_in : of_header {
     uint64_t cookie;
     of_match_t match;
     pad(2);
-    of_octets_t data; /* FIXME: Ensure total_len gets updated */
+    of_octets_t data;
 };
 
 struct of_flow_removed : of_header {
@@ -1538,12 +1643,12 @@ struct of_port_stats_prop_optical : of_port_stats_prop {
 
     uint32_t flags;       
     uint32_t tx_freq_lmda;
-    uint32_t tx_offset;  
+    uint32_t tx_offset;
     uint32_t tx_grid_span;
     uint32_t rx_freq_lmda;
     uint32_t rx_offset;
     uint32_t rx_grid_span;
-    uint16_t tx_pwr; 
+    uint16_t tx_pwr;
     uint16_t rx_pwr;
     uint16_t bias_current;
     uint16_t temperature;
@@ -1552,7 +1657,7 @@ struct of_port_stats_prop_optical : of_port_stats_prop {
 /* Experimenter port stats property. */
 struct of_port_stats_prop_experimenter : of_port_stats_prop {
     uint16_t         type == 0xffff;
-    uint16_t         length; 
+    uint16_t         length;
     uint32_t         experimenter == ?;
     uint32_t         exp_type;
     of_octets_t      experimenter_data;
@@ -1580,18 +1685,23 @@ struct of_queue_stats_prop {
     uint16_t         length;
 };
 
+struct of_queue_stats_prop_experimenter : of_queue_stats_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
 struct of_queue_stats_entry {
-    uint16_t length;  
-    pad(6);         
+    uint16_t length;
+    pad(6);
     of_port_no_t port_no;
-    uint32_t queue_id;  
-    uint64_t tx_bytes; 
+    uint32_t queue_id;
+    uint64_t tx_bytes;
     uint64_t tx_packets;
     uint64_t tx_errors;
     uint32_t duration_sec;
     uint32_t duration_nsec;
-                          
-
     list(of_queue_stats_prop_t) properties;
 };
 
@@ -1621,7 +1731,7 @@ struct of_group_desc_stats_entry {
     list(of_bucket_t) buckets;
 };
 
-// STATS: 
+// STATS:
 //  Desc, flow, agg, table, port, queue, group, group_desc, group_feat, experi
 
 struct of_stats_request : of_header {
@@ -1865,6 +1975,12 @@ struct of_table_feature_prop_apply_setfield_miss : of_table_feature_prop {
     uint16_t         type == 15;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
+};
+
+struct of_table_feature_prop_table_sync_from : of_table_feature_prop {
+    uint16_t         type == 16;
+    uint16_t         length;
+    list(of_uint8_t) table_ids;
 };
 
 struct of_table_feature_prop_experimenter : of_table_feature_prop {
@@ -2140,6 +2256,96 @@ struct of_port_desc_stats_reply : of_stats_reply {
     list(of_port_desc_t) entries;
 };
 
+struct of_table_desc_stats_request : of_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 14;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+};
+
+struct of_table_desc {
+    uint16_t length;
+    uint8_t table_id;
+    pad(1);
+    enum ofp_table_config config;
+};
+
+struct of_table_desc_stats_reply : of_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 14;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    list(of_table_desc_t) entries;
+};
+
+struct of_queue_desc_stats_request : of_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 15;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+};
+
+struct of_queue_desc_prop {
+    uint16_t type == ?;
+    uint16_t length;
+};
+
+struct of_queue_desc_prop_min_rate : of_queue_desc_prop {
+    uint16_t type == 1;
+    uint16_t length;
+    uint16_t rate;
+    pad(2);
+};
+
+struct of_queue_desc_prop_max_rate : of_queue_desc_prop {
+    uint16_t type == 2;
+    uint16_t length;
+    uint16_t rate;
+    pad(2);
+};
+
+struct of_queue_desc_prop_experimenter : of_queue_desc_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
+struct of_queue_desc {
+    uint32_t port_no;
+    uint32_t queue_id;
+    uint16_t length;
+    pad(6);
+    list(of_queue_desc_prop_t) properties;
+};
+
+struct of_queue_desc_stats_reply : of_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 15;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    list(of_queue_desc_t) entries;
+};
+
+/*
+ * Not supporting the flow monitor multipart messages. This message is
+ * poorly designed because it includes a variable length match inside a
+ * struct (ofp_flow_monitor_request) with no explicit length member.
+ * I'm not writing the special case code to figure out the total length.
+ */
+
 struct of_meter_band_stats {
     uint64_t        packet_band_count;
     uint64_t        byte_band_count;
@@ -2225,24 +2431,139 @@ struct of_role_reply : of_header {
     uint64_t generation_id;
 };
 
-////////////////////////////////////////////////////////////////
-// FIXME understand async; where do bitmasks live?
-// Determine bitmap type for masks below.
-// DOCUMENT masks where uint32_t[0] is interest for equal/master
-//   while uint32_t[1] is interest for slave
-////////////////////////////////////////////////////////////////
+/* Bundle messages */
+
+struct of_bundle_prop {
+    uint16_t type == ?;
+    uint16_t length;
+};
+
+struct of_bundle_prop_experimenter : of_bundle_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
+struct of_bundle_ctrl_msg : of_header {
+    uint8_t version;
+    uint8_t type == 33;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t bundle_id;
+    enum ofp_bundle_ctrl_type bundle_ctrl_type;
+    enum ofp_bundle_flags flags;
+    list(of_bundle_prop_t) properties;
+};
+
+struct of_bundle_add_msg : of_header {
+    uint8_t version;
+    uint8_t type == 34;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t bundle_id;
+    pad(2);
+    enum ofp_bundle_flags flags;
+    // TODO support embedding of_header
+    of_octets_t data;
+    // TODO support trailing properties
+};
+
+/* Async config messages */
+
+struct of_async_config_prop {
+    uint16_t type == ?;
+    uint16_t length;
+};
+
+struct of_async_config_prop_packet_in_slave : of_async_config_prop {
+    uint16_t type == 0;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_packet_in_master : of_async_config_prop {
+    uint16_t type == 1;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_port_status_slave : of_async_config_prop {
+    uint16_t type == 2;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_port_status_master : of_async_config_prop {
+    uint16_t type == 3;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_flow_removed_slave : of_async_config_prop {
+    uint16_t type == 4;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_flow_removed_master : of_async_config_prop {
+    uint16_t type == 5;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_role_status_slave : of_async_config_prop {
+    uint16_t type == 6;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_role_status_master : of_async_config_prop {
+    uint16_t type == 7;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_table_status_slave : of_async_config_prop {
+    uint16_t type == 8;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_table_status_master : of_async_config_prop {
+    uint16_t type == 9;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_requestforward_slave : of_async_config_prop {
+    uint16_t type == 10;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_requestforward_master : of_async_config_prop {
+    uint16_t type == 11;
+    uint16_t length;
+    uint32_t mask;
+};
+
+struct of_async_config_prop_experimenter_slave : of_async_config_prop {
+    uint16_t type == 0xfffe;
+    uint16_t length;
+};
+
+struct of_async_config_prop_experimenter_master : of_async_config_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+};
 
 struct of_async_get_request : of_header {
     uint8_t version;
     uint8_t type == 26;
     uint16_t length;
     uint32_t xid;
-    uint32_t packet_in_mask_equal_master;
-    uint32_t packet_in_mask_slave;
-    uint32_t port_status_mask_equal_master;
-    uint32_t port_status_mask_slave;
-    uint32_t flow_removed_mask_equal_master;
-    uint32_t flow_removed_mask_slave;
+    list(of_async_config_prop_t) properties;
 };
 
 struct of_async_get_reply : of_header {
@@ -2250,12 +2571,7 @@ struct of_async_get_reply : of_header {
     uint8_t type == 27;
     uint16_t length;
     uint32_t xid;
-    uint32_t packet_in_mask_equal_master;
-    uint32_t packet_in_mask_slave;
-    uint32_t port_status_mask_equal_master;
-    uint32_t port_status_mask_slave;
-    uint32_t flow_removed_mask_equal_master;
-    uint32_t flow_removed_mask_slave;
+    list(of_async_config_prop_t) properties;
 };
 
 struct of_async_set : of_header {
@@ -2263,10 +2579,56 @@ struct of_async_set : of_header {
     uint8_t type == 28;
     uint16_t length;
     uint32_t xid;
-    uint32_t packet_in_mask_equal_master;
-    uint32_t packet_in_mask_slave;
-    uint32_t port_status_mask_equal_master;
-    uint32_t port_status_mask_slave;
-    uint32_t flow_removed_mask_equal_master;
-    uint32_t flow_removed_mask_slave;
+    list(of_async_config_prop_t) properties;
+};
+
+/* Role status message */
+
+struct of_role_prop {
+    uint16_t type == ?;
+    uint16_t length;
+};
+
+struct of_role_prop_experimenter : of_role_prop {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == ?;
+    uint32_t exp_type;
+};
+
+struct of_role_status : of_header {
+    uint8_t version;
+    uint8_t type == 30;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t role;
+    enum ofp_controller_role_reason reason;
+    pad(3);
+    uint64_t generation_id;
+    list(of_role_prop_t) properties;
+};
+
+/* Table status messages */
+
+struct of_table_status : of_header {
+    uint8_t version;
+    uint8_t type == 31;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t role;
+    enum ofp_table_reason reason;
+    pad(7);
+    of_table_desc_t table;
+};
+
+/* Request forward message */
+
+struct of_requestforward : of_header {
+    uint8_t version;
+    uint8_t type == 32;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t role;
+    // TODO support embedding of_header
+    of_octets_t data;
 };
