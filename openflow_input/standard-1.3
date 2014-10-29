@@ -134,6 +134,7 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_NO_RECV = 0x4,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
+    OFPPC_BSN_BREAKOUT_ENABLED = 0x40000000,
     OFPPC_BSN_MIRROR_DEST = 0x80000000,
 };
 
@@ -160,6 +161,7 @@ enum ofp_port_features(wire_type=uint32_t, bitmask=True) {
     OFPPF_AUTONEG = 0x2000,
     OFPPF_PAUSE = 0x4000,
     OFPPF_PAUSE_ASYM = 0x8000,
+    OFPPF_BSN_BREAKOUT_CAPABLE = 0x80000000,
 };
 
 enum ofp_port_reason(wire_type=uint8_t) {
