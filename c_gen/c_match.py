@@ -458,7 +458,7 @@ def gen_unified_match_to_v3(out):
 static int
 populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
 {
-    of_oxm_t oxm_entry;
+    of_object_t elt;
 
     /* For each active member, add an OXM entry to the list */
 """)
@@ -466,23 +466,18 @@ populate_oxm_list(of_match_t *src, of_list_oxm_t *oxm_list)
         out.write("""\
     if (OF_MATCH_MASK_%(ku)s_ACTIVE_TEST(src)) {
         if (!OF_MATCH_MASK_%(ku)s_EXACT_TEST(src)) {
-            of_oxm_%(key)s_masked_t *elt;
-            elt = &oxm_entry.%(key)s_masked;
-
-            of_oxm_%(key)s_masked_init(elt,
+            of_oxm_%(key)s_masked_init(&elt,
                 oxm_list->version, -1, 1);
-            of_list_oxm_append_bind(oxm_list, &oxm_entry);
-            of_oxm_%(key)s_masked_value_set(elt,
+            of_list_oxm_append_bind(oxm_list, &elt);
+            of_oxm_%(key)s_masked_value_set(&elt,
                    src->fields.%(key)s);
-            of_oxm_%(key)s_masked_value_mask_set(elt,
+            of_oxm_%(key)s_masked_value_mask_set(&elt,
                    src->masks.%(key)s);
         } else {  /* Active, but not masked */
-            of_oxm_%(key)s_t *elt;
-            elt = &oxm_entry.%(key)s;
-            of_oxm_%(key)s_init(elt,
+            of_oxm_%(key)s_init(&elt,
                 oxm_list->version, -1, 1);
-            of_list_oxm_append_bind(oxm_list, &oxm_entry);
-            of_oxm_%(key)s_value_set(elt, src->fields.%(key)s);
+            of_list_oxm_append_bind(oxm_list, &elt);
+            of_oxm_%(key)s_value_set(&elt, src->fields.%(key)s);
         }
     }
 """ % dict(key=key, ku=key.upper()))
@@ -629,7 +624,7 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
 {
     int rv;
     of_list_oxm_t oxm_list;
-    of_oxm_t oxm_entry;
+    of_object_t oxm_entry;
 """)
 #    for key in match.of_match_members:
 #        out.write("    of_oxm_%s_t *%s;\n" % (key, key))
@@ -643,23 +638,23 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
     rv = of_list_oxm_first(&oxm_list, &oxm_entry);
 
     while (rv == OF_ERROR_NONE) {
-        switch (oxm_entry.header.object_id) { /* What kind of entry is this */
+        switch (oxm_entry.object_id) { /* What kind of entry is this */
 """)
     for key in match.of_match_members:
         out.write("""
         case OF_OXM_%(ku)s_MASKED:
             of_oxm_%(key)s_masked_value_mask_get(
-                &oxm_entry.%(key)s_masked,
+                &oxm_entry,
                 &dst->masks.%(key)s);
             of_oxm_%(key)s_masked_value_get(
-                &oxm_entry.%(key)s,
+                &oxm_entry,
                 &dst->fields.%(key)s);
             of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
             break;
         case OF_OXM_%(ku)s:
             OF_MATCH_MASK_%(ku)s_EXACT_SET(dst);
             of_oxm_%(key)s_value_get(
-                &oxm_entry.%(key)s,
+                &oxm_entry,
                 &dst->fields.%(key)s);
             break;
 """ % (dict(ku=key.upper(), key=key)))

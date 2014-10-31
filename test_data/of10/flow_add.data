@@ -117,19 +117,19 @@ of_flow_add_flags_set(obj, 2);
     of_list_action_t actions;
     of_flow_add_actions_bind(obj, &actions);
     {
-        of_action_t action;
-        of_action_output_init(&action.output, OF_VERSION_1_0, -1, 1);
+        of_object_t action;
+        of_action_output_init(&action, OF_VERSION_1_0, -1, 1);
         of_list_action_append_bind(&actions, &action);
-        of_action_output_port_set(&action.output, OF_PORT_DEST_FLOOD);
+        of_action_output_port_set(&action, OF_PORT_DEST_FLOOD);
     }
     {
-        of_action_t action;
-        of_action_nicira_dec_ttl_init(&action.nicira_dec_ttl, OF_VERSION_1_0, -1, 1);
+        of_object_t action;
+        of_action_nicira_dec_ttl_init(&action, OF_VERSION_1_0, -1, 1);
         of_list_action_append_bind(&actions, &action);
     }
     {
-        of_action_t action;
-        of_action_bsn_set_tunnel_dst_init(&action.bsn_set_tunnel_dst, OF_VERSION_1_0, -1, 1);
+        of_object_t action;
+        of_action_bsn_set_tunnel_dst_init(&action, OF_VERSION_1_0, -1, 1);
         of_list_action_append_bind(&actions, &action);
     }
 }

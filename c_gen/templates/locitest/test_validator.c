@@ -88,9 +88,9 @@ test_validate_tlv16_list(void)
     of_message_t msg; 
     of_flow_modify_actions_bind(obj, &list);
     of_action_set_tp_dst_init(&element1, OF_VERSION_1_0, -1, 1);
-    of_list_action_append_bind(&list, (of_action_t *)&element1);
+    of_list_action_append_bind(&list, &element1);
     of_action_output_init(&element2, OF_VERSION_1_0, -1, 1);
-    of_list_action_append_bind(&list, (of_action_t *)&element2);
+    of_list_action_append_bind(&list, &element2);
     msg = OF_OBJECT_TO_MESSAGE(obj);
 
     TEST_ASSERT(of_validate_message(msg, of_message_length_get(msg)) == 0);

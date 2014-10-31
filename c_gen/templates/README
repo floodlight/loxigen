@@ -60,7 +60,7 @@ Here's example code that creates a flow mod:
     for (i = 1; i <= 4; i++) {
         of_action_output_t action;
         of_action_output_init(&action, flow_add->version, -1, 1);
-        of_list_action_append_bind(&actions, (of_action_t *)&action);
+        of_list_action_append_bind(&actions, &action);
         of_action_output_port_set(&action, i);
     }
 

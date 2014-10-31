@@ -1076,13 +1076,13 @@ extern %(get_ret_type)s %(base_name)s_get(
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
 extern int %(cls)s_first(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_list_iter_t iter);
 extern int %(cls)s_next(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_list_iter_t iter);
 extern int %(cls)s_append_bind(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_list_iter_t iter);
 extern int %(cls)s_append(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_list_iter_t iter);
 
 /**
  * Iteration macro for list of type %(cls)s
@@ -1556,10 +1556,6 @@ def gen_init_fn_body(cls, out):
     @param cls The class name for the function
     @param out The file to which to write
     """
-    if type_maps.class_is_inheritance_root(cls):
-        param = "obj_p"
-    else:
-        param = "obj"
 
     out.write("""
 /**
@@ -1580,20 +1576,9 @@ def gen_init_fn_body(cls, out):
  */
 
 void
-%(cls)s_init(%(cls)s_t *%(param)s,
+%(cls)s_init(of_object_t *obj,
     of_version_t version, int bytes, int clean_wire)
 {
-""" % dict(cls=cls, param=param))
-
-    # Use an extra pointer to deal with inheritance classes
-    if type_maps.class_is_inheritance_root(cls):
-        out.write("""\
-    %s_header_t *obj;
-
-    obj = &obj_p->header;  /* Need instantiable subclass */
-""" % cls)
-
-    out.write("""
     LOCI_ASSERT(of_object_fixed_len[version][%(enum)s] >= 0);
     if (clean_wire) {
         MEMSET(obj, 0, sizeof(*obj));
@@ -1604,9 +1589,7 @@ void
     obj->version = version;
     obj->length = bytes;
     obj->object_id = %(enum)s;
-""" % dict(cls=cls, enum=enum_name(cls)))
 
-    out.write("""
     /* Grow the wire buffer */
     if (obj->wbuf != NULL) {
         int tot_bytes;
@@ -1615,8 +1598,7 @@ void
         of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
-
-""")
+""" % dict(cls=cls, enum=enum_name(cls)))
 
 def gen_new_fn_body(cls, out):
     """
@@ -1648,15 +1630,15 @@ def gen_new_fn_body(cls, out):
  * \\ingroup %(cls)s
  */
 
-%(cls)s_t *
+of_object_t *
 %(cls)s_new(of_version_t version)
 {
-    %(cls)s_t *obj;
+    of_object_t *obj;
     int bytes;
 
     bytes = of_object_fixed_len[version][%(enum)s];
 
-    if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
+    if ((obj = of_object_new(%(max_length)s)) == NULL) {
         return NULL;
     }
 
@@ -1717,11 +1699,11 @@ def gen_new_function_declarations(out):
 
     for cls in of_g.standard_class_order:
         out.write("""
-extern %(cls)s_t *
+extern of_object_t *
     %(cls)s_new(of_version_t version);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
-    %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
+    of_object_t *obj, of_version_t version, int bytes, int clean_wire);
 """ % dict(cls=cls))
 
     out.write("""
@@ -1743,8 +1725,8 @@ extern %(cls)s_t *
  * \ingroup %(cls)s
  */
 static inline void
-%(cls)s_delete(%(cls)s_t *obj) {
-    of_object_delete((of_object_t *)(obj));
+%(cls)s_delete(of_object_t *obj) {
+    of_object_delete(obj);
 }
 """ % dict(cls=cls))
 
