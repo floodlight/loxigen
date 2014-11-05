@@ -624,6 +624,10 @@ exceptions = {
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
         'of_oxm_mpls_bos' : { 'value' : boolean_value },
         'of_oxm_mpls_bos_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+        'of_oxm_ipv6_exthdr' : { 'value' : u16obj },
+        'of_oxm_ipv6_exthdr_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+        'of_oxm_pbb_uca' : { 'value' : boolean_value },
+        'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
