@@ -245,6 +245,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
 
+    public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
+            new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
+
     public String getName() {
         return name;
     }

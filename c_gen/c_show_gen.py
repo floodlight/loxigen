@@ -104,6 +104,7 @@ show_hex = set([
     ('uint32_t', 'flow_removed_mask_slave'),
     ('uint32_t', 'band_types'),
     ('uint16_t', 'bsn_tcp_flags'),
+    ('uint8_t', 'bsn_l2_cache_hit'),
 ])
 
 def gen_emitter(cls, m_name, m_type):
