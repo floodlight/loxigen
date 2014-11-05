@@ -41,7 +41,7 @@ struct of_oxm_bsn_l2_cache_hit : of_oxm {
 };
 
 struct of_oxm_bsn_l2_cache_hit_masked : of_oxm {
-    uint32_t type_len == 0x00032402;
+    uint32_t type_len == 0x00032502;
     uint8_t value;
     uint8_t value_mask;
 };
