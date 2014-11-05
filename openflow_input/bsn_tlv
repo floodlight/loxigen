@@ -385,5 +385,5 @@ struct of_bsn_tlv_mac_mask : of_bsn_tlv {
 struct of_bsn_tlv_priority : of_bsn_tlv {
     uint16_t type == 57;
     uint16_t length;
-    uint16_t value;
+    uint32_t value;
 };
