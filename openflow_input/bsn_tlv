@@ -369,3 +369,9 @@ struct of_bsn_tlv_partner_state: of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_lacp_state value;
 };
+
+struct of_bsn_tlv_data : of_bsn_tlv {
+    uint16_t type == 55;
+    uint16_t length;
+    of_octets_t value;
+};
