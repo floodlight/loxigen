@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 /*
  * Notification of idle flows

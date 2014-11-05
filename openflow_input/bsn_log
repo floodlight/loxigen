@@ -29,6 +29,7 @@
 // the receiver's configured loglevel is lower than the message's loglevel.
 
 #version 4
+#version 5
 
 enum ofp_bsn_loglevel(wire_type=uint8_t) {
     OFP_BSN_LOGLEVEL_MSG = 0,
