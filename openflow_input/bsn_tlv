@@ -376,3 +376,15 @@ struct of_bsn_tlv_data : of_bsn_tlv {
     uint16_t length;
     of_octets_t value;
 };
+
+struct of_bsn_tlv_mac_mask : of_bsn_tlv {
+    uint16_t type == 56;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_priority : of_bsn_tlv {
+    uint16_t type == 57;
+    uint16_t length;
+    uint32_t value;
+};
