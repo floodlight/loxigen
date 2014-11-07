@@ -753,7 +753,6 @@ def external_h_top_matter(out, name):
  * Per-class static delete functions
  * Per-class, per-member accessor declarations
  * Per-class structure definitions
- * Generic union (inheritance) definitions
  * Pointer set function declarations
  * Some special case macros
  *
@@ -966,38 +965,14 @@ def v3_match_offset_get(cls):
 #
 ################################################################
 
-def gen_generics(out):
-    for (cls, subclasses) in type_maps.inheritance_map.items():
-        out.write("""
-/**
- * Inheritance super class for %(cls)s
- *
- * This class is the union of %(cls)s classes.  You can refer
- * to it untyped by refering to the member 'header' whose structure
- * is common across all sub-classes.
- */
-
-union %(cls)s_u {
-    %(cls)s_header_t header; /* Generic instance */
-""" % dict(cls=cls))
-        for subcls in sorted(subclasses):
-            instance = loxi_utils.class_to_instance(subcls, cls)
-            out.write("    %s_%s_t %s;\n" % (cls, instance, instance))
-        out.write("};\n")
-
 def gen_struct_typedefs(out):
     """
     Generate typedefs for all struct objects
     @param out The file for output, already open
     """
 
-    out.write("\n/* LOCI inheritance parent typedefs */\n")
-    for cls in type_maps.inheritance_map:
-        out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
 
@@ -1036,7 +1011,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
+        if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1076,13 +1051,13 @@ extern %(get_ret_type)s %(base_name)s_get(
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
 extern int %(cls)s_first(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_next(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append_bind(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 
 /**
  * Iteration macro for list of type %(cls)s
@@ -1224,7 +1199,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
-    elif m_type == "of_oxm_header_t":
+    elif m_type == "of_oxm_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1232,7 +1207,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
-    elif m_type == "of_bsn_vport_header_t":
+    elif m_type == "of_bsn_vport_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1715,8 +1690,6 @@ extern of_object_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if type_maps.class_is_inheritance_root(cls):
-#            continue
         out.write("""
 /**
  * Delete an object of type %(cls)s_t
@@ -1774,8 +1747,8 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            pass # Check this
+        if type_maps.class_is_virtual(cls):
+            pass
 
         out.write("""
 /**

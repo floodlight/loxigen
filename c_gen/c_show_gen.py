@@ -89,7 +89,6 @@ show_hex = set([
     ('uint64_t', 'generation_id'),
     ('uint16_t', 'value_mask'),
     ('uint32_t', 'value_mask'),
-    ('uint32_t', 'oxm_header'),
     ('uint8_t', 'value_mask'),
     ('uint64_t', 'value_mask'),
     ('uint64_t', 'write_setfields'),
@@ -164,7 +163,7 @@ int of_object_show(loci_writer_f writer, void* cookie, of_object_t* obj);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""\
 int %(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, of_object_t *obj);
@@ -203,7 +202,7 @@ unknown_show(loci_writer_f writer, void* cookie, of_object_t *obj)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""
 int
@@ -255,7 +254,7 @@ int
                     sub_cls = m_type[:-2] # Trim _t
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
-    out += %(sub_cls)s_%(ver_name)s_show(writer, cookie, &%(v_name)s);
+    out += of_object_show(writer, cookie, &%(v_name)s);
 """ % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
@@ -303,7 +302,7 @@ static const loci_obj_show_f show_funs_v%(version)s[OF_OBJECT_COUNT] = {
                 comma = ","
 
             if (not loxi_utils.class_in_version(cls, version) or
-                    type_maps.class_is_inheritance_root(cls)):
+                    type_maps.class_is_virtual(cls)):
                 out.write("    unknown_show%s\n" % comma);
             else:
                 out.write("    %s_%s_show%s\n" %
