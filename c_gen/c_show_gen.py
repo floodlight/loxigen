@@ -163,7 +163,7 @@ int of_object_show(loci_writer_f writer, void* cookie, of_object_t* obj);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""\
 int %(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, of_object_t *obj);
@@ -202,7 +202,7 @@ unknown_show(loci_writer_f writer, void* cookie, of_object_t *obj)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""
 int
@@ -302,7 +302,7 @@ static const loci_obj_show_f show_funs_v%(version)s[OF_OBJECT_COUNT] = {
                 comma = ","
 
             if (not loxi_utils.class_in_version(cls, version) or
-                    type_maps.class_is_inheritance_root(cls)):
+                    type_maps.class_is_virtual(cls)):
                 out.write("    unknown_show%s\n" % comma);
             else:
                 out.write("    %s_%s_show%s\n" %

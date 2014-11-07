@@ -1011,7 +1011,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
+        if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1690,8 +1690,6 @@ extern of_object_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if type_maps.class_is_inheritance_root(cls):
-#            continue
         out.write("""
 /**
  * Delete an object of type %(cls)s_t
@@ -1749,8 +1747,8 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            pass # Check this
+        if type_maps.class_is_virtual(cls):
+            pass
 
         out.write("""
 /**
