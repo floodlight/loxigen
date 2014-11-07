@@ -44,6 +44,10 @@ def class_is_inheritance_root(cls):
     return cls in inheritance_map
 
 def generate_maps():
+    for ofclass in loxi_globals.unified.classes:
+        if ofclass.virtual and not ofclass.superclass:
+            inheritance_map[ofclass.name] = set()
+
     for version, protocol in loxi_globals.ir.items():
         wire_version = version.wire_version
         for ofclass in protocol.classes:
@@ -51,8 +55,6 @@ def generate_maps():
             if not root or root == ofclass or root.name == "of_header":
                 continue
 
-            if root.name not in inheritance_map:
-                inheritance_map[root.name] = set()
             inheritance_map[root.name].add(ofclass.name)
 
 def sub_class_map(base_type, version):
