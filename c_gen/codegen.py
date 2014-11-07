@@ -121,19 +121,6 @@ def generate_classes(install_dir):
                 c_code_gen.gen_new_function_definitions(out, uclass.name)
                 c_code_gen.gen_accessor_definitions(out, uclass.name)
 
-# TODO remove header classes and use the corresponding class instead
-def generate_header_classes(install_dir):
-    for cls in of_g.standard_class_order:
-        if not cls.endswith("_header") or cls in ["of_header", "of_bsn_header", "of_nicira_header"]:
-            continue
-        with template_utils.open_output(install_dir, "loci/src/%s.c" % cls) as out:
-            util.render_template(out, "class.c",
-                push_wire_types_data=None,
-                parse_wire_types_data=None)
-            # Append legacy generated code
-            c_code_gen.gen_new_function_definitions(out, cls)
-            c_code_gen.gen_accessor_definitions(out, cls)
-
 def generate_classes_header(install_dir):
     # Collect legacy code
     tmp = StringIO()
@@ -238,16 +225,6 @@ def build_class_metadata():
             wire_length_set=wire_length_set,
             wire_type_get=wire_type_get,
             wire_type_set=wire_type_set))
-
-        # If this is the root of an inheritance hierachy, add metadata
-        # for the corresponding header class
-        if uclass.name in type_maps.inheritance_map:
-            class_metadata.append(ClassMetadata(
-                name=uclass.name + '_header',
-                wire_length_get=wire_length_get,
-                wire_length_set=wire_length_set,
-                wire_type_get=wire_type_get,
-                wire_type_set=wire_type_set))
 
     for metadata in class_metadata:
         class_metadata_dict[metadata.name] = metadata

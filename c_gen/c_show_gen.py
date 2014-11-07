@@ -89,7 +89,6 @@ show_hex = set([
     ('uint64_t', 'generation_id'),
     ('uint16_t', 'value_mask'),
     ('uint32_t', 'value_mask'),
-    ('uint32_t', 'oxm_header'),
     ('uint8_t', 'value_mask'),
     ('uint64_t', 'value_mask'),
     ('uint64_t', 'write_setfields'),

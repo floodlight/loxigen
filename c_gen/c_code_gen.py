@@ -1199,7 +1199,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
-    elif m_type == "of_oxm_header_t":
+    elif m_type == "of_oxm_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1207,7 +1207,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
-    elif m_type == "of_bsn_vport_header_t":
+    elif m_type == "of_bsn_vport_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);

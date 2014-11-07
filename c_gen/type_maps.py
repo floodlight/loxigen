@@ -36,8 +36,6 @@ def class_is_virtual(cls):
     """
     Returns True if cls is a virtual class
     """
-    if cls.endswith("header"):
-        return True
     if loxi_utils.class_is_list(cls):
         return True
     return loxi_globals.unified.class_by_name(cls).virtual
