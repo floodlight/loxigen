@@ -1076,13 +1076,13 @@ extern %(get_ret_type)s %(base_name)s_get(
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
 extern int %(cls)s_first(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_next(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append_bind(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append(
-    %(cls)s_t *list, of_list_iter_t iter);
+    %(cls)s_t *list, of_object_t *iter);
 
 /**
  * Iteration macro for list of type %(cls)s
