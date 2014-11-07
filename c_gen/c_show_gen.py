@@ -255,7 +255,7 @@ int
                     sub_cls = m_type[:-2] # Trim _t
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
-    out += %(sub_cls)s_%(ver_name)s_show(writer, cookie, &%(v_name)s);
+    out += of_object_show(writer, cookie, &%(v_name)s);
 """ % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
