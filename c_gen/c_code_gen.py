@@ -973,8 +973,6 @@ def gen_struct_typedefs(out):
 
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
 
