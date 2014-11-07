@@ -753,7 +753,6 @@ def external_h_top_matter(out, name):
  * Per-class static delete functions
  * Per-class, per-member accessor declarations
  * Per-class structure definitions
- * Generic union (inheritance) definitions
  * Pointer set function declarations
  * Some special case macros
  *
@@ -966,34 +965,12 @@ def v3_match_offset_get(cls):
 #
 ################################################################
 
-def gen_generics(out):
-    for (cls, subclasses) in type_maps.inheritance_map.items():
-        out.write("""
-/**
- * Inheritance super class for %(cls)s
- *
- * This class is the union of %(cls)s classes.  You can refer
- * to it untyped by refering to the member 'header' whose structure
- * is common across all sub-classes.
- */
-
-union %(cls)s_u {
-    %(cls)s_header_t header; /* Generic instance */
-""" % dict(cls=cls))
-        for subcls in sorted(subclasses):
-            instance = loxi_utils.class_to_instance(subcls, cls)
-            out.write("    %s_%s_t %s;\n" % (cls, instance, instance))
-        out.write("};\n")
-
 def gen_struct_typedefs(out):
     """
     Generate typedefs for all struct objects
     @param out The file for output, already open
     """
 
-    out.write("\n/* LOCI inheritance parent typedefs */\n")
-    for cls in type_maps.inheritance_map:
-        out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
         if type_maps.class_is_inheritance_root(cls):
