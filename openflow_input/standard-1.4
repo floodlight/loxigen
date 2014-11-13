@@ -1576,6 +1576,46 @@ struct of_table_features_failed_error_msg : of_error_msg {
     of_octets_t data;
 };
 
+struct of_bad_property_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 14;
+    enum ofp_bad_property_code code;
+    of_octets_t data;
+};
+
+struct of_async_config_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 15;
+    enum ofp_async_config_failed_code code;
+    of_octets_t data;
+};
+
+struct of_flow_monitor_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 16;
+    enum ofp_flow_monitor_failed_code code;
+    of_octets_t data;
+};
+
+struct of_bundle_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 17;
+    enum ofp_bundle_failed_code code;
+    of_octets_t data;
+};
+
 struct of_experimenter_error_msg : of_error_msg {
     uint8_t version;
     uint8_t type == 1;

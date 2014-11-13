@@ -42,10 +42,9 @@
  */
 
 int
-${cls}_first(${cls}_t *list, of_list_iter_t iter)
+${cls}_first(${cls}_t *list, of_object_t *obj)
 {
     int rv;
-    of_object_t *obj = iter.obj;
 
     ${e_cls}_init(obj, list->version, -1, 1);
 
@@ -73,10 +72,9 @@ ${cls}_first(${cls}_t *list, of_list_iter_t iter)
  */
 
 int
-${cls}_next(${cls}_t *list, of_list_iter_t iter)
+${cls}_next(${cls}_t *list, of_object_t *obj)
 {
     int rv;
-    of_object_t *obj = iter.obj;
 
     if ((rv = of_list_next(list, obj)) < 0) {
         return rv;
@@ -105,9 +103,9 @@ ${cls}_next(${cls}_t *list, of_list_iter_t iter)
  */
 
 int
-${cls}_append_bind(${cls}_t *list, of_list_iter_t iter)
+${cls}_append_bind(${cls}_t *list, of_object_t *obj)
 {
-    return of_list_append_bind(list, iter.obj);
+    return of_list_append_bind(list, obj);
 }
 
 /**
@@ -119,7 +117,7 @@ ${cls}_append_bind(${cls}_t *list, of_list_iter_t iter)
  */
 
 int
-${cls}_append(${cls}_t *list, of_list_iter_t iter)
+${cls}_append(${cls}_t *list, of_object_t *obj)
 {
-    return of_list_append(list, iter.obj);
+    return of_list_append(list, obj);
 }

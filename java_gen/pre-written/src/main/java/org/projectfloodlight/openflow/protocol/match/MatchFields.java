@@ -40,6 +40,8 @@ public enum MatchFields {
     MPLS_TC,
     MPLS_BOS,
     TUNNEL_ID,
+    IPV6_EXTHDR,
+    PBB_UCA,
     BSN_IN_PORTS_128,
     BSN_LAG_ID,
     BSN_VRF,
@@ -58,4 +60,5 @@ public enum MatchFields {
     BSN_UDF7,
     BSN_TCP_FLAGS,
     BSN_VLAN_XLATE_PORT_GROUP_ID,
+    BSN_L2_CACHE_HIT,
 }

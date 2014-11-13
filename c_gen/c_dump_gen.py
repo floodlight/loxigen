@@ -90,7 +90,7 @@ int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""\
 int %(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, of_object_t *obj);
@@ -129,7 +129,7 @@ unknown_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""
 int
@@ -184,7 +184,7 @@ int
                     sub_cls = m_type[:-2] # Trim _t
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
-    out += %(sub_cls)s_%(ver_name)s_dump(writer, cookie, &%(v_name)s);
+    out += of_object_dump(writer, cookie, &%(v_name)s);
 """ % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
@@ -234,7 +234,7 @@ static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
                 comma = ","
 
             if (not loxi_utils.class_in_version(cls, version) or
-                    type_maps.class_is_inheritance_root(cls)):
+                    type_maps.class_is_virtual(cls)):
                 out.write("    unknown_dump%s\n" % comma);
             else:
                 out.write("    %s_%s_dump%s\n" %

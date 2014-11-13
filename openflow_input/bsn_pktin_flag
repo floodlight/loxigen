@@ -26,6 +26,7 @@
 // under the EPL.
 
 #version 4
+#version 5
 
 // In a realistic switch pipeline there are multiple reasons a given packet
 // should be sent to the controller. The packet-in reason field is only 8 bits,
@@ -43,4 +44,5 @@ enum ofp_bsn_pktin_flag(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_PKTIN_FLAG_L3_MISS = 0x100,
     OFP_BSN_PKTIN_FLAG_L3_CPU = 0x200,
     OFP_BSN_PKTIN_FLAG_INGRESS_ACL = 0x400,
+    OFP_BSN_PKTIN_FLAG_SFLOW = 0x800,
 };
