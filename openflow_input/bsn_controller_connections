@@ -37,6 +37,7 @@
 // The URIs are of the form tcp://1.2.3.4:6553
 
 #version 4
+#version 5
 
 enum ofp_bsn_controller_connection_state(wire_type=uint8_t) {
     OFP_BSN_CONTROLLER_CONNECTION_STATE_DISCONNECTED = 0,

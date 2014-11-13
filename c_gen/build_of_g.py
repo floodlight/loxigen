@@ -202,13 +202,7 @@ def build_ordered_classes():
                 if type(m) == OFPadMember:
                     continue
                 else:
-                    # HACK the C backend does not yet support of_oxm_t
-                    if m.oftype == 'of_oxm_t':
-                        m_type = 'of_oxm_header_t'
-                    # HACK the C backend does not yet support of_bsn_vport_t
-                    elif m.oftype == 'of_bsn_vport_t':
-                        m_type = 'of_bsn_vport_header_t'
-                    elif m.oftype.find("list(") == 0:
+                    if m.oftype.find("list(") == 0:
                         (list_name, base_type) = loxi_utils.list_name_extract(m.oftype)
                         m_type = list_name + "_t"
                     else:
@@ -248,19 +242,6 @@ def analyze_input():
     Add information computed from the input, including offsets and
     lengths of struct members and the set of list and action_id types.
     """
-
-    # Generate header classes for inheritance parents
-    for wire_version, ordered_classes in of_g.ordered_classes.items():
-        classes = versions[of_g.of_version_wire2name[wire_version]]['classes']
-        for cls in ordered_classes:
-            if type_maps.class_is_inheritance_root(cls):
-                new_cls = cls + '_header'
-                of_g.ordered_classes[wire_version].append(new_cls)
-                classes[new_cls] = classes[cls]
-                of_g.base_length[(new_cls, wire_version)] = of_g.base_length[(cls, wire_version)]
-                if (cls, wire_version) in of_g.is_fixed_length:
-                    of_g.is_fixed_length.add((cls, wire_version))
-
     # Create lists
     for version, protocol in loxi_globals.ir.items():
         lists = set()

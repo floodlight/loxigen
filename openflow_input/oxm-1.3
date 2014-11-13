@@ -52,3 +52,16 @@ struct of_oxm_mpls_bos_masked : of_oxm {
     uint8_t value;
     uint8_t value_mask;
 };
+
+/* Not supporting pbb_isid at the moment, requires a 3-byte field */
+
+struct of_oxm_ipv6_exthdr : of_oxm {
+    uint32_t type_len == 0x80004e02;
+    uint16_t value;
+};
+
+struct of_oxm_ipv6_exthdr_masked : of_oxm {
+    uint32_t type_len == 0x80004f04;
+    uint16_t value;
+    uint16_t value_mask;
+};

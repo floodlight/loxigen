@@ -35,6 +35,7 @@
 // not remove the table entry on its own.
 
 #version 4
+#version 5
 
 struct of_bsn_arp_idle : of_bsn_header {
     uint8_t version;

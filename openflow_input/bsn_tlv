@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 struct of_bsn_tlv_port : of_bsn_tlv {
     uint16_t type == 0;
@@ -368,4 +369,22 @@ struct of_bsn_tlv_partner_state: of_bsn_tlv {
     uint16_t type == 54;
     uint16_t length;
     enum ofp_bsn_lacp_state value;
+};
+
+struct of_bsn_tlv_data : of_bsn_tlv {
+    uint16_t type == 55;
+    uint16_t length;
+    of_octets_t value;
+};
+
+struct of_bsn_tlv_mac_mask : of_bsn_tlv {
+    uint16_t type == 56;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_priority : of_bsn_tlv {
+    uint16_t type == 57;
+    uint16_t length;
+    uint32_t value;
 };

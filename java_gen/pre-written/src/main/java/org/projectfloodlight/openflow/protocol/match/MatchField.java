@@ -185,6 +185,12 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U64> TUNNEL_ID = 
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
 
+    public final static MatchField<U16> IPV6_EXTHDR =
+            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR);
+
+    public final static MatchField<OFBooleanValue> PBB_UCA =
+            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
+
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
 
@@ -238,6 +244,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
+
+    public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
+            new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
 
     public String getName() {
         return name;
