@@ -43,7 +43,7 @@ public class ClassId implements OFValueType<ClassId> {
 
     @Override
     public String toString() {
-        return Integer.toString(rawValue);
+        return UnsignedInts.toString(rawValue);
     }
 
     @Override
