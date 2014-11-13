@@ -126,5 +126,18 @@ class TestAllOF13(unittest.TestCase):
             else:
                 fn()
 
+class TestUtils(unittest.TestCase):
+    def check_bitmap_512(self, value, data):
+        self.assertEquals(data, ofp.util.pack_bitmap_512(set(value)))
+        self.assertEquals(ofp.util.unpack_bitmap_512(OFReader(data)), set(value))
+
+    def test_bitmap_512(self):
+        self.check_bitmap_512([0], "\x00" * 63 + "\x01")
+        self.check_bitmap_512([8], "\x00" * 62 + "\x01\x00")
+        self.check_bitmap_512([63], "\x00" * 56 + "\x80" + "\x00" * 7)
+        self.check_bitmap_512([64], "\x00" * 55 + "\x01" + "\x00" * 8)
+        self.check_bitmap_512([511], "\x80" + "\x00" * 63)
+        self.check_bitmap_512([5, 67, 90], "\x00" * 52 + "\x04\x00\x00\x08\x00\x00\x00\x00\x00\x00\x00\x20")
+
 if __name__ == '__main__':
     unittest.main()
