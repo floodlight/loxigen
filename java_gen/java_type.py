@@ -470,6 +470,10 @@ of_version = JType("OFVersion", 'byte') \
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
+of_message = JType("OFMessage")\
+            .op(read="OFMessageVer$version.READER.readFrom(bb)",
+                write="$name.writeTo(bb)")
+
 of_type = JType("OFType", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 action_type= gen_enum_jtype("OFActionType")\
@@ -513,6 +517,10 @@ boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
 gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
+           )
+bundle_id = JType("BundleId") \
+        .op(read='BundleId.read4Bytes(bb)',
+            write='$name.write4Bytes(bb)',
            )
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
@@ -718,6 +726,8 @@ exceptions = {
         'of_bsn_log': { 'data': var_string },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
+
+        'of_bundle_add_msg' : { 'data' : of_message },
 }
 
 
@@ -782,6 +792,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return action_type_set
     elif field_name == "table_id" and re.match(r'of_bsn_gentable.*', obj_name):
         return gen_table_id
+    elif field_name == "bundle_id" and re.match(r'of_bundle_.*', obj_name):
+        return bundle_id
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

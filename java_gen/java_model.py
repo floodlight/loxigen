@@ -413,6 +413,9 @@ class JavaOFInterface(object):
                 reply_name = m.group(1) + "Reply"
                 if model.interface_by_name(reply_name):
                     return ["OFRequest<%s>" % reply_name ]
+            elif self.name == "OFBundleCtrlMsg":
+                reply_name = "OFBundleCtrlMsg"
+                return ["OFRequest<%s>" % reply_name ]
         return []
 
 
