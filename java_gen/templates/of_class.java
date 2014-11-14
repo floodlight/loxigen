@@ -74,6 +74,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     ${impl_class}(${
         ", ".join("%s %s" %(prop.java_type.public_type, prop.name) for prop in msg.data_members) }) {
 //:: for prop in msg.data_members:
+//::   if not prop.java_type.is_primitive and (not prop.default_value or prop.default_value != "null"):
+        if(${prop.name} == null) {
+            throw new NullPointerException("${msg.name}: property ${prop.name} cannot be null");
+        }
+//::   #endif
+//:: #endfor
+//:: for prop in msg.data_members:
         this.${prop.name} = ${prop.name};
 //:: #endfor
     }

@@ -8,28 +8,28 @@ import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
 @Immutable
-public class ClassId implements OFValueType<ClassId> {
+public class BundleId implements OFValueType<BundleId> {
     static final int LENGTH = 4;
 
     private final static int NONE_VAL = 0;
-    public final static ClassId NONE = new ClassId(NONE_VAL);
+    public final static BundleId NONE = new BundleId(NONE_VAL);
 
     private final static int NO_MASK_VAL = 0xFFFFFFFF;
-    public final static ClassId NO_MASK = new ClassId(NO_MASK_VAL);
-    public final static ClassId FULL_MASK = NONE;
+    public final static BundleId NO_MASK = new BundleId(NO_MASK_VAL);
+    public final static BundleId FULL_MASK = NONE;
 
     private final int rawValue;
 
-    private ClassId(final int rawValue) {
+    private BundleId(final int rawValue) {
         this.rawValue = rawValue;
     }
 
-    public static ClassId of(final int raw) {
+    public static BundleId of(final int raw) {
         if(raw == NONE_VAL)
             return NONE;
         else if(raw == NO_MASK_VAL)
             return NO_MASK;
-        return new ClassId(raw);
+        return new BundleId(raw);
     }
 
     public int getInt() {
@@ -47,8 +47,8 @@ public class ClassId implements OFValueType<ClassId> {
     }
 
     @Override
-    public ClassId applyMask(ClassId mask) {
-        return ClassId.of(rawValue & mask.rawValue);    }
+    public BundleId applyMask(BundleId mask) {
+        return BundleId.of(rawValue & mask.rawValue);    }
 
     @Override
     public int hashCode() {
@@ -66,7 +66,7 @@ public class ClassId implements OFValueType<ClassId> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ClassId other = (ClassId) obj;
+        BundleId other = (BundleId) obj;
         if (rawValue != other.rawValue)
             return false;
         return true;
@@ -76,12 +76,12 @@ public class ClassId implements OFValueType<ClassId> {
         c.writeInt(rawValue);
     }
 
-    public static ClassId read4Bytes(ChannelBuffer c) {
-        return ClassId.of(c.readInt());
+    public static BundleId read4Bytes(ChannelBuffer c) {
+        return BundleId.of(c.readInt());
     }
 
     @Override
-    public int compareTo(ClassId o) {
+    public int compareTo(BundleId o) {
         return UnsignedInts.compare(rawValue, rawValue);
     }
 

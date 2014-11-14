@@ -51,7 +51,9 @@ public final class OFFactories {
 
     private static class GenericReader implements OFMessageReader<OFMessage> {
         public OFMessage readFrom(ChannelBuffer bb) throws OFParseError {
-            short wireVersion = U8.f(bb.getByte(0));
+            if(!bb.readable())
+                return null;
+            short wireVersion = U8.f(bb.getByte(bb.readerIndex()));
             OFFactory factory;
             switch (wireVersion) {
             //:: for v in versions:
