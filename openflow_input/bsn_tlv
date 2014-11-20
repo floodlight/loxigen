@@ -388,3 +388,9 @@ struct of_bsn_tlv_priority : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_interval : of_bsn_tlv {
+    uint16_t type == 58;
+    uint16_t length;
+    uint32_t value;
+};
