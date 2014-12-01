@@ -42,6 +42,8 @@ public enum MatchFields {
     TUNNEL_ID,
     IPV6_EXTHDR,
     PBB_UCA,
+    TUNNEL_IPV4_SRC,
+    TUNNEL_IPV4_DST,
     BSN_IN_PORTS_128,
     BSN_LAG_ID,
     BSN_VRF,
