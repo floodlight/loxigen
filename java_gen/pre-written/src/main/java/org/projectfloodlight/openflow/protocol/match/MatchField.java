@@ -190,6 +190,14 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<OFBooleanValue> PBB_UCA =
             new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
+  
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
+            new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_DST =
+            new MatchField<IPv4Address>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
