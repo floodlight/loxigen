@@ -9,12 +9,3 @@
         return (!state.contains(OFPortState.LINK_DOWN) && !config.contains(OFPortConfig.PORT_DOWN));
     }
     
-    /**
-     * Return a brief String describing this port containing the port number
-     * and port name
-     * @return a brief description string 
-     */
-    public String toBriefString() {
-        return String.format("%s (%d)", name, portNo);
-    }
-    
