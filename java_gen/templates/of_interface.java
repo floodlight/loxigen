@@ -27,6 +27,7 @@
 //::
 //:: import itertools
 //:: import re
+//:: import os
 //:: include('_copyright.java')
 
 //:: include('_autogen.java')
@@ -39,6 +40,10 @@ public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotati
 //:: for prop in msg.members:
     ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
+//:: if os.path.exists("%s/custom/interface/%s.java" % (template_dir, msg.name)):
+//:: include("custom/interface/%s.java" % msg.name, msg=msg)
+//:: #endif
+    
 
     void writeTo(ChannelBuffer channelBuffer);
 
