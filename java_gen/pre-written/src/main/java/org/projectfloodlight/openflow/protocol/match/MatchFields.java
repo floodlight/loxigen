@@ -57,9 +57,8 @@ public enum MatchFields {
     BSN_UDF7,
     BSN_TCP_FLAGS,
     BSN_VLAN_XLATE_PORT_GROUP_ID,
-    OCH_SIGID,
     OCH_SIGTYPE,
-    OCH_SIGID_BASIC,
     OCH_SIGTYPE_BASIC,
-;
+    OCH_SIGID,
+    OCH_SIGID_BASIC,;
 }

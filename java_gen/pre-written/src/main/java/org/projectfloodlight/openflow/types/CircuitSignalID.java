@@ -37,6 +37,21 @@ public class CircuitSignalID implements OFValueType<CircuitSignalID> {
         return length;
     }
 
+    public byte getGridType() {
+        return gridType;
+    }
+
+    public byte getChannelSpacing() {
+        return channelSpacing;
+    }
+
+    public short getChannelNumber() {
+        return channelNumber;
+    }
+
+    public short getSpectralWidth() {
+        return spectralWidth;
+    }
 
     public void write6Bytes(ChannelBuffer c) {
         c.writeByte(gridType);
