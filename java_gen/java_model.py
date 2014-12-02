@@ -587,6 +587,8 @@ class JavaOFInterface(object):
             if not find(lambda x: x.name == "mask", self.ir_model_members):
                 virtual_members.append(
                         JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+        elif self.name =="OFErrorMsg":
+            virtual_members += [ JavaVirtualMember(self, "data", java_type.error_cause_data) ]
 
         if not find(lambda m: m.name == "version", self.ir_model_members):
             virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
