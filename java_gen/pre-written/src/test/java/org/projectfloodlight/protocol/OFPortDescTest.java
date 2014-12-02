@@ -15,12 +15,23 @@ import static org.hamcrest.Matchers.is;
 
 import static org.junit.Assert.assertThat;
 
+/**
+ * Tests auxiliary OFPortDesc methods for all versions of OpenFlow
+ *
+ * @author Jason Parraga <jason.parraga@bigswitch.com>
+ */
 public class OFPortDescTest {
-
-    OFFactory factory = OFFactories.getFactory(OFVersion.OF_13);
 
     @Test
     public void testIsEnabled() {
+       testIsEnabledForFactory(OFFactories.getFactory(OFVersion.OF_10));
+       testIsEnabledForFactory(OFFactories.getFactory(OFVersion.OF_11));
+       testIsEnabledForFactory(OFFactories.getFactory(OFVersion.OF_12));
+       testIsEnabledForFactory(OFFactories.getFactory(OFVersion.OF_13));
+       testIsEnabledForFactory(OFFactories.getFactory(OFVersion.OF_14));
+    }
+
+    public void testIsEnabledForFactory(OFFactory factory) {
         // Default
         OFPortDesc desc = factory.buildPortDesc()
                 .build();
