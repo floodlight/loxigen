@@ -1056,8 +1056,15 @@ int
     out.write("""
     of_object_t elt;
     int cur_len = 0;
+    static int recursion;
     (void) elt;
     (void) cur_len;
+
+    if (recursion > 0) {
+        return value;
+    }
+
+    recursion++;
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
@@ -1082,6 +1089,7 @@ int
         for instance, subcls in sub_classes:
             setup_instance(out, cls, subcls, instance, v_name, version)
     out.write("""
+    recursion--;
     return value;
 }
 """)
@@ -1103,6 +1111,13 @@ int
     of_object_t elt;
     int count = 0;
     int rv;
+    static int recursion;
+
+    if (recursion > 0) {
+        return value;
+    }
+
+    recursion++;
 """ % dict(cls=cls, base_type=base_type))
 
 
@@ -1171,6 +1186,7 @@ int
         of_object_delete((of_object_t *)dup);
     }
 
+    recursion--;
     return value;
 }
 """ % dict(cls=cls, u_cls=cls.upper(), entry_count=entry_count))
