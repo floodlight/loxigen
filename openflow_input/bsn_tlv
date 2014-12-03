@@ -394,3 +394,11 @@ struct of_bsn_tlv_interval : of_bsn_tlv {
     uint16_t length;
     uint32_t value; /* Milliseconds */
 };
+
+/* A reference to an entry in another gentable */
+struct of_bsn_tlv_reference : of_bsn_tlv {
+    uint16_t type == 59;
+    uint16_t length;
+    uint16_t table_id;
+    list(of_bsn_tlv_t) key;
+};
