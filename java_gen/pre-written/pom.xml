@@ -8,9 +8,9 @@
         <version>7</version>
     </parent>
 
-    <groupId>org.projectfloodlight</groupId>
+    <groupId>org.onosproject</groupId>
     <artifactId>openflowj</artifactId>
-    <version>0.3.8-SNAPSHOT</version>
+    <version>0.3.7.oe</version>
     <packaging>jar</packaging>
 
     <name>OpenFlowJ-Loxi</name>
@@ -232,11 +232,10 @@ i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
                 </configuration>
             </plugin>
 
-            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.4</version>
+                <version>1.5</version>
                 <executions>
                     <execution>
                         <id>sign-artifacts</id>
@@ -247,7 +246,16 @@ i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
                     </execution>
                 </executions>
             </plugin>
-            -->
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.5</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                </configuration>
+            </plugin>
         </plugins>
         <resources>
             <resource>
