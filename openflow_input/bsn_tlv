@@ -400,3 +400,21 @@ struct of_bsn_tlv_ipv4_netmask : of_bsn_tlv {
     uint16_t length;
     of_ipv4_t value;
 };
+
+struct of_bsn_tlv_mpls_label : of_bsn_tlv {
+    uint16_t type == 61;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_mpls_control_word : of_bsn_tlv {
+    uint16_t type == 62;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_mpls_sequenced : of_bsn_tlv {
+    uint16_t type == 63;
+    uint16_t length;
+    uint8_t value;
+};
