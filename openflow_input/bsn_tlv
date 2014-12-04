@@ -394,3 +394,9 @@ struct of_bsn_tlv_interval : of_bsn_tlv {
     uint16_t length;
     uint32_t value; /* Milliseconds */
 };
+
+struct of_bsn_tlv_ipv4_netmask : of_bsn_tlv {
+    uint16_t type == 60;
+    uint16_t length;
+    of_ipv4_t value;
+};
