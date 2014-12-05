@@ -1,0 +1,2 @@
+    // Additional method
+    boolean isEnabled();
