@@ -30,7 +30,6 @@
 // Copyright (c) 2011, 2012 Open Networking Foundation
 
 #version 4
-#version 5
 
 struct of_instruction_bsn_auto_negotiation : of_instruction_bsn {
     uint16_t type == 65535;
