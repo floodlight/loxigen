@@ -102,17 +102,17 @@ class TestOFReader(unittest.TestCase):
         self.assertEquals(reader.is_empty(), True)
 
     def test_skip_align(self):
-        reader = OFReader("abcd" + "efgh" + "ijkl" + "mnop" + "qr")
+        reader = OFReader("abcd" + "efgh" + "ijkl" + "mnop" + "qrst")
         reader.skip_align()
         self.assertEquals(reader.peek('2s')[0], 'ab')
         self.assertEquals(reader.read('2s')[0], "ab")
         reader.skip_align()
         self.assertEquals(reader.peek('2s')[0], 'ij')
         self.assertEquals(reader.read('2s')[0], 'ij')
-        child = reader.slice(8)
-        self.assertEquals(child.peek('2s')[0], 'kl')
+        child = reader.slice(10)
+        self.assertEquals(child.read('2s')[0], 'kl')
         child.skip_align()
-        self.assertEquals(child.peek('2s')[0], 'qr')
+        self.assertEquals(child.peek('2s')[0], 'st')
 
 if __name__ == '__main__':
     unittest.main()
