@@ -426,3 +426,9 @@ struct of_bsn_tlv_mpls_sequenced : of_bsn_tlv {
     uint16_t length;
     uint8_t value;
 };
+
+struct of_bsn_tlv_bucket : of_bsn_tlv {
+    uint16_t type == 64;
+    uint16_t length;
+    list(of_bsn_tlv_t) value;
+};
