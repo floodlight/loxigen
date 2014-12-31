@@ -963,55 +963,31 @@ of_match_eq(of_match_t *match1, of_match_t *match2)
  */
 
 static inline int
-of_match_more_specific(of_match_t *entry, of_match_t *query)
+of_match_more_specific(const of_match_t *entry, const of_match_t *query)
 {
-    of_match_fields_t *q_m, *e_m;  /* Short hand for masks, fields */
-    of_match_fields_t *q_f, *e_f;
+    LOCI_ASSERT(sizeof(of_match_fields_t) % sizeof(uint8_t) == 0);
 
-    q_m = &query->masks;
-    e_m = &entry->masks;
-    q_f = &query->fields;
-    e_f = &entry->fields;
-""")
-    for key, entry in match.of_match_members.items():
-        q_m = "&q_m->%s" % key
-        e_m = "&e_m->%s" % key
-        q_f = "&q_f->%s" % key
-        e_f = "&e_f->%s" % key
-        if entry["m_type"] == "of_ipv6_t":
-            comp = "OF_MORE_SPECIFIC_IPV6"
-            match_type = "OF_RESTRICTED_MATCH_IPV6"
-        elif entry["m_type"] == "of_mac_addr_t":
-            comp = "OF_MORE_SPECIFIC_MAC_ADDR"
-            match_type = "OF_RESTRICTED_MATCH_MAC_ADDR"
-        elif entry["m_type"] == "of_bitmap_128_t":
-            comp = "OF_MORE_SPECIFIC_BITMAP_128"
-            match_type = "OF_RESTRICTED_MATCH_BITMAP_128"
-        else: # Integer
-            comp = "OF_MORE_SPECIFIC_INT"
-            match_type = "OF_RESTRICTED_MATCH_INT"
-            q_m = "q_m->%s" % key
-            e_m = "e_m->%s" % key
-            q_f = "q_f->%s" % key
-            e_f = "e_f->%s" % key
-        out.write("""
-    /* Mask and values for %(key)s */
-    if (!%(comp)s(%(e_m)s, %(q_m)s)) {
-        return 0;
-    }
-    if (!%(match_type)s(%(e_f)s, %(q_f)s,
-            %(q_m)s)) {
-        return 0;
-    }
-""" % dict(match_type=match_type, comp=comp, q_f=q_f, e_f=e_f,
-           q_m=q_m, e_m=e_m, key=key))
+    /* Short hand for masks, fields */
+    const uint8_t *qm = (const uint8_t *)&query->masks;
+    const uint8_t *em = (const uint8_t *)&entry->masks;
+    const uint8_t *qf = (const uint8_t *)&query->fields;
+    const uint8_t *ef = (const uint8_t *)&entry->fields;
 
-    out.write("""
+    int i;
+    for (i = 0; i < sizeof(of_match_fields_t)/sizeof(uint8_t); i++) {
+        if (qm[i] & ~em[i]) {
+            /* Query mask has a bit set that isn't set in the entry mask */
+            return 0;
+        }
+
+        if ((qf[i] ^ ef[i]) & qm[i]) {
+            /* Query and entry disagree on a field bit */
+            return 0;
+        }
+    }
+
     return 1;
 }
-""")
-
-    out.write("""
 
 /**
  * Do two entries overlap?
@@ -1022,42 +998,24 @@ of_match_more_specific(of_match_t *entry, of_match_t *query)
  */
 
 static inline int
-of_match_overlap(of_match_t *match1, of_match_t *match2)
+of_match_overlap(const of_match_t *match1, const of_match_t *match2)
 {
-    of_match_fields_t *m1, *m2;  /* Short hand for masks, fields */
-    of_match_fields_t *f1, *f2;
+    LOCI_ASSERT(sizeof(of_match_fields_t) % sizeof(uint8_t) == 0);
 
-    m1 = &match1->masks;
-    m2 = &match2->masks;
-    f1 = &match1->fields;
-    f2 = &match2->fields;
-""")
-    for key, entry in match.of_match_members.items():
-        m1 = "&m1->%s" % key
-        m2 = "&m2->%s" % key
-        f1 = "&f1->%s" % key
-        f2 = "&f2->%s" % key
-        if entry["m_type"] == "of_ipv6_t":
-            check = "OF_OVERLAP_IPV6"
-        elif entry["m_type"] == "of_mac_addr_t":
-            check = "OF_OVERLAP_MAC_ADDR"
-        elif entry["m_type"] == "of_bitmap_128_t":
-            check = "OF_OVERLAP_BITMAP_128"
-        else: # Integer
-            check = "OF_OVERLAP_INT"
-            m1 = "m1->%s" % key
-            m2 = "m2->%s" % key
-            f1 = "f1->%s" % key
-            f2 = "f2->%s" % key
-        out.write("""
-    /* Check overlap for %(key)s */
-    if (!%(check)s(%(f1)s, %(f2)s,
-        %(m2)s, %(m1)s)) {
-        return 0; /* This field differentiates; all done */
+    /* Short hand for masks, fields */
+    const uint8_t *m1 = (const uint8_t *)&match1->masks;
+    const uint8_t *m2 = (const uint8_t *)&match2->masks;
+    const uint8_t *f1 = (const uint8_t *)&match1->fields;
+    const uint8_t *f2 = (const uint8_t *)&match2->fields;
+
+    int i;
+    for (i = 0; i < sizeof(of_match_fields_t)/sizeof(uint8_t); i++) {
+        if ((f1[i] ^ f2[i]) & (m1[i] & m2[i])) {
+            /* Matches disagree on a field bit they both qualify on */
+            return 0;
+        }
     }
-""" % dict(check=check, f1=f1, f2=f2, m1=m1, m2=m2, key=key))
 
-    out.write("""
     return 1; /* No field differentiates matches */
 }
 """)

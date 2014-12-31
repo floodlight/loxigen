@@ -116,6 +116,11 @@ type_data_map = {
         init='0',
         pack='util.pack_checksum_128(%s)',
         unpack="util.unpack_checksum_128(%s)"),
+
+    'of_bitmap_512_t': OFTypeData(
+        init='set()',
+        pack='util.pack_bitmap_512(%s)',
+        unpack="util.unpack_bitmap_512(%s)"),
 }
 
 ## Fixed length strings

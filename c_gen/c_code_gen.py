@@ -616,19 +616,26 @@ typedef struct of_ipv6_s {
    uint8_t addr[OF_IPV6_BYTES];
 } of_ipv6_t;
 
+typedef struct of_bitmap_512_s {
+    uint64_t words[8];
+} of_bitmap_512_t;
+
 extern const of_mac_addr_t of_mac_addr_all_ones;
-extern const of_mac_addr_t of_mac_addr_all_zeros;
+extern const of_mac_addr_t of_mac_addr_all_zeroes;
 
 extern const of_ipv6_t of_ipv6_all_ones;
 extern const of_ipv6_t of_ipv6_all_zeros;
 
+extern const of_bitmap_512_t of_bitmap_512_all_ones;
+extern const of_bitmap_512_t of_bitmap_512_all_zeroes;
+
 /**
  * Generic zero and all-ones values of size 16 bytes.
  *
- * IPv6 is longest data type we worry about for comparisons
+ * bitmap_512 is longest data type we worry about for comparisons
  */
-#define of_all_zero_value of_ipv6_all_zeros
-#define of_all_ones_value of_ipv6_all_ones
+#define of_all_zero_value of_bitmap_512_all_zeroes
+#define of_all_ones_value of_bitmap_512_all_ones
 
 /**
  * Non-zero/all ones check for arbitrary type of size <= 16 bytes
