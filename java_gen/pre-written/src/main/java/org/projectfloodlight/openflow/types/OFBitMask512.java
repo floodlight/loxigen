@@ -119,7 +119,7 @@ public class OFBitMask512 implements OFValueType<OFBitMask512> {
             word = raw2;
             bit -= 384;
         } else {
-            word = raw1; // ports -512
+            word = raw1;
             bit -= 448;
         }
         return (word & ((long)1 << bit)) != 0;
