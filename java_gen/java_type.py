@@ -449,10 +449,14 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
-port_bitmap = JType('OFBitMask128') \
+port_bitmap_128 = JType('OFBitMask128') \
             .op(read='OFBitMask128.read16Bytes(bb)',
                 write='$name.write16Bytes(bb)',
                 default='OFBitMask128.NONE')
+port_bitmap_512 = JType('OFBitMask512') \
+            .op(read='OFBitMask512.read64Bytes(bb)',
+                write='$name.write64Bytes(bb)',
+                default='OFBitMask512.NONE')
 table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
@@ -573,7 +577,8 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap,
+        'of_bitmap_128_t': port_bitmap_128,
+        'of_bitmap_512_t': port_bitmap_512,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
@@ -637,8 +642,11 @@ exceptions = {
         'of_oxm_pbb_uca' : { 'value' : boolean_value },
         'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
-        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
-        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
+        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap_128 },
+        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap_128, 'value_mask': port_bitmap_128 },
+
+        'of_oxm_bsn_in_ports_512' : { 'value': port_bitmap_512 },
+        'of_oxm_bsn_in_ports_512_masked' : { 'value': port_bitmap_512, 'value_mask': port_bitmap_512 },
 
         'of_oxm_bsn_lag_id' : { 'value' : lag_id },
         'of_oxm_bsn_lag_id_masked' : { 'value' : lag_id, 'value_mask' : lag_id },

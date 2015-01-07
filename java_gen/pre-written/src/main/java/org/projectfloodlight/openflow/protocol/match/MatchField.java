@@ -14,6 +14,7 @@ import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBitMask512;
 import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
@@ -182,7 +183,7 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<OFBooleanValue>("mpls_bos", MatchFields.MPLS_BOS,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
-    public final static MatchField<U64> TUNNEL_ID = 
+    public final static MatchField<U64> TUNNEL_ID =
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
 
     public final static MatchField<U16> IPV6_EXTHDR =
@@ -190,7 +191,7 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<OFBooleanValue> PBB_UCA =
             new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
-  
+
     public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
             new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
@@ -201,6 +202,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
+
+    public final static MatchField<OFBitMask512> BSN_IN_PORTS_512 =
+            new MatchField<OFBitMask512>("bsn_in_ports_512", MatchFields.BSN_IN_PORTS_512);
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
