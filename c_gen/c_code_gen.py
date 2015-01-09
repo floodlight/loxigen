@@ -621,7 +621,7 @@ typedef struct of_bitmap_512_s {
 } of_bitmap_512_t;
 
 extern const of_mac_addr_t of_mac_addr_all_ones;
-extern const of_mac_addr_t of_mac_addr_all_zeroes;
+extern const of_mac_addr_t of_mac_addr_all_zeros;
 
 extern const of_ipv6_t of_ipv6_all_ones;
 extern const of_ipv6_t of_ipv6_all_zeros;
