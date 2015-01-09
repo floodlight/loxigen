@@ -29,7 +29,13 @@
 // governing permissions and limitations under the EPL.
 
 // IVS supports running sandboxed Lua code as the forwarding pipeline.
-// This extension allows the controller to upload the Lua code.
+// This extension allows the controller to upload the Lua code, send
+// commands to it, and receive async notifications.
+//
+// Most of the data passed between the controller and the Lua code is
+// opaque to the rest of the switch. It's assumed that the controller
+// is tightly coupled to the Lua code it uploaded, so there's no need
+// to version the protocol between them.
 
 #version 4
 #version 5
@@ -64,5 +70,39 @@ struct of_bsn_lua_upload : of_bsn_header {
     uint32_t subtype == 64;
     enum ofp_bsn_lua_upload_flags flags;
     of_str64_t filename;
+    of_octets_t data;
+};
+
+// Send a command to Lua
+
+struct of_bsn_lua_command_request : of_bsn_header {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 65;
+    of_octets_t data;
+};
+
+struct of_bsn_lua_command_reply : of_bsn_header {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 66;
+    of_octets_t data;
+};
+
+// Async message from Lua to the controller
+
+struct of_bsn_lua_notification : of_bsn_header {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 67;
     of_octets_t data;
 };
