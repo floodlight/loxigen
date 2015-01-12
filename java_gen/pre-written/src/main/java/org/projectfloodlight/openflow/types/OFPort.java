@@ -434,7 +434,7 @@ public class OFPort implements OFValueType<OFPort> {
                 if (portNumber < 0 && portNumber > OFPP_MAX_SHORT)
                     throw new IllegalArgumentException("Unknown special port number: "
                             + portNumber);
-                return new OFPort(portNumber);
+                return new OFPort(U16.f(portNumber));
         }
     }
 
