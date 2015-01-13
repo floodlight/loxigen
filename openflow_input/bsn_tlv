@@ -432,3 +432,39 @@ struct of_bsn_tlv_bucket : of_bsn_tlv {
     uint16_t length;
     list(of_bsn_tlv_t) value;
 };
+
+struct of_bsn_tlv_tcp_src : of_bsn_tlv {
+    uint16_t type == 65;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_tcp_dst : of_bsn_tlv {
+    uint16_t type == 66;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_ip_proto : of_bsn_tlv {
+    uint16_t type == 67;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_type : of_bsn_tlv {
+    uint16_t type == 68;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_code : of_bsn_tlv {
+    uint16_t type == 69;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_id : of_bsn_tlv {
+    uint16_t type == 70;
+    uint16_t length;
+    uint16_t value;
+};
