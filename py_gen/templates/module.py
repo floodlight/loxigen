@@ -33,12 +33,11 @@
 
 import struct
 import loxi
-import const
-:: for module in modules:
-import ${module}
-:: #endfor
 import util
 import loxi.generic_util
+
+import sys
+ofp = sys.modules['loxi.${subdir}']
 
 :: for ofclass in ofclasses:
 :: include('_ofclass.py', ofclass=ofclass)
