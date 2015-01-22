@@ -109,5 +109,5 @@ def codegen(install_dir):
         for name, ofclasses in modules.items():
             args = args_by_module.get(name, {})
             render(os.path.join(subdir, name + '.py'), template_name='module.py',
-                   version=version, ofclasses=ofclasses, modules=modules.keys(),
+                   version=version, ofclasses=ofclasses, subdir=subdir,
                    **args)

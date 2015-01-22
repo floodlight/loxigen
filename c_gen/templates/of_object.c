@@ -521,7 +521,7 @@ of_object_wire_buffer_steal(of_object_t *obj, uint8_t **buffer)
     obj->wbuf = NULL;
 }
 
-#define _MAX_PARENT_ITERATIONS 4
+#define _MAX_PARENT_ITERATIONS 8
 /**
  * Iteratively update parent lengths thru hierarchy
  * @param obj The object whose length is being updated

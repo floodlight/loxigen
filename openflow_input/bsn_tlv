@@ -468,3 +468,9 @@ struct of_bsn_tlv_icmp_id : of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_rx_bytes : of_bsn_tlv {
+    uint16_t type == 71;
+    uint16_t length;
+    uint64_t value;
+};
