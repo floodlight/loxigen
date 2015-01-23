@@ -135,6 +135,10 @@ function read_of_table_name_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 32)
 end
 
+function read_of_str64_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 64)
+end
+
 function read_of_port_desc_t(reader, version, subtree, field_name)
     if reader.is_empty() then
         return
