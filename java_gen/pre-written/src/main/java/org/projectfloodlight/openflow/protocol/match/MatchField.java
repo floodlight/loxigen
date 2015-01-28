@@ -14,6 +14,7 @@ import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBitMask512;
 import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
@@ -179,11 +180,32 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
-    public final static MatchField<U64> TUNNEL_ID = 
+    public final static MatchField<OFBooleanValue> MPLS_BOS =
+            new MatchField<OFBooleanValue>("mpls_bos", MatchFields.MPLS_BOS,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+
+    public final static MatchField<U64> TUNNEL_ID =
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
+
+    public final static MatchField<U16> IPV6_EXTHDR =
+            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR);
+
+    public final static MatchField<OFBooleanValue> PBB_UCA =
+            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
+
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
+            new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_DST =
+            new MatchField<IPv4Address>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
+
+    public final static MatchField<OFBitMask512> BSN_IN_PORTS_512 =
+            new MatchField<OFBitMask512>("bsn_in_ports_512", MatchFields.BSN_IN_PORTS_512);
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
@@ -236,7 +258,6 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
 
-
     public final static MatchField<U8> OCH_SIGTYPE =
             new MatchField<U8>("och_sigtype",
                                     MatchFields.OCH_SIGTYPE);
@@ -244,7 +265,6 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U8> OCH_SIGTYPE_BASIC =
             new MatchField<U8>("och_sigtype_basic",
                                     MatchFields.OCH_SIGTYPE_BASIC);
-
 
     public final static MatchField<CircuitSignalID> OCH_SIGID =
             new MatchField<CircuitSignalID>("och_sigid",
@@ -254,6 +274,9 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<CircuitSignalID>("och_sigid_basic",
                                     MatchFields.OCH_SIGID);
     
+    public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
+            new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
+
     public String getName() {
         return name;
     }

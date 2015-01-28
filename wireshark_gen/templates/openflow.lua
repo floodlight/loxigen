@@ -52,7 +52,7 @@ local openflow_versions = {
 
 :: for version, ofproto in ir.items():
 :: for enum in ofproto.enums:
-local enum_v${version.wire_version}_${enum.name} = {
+enum_v${version.wire_version}_${enum.name} = {
 :: for (name, value) in enum.values:
     [${value}] = "${name}",
 :: #endfor
@@ -159,8 +159,8 @@ function p_of.dissector (buf, pkt, root)
             local msg_len = buf(offset+2,2):uint()
 
             -- Detect obviously broken messages
-            if msg_version == 0 or msg_version > 4 then break end
-            if msg_type > 29 then break end
+            if msg_version == 0 or msg_version > 5 then break end
+            if msg_type > 34 then break end
             if msg_len < 8 then break end
 
             if offset + msg_len > buf:len() then

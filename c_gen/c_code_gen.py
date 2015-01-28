@@ -403,7 +403,6 @@ extern int of_wire_buffer_of_match_set(of_object_t *obj, int offset,
 int of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id, int max_len);
 
 extern const int *const of_object_fixed_len[OF_VERSION_ARRAY_MAX];
-extern const int *const of_object_extra_len[OF_VERSION_ARRAY_MAX];
 """)
     c_type_maps.gen_type_data_header(out)
     c_match.gen_declarations(out)
@@ -530,7 +529,7 @@ typedef int (*loci_writer_f)(void *cookie, const char *fmt, ...);
 /**
  * Check if a version is supported
  */
-#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_3)
+#define OF_VERSION_OKAY(v) ((v) >= OF_VERSION_1_0 && (v) <= OF_VERSION_1_4)
 
 """)
     gen_version_enum(out)
@@ -617,19 +616,26 @@ typedef struct of_ipv6_s {
    uint8_t addr[OF_IPV6_BYTES];
 } of_ipv6_t;
 
+typedef struct of_bitmap_512_s {
+    uint64_t words[8];
+} of_bitmap_512_t;
+
 extern const of_mac_addr_t of_mac_addr_all_ones;
 extern const of_mac_addr_t of_mac_addr_all_zeros;
 
 extern const of_ipv6_t of_ipv6_all_ones;
 extern const of_ipv6_t of_ipv6_all_zeros;
 
+extern const of_bitmap_512_t of_bitmap_512_all_ones;
+extern const of_bitmap_512_t of_bitmap_512_all_zeroes;
+
 /**
  * Generic zero and all-ones values of size 16 bytes.
  *
- * IPv6 is longest data type we worry about for comparisons
+ * bitmap_512 is longest data type we worry about for comparisons
  */
-#define of_all_zero_value of_ipv6_all_zeros
-#define of_all_ones_value of_ipv6_all_ones
+#define of_all_zero_value of_bitmap_512_all_zeroes
+#define of_all_ones_value of_bitmap_512_all_ones
 
 /**
  * Non-zero/all ones check for arbitrary type of size <= 16 bytes
@@ -726,24 +732,6 @@ typedef uint64_t of_match_bmap_t;
 #define U64_HTON(val) U64_NTOH(val)
 #define IPV6_HTON(dst, src) /* NOTE different syntax; currently no-op */
 #endif
-
-/****************************************************************
- *
- * The following are internal definitions used by the automatically
- * generated code.  Users should not reference these definitions
- * as they may change between versions of this code
- *
- ****************************************************************/
-
-#define OF_MESSAGE_IN_MATCH_POINTER(obj)                            \\
-    (WIRE_BUF_POINTER(&((obj)->wire_buffer), OF_MESSAGE_IN_MATCH_OFFSET))
-#define OF_MESSAGE_IN_MATCH_LEN(ptr) BUF_U16_GET(&ptr[2])
-#define OF_MESSAGE_IN_DATA_OFFSET(obj) \\
-    (FIXED_LEN + OF_MESSAGE_IN_MATCH_LEN(OF_MESSAGE_IN_MATCH_POINTER(obj)) + 2)
-
-#define OF_MESSAGE_OUT_DATA_OFFSET(obj) \\
-    (FIXED_LEN + of_message_out_actions_len_get(obj))
-
 """)
 
 def external_h_top_matter(out, name):
@@ -773,7 +761,6 @@ def external_h_top_matter(out, name):
  * Per-class static delete functions
  * Per-class, per-member accessor declarations
  * Per-class structure definitions
- * Generic union (inheritance) definitions
  * Pointer set function declarations
  * Some special case macros
  *
@@ -874,61 +861,6 @@ extern const char *const of_object_id_str[];
 
 #define OF_MESSAGE_OBJECT_COUNT %d
 """ % ((last + 1), msg_count))
-
-    # Generate object type range checking for inheritance classes
-
-    # @fixme These should be determined algorithmicly
-    out.write("""
-/*
- * Macros to check if an object ID is within an inheritance class range
- */
-""")
-    # Alphabetical order for 'last'
-    last_ids = dict(of_action="OF_ACTION_STRIP_VLAN",
-                    of_oxm="OF_OXM_VLAN_VID_MASKED",
-                    of_instruction="OF_INSTRUCTION_WRITE_METADATA",
-                    of_queue_prop="OF_QUEUE_PROP_MIN_RATE",
-                    of_table_feature_prop="OF_TABLE_FEATURE_PROP_WRITE_SETFIELD_MISS",
-                    # @FIXME add meter_band ?
-                    )
-    for cls, last in last_ids.items():
-        out.write("""
-#define %(enum)s_FIRST_ID      (%(enum)s + 1)
-#define %(enum)s_LAST_ID       %(last)s
-#define %(enum)s_VALID_ID(id) \\
-    ((id) >= %(enum)s_FIRST_ID && \\
-     (id) <= %(enum)s_LAST_ID)
-""" % dict(enum=enum_name(cls), last=last))
-    out.write("""
-/**
- * Function to check a wire ID
- * @param object_id The ID to check
- * @param base_object_id The inheritance parent, if applicable
- * @returns boolean: If base_object_id is an inheritance class, check if
- * object_id is valid as a subclass.  Otherwise return 1.
- *
- * Note: Could check that object_id == base_object_id in the
- * second case.
- */
-static inline int
-of_wire_id_valid(int object_id, int base_object_id) {
-    switch (base_object_id) {
-    case OF_ACTION:
-        return OF_ACTION_VALID_ID(object_id);
-    case OF_OXM:
-        return OF_OXM_VALID_ID(object_id);
-    case OF_QUEUE_PROP:
-        return OF_QUEUE_PROP_VALID_ID(object_id);
-    case OF_TABLE_FEATURE_PROP:
-        return OF_TABLE_FEATURE_PROP_VALID_ID(object_id);
-    case OF_INSTRUCTION:
-        return OF_INSTRUCTION_VALID_ID(object_id);
-    default:
-        break;
-    }
-    return 1;
-}
-""")
 
 ################################################################
 #
@@ -1041,37 +973,14 @@ def v3_match_offset_get(cls):
 #
 ################################################################
 
-def gen_generics(out):
-    for (cls, subclasses) in type_maps.inheritance_map.items():
-        out.write("""
-/**
- * Inheritance super class for %(cls)s
- *
- * This class is the union of %(cls)s classes.  You can refer
- * to it untyped by refering to the member 'header' whose structure
- * is common across all sub-classes.
- */
-
-union %(cls)s_u {
-    %(cls)s_header_t header; /* Generic instance */
-""" % dict(cls=cls))
-        for subcls in sorted(subclasses):
-            out.write("    %s_%s_t %s;\n" % (cls, subcls, subcls))
-        out.write("};\n")
-
 def gen_struct_typedefs(out):
     """
     Generate typedefs for all struct objects
     @param out The file for output, already open
     """
 
-    out.write("\n/* LOCI inheritance parent typedefs */\n")
-    for cls in type_maps.inheritance_map:
-        out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
 
@@ -1110,7 +1019,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
+        if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1150,13 +1059,13 @@ extern %(get_ret_type)s %(base_name)s_get(
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
 extern int %(cls)s_first(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_next(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append_bind(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 
 /**
  * Iteration macro for list of type %(cls)s
@@ -1298,7 +1207,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
-    elif m_type == "of_oxm_header_t":
+    elif m_type == "of_oxm_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1306,7 +1215,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
-    elif m_type == "of_bsn_vport_header_t":
+    elif m_type == "of_bsn_vport_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1630,10 +1539,6 @@ def gen_init_fn_body(cls, out):
     @param cls The class name for the function
     @param out The file to which to write
     """
-    if cls in type_maps.inheritance_map:
-        param = "obj_p"
-    else:
-        param = "obj"
 
     out.write("""
 /**
@@ -1654,33 +1559,20 @@ def gen_init_fn_body(cls, out):
  */
 
 void
-%(cls)s_init(%(cls)s_t *%(param)s,
+%(cls)s_init(of_object_t *obj,
     of_version_t version, int bytes, int clean_wire)
 {
-""" % dict(cls=cls, param=param))
-
-    # Use an extra pointer to deal with inheritance classes
-    if cls in type_maps.inheritance_map:
-        out.write("""\
-    %s_header_t *obj;
-
-    obj = &obj_p->header;  /* Need instantiable subclass */
-""" % cls)
-
-    out.write("""
     LOCI_ASSERT(of_object_fixed_len[version][%(enum)s] >= 0);
     if (clean_wire) {
         MEMSET(obj, 0, sizeof(*obj));
     }
     if (bytes < 0) {
-        bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+        bytes = of_object_fixed_len[version][%(enum)s];
     }
     obj->version = version;
     obj->length = bytes;
     obj->object_id = %(enum)s;
-""" % dict(cls=cls, enum=enum_name(cls)))
 
-    out.write("""
     /* Grow the wire buffer */
     if (obj->wbuf != NULL) {
         int tot_bytes;
@@ -1689,66 +1581,7 @@ void
         of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
-
-""")
-
-## @fixme This should also be updated once there is a map from
-# class instance to wire length/type accessors
-def gen_wire_push_fn(cls, out):
-    """
-    Generate the calls to push values into the wire buffer
-    """
-    if type_maps.class_is_virtual(cls):
-        print "Push fn gen called for virtual class " + cls
-        return
-
-    out.write("""
-/**
- * Helper function to push values into the wire buffer
- */
-static inline int
-%(cls)s_push_wire_values(%(cls)s_t *obj)
-{
-""" % dict(cls=cls))
-
-    import loxi_globals
-    uclass = loxi_globals.unified.class_by_name(cls)
-    if uclass and not uclass.virtual and uclass.has_type_members:
-        out.write("""
-    %(cls)s_push_wire_types(obj);
-""" % dict(cls=cls))
-
-    if loxi_utils.class_is_message(cls):
-        out.write("""
-    /* Message obj; set length */
-    of_message_t msg;
-
-    if ((msg = OF_OBJECT_TO_MESSAGE(obj)) != NULL) {
-        of_message_length_set(msg, obj->length);
-    }
-""" % dict(name = enum_name(cls)))
-
-    else: # Not a message
-        if loxi_utils.class_is_tlv16(cls):
-            out.write("""
-    /* TLV obj; set length */
-    of_tlv16_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-        if loxi_utils.class_is_u16_len(cls) or cls == "of_packet_queue":
-            out.write("""
-    of_object_wire_length_set((of_object_t *)obj, obj->length);
-""")
-
-        if cls == "of_meter_stats":
-            out.write("""
-    of_meter_stats_wire_length_set((of_object_t *)obj, obj->length);
-""" % dict(enum=enum_name(cls)))
-
-    out.write("""
-    return OF_ERROR_NONE;
-}
-""")
+""" % dict(cls=cls, enum=enum_name(cls)))
 
 def gen_new_fn_body(cls, out):
     """
@@ -1762,9 +1595,6 @@ def gen_new_fn_body(cls, out):
  * \\defgroup %(cls)s %(cls)s
  */
 """ % dict(cls=cls))
-
-    if not type_maps.class_is_virtual(cls):
-        gen_wire_push_fn(cls, out)
 
     uclass = loxi_globals.unified.class_by_name(cls)
     is_fixed_length = uclass and uclass.is_fixed_length
@@ -1783,35 +1613,40 @@ def gen_new_fn_body(cls, out):
  * \\ingroup %(cls)s
  */
 
-%(cls)s_t *
+of_object_t *
 %(cls)s_new(of_version_t version)
 {
-    %(cls)s_t *obj;
+    of_object_t *obj;
     int bytes;
 
-    bytes = of_object_fixed_len[version][%(enum)s] + of_object_extra_len[version][%(enum)s];
+    bytes = of_object_fixed_len[version][%(enum)s];
 
-    if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
+    if ((obj = of_object_new(%(max_length)s)) == NULL) {
         return NULL;
     }
 
     %(cls)s_init(obj, version, bytes, 0);
 """ % dict(cls=cls, enum=enum_name(cls), max_length=max_length))
     if not type_maps.class_is_virtual(cls):
-        out.write("""
-    if (%(cls)s_push_wire_values(obj) < 0) {
-        FREE(obj);
-        return NULL;
-    }
-""" % dict(cls=cls))
+        from codegen import class_metadata_dict
+        metadata = class_metadata_dict[cls]
+
+        if metadata.wire_type_set != 'NULL':
+            out.write("""\
+    %s(obj);
+""" % metadata.wire_type_set)
+
+        if metadata.wire_length_set != 'NULL':
+            out.write("""\
+    %s(obj, obj->length);
+""" % metadata.wire_length_set)
 
     match_offset = v3_match_offset_get(cls)
     if match_offset >= 0:
         # Init length field for match object
         out.write("""
     /* Initialize match TLV for 1.2 */
-    /* FIXME: Check 1.3 below */
-    if ((version == OF_VERSION_1_2) || (version == OF_VERSION_1_3)) {
+    if ((version >= OF_VERSION_1_2)) {
         of_object_u16_set((of_object_t *)obj, %(match_offset)d + 2, 4);
     }
 """ % dict(match_offset=match_offset))
@@ -1847,11 +1682,11 @@ def gen_new_function_declarations(out):
 
     for cls in of_g.standard_class_order:
         out.write("""
-extern %(cls)s_t *
+extern of_object_t *
     %(cls)s_new(of_version_t version);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
-    %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
+    of_object_t *obj, of_version_t version, int bytes, int clean_wire);
 """ % dict(cls=cls))
 
     out.write("""
@@ -1863,8 +1698,6 @@ extern %(cls)s_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if cls in type_maps.inheritance_map:
-#            continue
         out.write("""
 /**
  * Delete an object of type %(cls)s_t
@@ -1873,8 +1706,8 @@ extern %(cls)s_t *
  * \ingroup %(cls)s
  */
 static inline void
-%(cls)s_delete(%(cls)s_t *obj) {
-    of_object_delete((of_object_t *)(obj));
+%(cls)s_delete(of_object_t *obj) {
+    of_object_delete(obj);
 }
 """ % dict(cls=cls))
 
@@ -1922,8 +1755,8 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if cls in type_maps.inheritance_map:
-            pass # Check this
+        if type_maps.class_is_virtual(cls):
+            pass
 
         out.write("""
 /**

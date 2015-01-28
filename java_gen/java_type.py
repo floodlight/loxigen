@@ -53,9 +53,12 @@ def format_primitive_literal(t, value):
         signed-craziness
     """
     signed, bits, cast_needed = java_primitives_info[t]
+    if t == 'boolean':
+        return "true" if bool(value) and value not in("False", "false") else "false"
+
     max = (1 << bits)-1
     if value > max:
-        raise Exception("Value %d to large for type %s" % (value, t))
+        raise Exception("Value %s to large for type %s" % (value, t))
 
     if signed:
         max_pos = (1 << (bits-1)) - 1
@@ -361,10 +364,20 @@ ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
             default='IPv4Address.NONE')
+ipv4_list =  JType('List<IPv4Address>') \
+        .op(read='ChannelUtils.readList(bb, $length, IPv4Address.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<IPv4Address>of()',
+            funnel="FunnelUtils.putList($name, sink)")
 ipv6 = JType("IPv6Address") \
         .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
+ipv6_list =  JType('List<IPv46ddress>') \
+        .op(read='ChannelUtils.readList(bb, $length, IPv6Address.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<IPv6Address>of()',
+            funnel="FunnelUtils.putList($name, sink)")
 packetin_reason = gen_enum_jtype("OFPacketInReason")
 transport_port = JType("TransportPort")\
         .op(read="TransportPort.read2Bytes(bb)",
@@ -437,10 +450,14 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
-port_bitmap = JType('OFBitMask128') \
+port_bitmap_128 = JType('OFBitMask128') \
             .op(read='OFBitMask128.read16Bytes(bb)',
                 write='$name.write16Bytes(bb)',
                 default='OFBitMask128.NONE')
+port_bitmap_512 = JType('OFBitMask512') \
+            .op(read='OFBitMask512.read64Bytes(bb)',
+                write='$name.write64Bytes(bb)',
+                default='OFBitMask512.NONE')
 table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
@@ -458,6 +475,10 @@ of_version = JType("OFVersion", 'byte') \
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
+of_message = JType("OFMessage")\
+            .op(read="OFMessageVer$version.READER.readFrom(bb)",
+                write="$name.writeTo(bb)")
+
 of_type = JType("OFType", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 action_type= gen_enum_jtype("OFActionType")\
@@ -505,6 +526,10 @@ gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
            )
+bundle_id = JType("BundleId") \
+        .op(read='BundleId.read4Bytes(bb)',
+            write='$name.write4Bytes(bb)',
+           )
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
 error_cause_data = JType("OFErrorCauseData") \
@@ -518,6 +543,10 @@ var_string = JType('String').op(
             )
 
 generic_t = JType("T")
+
+table_desc = JType('OFTableDesc') \
+        .op(read='OFTableDescVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
 
 
 default_mtype_to_jtype_convert_map = {
@@ -535,6 +564,8 @@ default_mtype_to_jtype_convert_map = {
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
+        'list(of_ipv4_t)' : ipv4_list,
+        'list(of_ipv6_t)' : ipv6_list,
         'of_octets_t' : octets,
         'of_match_t': of_match,
         'of_fm_cmd_t': flow_mod_cmd,
@@ -550,11 +581,13 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap,
+        'of_bitmap_128_t': port_bitmap_128,
+        'of_bitmap_512_t': port_bitmap_512,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_app_code_t': app_code,  
         'of_sig_id_t': sig_id,
+        'of_table_desc_t': table_desc,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -608,9 +641,18 @@ exceptions = {
         'of_oxm_mpls_label_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         'of_oxm_mpls_tc' : { 'value' : u8obj },
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+        'of_oxm_mpls_bos' : { 'value' : boolean_value },
+        'of_oxm_mpls_bos_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+        'of_oxm_ipv6_exthdr' : { 'value' : u16obj },
+        'of_oxm_ipv6_exthdr_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+        'of_oxm_pbb_uca' : { 'value' : boolean_value },
+        'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
-        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
-        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
+        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap_128 },
+        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap_128, 'value_mask': port_bitmap_128 },
+
+        'of_oxm_bsn_in_ports_512' : { 'value': port_bitmap_512 },
+        'of_oxm_bsn_in_ports_512_masked' : { 'value': port_bitmap_512, 'value_mask': port_bitmap_512 },
 
         'of_oxm_bsn_lag_id' : { 'value' : lag_id },
         'of_oxm_bsn_lag_id_masked' : { 'value' : lag_id, 'value_mask' : lag_id },
@@ -663,6 +705,9 @@ exceptions = {
         'of_oxm_bsn_vlan_xlate_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_vlan_xlate_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
+        'of_oxm_bsn_l2_cache_hit' : { 'value' : boolean_value },
+        'of_oxm_bsn_l2_cache_hit_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
@@ -704,8 +749,10 @@ exceptions = {
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
         'of_oxm_och_sigtype' : { 'value' : u8obj },
         'of_oxm_och_sigtype_basic' : { 'value' : u8obj },
-	'of_oxm_och_sigid' : {'value' : sig_id},
-	'of_oxm_och_sigid_basic' : {'value' : sig_id},  
+        'of_oxm_och_sigid' : {'value' : sig_id},
+        'of_oxm_och_sigid_basic' : {'value' : sig_id},  
+
+        'of_bundle_add_msg' : { 'data' : of_message },
 }
 
 
@@ -770,6 +817,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return action_type_set
     elif field_name == "table_id" and re.match(r'of_bsn_gentable.*', obj_name):
         return gen_table_id
+    elif field_name == "bundle_id" and re.match(r'of_bundle_.*', obj_name):
+        return bundle_id
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

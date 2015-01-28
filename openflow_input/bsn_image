@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 struct of_bsn_image_desc_stats_request : of_bsn_stats_request {
     uint8_t version;

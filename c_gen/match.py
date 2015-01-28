@@ -131,6 +131,7 @@ match_keys = {
     2: of_v2_keys,
     3: [],
     4: [],
+    5: [],
 }
 
 # Complete list of match keys, sorted by the standard order
@@ -196,8 +197,7 @@ def match_sanity_check():
     # Generate list of OXM names from the unified classes
     oxm_names = [x[7:] for x in of_g.unified.keys() if
                  x.startswith('of_oxm_') and
-                 x.find('masked') < 0 and
-                 x.find('header') < 0]
+                 x.find('masked') < 0]
 
     # Check that all OXMs are in the match members
     for key in oxm_names:

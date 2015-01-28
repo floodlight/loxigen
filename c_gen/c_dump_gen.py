@@ -90,10 +90,10 @@ int of_object_dump(loci_writer_f writer, void* cookie, of_object_t* obj);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""\
-int %(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, %(cls)s_t *obj);
+int %(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, of_object_t *obj);
 """ % dict(cls=cls, ver_name=loxi_utils.version_to_name(version)))
 
     out.write("""
@@ -129,11 +129,11 @@ unknown_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if cls in type_maps.inheritance_map:
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""
 int
-%(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, %(cls)s_t *obj)
+%(cls)s_%(ver_name)s_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     int out = 0;
 """ % dict(cls=cls, ver_name=ver_name))
@@ -150,7 +150,7 @@ int
 """  % dict(m_type=m_type, v_name=var_name_map(m_type)))
                     if loxi_utils.class_is_list(m_type):
                         base_type = loxi_utils.list_to_entry_type(m_type)
-                        out.write("    %s elt;\n    int rv;\n" % base_type)
+                        out.write("    of_object_t elt;\n    int rv;\n")
             out.write("""
     out += writer(cookie, "Object of type %(cls)s\\n");
 """ % dict(cls=cls))
@@ -184,7 +184,7 @@ int
                     sub_cls = m_type[:-2] # Trim _t
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
-    out += %(sub_cls)s_%(ver_name)s_dump(writer, cookie, &%(v_name)s);
+    out += of_object_dump(writer, cookie, &%(v_name)s);
 """ % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
@@ -234,7 +234,7 @@ static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
                 comma = ","
 
             if (not loxi_utils.class_in_version(cls, version) or
-                    cls in type_maps.inheritance_map):
+                    type_maps.class_is_virtual(cls)):
                 out.write("    unknown_dump%s\n" % comma);
             else:
                 out.write("    %s_%s_dump%s\n" %
@@ -242,20 +242,20 @@ static const loci_obj_dump_f dump_funs_v%(version)s[OF_OBJECT_COUNT] = {
         out.write("};\n\n")
 
     out.write("""
-static const loci_obj_dump_f *const dump_funs[5] = {
-    NULL,
-    dump_funs_v1,
-    dump_funs_v2,
-    dump_funs_v3,
-    dump_funs_v4
+static const loci_obj_dump_f *const dump_funs[] = {
+""")
+
+    for version in of_g.of_version_range:
+        out.write("    [%(v)d] = dump_funs_v%(v)d,\n" % dict(v=version))
+
+    out.write("""\
 };
 
 int
 of_object_dump(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     if ((obj->object_id > 0) && (obj->object_id < OF_OBJECT_COUNT)) {
-        if (((obj)->version > 0) && ((obj)->version <= OF_VERSION_1_3)) {
-            /* @fixme VERSION */
+        if (OF_VERSION_OKAY(obj->version)) {
             return dump_funs[obj->version][obj->object_id](writer, cookie, (of_object_t *)obj);
         } else {
             return writer(cookie, "Bad version %d\\n", obj->version);

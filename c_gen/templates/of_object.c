@@ -521,7 +521,7 @@ of_object_wire_buffer_steal(of_object_t *obj, uint8_t **buffer)
     obj->wbuf = NULL;
 }
 
-#define _MAX_PARENT_ITERATIONS 4
+#define _MAX_PARENT_ITERATIONS 8
 /**
  * Iteratively update parent lengths thru hierarchy
  * @param obj The object whose length is being updated
@@ -581,9 +581,6 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
     if (loci_class_metadata[obj->object_id].wire_type_get != NULL) {
         of_object_id_t id;
         loci_class_metadata[obj->object_id].wire_type_get(obj, &id);
-        if (!of_wire_id_valid(id, base_object_id)) {
-            return OF_ERROR_PARSE;
-        }
         obj->object_id = id;
         /* Call the init function for this object type; do not push to wire */
         of_object_init_map[id]((of_object_t *)(obj), obj->version, -1, 0);

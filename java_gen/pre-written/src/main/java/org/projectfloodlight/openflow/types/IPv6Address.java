@@ -8,11 +8,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
+
+import org.projectfloodlight.openflow.protocol.Writeable;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
@@ -20,7 +23,7 @@ import com.google.common.primitives.Longs;
  *
  * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
  */
-public class IPv6Address extends IPAddress<IPv6Address> {
+public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;
@@ -41,6 +44,15 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     private IPv6Address(final long raw1, final long raw2) {
         this.raw1 = raw1;
         this.raw2 = raw2;
+    }
+
+    public final static Reader READER = new Reader();
+
+    private static class Reader implements OFMessageReader<IPv6Address> {
+        @Override
+        public IPv6Address readFrom(ChannelBuffer bb) throws OFParseError {
+            return new IPv6Address(bb.readLong(), bb.readLong());
+        }
     }
 
     @Override
@@ -213,8 +225,17 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     public static IPv6Address of(@Nonnull final String string) throws IllegalArgumentException {
         Preconditions.checkNotNull(string, "string must not be null");
 
+        // remove the zone id
+        int zoneDelimIndex = string.indexOf("%");
+        String substring;
+        if (zoneDelimIndex != -1) {
+            substring = string.substring(0, zoneDelimIndex);
+        } else {
+            substring = string;
+        }
+
         IPv6Builder builder = new IPv6Builder();
-        String[] parts = colonPattern.split(string, -1);
+        String[] parts = colonPattern.split(substring, -1);
 
         int leftWord = 0;
         int leftIndex = 0;
@@ -537,5 +558,11 @@ public class IPv6Address extends IPAddress<IPv6Address> {
     public void putTo(PrimitiveSink sink) {
         sink.putLong(raw1);
         sink.putLong(raw2);
+    }
+
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        bb.writeLong(raw1);
+        bb.writeLong(raw2);
     }
 }

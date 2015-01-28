@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 struct of_bsn_tlv_port : of_bsn_tlv {
     uint16_t type == 0;
@@ -171,4 +172,305 @@ struct of_bsn_tlv_crc_enabled : of_bsn_tlv {
     uint16_t type == 22;
     uint16_t length;
     uint8_t value;
+};
+
+struct of_bsn_tlv_external_ip : of_bsn_tlv {
+    uint16_t type == 23;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_external_mac : of_bsn_tlv {
+    uint16_t type == 24;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_external_netmask : of_bsn_tlv {
+    uint16_t type == 25;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_external_gateway_ip : of_bsn_tlv {
+    uint16_t type == 26;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_internal_mac : of_bsn_tlv {
+    uint16_t type == 27;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_internal_gateway_mac : of_bsn_tlv {
+    uint16_t type == 28;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_external_gateway_mac : of_bsn_tlv {
+    uint16_t type == 29;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_sampling_rate : of_bsn_tlv {
+    uint16_t type == 30;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_header_size : of_bsn_tlv {
+    uint16_t type == 31;
+    uint16_t length;
+    uint32_t value; /* bytes */
+};
+
+struct of_bsn_tlv_eth_src : of_bsn_tlv {
+    uint16_t type == 32;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_eth_dst : of_bsn_tlv {
+    uint16_t type == 33;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_ipv4_src : of_bsn_tlv {
+    uint16_t type == 34;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_ipv4_dst : of_bsn_tlv {
+    uint16_t type == 35;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_udp_src : of_bsn_tlv {
+    uint16_t type == 36;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_udp_dst : of_bsn_tlv {
+    uint16_t type == 37;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_sub_agent_id : of_bsn_tlv {
+    uint16_t type == 38;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_tx_bytes : of_bsn_tlv {
+    uint16_t type == 39;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_actor_system_priority: of_bsn_tlv {
+    uint16_t type == 40;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_actor_system_mac: of_bsn_tlv {
+    uint16_t type == 41;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_actor_port_priority: of_bsn_tlv {
+    uint16_t type == 42;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_actor_port_num: of_bsn_tlv {
+    uint16_t type == 43;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_actor_key: of_bsn_tlv {
+    uint16_t type == 44;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_convergence_status: of_bsn_tlv {
+    uint16_t type == 45;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_partner_system_priority: of_bsn_tlv {
+    uint16_t type == 47;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_system_mac: of_bsn_tlv {
+    uint16_t type == 48;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_partner_port_priority: of_bsn_tlv {
+    uint16_t type == 49;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_port_num: of_bsn_tlv {
+    uint16_t type == 50;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_partner_key: of_bsn_tlv {
+    uint16_t type == 51;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_name : of_bsn_tlv {
+    uint16_t type == 52;
+    uint16_t length;
+    of_octets_t value; /* UTF-8 encoded. Not null terminated. */
+};
+
+enum ofp_bsn_lacp_state(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_LACP_STATE_ACTIVITY = 0x01,
+    OFP_BSN_LACP_STATE_TIMEOUT = 0x02,
+    OFP_BSN_LACP_STATE_AGGREGATION = 0x04,
+    OFP_BSN_LACP_STATE_SYNCHRONIZATION = 0x08,
+    OFP_BSN_LACP_STATE_COLLECTING = 0x10,
+    OFP_BSN_LACP_STATE_DISTRIBUTING = 0x20,
+    OFP_BSN_LACP_STATE_DEFAULTED = 0x40,
+    OFP_BSN_LACP_STATE_EXPIRED = 0x80,
+};
+
+struct of_bsn_tlv_actor_state: of_bsn_tlv {
+    uint16_t type == 53;
+    uint16_t length;
+    enum ofp_bsn_lacp_state value;
+};
+
+struct of_bsn_tlv_partner_state: of_bsn_tlv {
+    uint16_t type == 54;
+    uint16_t length;
+    enum ofp_bsn_lacp_state value;
+};
+
+struct of_bsn_tlv_data : of_bsn_tlv {
+    uint16_t type == 55;
+    uint16_t length;
+    of_octets_t value;
+};
+
+struct of_bsn_tlv_mac_mask : of_bsn_tlv {
+    uint16_t type == 56;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_priority : of_bsn_tlv {
+    uint16_t type == 57;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_interval : of_bsn_tlv {
+    uint16_t type == 58;
+    uint16_t length;
+    uint32_t value; /* Milliseconds */
+};
+
+/* A reference to an entry in another gentable */
+struct of_bsn_tlv_reference : of_bsn_tlv {
+    uint16_t type == 59;
+    uint16_t length;
+    uint16_t table_id;
+    list(of_bsn_tlv_t) key;
+};
+
+struct of_bsn_tlv_ipv4_netmask : of_bsn_tlv {
+    uint16_t type == 60;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_mpls_label : of_bsn_tlv {
+    uint16_t type == 61;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_mpls_control_word : of_bsn_tlv {
+    uint16_t type == 62;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_mpls_sequenced : of_bsn_tlv {
+    uint16_t type == 63;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_bucket : of_bsn_tlv {
+    uint16_t type == 64;
+    uint16_t length;
+    list(of_bsn_tlv_t) value;
+};
+
+struct of_bsn_tlv_tcp_src : of_bsn_tlv {
+    uint16_t type == 65;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_tcp_dst : of_bsn_tlv {
+    uint16_t type == 66;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_ip_proto : of_bsn_tlv {
+    uint16_t type == 67;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_type : of_bsn_tlv {
+    uint16_t type == 68;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_code : of_bsn_tlv {
+    uint16_t type == 69;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_icmp_id : of_bsn_tlv {
+    uint16_t type == 70;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_rx_bytes : of_bsn_tlv {
+    uint16_t type == 71;
+    uint16_t length;
+    uint64_t value;
 };

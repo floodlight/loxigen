@@ -9,9 +9,11 @@ if [[ ! $ARTIFACT_REPO_URL ]]; then
     exit 1
 fi
 
+ARTIFACT_REPO_BRANCH=${2-master}
+
 ARTIFACT_REPO=$(mktemp -d --tmpdir "push-artifacts-repo.XXXXXXX")
 
-git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO}
+git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO} -b ${ARTIFACT_REPO_BRANCH}
 find ${ARTIFACT_REPO} -mindepth 1 -maxdepth 1 -type d \! -name '.*' -print0 | xargs -0 rm -r
 make LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
 
@@ -55,7 +57,7 @@ fi
 
     git tag -a -f "loxi/${loxi_head}" -m "Tag Loxigen Revision ${loxi_head}"
     git push --tags
-    git push
+    git push origin HEAD
 )
 
 rm -rf ${ARTIFACT_REPO}

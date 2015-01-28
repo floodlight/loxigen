@@ -29,12 +29,13 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 enum ofp_bsn_vrf_counter_constants(wire_type=uint32_t) {
     OFP_BSN_VRF_ALL = 0xffffffff,
 };
 
-enum of_bsn_vrf_counter_t(wire_type=uint8_t, complete=False) {
+enum of_bsn_vrf_counter(wire_type=uint8_t, complete=False, stable=True) {
   OFP_BSN_VRF_COUNTER_BYTES = 0,
   OFP_BSN_VRF_COUNTER_PACKETS = 1,
 };

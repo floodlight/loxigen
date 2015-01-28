@@ -39,20 +39,13 @@ def protocol(ver):
     """
     Import and return the protocol module for the given wire version.
     """
-    if ver == 1:
-        import of10
-        return of10
-    elif ver == 2:
-        import of11
-        return of11
-    elif ver == 3:
-        import of12
-        return of12
-    elif ver == 4:
-        import of13
-        return of13
-    else:
-        raise ValueError
+:: for v in loxi_globals.OFVersions.all_supported:
+    if ver == ${v.wire_version}:
+        import of${v.version.replace('.', '')}
+        return of${v.version.replace('.', '')}
+
+:: #endfor
+    raise ValueError
 
 class ProtocolError(Exception):
     """

@@ -469,14 +469,10 @@ of_wire_buffer_port_no_get(int version, of_wire_buffer_t *wbuf, int offset,
         of_wire_buffer_u16_get(wbuf, offset, &v16);
         *value = v16;
         break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u32_get(wbuf, offset, &v32);
         *value = v32;
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -498,13 +494,9 @@ of_wire_buffer_port_no_set(int version, of_wire_buffer_t *wbuf, int offset,
     case OF_VERSION_1_0:
         of_wire_buffer_u16_set(wbuf, offset, (uint16_t)value);
         break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u32_set(wbuf, offset, (uint32_t)value);
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -527,14 +519,10 @@ of_wire_buffer_fm_cmd_get(int version, of_wire_buffer_t *wbuf, int offset,
         of_wire_buffer_u16_get(wbuf, offset, &v16);
         *value = v16;
         break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u8_get(wbuf, offset, &v8);
         *value = v8;
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -553,13 +541,9 @@ of_wire_buffer_fm_cmd_set(int version, of_wire_buffer_t *wbuf, int offset,
     case OF_VERSION_1_0:
         of_wire_buffer_u16_set(wbuf, offset, (uint16_t)value);
         break;
-    case OF_VERSION_1_1:
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u8_set(wbuf, offset, (uint8_t)value);
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -583,13 +567,10 @@ of_wire_buffer_wc_bmap_get(int version, of_wire_buffer_t *wbuf, int offset,
         of_wire_buffer_u32_get(wbuf, offset, &v32);
         *value = v32;
         break;
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u64_get(wbuf, offset, &v64);
         *value = v64;
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -609,12 +590,9 @@ of_wire_buffer_wc_bmap_set(int version, of_wire_buffer_t *wbuf, int offset,
     case OF_VERSION_1_1:
         of_wire_buffer_u32_set(wbuf, offset, (uint32_t)value);
         break;
-    case OF_VERSION_1_2:
-    case OF_VERSION_1_3:
+    default:
         of_wire_buffer_u64_set(wbuf, offset, (uint64_t)value);
         break;
-    default:
-        LOCI_ASSERT(0);
     }
 }
 
@@ -909,6 +887,45 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
 
 #define of_wire_buffer_checksum_128_set(buf, offset, checksum) \
     (of_wire_buffer_u64_set(buf, offset, checksum.hi), of_wire_buffer_u64_set(buf, offset+8, checksum.lo))
+
+
+/**
+ * Get a bitmap_512 from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value Pointer to where to put value
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_bitmap_512_get(of_wire_buffer_t *wbuf, int offset, of_bitmap_512_t *value)
+{
+    OF_WIRE_BUFFER_ACCESS_CHECK(wbuf, offset + (int) sizeof(of_bitmap_512_t));
+    int i;
+    for (i = 0; i < 8; i++) {
+        buf_u64_get(OF_WIRE_BUFFER_INDEX(wbuf, offset+i*8), &value->words[i]);
+    }
+}
+
+/**
+ * Set a bitmap_512 in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value The value to store
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_bitmap_512_set(of_wire_buffer_t *wbuf, int offset, of_bitmap_512_t value)
+{
+    OF_WIRE_BUFFER_ACCESS_CHECK(wbuf, offset + (int) sizeof(of_bitmap_512_t));
+    int i;
+    for (i = 0; i < 8; i++) {
+        buf_u64_set(OF_WIRE_BUFFER_INDEX(wbuf, offset+i*8), value.words[i]);
+    }
+}
 
 /* Relocate data from start offset to the end of the buffer to a new position */
 static inline void

@@ -12,14 +12,16 @@ import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
-
+import org.projectfloodlight.openflow.protocol.Writeable;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 /**
  * Wrapper around an IPv4Address address
  *
  * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
  */
-public class IPv4Address extends IPAddress<IPv4Address> {
+public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     static final int LENGTH = 4;
     private final int rawValue;
 
@@ -36,6 +38,15 @@ public class IPv4Address extends IPAddress<IPv4Address> {
 
     private IPv4Address(final int rawValue) {
         this.rawValue = rawValue;
+    }
+
+    public final static Reader READER = new Reader();
+
+    private static class Reader implements OFMessageReader<IPv4Address> {
+        @Override
+        public IPv4Address readFrom(ChannelBuffer bb) throws OFParseError {
+            return new IPv4Address(bb.readInt());
+        }
     }
 
     @Override
@@ -345,4 +356,8 @@ public class IPv4Address extends IPAddress<IPv4Address> {
         sink.putInt(rawValue);
     }
 
+    @Override
+    public void writeTo(ChannelBuffer bb) {
+        bb.writeInt(rawValue);
+    }
 }

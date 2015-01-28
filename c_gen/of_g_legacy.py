@@ -31,8 +31,7 @@
 # @fixme This needs to be refactored and brought into the 21st century.
 #
 
-import sys
-# @fixme Replace with argparse
+import loxi_globals
 
 ################################################################
 #
@@ -114,6 +113,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint32_t",
         4: "uint32_t",
+        5: "uint32_t",
         "short_name":"port_no"
         },
     of_port_desc_t = {
@@ -121,6 +121,7 @@ of_mixed_types = dict(
         2: "of_port_desc_t",
         3: "of_port_desc_t",
         4: "of_port_desc_t",
+        5: "of_port_desc_t",
         "short_name":"port_desc"
         },
     of_bsn_vport_t = {
@@ -128,6 +129,7 @@ of_mixed_types = dict(
         2: "of_bsn_vport_t",
         3: "of_bsn_vport_t",
         4: "of_bsn_vport_t",
+        5: "of_bsn_vport_t",
         "short_name":"bsn_vport"
         },
     of_fm_cmd_t = { # Flow mod command went from u16 to u8
@@ -135,6 +137,7 @@ of_mixed_types = dict(
         2: "uint8_t",
         3: "uint8_t",
         4: "uint8_t",
+        5: "uint8_t",
         "short_name":"fm_cmd"
         },
     of_wc_bmap_t = { # Wildcard bitmap
@@ -142,6 +145,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"wc_bmap"
         },
     of_match_bmap_t = { # Match bitmap
@@ -149,6 +153,7 @@ of_mixed_types = dict(
         2: "uint32_t",
         3: "uint64_t",
         4: "uint64_t",
+        5: "uint64_t",
         "short_name":"match_bmap"
         },
     of_match_t = { # Match object
@@ -156,6 +161,7 @@ of_mixed_types = dict(
         2: "of_match_v2_t",
         3: "of_match_v3_t",
         4: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
+        5: "of_match_v3_t",  # Currently uses same match as 1.2 (v3).
         "short_name":"match"
         },
 )
@@ -209,6 +215,7 @@ of_base_types = dict(
 #                         short_name="match_v4"),
     of_octets_t = dict(bytes=-1, short_name="octets"),
     of_bitmap_128_t = dict(bytes=16, short_name="bitmap_128"),
+    of_bitmap_512_t = dict(bytes=64, short_name="bitmap_512"),
     of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
     of_app_code_t = dict(bytes=ofp_constants["OF_APP_CODE_LEN"],
                           short_name="app_code"),
@@ -221,7 +228,7 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                    "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t", "of_checksum_128_t",
-                   "of_str64_t"]
+                   "of_str64_t", "of_bitmap_512_t"]
 
 ##
 # LOXI identifiers
@@ -273,12 +280,6 @@ all_class_order = []
 ## Map from class, wire_version to size of fixed part of class
 base_length = {}
 
-## Map from class, wire_version to size of variable-offset, fixed length part of class
-extra_length = {
-    ("of_packet_in", 3): 2,
-    ("of_packet_in", 4): 2,
-}
-
 ## Boolean indication of variable length, per class, wire_version,
 is_fixed_length = set()
 
@@ -292,25 +293,21 @@ unified = {}
 # Indexed by (cls, version, member-name) and value is prev-member-name
 special_offsets = {}
 
-## Define Python variables with integer wire version values
-VERSION_1_0 = 1
-VERSION_1_1 = 2
-VERSION_1_2 = 3
-VERSION_1_3 = 4
-
-version_names = {1:"VERSION_1_0", 2:"VERSION_1_1", 3:"VERSION_1_2",
-                 4:"VERSION_1_3"}
-short_version_names = {1:"OF_1_0", 2:"OF_1_1", 3:"OF_1_2", 4:"OF_1_3"}
+# Map from wire version to OF_1_x
+short_version_names = {}
 
 # The iteration object that gives the wire versions supported
-of_version_range = [VERSION_1_0, VERSION_1_1, VERSION_1_2, VERSION_1_3]
+of_version_range = []
 
-of_version_wire2name = {
-    VERSION_1_0:"OF_VERSION_1_0",
-    VERSION_1_1:"OF_VERSION_1_1",
-    VERSION_1_2:"OF_VERSION_1_2",
-    VERSION_1_3:"OF_VERSION_1_3"
-    }
+# Map from wire version to OF_VERSION_1_x
+of_version_wire2name = {}
+
+for version in loxi_globals.OFVersions.all_supported:
+    v = version.version.replace('.', '_')
+    short_version_names[version.wire_version] = 'OF_' + v
+    of_version_range.append(version.wire_version)
+    of_version_wire2name[version.wire_version] = 'OF_VERSION_' + v
+    globals()['VERSION_' + v] = version.wire_version
 
 
 ################################################################
