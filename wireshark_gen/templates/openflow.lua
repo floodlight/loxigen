@@ -74,10 +74,13 @@ fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", 
 :: #endif
 :: #endfor
 
+error_field = ProtoField.string("of.error", "Error")
+
 p_of.fields = {
 :: for field in fields:
     fields[${repr(field.fullname)}],
 :: #endfor
+    error_field,
 }
 
 -- Subclass maps for virtual classes
@@ -140,6 +143,13 @@ function dissect_of_message(buf, root)
         protocol = "OF " .. openflow_versions[version_val]
     else
         return "Unknown protocol", "Dissection error"
+    end
+
+    if type_val == 1 then -- OpenFlow error message
+        local err = subtree:add(error_field, "")
+        err:set_hidden()
+        err:set_generated()
+        subtree:add_expert_info(PI_DEBUG, PI_WARN, "OpenFlow error message")
     end
 
     local info = "unknown"

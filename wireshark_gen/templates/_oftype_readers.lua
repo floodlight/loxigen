@@ -76,6 +76,8 @@ function read_of_match_t(reader, version, subtree, field_name)
         dissect_of_match_v3_v3(reader, subtree:add("of_match"))
     elseif version == 4 then
         dissect_of_match_v3_v4(reader, subtree:add("of_match"))
+    elseif version == 5 then
+        dissect_of_match_v3_v5(reader, subtree:add("of_match"))
     else
         error("Unsupported match version")
     end
@@ -131,6 +133,10 @@ end
 
 function read_of_table_name_t(reader, version, subtree, field_name)
     read_scalar(reader, subtree, field_name, 32)
+end
+
+function read_of_str64_t(reader, version, subtree, field_name)
+    read_scalar(reader, subtree, field_name, 64)
 end
 
 function read_of_port_desc_t(reader, version, subtree, field_name)
