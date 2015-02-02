@@ -103,19 +103,19 @@ public class OFBitMask512 implements OFValueType<OFBitMask512> {
         } else if (bit < 128) {
             word = raw7;
             bit -= 64;
-        } else if (bit < 128) {
+        } else if (bit < 192) {
             word = raw6;
             bit -= 128;
-        } else if (bit < 128) {
+        } else if (bit < 256) {
             word = raw5;
             bit -= 192;
-        } else if (bit < 128) {
+        } else if (bit < 320) {
             word = raw4;
             bit -= 256;
-        } else if (bit < 128) {
+        } else if (bit < 384) {
             word = raw3;
             bit -= 320;
-        } else if (bit < 128) {
+        } else if (bit < 448) {
             word = raw2;
             bit -= 384;
         } else {
