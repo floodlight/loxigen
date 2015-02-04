@@ -669,6 +669,9 @@ exceptions = {
         'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
+        'of_oxm_bsn_ingress_port_group_id' : { 'value' : class_id },
+        'of_oxm_bsn_ingress_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
         'of_oxm_bsn_udf0' : { 'value' : udf },
         'of_oxm_bsn_udf0_masked' : { 'value' : udf, 'value_mask' : udf },
 

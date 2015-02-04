@@ -64,4 +64,5 @@ public enum MatchFields {
     BSN_TCP_FLAGS,
     BSN_VLAN_XLATE_PORT_GROUP_ID,
     BSN_L2_CACHE_HIT,
+    BSN_INGRESS_PORT_GROUP_ID,
 }
