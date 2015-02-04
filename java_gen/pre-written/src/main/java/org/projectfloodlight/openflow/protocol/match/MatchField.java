@@ -227,6 +227,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_EGR_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
 
+    public final static MatchField<ClassId> BSN_INGRESS_PORT_GROUP_ID =
+            new MatchField<ClassId>("bsn_ingress_port_group_id", MatchFields.BSN_INGRESS_PORT_GROUP_ID);
+
     public final static MatchField<UDF> BSN_UDF0 =
             new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF0);
 
