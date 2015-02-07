@@ -11,7 +11,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
-import com.google.common.primitives.Longs;
+import com.google.common.primitives.UnsignedLongs;
 
 import org.projectfloodlight.openflow.protocol.Writeable;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
@@ -547,11 +547,11 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     @Override
     public int compareTo(IPv6Address o) {
-        int res = Longs.compare(raw1, o.raw1);
+        int res = UnsignedLongs.compare(raw1, o.raw1);
         if(res != 0)
             return res;
         else
-            return Longs.compare(raw2, o.raw2);
+            return UnsignedLongs.compare(raw2, o.raw2);
     }
 
     @Override
