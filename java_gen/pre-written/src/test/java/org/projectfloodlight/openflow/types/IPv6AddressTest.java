@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -328,6 +329,26 @@ public class IPv6AddressTest {
             assertEquals(IPVersion.IPv6, superIp.getIpVersion());
             assertEquals(IPv6AddressWithMask.of(ipMaskedString), superIp);
         }
+    }
+
+    @Test
+    public void testCompareTo() {
+        assertThat(
+                IPv6Address.of("fc00::1").compareTo(IPv6Address.of("fc00::2")),
+                Matchers.lessThan(0));
+        assertThat(
+                IPv6Address.of("::1").compareTo(IPv6Address.of("fc00::")),
+                Matchers.lessThan(0));
+
+        // Make sure that unsigned comparison is used on the first 64 bits
+        assertThat(
+                IPv6Address.of("fc00::1").compareTo(IPv6Address.of("1234::3")),
+                Matchers.greaterThan(0));
+
+        // Make sure that unsigned comparison is used on the next 64 bits
+        assertThat(
+                IPv6Address.of("::8000:0:0:1").compareTo(IPv6Address.of("::1")),
+                Matchers.greaterThan(0));
     }
 
     @Test
