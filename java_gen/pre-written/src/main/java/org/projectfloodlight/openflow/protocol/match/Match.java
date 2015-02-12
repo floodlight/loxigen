@@ -114,7 +114,7 @@ public interface Match extends OFObject {
 
     /**
      * True if and only if this field is currently partially specified in the match, i.e, the
-     * match will only select packets that match (p.value & getMask(field)) == getValue(field),
+     * match will only select packets that match (p.value &amp; getMask(field)) == getValue(field),
      * and getMask(field) != 0.
      *
      * @param field Match field.

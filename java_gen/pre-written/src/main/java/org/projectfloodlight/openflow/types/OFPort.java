@@ -15,7 +15,7 @@ import com.google.common.primitives.UnsignedInts;
  * called. If this port is not representable in OpenFlow 1.0, an
  * IllegalStateException is raised.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 @Immutable
 public class OFPort implements OFValueType<OFPort> {
@@ -445,7 +445,7 @@ public class OFPort implements OFValueType<OFPort> {
 
     /**
      * return the port number as int16. Special ports as defined by the OpenFlow
-     * spec will be converted to their OpenFlow 1.0 equivalent. port numbers >=
+     * spec will be converted to their OpenFlow 1.0 equivalent. port numbers {@literal >=}
      * FF00 will cause a IllegalArgumentException to be thrown
      *
      * @throws IllegalArgumentException

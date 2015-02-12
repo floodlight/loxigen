@@ -11,7 +11,7 @@ import com.google.common.primitives.UnsignedLongs;
  * Abstraction of a datapath ID that can be set and/or accessed as either a
  * long value or a colon-separated string. Immutable
  *
- * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
+ * @author Rob Vaterlaus {@literal <}rob.vaterlaus@bigswitch.com{@literal >}
  */
 @Immutable
 public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {

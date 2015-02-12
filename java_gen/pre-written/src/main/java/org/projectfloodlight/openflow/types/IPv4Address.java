@@ -19,7 +19,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
 /**
  * Wrapper around an IPv4Address address
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     static final int LENGTH = 4;

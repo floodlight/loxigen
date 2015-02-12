@@ -8,7 +8,7 @@ import com.google.common.primitives.UnsignedInts;
 /**
  * Abstraction of a buffer id in OpenFlow. Immutable.
  *
- * @author Rob Vaterlaus <rob.vaterlaus@bigswitch.com>
+ * @author Rob Vaterlaus {@literal <}rob.vaterlaus@bigswitch.com{@literal >}
  */
 @Immutable
 public class OFBufferId implements Comparable<OFBufferId>, PrimitiveSinkable {
