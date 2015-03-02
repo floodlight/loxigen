@@ -11,7 +11,7 @@ import com.google.common.primitives.UnsignedInts;
  * Abstraction of an logical / OpenFlow group (ofp_group) in OpenFlow.
  * Immutable.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 @Immutable
 public class OFGroup implements OFValueType<OFGroup> {

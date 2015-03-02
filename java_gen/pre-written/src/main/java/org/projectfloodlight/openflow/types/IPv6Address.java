@@ -21,7 +21,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
  * IPv6 address object. Instance controlled, immutable. Internal representation:
  * two 64 bit longs (not that you'd have to know).
  *
- * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@teleteach.de{@literal >}
  */
 public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     static final int LENGTH = 16;

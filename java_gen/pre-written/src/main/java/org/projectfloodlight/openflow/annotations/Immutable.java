@@ -6,7 +6,7 @@ package org.projectfloodlight.openflow.annotations;
  * construction. Such a class can be freely shared between threads and does not
  * require defensive copying (don't call clone).
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public @interface Immutable {
 

@@ -10,7 +10,7 @@ import com.google.common.primitives.Shorts;
 
 /** Represents an 802.1Q Vlan VID (12 bits).
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  *
  */
 public class VlanVid implements OFValueType<VlanVid> {

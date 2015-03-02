@@ -41,22 +41,22 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract boolean isBroadcast();
 
     /**
-     * Perform a low level AND operation on the bits of two IPAddress<?> objects
-     * @param   other IPAddress<?>
-     * @return  new IPAddress<?> object after the AND oper
+     * Perform a low level AND operation on the bits of two IPAddress objects
+     * @param   other IPAddress
+     * @return  new IPAddress object after the AND oper
      */
     public abstract F and(F other);
 
     /**
-     * Perform a low level OR operation on the bits of two IPAddress<?> objects
-     * @param   other IPAddress<?>
-     * @return  new IPAddress<?> object after the AND oper
+     * Perform a low level OR operation on the bits of two IPAddress objects
+     * @param   other IPAddress
+     * @return  new IPAddress object after the AND oper
      */
     public abstract F or(F other);
 
     /**
      * Returns a new IPAddress object with the bits inverted
-     * @return  IPAddress<?>
+     * @return  IPAddress
      */
     public abstract F not();
 
@@ -79,13 +79,14 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @param cidrMaskLength  the prefix length of the CIDR subnet mask
      *                        (i.e. the number of leading one-bits),
      *                        where <code>
-     *                        0 <= cidrMaskLength <= (F.getLength() * 8)
+     *                        0 {@literal <=} cidrMaskLength {@literal <=} (F.getLength() * 8)
      *                        </code>
      * @return                an {@code IPAddressWithMask<F>} object that
      *                        represents this IP address masked by the CIDR
      *                        subnet mask of the given prefix length
      * @throws IllegalArgumentException  if the given prefix length was invalid
-     * @see #ofCidrMaskLength(int)
+     * @see org.projectfloodlight.openflow.types.IPv4Address#ofCidrMaskLength(int)
+     * @see org.projectfloodlight.openflow.types.IPv6Address#ofCidrMaskLength(int)
      */
     @Nonnull
     public abstract IPAddressWithMask<F> withMaskOfLength(
