@@ -599,3 +599,16 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
 
     return OF_ERROR_NONE;
 }
+
+/*
+ * Truncate an object to its initial length.
+ *
+ * This allows the caller to reuse a single allocated object even if
+ * it has been appended to.
+ */
+void
+of_object_truncate(of_object_t *obj)
+{
+    of_object_init_map[obj->object_id](obj, obj->version, -1, 0);
+    obj->wbuf->current_bytes = obj->length;
+}
