@@ -474,3 +474,9 @@ struct of_bsn_tlv_rx_bytes : of_bsn_tlv {
     uint16_t length;
     uint64_t value;
 };
+
+struct of_bsn_tlv_vlan_pcp : of_bsn_tlv {
+    uint16_t type == 72;
+    uint16_t length;
+    uint8_t value;
+};
