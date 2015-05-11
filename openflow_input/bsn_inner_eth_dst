@@ -28,8 +28,8 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-#version 3
 #version 4
+#version 5
 
 /*
  * Inner ethernet destination MAC
