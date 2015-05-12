@@ -263,6 +263,15 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
             new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
 
+    public final static MatchField<U32> BSN_VXLAN_NETWORK_ID =
+            new MatchField<U32>("bsn_vxlan_network_id", MatchFields.BSN_VXLAN_NETWORK_ID);
+
+    public final static MatchField<MacAddress> BSN_INNER_ETH_DST =
+            new MatchField<MacAddress>("bsn_inner_eth_dst", MatchFields.BSN_INNER_ETH_DST);
+
+    public final static MatchField<MacAddress> BSN_INNER_ETH_SRC =
+            new MatchField<MacAddress>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
+
     public String getName() {
         return name;
     }
