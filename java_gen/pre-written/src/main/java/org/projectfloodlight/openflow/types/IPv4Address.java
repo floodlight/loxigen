@@ -95,7 +95,7 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
      */
     @Override
     public boolean isMulticast() {
-        return ((rawValue >>> 24) & 0xFF) == 0xE0;
+        return ((rawValue >>> 24) & 0xF0) == 0xE0;
     }
     
     @Override
