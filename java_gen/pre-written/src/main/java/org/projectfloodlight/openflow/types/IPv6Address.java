@@ -116,7 +116,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     /**
-     * IPv4 multicast addresses are defined by the prefix ff00::/8 
+     * IPv6 multicast addresses are defined by the prefix ff00::/8 
      */
     @Override
     public boolean isMulticast() {
