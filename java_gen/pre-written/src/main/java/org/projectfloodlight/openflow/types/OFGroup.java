@@ -62,7 +62,7 @@ public class OFGroup implements OFValueType<OFGroup> {
     public static OFGroup of(final int groupNumber) {
         switch(groupNumber) {
             case ZERO_VAL:
-                return MAX;
+                return ZERO;
             case MAX_VAL:
                 return MAX;
             case ALL_VAL:
