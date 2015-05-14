@@ -38,7 +38,7 @@ public class OFGroup implements OFValueType<OFGroup> {
     public final static OFGroup ANY = new NamedGroup(ANY_VAL, "any");
 
     /** group 0 in case we need it */
-    public static final OFGroup ZERO = OFGroup.of(ZERO_VAL);
+    public static final OFGroup ZERO = new OFGroup(ZERO_VAL);
 
     public static final OFGroup NO_MASK = ANY;
     public static final OFGroup FULL_MASK = ZERO;
