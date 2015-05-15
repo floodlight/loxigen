@@ -174,13 +174,13 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
                 (address[0] & 0xFFL) << 56 | (address[1] & 0xFFL) << 48
                         | (address[2] & 0xFFL) << 40 | (address[3] & 0xFFL) << 32
                         | (address[4] & 0xFFL) << 24 | (address[5] & 0xFFL) << 16
-                        | (address[6] & 0xFFL) << 8 | (address[7]);
+                        | (address[6] & 0xFFL) << 8 | (address[7] & 0xFFL);
 
         long raw2 =
                 (address[8] & 0xFFL) << 56 | (address[9] & 0xFFL) << 48
                         | (address[10] & 0xFFL) << 40 | (address[11] & 0xFFL) << 32
                         | (address[12] & 0xFFL) << 24 | (address[13] & 0xFFL) << 16
-                        | (address[14] & 0xFFL) << 8 | (address[15]);
+                        | (address[14] & 0xFFL) << 8 | (address[15] & 0xFFL);
 
         return IPv6Address.of(raw1, raw2);
     }
