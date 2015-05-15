@@ -40,6 +40,13 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract boolean isBroadcast();
 
+
+    /**
+     * Checks if the IPAddress is the multicast address
+     * @return boolean true or false
+     */
+    public abstract boolean isMulticast();
+
     /**
      * Perform a low level AND operation on the bits of two IPAddress objects
      * @param   other IPAddress

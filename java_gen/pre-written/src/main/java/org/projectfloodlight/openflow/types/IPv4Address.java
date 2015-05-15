@@ -90,6 +90,14 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         return this.equals(NO_MASK);
     }
 
+    /**
+     * IPv4 multicast addresses are defined by the leading address bits of 1110 
+     */
+    @Override
+    public boolean isMulticast() {
+        return ((rawValue >>> 24) & 0xF0) == 0xE0;
+    }
+    
     @Override
     public IPv4Address and(IPv4Address other) {
         Preconditions.checkNotNull(other, "other must not be null");

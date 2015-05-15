@@ -115,6 +115,14 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return this.equals(NO_MASK);
     }
 
+    /**
+     * IPv6 multicast addresses are defined by the prefix ff00::/8 
+     */
+    @Override
+    public boolean isMulticast() {
+        return (raw1 >>> 56) == 0xFFL;
+    }
+    
     @Override
     public IPv6Address and(IPv6Address other) {
         Preconditions.checkNotNull(other, "other must not be null");
