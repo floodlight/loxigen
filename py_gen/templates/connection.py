@@ -256,5 +256,9 @@ def connect(ip, port=6653, daemon=True, ofp=loxi.of14):
     cxn.daemon = daemon
     cxn.logger.debug("Connected to %s:%d", ip, port)
     cxn.start()
+
     cxn.send(ofp.message.hello())
+    if not cxn.recv(lambda msg: msg.type == ofp.OFPT_HELLO):
+        raise Exception("Did not receive HELLO")
+
     return cxn
