@@ -96,17 +96,17 @@ class Connection(Thread):
                 break
 
             # Parse the header to get type
-            hdr_version, hdr_type, hdr_length, hdr_xid = loxi.of14.message.parse_header(buf[offset:])
+            hdr_version, hdr_type, hdr_msglen, hdr_xid = loxi.of14.message.parse_header(buf[offset:])
 
-            # Use loxi to resolve to ofp of matching version
+            # Use loxi to resolve ofp of matching version
             ofp = loxi.protocol(hdr_version)
 
             # Extract the raw message bytes
-            if (offset + hdr_length) > len(buf):
+            if (offset + hdr_msglen) > len(buf):
                 # Not enough data for the body
                 break
-            rawmsg = buf[offset : offset + hdr_length]
-            offset += hdr_length
+            rawmsg = buf[offset : offset + hdr_msglen]
+            offset += hdr_msglen
 
             msg = ofp.message.parse_message(rawmsg)
             if not msg:
@@ -114,7 +114,7 @@ class Connection(Thread):
                 continue
 
             self.logger.debug("Received message %s.%s xid %d length %d",
-                                type(msg).__module__, type(msg).__name__, hdr_xid, hdr_length)
+                              type(msg).__module__, type(msg).__name__, hdr_xid, hdr_msglen)
 
             with self.rx_cv:
                 self.rx.append(msg)
