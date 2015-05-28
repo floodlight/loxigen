@@ -675,6 +675,9 @@ exceptions = {
         'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
+        'of_oxm_bsn_ingress_port_group_id' : { 'value' : class_id },
+        'of_oxm_bsn_ingress_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
         'of_oxm_bsn_udf0' : { 'value' : udf },
         'of_oxm_bsn_udf0_masked' : { 'value' : udf, 'value_mask' : udf },
 
@@ -707,6 +710,15 @@ exceptions = {
 
         'of_oxm_bsn_l2_cache_hit' : { 'value' : boolean_value },
         'of_oxm_bsn_l2_cache_hit_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
+        'of_oxm_bsn_vxlan_network_id' : { 'value' : u32obj },
+        'of_oxm_bsn_vxlan_network_id_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_bsn_inner_eth_dst' : { 'value' : mac_addr },
+        'of_oxm_bsn_inner_eth_dst_masked' : { 'value' : mac_addr, 'value_mask' : mac_addr },
+
+        'of_oxm_bsn_inner_eth_src' : { 'value' : mac_addr },
+        'of_oxm_bsn_inner_eth_src_masked' : { 'value' : mac_addr, 'value_mask' : mac_addr },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,

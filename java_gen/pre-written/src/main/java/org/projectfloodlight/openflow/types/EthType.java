@@ -218,7 +218,7 @@ public class EthType implements OFValueType<EthType> {
 
     @Override
     public String toString() {
-        return Integer.toHexString(rawValue);
+        return "0x" + Integer.toHexString(rawValue);
     }
 
     public void write2Bytes(ChannelBuffer c) {

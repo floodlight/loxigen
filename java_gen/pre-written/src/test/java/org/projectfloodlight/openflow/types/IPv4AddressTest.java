@@ -13,6 +13,7 @@ import java.net.Inet4Address;
 import java.net.InetAddress;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -386,6 +387,21 @@ public class IPv4AddressTest {
             assertEquals(IPVersion.IPv4, superIp.getIpVersion());
             assertEquals(IPv4AddressWithMask.of(ipMaskedString), superIp);
         }
+    }
+
+    @Test
+    public void testCompareTo() {
+        assertThat(
+                IPv4Address.of("1.0.0.1").compareTo(IPv4Address.of("1.0.0.2")),
+                Matchers.lessThan(0));
+        assertThat(
+                IPv4Address.of("1.0.0.3").compareTo(IPv4Address.of("3.0.0.1")),
+                Matchers.lessThan(0));
+
+        // Make sure that unsigned comparison is used
+        assertThat(
+                IPv4Address.of("201.0.0.1").compareTo(IPv4Address.NONE),
+                Matchers.greaterThan(0));
     }
 
     @Test

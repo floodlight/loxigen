@@ -21,7 +21,7 @@ import com.google.common.primitives.Shorts;
  *  </b>
  *
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  *
  */
 public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {

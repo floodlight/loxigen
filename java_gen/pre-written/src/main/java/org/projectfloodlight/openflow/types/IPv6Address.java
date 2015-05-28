@@ -11,7 +11,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
-import com.google.common.primitives.Longs;
+import com.google.common.primitives.UnsignedLongs;
 
 import org.projectfloodlight.openflow.protocol.Writeable;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
@@ -21,7 +21,7 @@ import org.projectfloodlight.openflow.exceptions.OFParseError;
  * IPv6 address object. Instance controlled, immutable. Internal representation:
  * two 64 bit longs (not that you'd have to know).
  *
- * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@teleteach.de{@literal >}
  */
 public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     static final int LENGTH = 16;
@@ -115,6 +115,14 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return this.equals(NO_MASK);
     }
 
+    /**
+     * IPv6 multicast addresses are defined by the prefix ff00::/8 
+     */
+    @Override
+    public boolean isMulticast() {
+        return (raw1 >>> 56) == 0xFFL;
+    }
+    
     @Override
     public IPv6Address and(IPv6Address other) {
         Preconditions.checkNotNull(other, "other must not be null");
@@ -166,13 +174,13 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
                 (address[0] & 0xFFL) << 56 | (address[1] & 0xFFL) << 48
                         | (address[2] & 0xFFL) << 40 | (address[3] & 0xFFL) << 32
                         | (address[4] & 0xFFL) << 24 | (address[5] & 0xFFL) << 16
-                        | (address[6] & 0xFFL) << 8 | (address[7]);
+                        | (address[6] & 0xFFL) << 8 | (address[7] & 0xFFL);
 
         long raw2 =
                 (address[8] & 0xFFL) << 56 | (address[9] & 0xFFL) << 48
                         | (address[10] & 0xFFL) << 40 | (address[11] & 0xFFL) << 32
                         | (address[12] & 0xFFL) << 24 | (address[13] & 0xFFL) << 16
-                        | (address[14] & 0xFFL) << 8 | (address[15]);
+                        | (address[14] & 0xFFL) << 8 | (address[15] & 0xFFL);
 
         return IPv6Address.of(raw1, raw2);
     }
@@ -547,11 +555,11 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     @Override
     public int compareTo(IPv6Address o) {
-        int res = Longs.compare(raw1, o.raw1);
+        int res = UnsignedLongs.compare(raw1, o.raw1);
         if(res != 0)
             return res;
         else
-            return Longs.compare(raw2, o.raw2);
+            return UnsignedLongs.compare(raw2, o.raw2);
     }
 
     @Override

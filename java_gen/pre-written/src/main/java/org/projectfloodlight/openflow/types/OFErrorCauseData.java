@@ -24,7 +24,7 @@ import com.google.common.hash.PrimitiveSink;
  *  This attempts to parse the offending message on demand, and if successful
  *  will present the parsed message.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     private static final Logger logger =

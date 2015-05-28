@@ -227,7 +227,7 @@ public enum IpDscp implements OFValueType<IpDscp> {
 
     @Override
     public String toString() {
-        return Integer.toHexString(dscp);
+        return "0x" + Integer.toHexString(dscp);
     }
 
     public void writeByte(ChannelBuffer c) {

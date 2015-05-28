@@ -41,6 +41,7 @@ LOXI_PY_FILES=$(shell find . \( -name loxi_output -prune \
                            \) -a -name '*.py')
 LOXI_TEMPLATE_FILES=$(shell find */templates -type f -a \
                                  \! \( -name '*.cache' -o -name '.*' \))
+JAVA_PRE_WRITTEN_FILES=$(shell find java_gen/pre-written -type f)
 INPUT_FILES = $(wildcard openflow_input/*)
 TEST_DATA = $(shell find test_data -name '*.data')
 OPENFLOWJ_OUTPUT_DIR = ${LOXI_OUTPUT_DIR}/openflowj
@@ -75,7 +76,7 @@ java: .loxi_ts.java
 		rsync --checksum --delete -rv ${LOXI_OUTPUT_DIR}/openflowj/gen-src/ ${OPENFLOWJ_ECLIPSE_WORKSPACE}/gen-src; \
 	fi
 
-.loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
+.loxi_ts.java: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA} ${JAVA_PRE_WRITTEN_FILES}
 	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=java
 	touch $@
 

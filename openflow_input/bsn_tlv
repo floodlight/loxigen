@@ -474,3 +474,29 @@ struct of_bsn_tlv_rx_bytes : of_bsn_tlv {
     uint16_t length;
     uint64_t value;
 };
+
+struct of_bsn_tlv_vlan_pcp : of_bsn_tlv {
+    uint16_t type == 72;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_strip_vlan_on_egress : of_bsn_tlv {
+    uint16_t type == 73;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_set_loopback_mode: of_bsn_tlv {
+    uint16_t type == 74;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_strip_mpls_l2_on_ingress : of_bsn_tlv {
+    uint16_t type == 75;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_strip_mpls_l3_on_ingress : of_bsn_tlv {
+    uint16_t type == 76;
+    uint16_t length;
+};

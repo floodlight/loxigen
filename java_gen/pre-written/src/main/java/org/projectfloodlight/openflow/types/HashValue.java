@@ -5,7 +5,7 @@ import javax.annotation.concurrent.Immutable;
 /** a hash value that supports bit-wise combinations, mainly to calculate hash values for
  *  reconciliation operations.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  *
  * @param <H> - this type, for return type safety.
  */
@@ -53,7 +53,7 @@ public interface HashValue<H extends HashValue<H>> {
      *  operations on a hashv value without the associated cost of object
      *  reallocation.
      *
-     * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+     * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
      *
      * @param <H> - the hashvalue
      */

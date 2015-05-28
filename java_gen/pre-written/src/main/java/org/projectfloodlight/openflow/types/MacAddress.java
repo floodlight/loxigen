@@ -14,7 +14,7 @@ import com.google.common.primitives.Longs;
 /**
  * Wrapper around a 6 byte mac address.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 
 public class MacAddress implements OFValueType<MacAddress> {

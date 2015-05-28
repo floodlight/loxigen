@@ -130,4 +130,17 @@ public class IPAddressTest {
         }
     }
 
+    @Test
+    public void testMulticastIp() {
+        IPAddress<?> ip0 = IPAddress.of("240.2.3.4");
+        IPAddress<?> ip1 = IPAddress.of("224.0.1.1");
+        IPAddress<?> ip2 = IPAddress.of("239.0.0.0");
+        IPAddress<?> ip3 = IPAddress.of("feff::1");
+        IPAddress<?> ip4 = IPAddress.of("ff00::1");
+        assertTrue(!ip0.isMulticast());
+        assertTrue(ip1.isMulticast());
+        assertTrue(ip2.isMulticast());
+        assertTrue(!ip3.isMulticast());
+        assertTrue(ip4.isMulticast());
+    }
 }

@@ -53,7 +53,7 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
 
     @Override
     public String toString() {
-        return Integer.toHexString(label);
+        return "0x" + Integer.toHexString(label);
     }
 
     public void write4Bytes(ChannelBuffer c) {

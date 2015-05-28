@@ -601,87 +601,14 @@ of_object_wire_init(of_object_t *obj, of_object_id_t base_object_id,
 }
 
 /*
- * Set member:
- *    get_wbuf_extent
- *    find offset of start of member
- *    if offset is at wbuf_extent (append new data)
- *        copy data at extent
- *        update parent length
- *    else
- *        find length of current entry
- *        move from end of current to extent to create (or remove) space
- *        copy data to offset
- *        update my length -- NEED LOCAL INFO TO DO THIS for some cases
- */
-
-/* Also need: get offset of member for all combinations */
-/* Also need: get length of member for all combinations */
-#if 0
-/**
- * Append the wire buffer data from src to the end of dst's wire buffer
- */
-int
-of_object_append_buffer(of_object_t *dst, of_object_t *src)
-{
-    of_wire_buffer_t *s_wbuf, *d_wbuf;
-    int orig_len, dst_offset, src_offset;
-
-    d_wbuf = OF_OBJECT_TO_WBUF(dst);
-    s_wbuf = OF_OBJECT_TO_WBUF(src);
-    dst_offset = dst->obj_offset + dst_length;
-    src_offset = src->obj_offset;
-    OF_WIRE_BUFFER_INIT_CHECK(d_wbuf, dst_offset + src->length);
-    MEMCPY(OF_WBUF_BUFFER_POINTER(d_wbuf, dst_offset),
-           OF_WBUF_BUFFER_POINTER(s_wbuf, 0), src->length);
-
-    orig_len = dst->length;
-    dst->length += src->length;
-
-    return OF_ERROR_NONE;
-}
-
-/**
- * Set the length of the actions object in a packet_in object
- */
-
-int
-of_packet_out_actions_length_set(of_packet_t *obj, int len)
-{
-    if (obj == NULL || obj->object_id != OF_PACKET_IN ||
-        obj->wbuf == NULL) {
-        return OF_ERROR_PARAM;
-    }
-
-    obj->actions_len_set(obj, len);
-}
-
-int
-_packet_out_data_offset_get(of_packet_t *obj)
-{
-    if (obj == NULL || obj->object_id != OF_PACKET_IN ||
-        obj->wbuf == NULL) {
-        return -1;
-    }
-
-    return OF_PACKET_OUT_FIXED_LENGTH + _packet_out_actions_length_get(obj);
-}
-
-
-/**
- * Simple length derivation function
+ * Truncate an object to its initial length.
  *
- * Most variable length fields are alone at the end of a structure.
- * Their length is a simple calculation, just the total length of
- * the parent minus the length of the non-variable part of the 
- * parent's class type.
- *
- * @param parent The parent object
- * @param length (out) Where to store the length of the final 
- * variable length member
+ * This allows the caller to reuse a single allocated object even if
+ * it has been appended to.
  */
-int
-of_object_simple_length_derive(of_object_t *obj, int *length)
+void
+of_object_truncate(of_object_t *obj)
 {
-    
+    of_object_init_map[obj->object_id](obj, obj->version, -1, 0);
+    obj->wbuf->current_bytes = obj->length;
 }
-#endif

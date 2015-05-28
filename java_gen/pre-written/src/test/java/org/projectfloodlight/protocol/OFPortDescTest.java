@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 /**
  * Tests auxiliary OFPortDesc methods for all versions of OpenFlow
  *
- * @author Jason Parraga <jason.parraga@bigswitch.com>
+ * @author Jason Parraga {@literal <}jason.parraga@bigswitch.com{@literal >}
  */
 public class OFPortDescTest {
 

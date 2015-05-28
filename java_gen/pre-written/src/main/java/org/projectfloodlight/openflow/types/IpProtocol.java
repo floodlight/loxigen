@@ -612,7 +612,7 @@ public class IpProtocol implements OFValueType<IpProtocol> {
 
     @Override
     public String toString() {
-        return Integer.toHexString(proto);
+        return "0x" + Integer.toHexString(proto);
     }
 
     public void writeByte(ChannelBuffer c) {
