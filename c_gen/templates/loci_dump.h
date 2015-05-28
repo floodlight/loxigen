@@ -91,6 +91,8 @@ typedef int (*loci_obj_dump_f)(loci_writer_f writer, void *cookie, of_object_t *
 #define LOCI_DUMP_desc_str(writer, cookie, val) LOCI_DUMP_string(writer, cookie, val)
 #define LOCI_DUMP_ser_num(writer, cookie, val) LOCI_DUMP_string(writer, cookie, val)
 #define LOCI_DUMP_str64(writer, cookie, val) LOCI_DUMP_string(writer, cookie, val)
+#define LOCI_DUMP_str6(writer, cookie, val) LOCI_DUMP_string(writer, cookie, val)
+#define LOCI_DUMP_str32(writer, cookie, val) LOCI_DUMP_string(writer, cookie, val)
 
 int loci_dump_match(loci_writer_f writer, void* cookie, of_match_t *match);
 #define LOCI_DUMP_match(writer, cookie, val) loci_dump_match(writer, cookie, &val)

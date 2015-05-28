@@ -1,0 +1,33 @@
+#version 4
+
+struct of_calient_stats_request : of_experimenter_stats_request {
+    uint8_t  version;
+    uint8_t  type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == ?;
+};
+
+struct of_calient_stats_reply : of_experimenter_stats_reply {
+    uint8_t  version;
+    uint8_t  type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == ?;
+};
+
+enum ofp_calient_ocs_alarm(wire_type=uint8_t, bitmask=True){
+    OFPOCSALM_CLEAR = 1,    /* Clear- no alarm */
+    OFPOCSALM_Minor = 2,    /* loss is greater than 5.25 */
+    OFPOCSALM_Major = 3,    /* loss is greater than 7.25 */
+    OFPOCSALM_Critical = 4, /* loss is greater than 10.25 */
+};
+

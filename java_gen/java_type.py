@@ -360,6 +360,8 @@ desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
 str64 = gen_fixed_length_string_jtype(64)
+str32 = gen_fixed_length_string_jtype(32)
+str6 = gen_fixed_length_string_jtype(6)
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -576,6 +578,8 @@ default_mtype_to_jtype_convert_map = {
         'of_port_name_t': port_name,
         'of_table_name_t': table_name,
         'of_str64_t': str64,
+        'of_str32_t': str32,
+        'of_str6_t': str6,
         'of_ipv4_t': ipv4,
         'of_ipv6_t': ipv6,
         'of_wc_bmap_t': flow_wildcards,

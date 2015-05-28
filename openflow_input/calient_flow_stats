@@ -1,0 +1,84 @@
+#version 4
+
+struct of_calient_flow_stats_request : of_calient_stats_request {
+    uint8_t  version;
+    uint8_t  type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == 2;     /* OFPEMPFS = 2 */
+    uint8_t table_id;          /* Recommended to be set to 0. Ignored */
+    pad(3); 
+    uint32_t out_port;         /* Require matching entries to include this as an output port.
+                                  A value of OFPP_ANY indicates no restriction. Ignored */
+    uint32_t out_group;        /* Require matching entries to include this as an output group.
+                                  A value of OFPP_ANY indicates no restriction. Ignored */
+    pad(4);                    /* Align to 64 bits */
+    uint64_t cookie;           /* Ignored */
+    uint64_t cookie_mask;      /* Ignored */
+    of_match_t match;          /* Fields to match. Variable size */
+};
+
+enum ofp_calient_cflow_admin_state(wire_type=uint8_t, bitmask=True){
+     OFPCAS_InService = 1,      /* when the connection is activated */
+     OFPCAS_UnderManagement = 2,/*Default Connection state – (when connection is not activated)*/
+};
+
+   
+enum ofp_calient_cflow_operational_state(wire_type=uint8_t, bitmask=True){
+     OFPCOS_InService = 1,   /* When connection is activated */
+     OFPCOS_OutOfService = 2,/*When connection has a critical alarm  ( activated or otherwise) */
+     OFPCOS_Ready = 3,       /*When AS state is UnderManagement */
+     OFPCOS_Degraded = 4,    /*When connection is activated and has a  Major alarm */
+};
+                              
+enum ofp_calient_cflow_Capability(wire_type=uint8_t, bitmask=True){
+    OFPCCS_Ok = 1,          /* Connection has been made successfully */
+    OFPCCS_Failed = 2,      /* Connection has Failed */
+    OFPCCS_Initializing = 3,/* Connection making is in progress */
+};
+
+struct of_calient_flow_stats_entry {
+    uint16_t length;
+    uint8_t table_id;        /* Ignored */
+    pad(1);
+    uint32_t duration_sec;   /* Not supported for now */
+    uint32_t duration_nsec;  /* Not supported for now */
+    uint16_t priority;       /* Not supported */
+    uint16_t idle_timeout;   /* Set to 0 as entries must be explicitly removed */
+    uint16_t hard_timeout;   /* Set to 0 as entries must be explicitly removed */
+    enum ofp_flow_mod_flags flags;
+    pad(4);
+    uint64_t cookie;         /* Ignored */
+    enum ofp_calient_cflow_admin_state admin_status;      /* AS = IS(Activated)/UMA */
+    enum ofp_calient_cflow_operational_state oper_status; /* OS = UMA/OOS */
+    enum ofp_calient_cflow_Capability  oper_capability;   /* OC = FAIL/OK/INIT */
+    enum ofp_calient_ocs_alarm alarm;                     /* Alarm = NA/MJ/MN/CR */
+    of_str6_t port_power;
+    pad(2);
+    of_str6_t connected_port_power;
+    pad(2);
+    of_str64_t cflow_name;   /* Connection name */
+    of_match_t match;
+};
+
+
+struct of_calient_flow_stats_reply : of_calient_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == 2;
+    uint16_t data_length;
+    pad(6);
+    list(of_calient_flow_stats_entry_t)flow_stats;
+};
+
+

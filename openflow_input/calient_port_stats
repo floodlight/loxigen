@@ -1,0 +1,54 @@
+#version 4
+
+struct of_calient_port_stats_request : of_calient_stats_request {
+    uint8_t  version;
+    uint8_t  type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == 3;
+    of_port_no_t port_no;
+    pad(4);
+};
+
+
+struct of_calient_port_stats_entry {
+    uint16_t length;
+    pad(2);
+    of_port_no_t port_no;
+    enum ofp_calient_optical_port_admin_state in_admin_status;        /* Input port admin status */
+    enum ofp_calient_optical_port_oper_state in_oper_status;          /* Input port operational status */
+    enum ofp_calient_optical_port_oper_capability in_oper_capability; /* Input port operational capability */
+    enum ofp_calient_ocs_alarm in_alarm;/* Alarm on Input port */
+    of_str6_t inport_power;     /* Input port power */
+    pad(2);
+    of_str6_t outport_power;    /* Output port power */
+    pad(2);
+    enum ofp_calient_optical_port_admin_state out_admin_status;       /* Output port Admin status */
+    enum ofp_calient_optical_port_oper_state out_oper_status;         /* Output port operational status */
+    enum ofp_calient_optical_port_oper_capability out_oper_capability;/* Output port operational capability */
+    enum ofp_calient_ocs_alarm out_alarm;/* Alarm on Output port */
+    pad(4);
+    of_str32_t in_circuit_id;   /* Circuit id associated with the input port */
+    of_str32_t out_circuit_id;  /* Circuit id associated with the output port */
+};
+
+struct of_calient_port_stats_reply : of_calient_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0x0080F958;
+    uint32_t subtype == 3;
+    uint16_t data_length;
+    pad(6);
+    list(of_calient_port_stats_entry_t) entries;
+};
+
+
