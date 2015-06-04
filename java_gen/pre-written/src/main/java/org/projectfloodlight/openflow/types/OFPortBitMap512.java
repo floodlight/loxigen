@@ -125,9 +125,9 @@ public class OFPortBitMap512 extends Masked<OFBitMask512> {
                 throw new IndexOutOfBoundsException("Port number is out of bounds");
             else if (bit == 511)
                 // the highest order bit in the bitmask is reserved. The switch will
-                // set that bit for all ports >= 127. The reason is that we don't want
+                // set that bit for all ports >= 511. The reason is that we don't want
                 // the OFPortMap to match all ports out of its range (i.e., a packet
-                // coming in on port 181 would match *any* OFPortMap).
+                // coming in on port 581 would match *any* OFPortMap).
                 throw new IndexOutOfBoundsException("The highest order bit in the bitmask is reserved.");
             else if (bit < 64) {
                 raw8 |= ((long)1 << bit);
@@ -159,9 +159,9 @@ public class OFPortBitMap512 extends Masked<OFBitMask512> {
                 throw new IndexOutOfBoundsException("Port number is out of bounds");
             else if (bit == 511)
                 // the highest order bit in the bitmask is reserved. The switch will
-                // set that bit for all ports >= 127. The reason is that we don't want
+                // set that bit for all ports >= 511. The reason is that we don't want
                 // the OFPortMap to match all ports out of its range (i.e., a packet
-                // coming in on port 181 would match *any* OFPortMap).
+                // coming in on port 581 would match *any* OFPortMap).
                 throw new IndexOutOfBoundsException("The highest order bit in the bitmask is reserved.");
             else if (bit < 64) {
                 raw8 &= ~((long)1 << bit);
