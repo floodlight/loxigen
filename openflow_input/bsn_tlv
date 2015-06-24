@@ -500,3 +500,9 @@ struct of_bsn_tlv_strip_mpls_l3_on_ingress : of_bsn_tlv {
     uint16_t type == 76;
     uint16_t length;
 };
+
+struct of_bsn_tlv_vlan_vid_mask : of_bsn_tlv {
+    uint16_t type == 77;
+    uint16_t length;
+    uint16_t value;
+};
