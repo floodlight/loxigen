@@ -516,3 +516,28 @@ struct of_bsn_tlv_l2_multicast_lookup : of_bsn_tlv {
     uint16_t type == 79;
     uint16_t length;
 };
+
+struct of_bsn_tlv_generation_id : of_bsn_tlv {
+    uint16_t type == 80;
+    uint16_t length;
+    uint64_t value;
+};
+
+enum ofp_bsn_anchor(wire_type=uint16_t) {
+    OFP_BSN_ANCHOR_PACKET_START = 0,
+    OFP_BSN_ANCHOR_L3_HEADER_START = 1,
+    OFP_BSN_ANCHOR_L4_HEADER_START = 2,
+    OFP_BSN_ANCHOR_L4_PAYLOAD_START = 3,
+};
+
+struct of_bsn_tlv_anchor : of_bsn_tlv {
+    uint16_t type == 81;
+    uint16_t length;
+    enum ofp_bsn_anchor value;
+};
+
+struct of_bsn_tlv_offset : of_bsn_tlv {
+    uint16_t type == 82;
+    uint16_t length;
+    uint16_t value;
+};
