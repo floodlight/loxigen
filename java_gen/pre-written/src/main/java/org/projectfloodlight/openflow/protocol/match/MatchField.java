@@ -272,6 +272,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<MacAddress> BSN_INNER_ETH_SRC =
             new MatchField<MacAddress>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
 
+    public final static MatchField<OFVlanVidMatch> BSN_INNER_VLAN_VID =
+            new MatchField<OFVlanVidMatch>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
+
     public String getName() {
         return name;
     }
