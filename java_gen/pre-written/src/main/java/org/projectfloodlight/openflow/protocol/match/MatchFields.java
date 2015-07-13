@@ -68,4 +68,5 @@ public enum MatchFields {
     BSN_VXLAN_NETWORK_ID,
     BSN_INNER_ETH_DST,
     BSN_INNER_ETH_SRC,
+    BSN_INNER_VLAN_VID,
 }
