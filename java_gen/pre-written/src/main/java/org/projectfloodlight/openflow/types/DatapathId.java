@@ -1,9 +1,13 @@
 package org.projectfloodlight.openflow.types;
 
 import org.projectfloodlight.openflow.annotations.Immutable;
+import org.projectfloodlight.openflow.types.DatapathId;
+import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
+import com.google.common.primitives.Bytes;
 import com.google.common.primitives.Longs;
 import com.google.common.primitives.UnsignedLongs;
 
@@ -34,6 +38,19 @@ public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
 
     public static DatapathId of(byte[] bytes) {
         return new DatapathId(Longs.fromByteArray(bytes));
+    }
+    
+    /**
+     * Creates a {@link DatapathId} from an {@link MacAddress}. This factory 
+     * method assumes that the {@link DatapathId} is composed of two zero bytes
+     * appended by the {@link MacAddress}'s 6 bytes.
+     * @param mac the {@link MacAddress} to create the {@link DatapathId} from
+     * @return a {@link DatapathId} derived from the supplied {@link MacAddress}
+     */
+    public static DatapathId of(MacAddress mac) {
+        byte[] zeroBytes = new byte[]{0,0};
+        byte[] fullBytes = Bytes.concat(zeroBytes, mac.getBytes());
+        return DatapathId.of(fullBytes);
     }
 
     public long getLong() {
