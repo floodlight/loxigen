@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import javax.annotation.Nonnull;
+
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.util.HexString;
 
@@ -38,13 +40,13 @@ public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
     }
 
     /**
-     * Creates a {@link DatapathId} from an {@link MacAddress}. This factory
+     * Creates a {@link DatapathId} from a {@link MacAddress}. This factory
      * method assumes that the {@link DatapathId} is composed of two zero bytes
      * appended by the {@link MacAddress}'s 6 bytes.
      * @param mac the {@link MacAddress} to create the {@link DatapathId} from
      * @return a {@link DatapathId} derived from the supplied {@link MacAddress}
      */
-    public static DatapathId of(MacAddress mac) {
+    public static DatapathId of(@Nonnull MacAddress mac) {
         byte[] zeroBytes = new byte[]{0,0};
         byte[] fullBytes = Bytes.concat(zeroBytes, mac.getBytes());
         return DatapathId.of(fullBytes);

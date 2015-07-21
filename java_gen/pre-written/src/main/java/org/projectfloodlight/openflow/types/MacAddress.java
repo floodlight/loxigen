@@ -8,6 +8,8 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -32,6 +34,10 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     private static final long LLDP_MAC_ADDRESS_MASK = 0xfffffffffff0L;
     private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
+
+    private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
+            "It must consist of 6 hex digit pairs separated by colons: ";
+    private static final int STRING_LENGTH = 6 * 2 + 5;
 
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
@@ -66,17 +72,14 @@ public class MacAddress implements OFValueType<MacAddress> {
      */
     @Nonnull
     public static MacAddress of(@Nonnull final String macString) throws IllegalArgumentException {
-        if (macString == null) {
-            throw new NullPointerException("macString must not be null");
-        }
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(macString),
+                                    "macString must not be null or empty");
+        Preconditions.checkArgument(macString.length() == (STRING_LENGTH),
+                FORMAT_ERROR + macString);
+
         int index = 0;
         int shift = 40;
-        final String FORMAT_ERROR = "Mac address is not well-formed. " +
-                "It must consist of 6 hex digit pairs separated by colons: ";
-
         long raw = 0;
-        if (macString.length() != 6 * 2 + 5)
-            throw new IllegalArgumentException(FORMAT_ERROR + macString);
 
         while (shift >= 0) {
             int digit1 = Character.digit(macString.charAt(index++), 16);
@@ -92,6 +95,21 @@ public class MacAddress implements OFValueType<MacAddress> {
             shift -= 8;
         }
         return MacAddress.of(raw);
+    }
+
+    /**
+     * Creates a {@link MacAddress} from a {@link DatapathId}. This factory
+     * method assumes that the {@link MacAddress} is composed of the last six
+     * bytes of the supplied {@link DatapathId}.
+     * @param dpid the {@link DatapathId} to create the {@link MacAddress} from
+     * @return a {@link MacAddress} derived from the supplied {@link DatapathId}
+     */
+    public static MacAddress of(@Nonnull DatapathId dpid) {
+        Preconditions.checkNotNull(dpid, "dpid must not be null");
+
+        byte[] dpidBytes = dpid.getBytes();
+        byte[] macBytes = Arrays.copyOfRange(dpidBytes, 2, 8);
+        return MacAddress.of(macBytes);
     }
 
     private volatile byte[] bytesCache = null;
