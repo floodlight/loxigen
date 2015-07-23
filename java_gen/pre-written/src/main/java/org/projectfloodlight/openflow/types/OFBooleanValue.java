@@ -18,6 +18,8 @@
 package org.projectfloodlight.openflow.types;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
@@ -28,6 +30,8 @@ public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
 
     public final static OFBooleanValue NO_MASK = TRUE;
     public final static OFBooleanValue FULL_MASK = FALSE;
+
+    public final static Reader READER_INSTANCE = new Reader();
 
     private final boolean value;
 
@@ -77,6 +81,13 @@ public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
     @Override
     public void writeTo(ChannelBuffer bb) {
         bb.writeByte(getInt());
+    }
+
+    private static class Reader implements OFMessageReader<OFBooleanValue> {
+        @Override
+        public OFBooleanValue readFrom(ChannelBuffer bb) throws OFParseError {
+            return of(bb.readByte() != 0);
+        }
     }
 
     @Override
