@@ -1,19 +1,24 @@
 package org.projectfloodlight.protocol;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.protocol.OFFactories;
 import org.projectfloodlight.openflow.protocol.OFFactory;
 import org.projectfloodlight.openflow.protocol.OFPortConfig;
 import org.projectfloodlight.openflow.protocol.OFPortDesc;
+import org.projectfloodlight.openflow.protocol.OFPortDescProp;
 import org.projectfloodlight.openflow.protocol.OFPortState;
 import org.projectfloodlight.openflow.protocol.OFVersion;
+import org.projectfloodlight.openflow.types.U64;
 
-import static org.hamcrest.Matchers.is;
-
-import static org.junit.Assert.assertThat;
+import com.google.common.collect.ImmutableList;
 
 /**
  * Tests auxiliary OFPortDesc methods for all versions of OpenFlow
@@ -50,4 +55,25 @@ public class OFPortDescTest {
                 .build();
         assertThat(desc.isEnabled(), is(false));
     }
+
+    @Test
+    public void testGenerationIdZeroIfUnset() {
+       for(OFVersion v: OFVersion.values()) {
+           OFFactory factory = OFFactories.getFactory(v);
+           assertThat("For version "+v, factory.buildPortDesc().build().getBsnGenerationId(),
+                    Matchers.equalTo(U64.ZERO));
+       }
+    }
+
+    @Test
+    public void testGenerationIdSet() {
+        OFFactory factory = OFFactories.getFactory(OFVersion.OF_14);
+        OFPortDesc desc = factory.buildPortDesc()
+          .setProperties(ImmutableList.<OFPortDescProp>of(
+                  factory.portDescPropBsnGenerationId(U64.of(1234))))
+          .build();
+
+       assertThat(desc.getBsnGenerationId(), equalTo(U64.of(1234)));
+    }
+
 }
