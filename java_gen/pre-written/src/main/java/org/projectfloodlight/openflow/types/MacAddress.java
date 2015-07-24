@@ -108,15 +108,14 @@ public class MacAddress implements OFValueType<MacAddress> {
     public static MacAddress of(@Nonnull DatapathId dpid) {
         Preconditions.checkNotNull(dpid, "dpid must not be null");
 
-        byte[] dpidBytes = dpid.getBytes();
+        long raw = dpid.getLong();
 
-        if (dpidBytes[0] == 0
-                && dpidBytes[1] == 0) {
-            return MacAddress.of(dpid.getLong());
-        } else {
+        // Mask out valid bytes
+        if( (raw & ~BROADCAST_VAL) != 0L) {
             throw new IllegalArgumentException("First two bytes of supplied "
-                    + "Datapathid must be 0");
+                 + "Datapathid must be 0");
         }
+        return of(raw);
     }
 
     private volatile byte[] bytesCache = null;
