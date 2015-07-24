@@ -8,6 +8,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
+import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
@@ -32,6 +33,10 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     private static final long LLDP_MAC_ADDRESS_MASK = 0xfffffffffff0L;
     private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
+
+    private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
+            "It must consist of 6 hex digit pairs separated by colons: ";
+    private static final int MAC_STRING_LENGTH = 6 * 2 + 5;
 
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
@@ -69,14 +74,14 @@ public class MacAddress implements OFValueType<MacAddress> {
         if (macString == null) {
             throw new NullPointerException("macString must not be null");
         }
+
         int index = 0;
         int shift = 40;
-        final String FORMAT_ERROR = "Mac address is not well-formed. " +
-                "It must consist of 6 hex digit pairs separated by colons: ";
-
         long raw = 0;
-        if (macString.length() != 6 * 2 + 5)
+
+        if (macString.length() != MAC_STRING_LENGTH) {
             throw new IllegalArgumentException(FORMAT_ERROR + macString);
+        }
 
         while (shift >= 0) {
             int digit1 = Character.digit(macString.charAt(index++), 16);
@@ -92,6 +97,25 @@ public class MacAddress implements OFValueType<MacAddress> {
             shift -= 8;
         }
         return MacAddress.of(raw);
+    }
+
+    /**
+     * Creates a {@link MacAddress} from a {@link DatapathId}. This factory
+     * method assumes that the first two bytes of the {@link DatapathId} are 0 bytes.
+     * @param dpid the {@link DatapathId} to create the {@link MacAddress} from
+     * @return a {@link MacAddress} derived from the supplied {@link DatapathId}
+     */
+    public static MacAddress of(@Nonnull DatapathId dpid) {
+        Preconditions.checkNotNull(dpid, "dpid must not be null");
+
+        long raw = dpid.getLong();
+
+        // Mask out valid bytes
+        if( (raw & ~BROADCAST_VAL) != 0L) {
+            throw new IllegalArgumentException("First two bytes of supplied "
+                 + "Datapathid must be 0");
+        }
+        return of(raw);
     }
 
     private volatile byte[] bytesCache = null;

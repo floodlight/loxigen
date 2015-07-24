@@ -31,6 +31,8 @@ public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
     public final static OFBooleanValue NO_MASK = TRUE;
     public final static OFBooleanValue FULL_MASK = FALSE;
 
+    public final static Reader READER_INSTANCE = new Reader();
+
     private final boolean value;
 
     private OFBooleanValue(boolean value) {
