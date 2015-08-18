@@ -541,3 +541,8 @@ struct of_bsn_tlv_offset : of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_negate : of_bsn_tlv {
+    uint16_t type == 83;
+    uint16_t length;
+};
