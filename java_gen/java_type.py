@@ -355,10 +355,13 @@ mac_addr = JType('MacAddress') \
             default="MacAddress.NONE")
 
 port_name = gen_fixed_length_string_jtype(16)
+app_code = gen_fixed_length_string_jtype(15)
 desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
 str64 = gen_fixed_length_string_jtype(64)
+str32 = gen_fixed_length_string_jtype(32)
+str6 = gen_fixed_length_string_jtype(6)
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -512,6 +515,9 @@ buffer_id = JType("OFBufferId") \
          .op(read="OFBufferId.of(bb.readInt())", write="bb.writeInt($name.getInt())", default="OFBufferId.NO_BUFFER")
 lag_id = JType("LagId") \
          .op(version=ANY, read="LagId.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="LagId.NONE")
+
+sig_id = JType("CircuitSignalID") \
+         .op(version=ANY, read="CircuitSignalID.read6Bytes(bb)", write="$name.write6Bytes(bb)", default="CircuitSignalID.NONE")
 vrf = JType("VRF") \
          .op(version=ANY, read="VRF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="VRF.ZERO")
 class_id = JType("ClassId") \
@@ -572,6 +578,8 @@ default_mtype_to_jtype_convert_map = {
         'of_port_name_t': port_name,
         'of_table_name_t': table_name,
         'of_str64_t': str64,
+        'of_str32_t': str32,
+        'of_str6_t': str6,
         'of_ipv4_t': ipv4,
         'of_ipv6_t': ipv6,
         'of_wc_bmap_t': flow_wildcards,
@@ -581,6 +589,8 @@ default_mtype_to_jtype_convert_map = {
         'of_bitmap_512_t': port_bitmap_512,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
+        'of_app_code_t': app_code,  
+        'of_sig_id_t': sig_id,
         'of_table_desc_t': table_desc,
         }
 
@@ -756,6 +766,10 @@ exceptions = {
         'of_bsn_log': { 'data': var_string },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
+        'of_oxm_och_sigtype' : { 'value' : u8obj },
+        'of_oxm_och_sigtype_basic' : { 'value' : u8obj },
+        'of_oxm_och_sigid' : {'value' : sig_id},
+        'of_oxm_och_sigid_basic' : {'value' : sig_id},  
 
         'of_bundle_add_msg' : { 'data' : of_message },
 }

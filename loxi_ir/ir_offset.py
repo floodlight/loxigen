@@ -25,7 +25,8 @@ ofp_constants = dict(
     OF_MAX_PORT_NAME_LEN  = 16,
     OF_ETH_ALEN = 6,
     OF_DESC_STR_LEN   = 256,
-    OF_SERIAL_NUM_LEN = 32
+    OF_SERIAL_NUM_LEN = 32,
+    OF_APP_CODE_LEN = 15 	
 )
 
 
@@ -103,12 +104,16 @@ of_base_lengths = dict(
     of_desc_str_t = (ofp_constants["OF_DESC_STR_LEN"], True),
     of_serial_num_t = (ofp_constants["OF_SERIAL_NUM_LEN"], True),
     of_str64_t = (64, True),
+    of_str32_t = (32, True),
+    of_str6_t = (6, True),
     of_match_v1_t = (40, True),
     of_match_v2_t = (88, True),
     of_match_v3_t = (8, False),
     of_octets_t = (0, False),
     of_bitmap_128_t = (16, True),
     of_checksum_128_t = (16, True),
+    of_app_code_t = (15,True),
+    of_sig_id_t = (6, True),
     of_bitmap_512_t = (64, True),
 )
 

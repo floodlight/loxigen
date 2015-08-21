@@ -86,7 +86,9 @@ ofp_constants = dict(
     OF_MAX_PORT_NAME_LEN  = 16,
     OF_ETH_ALEN = 6,
     OF_DESC_STR_LEN   = 256,
-    OF_SERIAL_NUM_LEN = 32
+    OF_SERIAL_NUM_LEN = 32,
+    OF_APP_CODE_LEN = 15, 	
+    OF_SIGID_LEN=6, 	
 )
 
 ## List of mixed data types
@@ -199,6 +201,8 @@ of_base_types = dict(
     of_serial_num_t = dict(bytes=ofp_constants["OF_SERIAL_NUM_LEN"],
                            short_name="ser_num"),
     of_str64_t = dict(bytes=64, short_name="str64"),
+    of_str32_t = dict(bytes=32, short_name="str32"),
+    of_str6_t = dict(bytes=6, short_name="str6"),
     of_match_v1_t = dict(bytes=40, to_w="match_v1_hton",
                          from_w="match_v1_ntoh",
                          short_name="match_v1"),
@@ -215,6 +219,10 @@ of_base_types = dict(
     of_bitmap_128_t = dict(bytes=16, short_name="bitmap_128"),
     of_bitmap_512_t = dict(bytes=64, short_name="bitmap_512"),
     of_checksum_128_t = dict(bytes=16, short_name="checksum_128"),
+    of_app_code_t = dict(bytes=ofp_constants["OF_APP_CODE_LEN"],
+                          short_name="app_code"),
+    of_sig_id_t = dict(bytes=ofp_constants["OF_SIGID_LEN"],
+                          short_name="sig_id"),
 )
 
 of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
@@ -222,7 +230,7 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t",
                    "of_match_bmap_t", "of_port_name_t", "of_table_name_t",
                    "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                    "of_ipv6_t", "of_ipv4_t", "of_bitmap_128_t", "of_checksum_128_t",
-                   "of_str64_t", "of_bitmap_512_t"]
+                   "of_str64_t", "of_str32_t", "of_str6_t", "of_bitmap_512_t"]
 
 ##
 # LOXI identifiers

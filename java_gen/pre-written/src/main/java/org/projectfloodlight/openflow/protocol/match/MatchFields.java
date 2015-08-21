@@ -69,4 +69,8 @@ public enum MatchFields {
     BSN_INNER_ETH_DST,
     BSN_INNER_ETH_SRC,
     BSN_INNER_VLAN_VID,
+    OCH_SIGTYPE,
+    OCH_SIGTYPE_BASIC,
+    OCH_SIGID,
+    OCH_SIGID_BASIC,
 }

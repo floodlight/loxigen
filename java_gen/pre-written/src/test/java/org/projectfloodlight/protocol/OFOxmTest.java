@@ -59,4 +59,6 @@ public class OFOxmTest {
         OFOxm<IPv4Address> canonical = ipv4SrcMasked.getCanonical();
         assertEquals(ipv4SrcMasked, canonical);
     }
+
+
 }
