@@ -26,8 +26,8 @@ struct of_calient_stats_reply : of_experimenter_stats_reply {
 
 enum ofp_calient_ocs_alarm(wire_type=uint8_t, bitmask=True){
     OFPOCSALM_CLEAR = 1,    /* Clear- no alarm */
-    OFPOCSALM_Minor = 2,    /* loss is greater than 5.25 */
-    OFPOCSALM_Major = 3,    /* loss is greater than 7.25 */
-    OFPOCSALM_Critical = 4, /* loss is greater than 10.25 */
+    OFPOCSALM_MINOR = 2,    /* loss is greater than 5.25 */
+    OFPOCSALM_MAJOR = 3,    /* loss is greater than 7.25 */
+    OFPOCSALM_CRITICAL = 4, /* loss is greater than 10.25 */
 };
 
