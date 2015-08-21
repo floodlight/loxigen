@@ -546,3 +546,9 @@ struct of_bsn_tlv_negate : of_bsn_tlv {
     uint16_t type == 83;
     uint16_t length;
 };
+
+struct of_bsn_tlv_ipv6 : of_bsn_tlv {
+    uint16_t type == 84;
+    uint16_t length;
+    of_ipv6_t value; 
+};
