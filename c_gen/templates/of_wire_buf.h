@@ -888,6 +888,52 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
 #define of_wire_buffer_checksum_128_set(buf, offset, checksum) \
     (of_wire_buffer_u64_set(buf, offset, checksum.hi), of_wire_buffer_u64_set(buf, offset+8, checksum.lo))
 
+/**
+ * Get a str32 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str32_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 32)
+
+/**
+ * Set a str32 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str32
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str32_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 32)
+
+/**
+ * Get a str6 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str6_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 6)
+/**
+ * Set a str6 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str6
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str6_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 6)
 
 /**
  * Get a bitmap_512 from a wire buffer

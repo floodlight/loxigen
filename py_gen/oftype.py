@@ -132,6 +132,8 @@ fixed_length_strings = {
     'of_serial_num_t': 32,
     'of_desc_str_t': 256,
     'of_str64_t': 64,
+    'of_str32_t': 32,
+    'of_str6_t': 6,
 }
 
 for (cls, length) in fixed_length_strings.items():

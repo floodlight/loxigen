@@ -28,6 +28,7 @@ import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
+import org.projectfloodlight.openflow.types.CircuitSignalID;
 
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
@@ -259,6 +260,22 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
 
+    public final static MatchField<U8> OCH_SIGTYPE =
+            new MatchField<U8>("och_sigtype",
+                                    MatchFields.OCH_SIGTYPE);
+
+    public final static MatchField<U8> OCH_SIGTYPE_BASIC =
+            new MatchField<U8>("och_sigtype_basic",
+                                    MatchFields.OCH_SIGTYPE_BASIC);
+
+    public final static MatchField<CircuitSignalID> OCH_SIGID =
+            new MatchField<CircuitSignalID>("och_sigid",
+                                    MatchFields.OCH_SIGID);
+
+    public final static MatchField<CircuitSignalID> OCH_SIGID_BASIC =
+            new MatchField<CircuitSignalID>("och_sigid_basic",
+                                    MatchFields.OCH_SIGID);
+    
     public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
             new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
 
