@@ -151,4 +151,38 @@ public class MacAddressTest {
         assertFalse(MacAddress.of("00:80:C2:f0:00:00").isLLDPAddress());
         assertFalse(MacAddress.of("FE:80:C2:00:00:00").isLLDPAddress());
     }
+
+    @Test
+    public void generateMac()
+    {
+        IPv4Address ip = IPv4Address.of("224.1.1.1");
+        MacAddress mac = MacAddress.forIPv4MulticastAddress(ip);
+        MacAddress expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("224.129.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("225.1.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("239.129.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("224.1.2.3");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:02:03");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("239.129.2.3");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:02:03");
+        assertTrue(mac.equals(expectedMac));
+    }
 }
