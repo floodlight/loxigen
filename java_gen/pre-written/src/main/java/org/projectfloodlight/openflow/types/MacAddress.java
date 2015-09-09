@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.assertTrue;
-
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
