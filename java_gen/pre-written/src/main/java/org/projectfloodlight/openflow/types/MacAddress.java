@@ -5,7 +5,7 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.junit.Test;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
