@@ -153,7 +153,7 @@ public class MacAddressTest {
     }
 
     @Test
-    public void generateMac()
+    public void testForIPv4MulticastAddress()
     {
         IPv4Address ip = IPv4Address.of("224.1.1.1");
         MacAddress mac = MacAddress.forIPv4MulticastAddress(ip);

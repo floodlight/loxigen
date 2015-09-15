@@ -205,7 +205,8 @@ public class MacAddress implements OFValueType<MacAddress> {
         sink.putShort((short) (this.rawValue & 0xFFFF));
     }
 
-    /** Parse an IPv4 Multicast address and return the macAddress
+    /*
+     * Parse an IPv4 Multicast address and return the macAddress
      * corresponding to the multicast IPv4 address.
      * 
      * For multicast forwarding, the mac addresses in the range
@@ -227,7 +228,8 @@ public class MacAddress implements OFValueType<MacAddress> {
             throws IllegalArgumentException {
  
         if (!ipv4.isMulticast())
-            throw new IllegalArgumentException("Not a Multicast IPAddress");
+            throw new IllegalArgumentException(
+                    "Not a Multicast IPAddress\"" + ipv4 + "\"");
         
         long ipLong = ipv4.getInt();
         int ipMask = 0x007FFFFF;
