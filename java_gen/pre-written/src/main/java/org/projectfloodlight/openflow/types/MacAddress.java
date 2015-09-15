@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.util.HexString;
 
@@ -33,6 +34,8 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     private static final long LLDP_MAC_ADDRESS_MASK = 0xfffffffffff0L;
     private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
+    private final static MacAddress MULTICAST_BASE_ADDRESS =
+           MacAddress.of("01:00:5E:00:00:00");
 
     private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
             "It must consist of 6 hex digit pairs separated by colons: ";
@@ -226,6 +229,40 @@ public class MacAddress implements OFValueType<MacAddress> {
         sink.putShort((short) (this.rawValue & 0xFFFF));
     }
 
+    /*
+     * Parse an IPv4 Multicast address and return the macAddress
+     * corresponding to the multicast IPv4 address.
+     * 
+     * For multicast forwarding, the mac addresses in the range
+     * 01-00-5E-00-00-00 to 01-00-5E-7F-FF-FF have been reserved.
+     * The most significant 25 bits of the above 48-bit mac address
+     * are fixed while the lower 23 bits are variable.
+     * These lower 23 bits are derived from the lower 23 bits
+     * of the multicast IP address.
+     *
+     * AND ipv4 address with 0x07FFFFF to extract the last 23 bits
+     * OR with 01:00:5E:00:00:00 MAC (first 25 bits)
+     *
+     * @param ipv4 - ipv4 multicast address
+     * @return the MacAddress corresponding to the multicast address
+     * @throws IllegalArgumentException if ipv4 is not a valid multicast address
+     */
+    @Nonnull
+    public static MacAddress forIPv4MulticastAddress(IPv4Address ipv4)
+            throws IllegalArgumentException {
+ 
+        if (!ipv4.isMulticast())
+            throw new IllegalArgumentException(
+                    "Not a Multicast IPAddress\"" + ipv4 + "\"");
+        
+        long ipLong = ipv4.getInt();
+        int ipMask = 0x007FFFFF;
+        ipLong = ipLong & ipMask;
 
+        long macLong = MULTICAST_BASE_ADDRESS.getLong(); // 01:00:5E:00:00:00
+        macLong = macLong | ipLong;
+        MacAddress returnMac = MacAddress.of(macLong);
 
+        return returnMac;
+    }
 }

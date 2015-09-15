@@ -156,6 +156,40 @@ public class MacAddressTest {
     }
 
     @Test
+
+    public void testForIPv4MulticastAddress()
+    {
+        IPv4Address ip = IPv4Address.of("224.1.1.1");
+        MacAddress mac = MacAddress.forIPv4MulticastAddress(ip);
+        MacAddress expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("224.129.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("225.1.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("239.129.1.1");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:01:01");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("224.1.2.3");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:02:03");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv4Address.of("239.129.2.3");
+        mac = MacAddress.forIPv4MulticastAddress(ip);
+        expectedMac = MacAddress.of("01:00:5E:01:02:03");
+        assertTrue(mac.equals(expectedMac));
+    }
+    
     public void testOfDatapathid() {
         MacAddress mac = MacAddress.of(DatapathId.NONE);
         assertThat(mac, is(MacAddress.NONE));
