@@ -22,14 +22,13 @@ import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U16;
-import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.types.U32;
+import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
 
-@SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
     public final MatchFields id;
@@ -271,6 +270,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<MacAddress> BSN_INNER_ETH_SRC =
             new MatchField<MacAddress>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
+
+    public final static MatchField<OFVlanVidMatch> BSN_INNER_VLAN_VID =
+            new MatchField<OFVlanVidMatch>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
 
     public String getName() {
         return name;

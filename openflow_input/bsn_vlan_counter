@@ -74,3 +74,13 @@ struct of_bsn_vlan_counter_stats_reply : of_bsn_stats_reply {
     uint32_t subtype == 9;
     list(of_bsn_vlan_counter_stats_entry_t) entries;
 };
+
+struct of_bsn_vlan_counter_clear : of_bsn_header {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 70;
+    uint16_t vlan_vid;
+};

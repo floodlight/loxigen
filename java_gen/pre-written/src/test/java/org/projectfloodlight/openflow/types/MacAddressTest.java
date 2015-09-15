@@ -1,16 +1,19 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+
+import static org.hamcrest.Matchers.is;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MacAddressTest {
     byte[][] testAddresses = new byte[][] {
@@ -153,6 +156,7 @@ public class MacAddressTest {
     }
 
     @Test
+
     public void testForIPv4MulticastAddress()
     {
         IPv4Address ip = IPv4Address.of("224.1.1.1");
@@ -184,5 +188,16 @@ public class MacAddressTest {
         mac = MacAddress.forIPv4MulticastAddress(ip);
         expectedMac = MacAddress.of("01:00:5E:01:02:03");
         assertTrue(mac.equals(expectedMac));
+    }
+    
+    public void testOfDatapathid() {
+        MacAddress mac = MacAddress.of(DatapathId.NONE);
+        assertThat(mac, is(MacAddress.NONE));
+
+        for (String s : testStrings) {
+            DatapathId dpid = DatapathId.of("00:00:" + s);
+            mac = MacAddress.of(dpid);
+            assertThat(mac, is(MacAddress.of(s)));
+        }
     }
 }

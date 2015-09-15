@@ -880,7 +880,7 @@ struct of_port_desc_prop_experimenter : of_port_desc_prop {
     uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == ?;
-    uint32_t exp_type;
+    //uint32_t exp_type;
 };
 
 struct of_port_desc {
@@ -2224,7 +2224,7 @@ struct of_meter_config_stats_reply : of_stats_reply {
     uint16_t stats_type == 10;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_meter_band_t) entries;
+    list(of_meter_config_t) entries;
 };
 
 // FIXME stats added to get things working
