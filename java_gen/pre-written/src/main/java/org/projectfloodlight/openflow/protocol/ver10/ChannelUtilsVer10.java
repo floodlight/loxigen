@@ -3,13 +3,15 @@ package org.projectfloodlight.openflow.protocol.ver10;
 import java.util.EnumSet;
 import java.util.Set;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.match.Match;
 import org.projectfloodlight.openflow.protocol.stat.Stat;
 
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Collection of helper functions for reading and writing into Unpooled
@@ -18,8 +20,8 @@ import com.google.common.hash.PrimitiveSink;
  */
 
 public class ChannelUtilsVer10 {
-    public static Match readOFMatch(final ByteBuf bb) throws OFParseError {
-        return OFMatchV1Ver10.READER.readFrom(bb);
+    public static Match readOFMatch(final OFMessageReaderContext context, final ByteBuf bb) throws OFParseError {
+        return OFMatchV1Ver10.READER.readFrom(context, bb);
     }
 
     public static Set<OFActionType> readSupportedActions(ByteBuf bb) {

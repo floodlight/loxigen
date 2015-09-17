@@ -19,13 +19,15 @@ package org.projectfloodlight.openflow.types;
 
 import java.math.BigInteger;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.AbstractOFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
+
+import io.netty.buffer.ByteBuf;
 
 public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
@@ -172,9 +174,9 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
 
     public final static Reader READER = new Reader();
 
-    private static class Reader implements OFMessageReader<U64> {
+    private static class Reader extends AbstractOFMessageReader<U64> {
         @Override
-        public U64 readFrom(ByteBuf bb) throws OFParseError {
+        public U64 readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
             return U64.ofRaw(bb.readLong());
         }
     }

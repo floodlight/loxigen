@@ -2,9 +2,9 @@ package org.projectfloodlight.openflow.util;
 
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.Writeable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Collection of helper functions for reading and writing into Unpooled
@@ -57,13 +59,13 @@ public class ChannelUtils {
         bb.writeBytes(byteArray);
     }
 
-    public static <T> List<T> readList(ByteBuf bb, int length, OFMessageReader<T> reader) throws OFParseError {
+    public static <T> List<T> readList(OFMessageReaderContext context, ByteBuf bb, int length, OFMessageReader<T> reader) throws OFParseError {
         int end = bb.readerIndex() + length;
         Builder<T> builder = ImmutableList.<T>builder();
         if(logger.isTraceEnabled())
             logger.trace("readList(length={}, reader={})", length, reader.getClass());
         while(bb.readerIndex() < end) {
-            T read = reader.readFrom(bb);
+            T read = reader.readFrom(context, bb);
             if(logger.isTraceEnabled())
                 logger.trace("readList: read={}, left={}", read, end - bb.readerIndex());
             builder.add(read);

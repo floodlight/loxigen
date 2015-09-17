@@ -40,7 +40,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
         private final Map<StatFields, OFOxs<?>> oxsMap;
 
         public Builder() {
-            oxsMap = new EnumMap<StatFields, OFOxs<?>>(StatFields.class);
+            oxsMap = new EnumMap<>(StatFields.class);
         }
 
         public Builder(EnumMap<StatFields, OFOxs<?>> oxsMap) {
@@ -66,7 +66,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
     }
 
     public static OFOxsList ofList(Iterable<OFOxs<?>> oxsList) {
-        Map<StatFields, OFOxs<?>> map = new EnumMap<StatFields, OFOxs<?>>(
+        Map<StatFields, OFOxs<?>> map = new EnumMap<>(
                 StatFields.class);
         for (OFOxs<?> o : oxsList) {
             map.put(o.getStatField().id, o);
@@ -75,7 +75,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
     }
 
     public static OFOxsList of(OFOxs<?>... oxss) {
-        Map<StatFields, OFOxs<?>> map = new EnumMap<StatFields, OFOxs<?>>(
+        Map<StatFields, OFOxs<?>> map = new EnumMap<>(
                 StatFields.class);
         for (OFOxs<?> o : oxss) {
             map.put(o.getStatField().id, o);
@@ -83,9 +83,9 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
         return new OFOxsList(map);
     }
 
-    public static OFOxsList readFrom(ByteBuf bb, int length,
+    public static OFOxsList readFrom(OFMessageReaderContext context, ByteBuf bb, int length,
             OFMessageReader<OFOxs<?>> reader) throws OFParseError {
-        return ofList(ChannelUtils.readList(bb, length, reader));
+        return ofList(ChannelUtils.readList(context, bb, length, reader));
     }
 
     @Override
@@ -96,7 +96,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
     }
 
     public OFOxsList.Builder createBuilder() {
-        return new OFOxsList.Builder(new EnumMap<StatFields, OFOxs<?>>(oxsMap));
+        return new OFOxsList.Builder(new EnumMap<>(oxsMap));
     }
 
     @Override

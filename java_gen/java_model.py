@@ -823,13 +823,26 @@ class JavaOFClass(object):
     @property
     @memoize
     def superclass(self):
-        return find(lambda c: c.version == self.version and c.c_name == self.ir_class.superclass, model.all_classes)
+        if self.ir_class.superclass:
+            superclass_name = self.ir_class.superclass.name
+            return find(lambda c: c.version == self.version and c.c_name == superclass_name, model.all_classes)
+        else:
+            return None
 
     @property
     @memoize
     def subclasses(self):
         return [ c for c in model.all_classes if c.version == self.version and c.ir_class.superclass
                    and c.ir_class.superclass.name == self.c_name ]
+    @property
+    @memoize
+    def ancestor_classes(self):
+        if self.superclass:
+            return [ self ] + self.superclass.ancestor_classes
+        else:
+            return [ self ]
+
+
 
 #######################################################################
 ### Member
@@ -1031,9 +1044,9 @@ class JavaVirtualMember(JavaMember):
     def value(self):
         return self._value
 
-    @property
-    def priv_value(self):
-        return self._value
+    #@property
+    #def priv_value(self):
+    #    return self._value
 
 
     @property

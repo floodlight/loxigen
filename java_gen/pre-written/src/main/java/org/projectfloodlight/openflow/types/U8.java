@@ -17,13 +17,15 @@
 
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.AbstractOFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
+
+import io.netty.buffer.ByteBuf;
 
 public class U8 implements Writeable, OFValueType<U8> {
     private final static byte ZERO_VAL = 0;
@@ -104,9 +106,9 @@ public class U8 implements Writeable, OFValueType<U8> {
 
     public final static Reader READER = new Reader();
 
-    private static class Reader implements OFMessageReader<U8> {
+    private static class Reader extends AbstractOFMessageReader<U8> {
         @Override
-        public U8 readFrom(ByteBuf bb) throws OFParseError {
+        public U8 readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
             return new U8(bb.readByte());
         }
     }

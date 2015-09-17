@@ -4,7 +4,6 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.match.MatchFields;
@@ -18,6 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
 
 public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkable {
     private static final Logger logger = LoggerFactory.getLogger(OFOxmList.class);
@@ -97,9 +98,9 @@ public class OFOxmList implements Iterable<OFOxm<?>>, Writeable, PrimitiveSinkab
         return new OFOxmList(map);
     }
 
-    public static OFOxmList readFrom(ByteBuf bb, int length,
+    public static OFOxmList readFrom(OFMessageReaderContext context, ByteBuf bb, int length,
             OFMessageReader<OFOxm<?>> reader) throws OFParseError {
-        return ofList(ChannelUtils.readList(bb, length, reader));
+        return ofList(ChannelUtils.readList(context, bb, length, reader));
     }
 
     @Override

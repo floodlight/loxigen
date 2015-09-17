@@ -49,8 +49,8 @@ public final class OFFactories {
             }
     }
 
-    private static class GenericReader implements OFMessageReader<OFMessage> {
-        public OFMessage readFrom(ByteBuf bb) throws OFParseError {
+    private static class GenericReader extends AbstractOFMessageReader<OFMessage> {
+        public OFMessage readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
             if(!bb.isReadable())
                 return null;
             short wireVersion = U8.f(bb.getByte(bb.readerIndex()));
@@ -64,7 +64,7 @@ public final class OFFactories {
             default:
                 throw new IllegalArgumentException("Unknown wire version: " + wireVersion);
             }
-            return factory.getReader().readFrom(bb);
+            return factory.getReader().readFrom(context, bb);
         }
     }
 

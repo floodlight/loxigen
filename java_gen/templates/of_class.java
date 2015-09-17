@@ -195,9 +195,15 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 
 
     final static Reader READER = new Reader();
-    static class Reader implements OFMessageReader<${msg.interface.name}> {
+    static class Reader extends AbstractOFMessageReader<${msg.interface.name}> {
         @Override
-        public ${msg.interface.name} readFrom(ByteBuf bb) throws OFParseError {
+        public ${msg.interface.name} readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
+//:: if msg.is_fixed_length:
+            if(bb.readableBytes() < LENGTH)
+//:: else:
+            if(bb.readableBytes() < MINIMUM_LENGTH)
+//:: #endif
+                return null;
 //:: for prop in msg.members:
 //:: if not prop.is_virtual and (prop.is_length_value or prop.is_field_length_value):
             int start = bb.readerIndex();
@@ -205,6 +211,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 //:: #endfor
 //:: fields_with_length_member = {}
+//:: aligned_length = None
 //:: for prop in msg.members:
 //:: if prop.is_virtual:
 //::    continue
@@ -223,7 +230,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
             //:: #endif
-            if(bb.readableBytes() + (bb.readerIndex() - start) < ${prop.name}) {
+            //
+            //:: if msg.align and not msg.length_includes_align:
+            //::    aligned_length = "(({} + {}) / {}) * {}".format(prop.name, msg.align - 1, msg.align, msg.align)
+            //:: else:
+            //::     aligned_length = prop.name
+            //:: #endif
+            if(bb.readableBytes() + (bb.readerIndex() - start) < ${aligned_length}) {
                 // Buffer does not have all data yet
                 bb.readerIndex(start);
                 return null;
@@ -250,7 +263,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             bb.skipBytes(length - (bb.readerIndex() - start));
             //:: else:
             // align message to ${msg.align} bytes (length does not contain alignment)
-            bb.skipBytes(((length + ${msg.align-1})/${msg.align} * ${msg.align} ) - length );
+            bb.skipBytes(${aligned_length} - length );
             //:: #endif
             //:: #endif
 

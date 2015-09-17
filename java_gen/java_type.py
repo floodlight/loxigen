@@ -263,7 +263,7 @@ def gen_list_jtype(java_base_name):
     # write op assumes class implements Writeable
     return JType("List<{}>".format(java_base_name)) \
         .op(
-            read= 'ChannelUtils.readList(bb, $length, {}Ver$version.READER)'.format(java_base_name), \
+            read= 'ChannelUtils.readList(context, bb, $length, {}Ver$version.READER)'.format(java_base_name), \
             write='ChannelUtils.writeList(bb, $name)',
             default="ImmutableList.<{}>of()".format(java_base_name),
             funnel='FunnelUtils.putList($name, sink)'
@@ -284,7 +284,7 @@ u8 =  JType('short', 'byte') \
         .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
         .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
-        .op(read='ChannelUtils.readList(bb, $length, U8.READER)',
+        .op(read='ChannelUtils.readList(context, bb, $length, U8.READER)',
             write='ChannelUtils.writeList(bb, $name)',
             default='ImmutableList.<U8>of()',
             funnel='FunnelUtils.putList($name, sink)'
@@ -302,13 +302,13 @@ u32 = JType('long', 'int') \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
 u32_list = JType('List<U32>', 'int[]') \
         .op(
-                read='ChannelUtils.readList(bb, $length, U32.READER)',
+                read='ChannelUtils.readList(context, bb, $length, U32.READER)',
                 write='ChannelUtils.writeList(bb, $name)',
                 default="ImmutableList.<U32>of()",
                 funnel="FunnelUtils.putList($name, sink)")
 u64_list = JType('List<U64>', 'int[]') \
         .op(
-                read='ChannelUtils.readList(bb, $length, U64.READER)',
+                read='ChannelUtils.readList(context, bb, $length, U64.READER)',
                 write='ChannelUtils.writeList(bb, $name)',
                 default="ImmutableList.<U64>of()",
                 funnel="FunnelUtils.putList($name, sink)")
@@ -346,11 +346,11 @@ octets = JType('byte[]')\
             funnel="sink.putBytes($name)"
             );
 of_match = JType('Match') \
-        .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
+        .op(read='ChannelUtilsVer$version.readOFMatch(context, bb)', \
             write='$name.writeTo(bb)',
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
 of_stat = JType('Stat') \
-         .op(read='ChannelUtilsVer$version.readOFStat(bb)', write='$name.writeTo(bb)')
+         .op(read='ChannelUtilsVer$version.readOFStat(context, bb)', write='$name.writeTo(bb)')
 of_time = JType('OFTime') \
          .op(read='OFTimeVer$version.READER.readFrom(bb)', \
              write='$name.writeTo(bb)')
@@ -383,7 +383,7 @@ ipv4 = JType("IPv4Address") \
             write="$name.write4Bytes(bb)",
             default='IPv4Address.NONE')
 ipv4_list =  JType('List<IPv4Address>') \
-        .op(read='ChannelUtils.readList(bb, $length, IPv4Address.READER)',
+        .op(read='ChannelUtils.readList(context, bb, $length, IPv4Address.READER)',
             write='ChannelUtils.writeList(bb, $name)',
             default='ImmutableList.<IPv4Address>of()',
             funnel="FunnelUtils.putList($name, sink)")
@@ -392,7 +392,7 @@ ipv6 = JType("IPv6Address") \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
 ipv6_list =  JType('List<IPv46ddress>') \
-        .op(read='ChannelUtils.readList(bb, $length, IPv6Address.READER)',
+        .op(read='ChannelUtils.readList(context, bb, $length, IPv6Address.READER)',
             write='ChannelUtils.writeList(bb, $name)',
             default='ImmutableList.<IPv6Address>of()',
             funnel="FunnelUtils.putList($name, sink)")
@@ -455,7 +455,7 @@ oxm = JType("OFOxm<?>")\
               write="$name.writeTo(bb)")
 oxm_list = JType("OFOxmList") \
         .op(
-            read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', \
+            read= 'OFOxmList.readFrom(context, bb, $length, OFOxmVer$version.READER)', \
             write='$name.writeTo(bb)',
             default="OFOxmList.EMPTY")
 connection_uri = JType("OFConnectionIndex") \
@@ -466,7 +466,7 @@ oxs = JType("OFOxs<?>")\
         .op(read="OFOxsVer15.READER.readFrom(bb)",
             write="$name.writeTo(bb)")
 oxs_list = JType("OFOxsList") \
-        .op(read= 'OFOxsList.readFrom(bb, $length, OFOxsVer15.READER)', \
+        .op(read= 'OFOxsList.readFrom(context, bb, $length, OFOxsVer15.READER)', \
             write='$name.writeTo(bb)',
             default="OFOxsList.EMPTY")
 meter_features = JType("OFMeterFeatures")\
@@ -563,7 +563,7 @@ bundle_id = JType("BundleId") \
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
 error_cause_data = JType("OFErrorCauseData") \
-         .op(version=ANY, read="OFErrorCauseData.read(bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)", default="OFErrorCauseData.NONE");
+         .op(version=ANY, read="OFErrorCauseData.read(context, bb, $length, OFVersion.OF_$version)", write="$name.writeTo(bb)", default="OFErrorCauseData.NONE");
 
 var_string = JType('String').op(
               read='ChannelUtils.readFixedLengthString(bb, $length)',

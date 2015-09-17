@@ -1,8 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
 import java.util.Arrays;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -10,6 +7,8 @@ import org.projectfloodlight.openflow.protocol.OFErrorMsg;
 import org.projectfloodlight.openflow.protocol.OFFactories;
 import org.projectfloodlight.openflow.protocol.OFFactory;
 import org.projectfloodlight.openflow.protocol.OFMessage;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContexts;
 import org.projectfloodlight.openflow.protocol.OFVersion;
 import org.projectfloodlight.openflow.protocol.Writeable;
 import org.projectfloodlight.openflow.util.ChannelUtils;
@@ -18,6 +17,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 /** A special-purpose wrapper for the 'data' field in an {@link OFErrorMsg} message
  *  that contains a byte serialization of the offending message.
@@ -35,18 +37,24 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
      *  because parsing of the 0-byte array will always return null, irrespective of the
      *  version.
      */
-    public static final OFErrorCauseData NONE = new OFErrorCauseData(new byte[0], OFVersion.OF_13);
+    public static final OFErrorCauseData NONE = new OFErrorCauseData(new byte[0], OFVersion.OF_13, OFMessageReaderContexts.DEFAULT);
 
     private final byte[] data;
     private final OFVersion version;
+    private final OFMessageReaderContext context;
 
-    private OFErrorCauseData(byte[] data, OFVersion version) {
+    private OFErrorCauseData(byte[] data, OFVersion version, OFMessageReaderContext context) {
         this.data = data;
         this.version = version;
+        this.context = context;
+    }
+
+    public static OFErrorCauseData of(OFMessageReaderContext context, byte[] data, OFVersion version) {
+         return new OFErrorCauseData(Arrays.copyOf(data, data.length), version, context);
     }
 
     public static OFErrorCauseData of(byte[] data, OFVersion version) {
-         return new OFErrorCauseData(Arrays.copyOf(data, data.length), version);
+        return of(OFMessageReaderContexts.DEFAULT, data, version);
     }
 
     public byte[] getData() {
@@ -56,7 +64,7 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     public Optional<OFMessage> getParsedMessage() {
         OFFactory factory = OFFactories.getFactory(version);
         try {
-            OFMessage msg = factory.getReader().readFrom(Unpooled.wrappedBuffer(data));
+            OFMessage msg = factory.getReader().readFrom(context, Unpooled.wrappedBuffer(data));
             if(msg != null)
                 return Optional.of(msg);
             else
@@ -67,9 +75,9 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
         }
     }
 
-    public static OFErrorCauseData read(ByteBuf bb, int length, OFVersion version) {
+    public static OFErrorCauseData read(OFMessageReaderContext context, ByteBuf bb, int length, OFVersion version) {
         byte[] bytes = ChannelUtils.readBytes(bb, length);
-        return of(bytes, version);
+        return of(context, bytes, version);
    }
 
     @Override

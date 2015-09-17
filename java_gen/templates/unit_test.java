@@ -38,10 +38,13 @@ package ${test.package};
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import org.hamcrest.CoreMatchers;
 
-
+@RunWith(Parameterized.class)
 public class ${test.name} {
     //:: factory = java_model.model.factory_of(test.interface)
     //:: var_type = msg.interface.name
@@ -53,6 +56,23 @@ public class ${test.name} {
 
     final static byte[] ${msg.constant_name}_SERIALIZED =
         new byte[] { ${", ".join("%s0x%x" % (("" if ord(c)<128 else "(byte) "),  ord(c)) for c in test_data["binary"] ) } };
+
+
+    private final static int[] PREFIX_BYTES = { 0, 1, 4, 255, 65335 };
+    private final static byte[] EMPTY_BYTES = new byte[65535];
+
+    private final OFMessageReader<?> messageReader;
+
+    @Parameters(name="{index}.MessageReader={0}")
+    public static Iterable<Object> data() {
+        return ImmutableList.<Object>of(
+                ${ ", ".join( "{}.READER".format(c.name) for c in msg.ancestor_classes) }
+        );
+    }
+
+    public ${test.name}(OFMessageReader<?> messageReader) {
+        this.messageReader = messageReader;
+    }
 
     @Before
     public void setup() {
@@ -77,8 +97,17 @@ public class ${test.name} {
         assertThat(written, CoreMatchers.equalTo(${msg.constant_name}_SERIALIZED));
     }
 
+   //:: else:
+   // FIXME: No java stanza in test_data for this class. Add to support write test
+   //:: #endif
+
     @Test
     public void testRead() throws Exception {
+        ByteBuf input = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
+
+        Object ${var_name}Read = messageReader.readFrom(input);
+        assertThat(${var_name}Read, CoreMatchers.instanceOf(${msg.name}.class));
+    //:: if "java" in test_data:
         //:: if use_builder:
         ${var_type}.Builder builder = factory.${factory_method}();
         ${test_data["java"]};
@@ -87,24 +116,47 @@ public class ${test.name} {
         ${var_type} ${var_name}Built = factory.${factory_method}();
         //:: #endif
 
-        ByteBuf input = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
-
-        // FIXME should invoke the overall reader once implemented
-        ${var_type} ${var_name}Read = ${msg.name}.READER.readFrom(input);
         assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
         assertEquals(${var_name}Built, ${var_name}Read);
+    //:: #else
+        // FIXME: No java stanza in test_data for this class. Add to enable validation of read message
+    //:: #endif
    }
-   //:: else:
-   // FIXME: No java stanza in test_data for this class. Add for more comprehensive unit testing
-   //:: #endif
+
+    /**
+     * Validates Reader handling of partial messages in the buffer.
+     *
+     * Ensures that readers deal with partially available messages, and that buffers
+     * are returned unmodified. Also checks compatibility when the data is not at the start of
+     * the buffer (readerIndex=0), but somewhere else (with the readerIndex appropriately set).
+     */
+   @Test
+   public void testPartialRead() throws Exception {
+       ByteBuf msgBuffer = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
+       for (int prefixLength: PREFIX_BYTES) {
+           ByteBuf prefixBuffer = Unpooled.wrappedBuffer(EMPTY_BYTES).slice(0, prefixLength);
+           ByteBuf wholeBuffer = Unpooled.wrappedBuffer(prefixBuffer, msgBuffer);
+           for (int partialLength = 0; partialLength < ${msg.constant_name}_SERIALIZED.length - 1; partialLength++) {
+               int length = prefixLength + partialLength;
+               ByteBuf slice = wholeBuffer.slice(0, length);
+               slice.readerIndex(prefixLength);
+
+               Object read = messageReader.readFrom(slice);
+
+               assertNull("partial message should not be read", read);
+               assertEquals("Reader index should be back at the start", prefixLength, slice.readerIndex());
+           }
+
+       }
+   }
 
    @Test
    public void testReadWrite() throws Exception {
        ByteBuf input = Unpooled.copiedBuffer(${msg.constant_name}_SERIALIZED);
 
        // FIXME should invoke the overall reader once implemented
-       ${var_type} ${var_name} = ${msg.name}.READER.readFrom(input);
+       ${var_type} ${var_name} = (${var_type}) messageReader.readFrom(input);
        assertEquals(${msg.constant_name}_SERIALIZED.length, input.readerIndex());
 
        // write message again

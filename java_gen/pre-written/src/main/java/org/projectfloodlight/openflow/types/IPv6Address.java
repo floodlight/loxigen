@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -14,12 +12,15 @@ import java.util.regex.Pattern;
 import javax.annotation.Nonnull;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.AbstractOFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
@@ -52,9 +53,9 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     public final static Reader READER = new Reader();
 
-    private static class Reader implements OFMessageReader<IPv6Address> {
+    private static class Reader extends AbstractOFMessageReader<IPv6Address> {
         @Override
-        public IPv6Address readFrom(ByteBuf bb) throws OFParseError {
+        public IPv6Address readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
             return new IPv6Address(bb.readLong(), bb.readLong());
         }
     }
@@ -561,8 +562,8 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
             throw new IllegalArgumentException("16 bit word index must be in [0,7]");
     }
 
-    /** 
-     * get the index of the first word where to apply IPv6 zero compression 
+    /**
+     * get the index of the first word where to apply IPv6 zero compression
      *
      * @return the index
      */

@@ -48,9 +48,9 @@ abstract class ${msg.name} {
 
     public final static ${msg.name}.Reader READER = new Reader();
 
-    static class Reader implements OFMessageReader<${msg.interface.inherited_declaration()}> {
+    static class Reader extends AbstractOFMessageReader<${msg.interface.inherited_declaration()}> {
         @Override
-        public ${msg.interface.inherited_declaration()} readFrom(ByteBuf bb) throws OFParseError {
+        public ${msg.interface.inherited_declaration()} readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
 //:: if msg.is_fixed_length:
             if(bb.readableBytes() < LENGTH)
 //:: else:
@@ -59,8 +59,11 @@ abstract class ${msg.name} {
                 return null;
             int start = bb.readerIndex();
 //:: fields_with_length_member = {}
+//:: length_field = None
 //::    for prop in msg.members:
-//::       if prop.is_data:
+//::       if prop.is_virtual:
+//::         continue
+//::       elif prop.is_data:
             ${prop.java_type.skip_op(version,
                     length=fields_with_length_member[prop.c_name] if prop.c_name in fields_with_length_member else None)};
 //:: elif prop.is_pad:
@@ -75,12 +78,17 @@ abstract class ${msg.name} {
             ${prop.java_type.public_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=True)};
             if(${prop.name} < MINIMUM_LENGTH)
                 throw new OFParseError("Wrong ${prop.name}: Expected to be >= " + MINIMUM_LENGTH + ", was: " + ${prop.name});
+            if( ( bb.readableBytes() + (bb.readerIndex() - start)) < ${prop.name} ) {
+                // message not yet fully read
+                bb.readerIndex(start);
+                return null;
+            }
+//::     length_field = prop.name
 //:: elif prop.is_field_length_value:
 //::        fields_with_length_member[prop.member.field_name] = prop.name
             int ${prop.name} = ${prop.java_type.read_op(version)};
 //:: elif prop.is_discriminator:
             ${prop.java_type.priv_type} ${prop.name} = ${prop.java_type.read_op(version, pub_type=False)};
-            bb.readerIndex(start);
             switch(${prop.name}) {
 //::     for sub in msg.subclasses:
 //::           if not model.generate_class(sub):
@@ -92,16 +100,40 @@ abstract class ${msg.name} {
 //::                           (sub.name, msg.name, prop.name))
 //::           #endif
                case ${m.priv_value}:
+                   bb.readerIndex(start);
                    // discriminator value ${m.enum_value}=${m.value} for class ${sub.name}
-                   return ${sub.name}.READER.readFrom(bb);
+                   return ${sub.name}.READER.readFrom(context, bb);
 //:: #endif    # generate_class
 //:: #endfor
                default:
-                   throw new OFParseError("Unknown value for discriminator ${prop.name} of class ${msg.name}: " + ${prop.name});
+                   context.getUnparsedHandler().unparsedMessage(${msg.name}.class, "${prop.name}", ${prop.name});
             }
-//::        break
 //:: #endif
 //:: #endfor
+            // will only reach here if the discriminator turns up nothing.
+//::    if msg.ir_class.is_instanceof("of_oxm"):
+//::        length_field = "length"
+            // hack around for OXM's: they have their length stored as the 4th
+            int oxmDataLength = typeLen & 0x0000_00FF;
+            bb.skipBytes(oxmDataLength);
+            return null;
+//::    elif not msg.is_fixed_length and length_field == None:
+                   // ${msg.name} is variable length, and length field not read before discriminator.
+                   // Cannot carry on after parse error
+            throw new OFParseError("Could not parse message ${prop.name} and length not known, so cannot be skipped");
+//::    else:
+            //:: if msg.is_fixed_length:
+                skip = "LENGTH"
+            //:: else:
+            //::    if msg.align and not msg.length_includes_align:
+            //::        skip = "(({} + {}) / {}) * {}".format(length_field, msg.align - 1, msg.align, msg.align)
+            //::    else:
+            //::        skip = length_field
+            //::    #endif
+            //:: #endif
+            bb.skipBytes(${skip} - (bb.readerIndex() - start));
+            return null;
+//::    #endif
         }
     }
 }

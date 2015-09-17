@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.net.Inet4Address;
@@ -12,12 +10,15 @@ import java.util.Arrays;
 import javax.annotation.Nonnull;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.AbstractOFMessageReader;
+import org.projectfloodlight.openflow.protocol.OFMessageReaderContext;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Wrapper around an IPv4Address address
@@ -45,9 +46,9 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
 
     public final static Reader READER = new Reader();
 
-    private static class Reader implements OFMessageReader<IPv4Address> {
+    private static class Reader extends AbstractOFMessageReader<IPv4Address> {
         @Override
-        public IPv4Address readFrom(ByteBuf bb) throws OFParseError {
+        public IPv4Address readFrom(OFMessageReaderContext context, ByteBuf bb) throws OFParseError {
             return new IPv4Address(bb.readInt());
         }
     }
