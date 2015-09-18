@@ -17,7 +17,7 @@ public class VxlanNI implements OFValueType<VxlanNI> {
 
     private static final int VALIDATION_MASK = 0x00FFffFF;
     private static final int ZERO_VALUE = 0x0;
-    final static int LENGTH = 3;
+    final static int LENGTH = 4;
 
     public static final VxlanNI ZERO_INVALID = new VxlanNI(ZERO_VALUE);
 
@@ -59,7 +59,7 @@ public class VxlanNI implements OFValueType<VxlanNI> {
 
     @Override
     public String toString() {
-        return "VxlanNI [vni=" + vni + "]";
+        return String.valueOf(vni);
     }
 
     @Override
@@ -67,27 +67,12 @@ public class VxlanNI implements OFValueType<VxlanNI> {
         return LENGTH;
     }
 
-    private volatile byte[] bytesCache = null;
 
-    public byte[] getBytes() {
-        if (bytesCache == null) {
-            synchronized (this) {
-                if (bytesCache == null) {
-                    bytesCache =
-                            new byte[] { (byte) ((vni >> 16) & 0xFF),
-                                         (byte) ((vni >> 8) & 0xFF),
-                                         (byte) ((vni >> 0) & 0xFF) };
-                }
-            }
-        }
-        return Arrays.copyOf(bytesCache, bytesCache.length);
-    }
-
-    public void write3Bytes(ChannelBuffer c) {
+    public void write4Bytes(ChannelBuffer c) {
         c.writeInt(this.vni);
     }
 
-    public static VxlanNI read3Bytes(ChannelBuffer c) throws OFParseError {
+    public static VxlanNI read4Bytes(ChannelBuffer c) throws OFParseError {
         return VxlanNI.ofVni(c.readInt());
     }
 
