@@ -353,6 +353,11 @@ mac_addr = JType('MacAddress') \
         .op(read="MacAddress.read6Bytes(bb)", \
             write="$name.write6Bytes(bb)",
             default="MacAddress.NONE")
+vxlan_ni = JType('VxlanNI') \
+        .op(read="VxlanNI.read4Bytes(bb)", \
+            write="$name.write4Bytes(bb)",
+            default="VxlanNI.ZERO")
+
 
 port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
@@ -705,8 +710,8 @@ exceptions = {
         'of_oxm_bsn_l2_cache_hit' : { 'value' : boolean_value },
         'of_oxm_bsn_l2_cache_hit_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
-        'of_oxm_bsn_vxlan_network_id' : { 'value' : u32obj },
-        'of_oxm_bsn_vxlan_network_id_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        'of_oxm_bsn_vxlan_network_id' : { 'value' : vxlan_ni },
+        'of_oxm_bsn_vxlan_network_id_masked' : { 'value' : vxlan_ni, 'value_mask' : vxlan_ni},
 
         'of_oxm_bsn_inner_eth_dst' : { 'value' : mac_addr },
         'of_oxm_bsn_inner_eth_dst_masked' : { 'value' : mac_addr, 'value_mask' : mac_addr },

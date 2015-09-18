@@ -34,11 +34,6 @@ public class VxlanNITest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testInvalidVni0() {
-        VxlanNI.ofVni(0x0);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
     public void testInvalidVni1() {
         VxlanNI.ofVni(0xFFffFFff);
     }

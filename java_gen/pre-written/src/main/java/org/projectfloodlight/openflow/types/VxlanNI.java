@@ -16,10 +16,14 @@ import com.google.common.primitives.UnsignedInts;
 public class VxlanNI implements OFValueType<VxlanNI> {
 
     private static final int VALIDATION_MASK = 0x00FFffFF;
-    private static final int ZERO_VALUE = 0x0;
     final static int LENGTH = 4;
 
-    public static final VxlanNI ZERO_INVALID = new VxlanNI(ZERO_VALUE);
+    private static final int ZERO_VAL = 0x0;
+    public static final VxlanNI ZERO = new VxlanNI(ZERO_VAL);
+
+    private static final int NO_MASK_VAL = 0xFFffFFff;
+    public final static VxlanNI NO_MASK = new VxlanNI(NO_MASK_VAL);
+    public static final VxlanNI FULL_MASK = ZERO;
 
     private final int vni;
 
@@ -28,7 +32,9 @@ public class VxlanNI implements OFValueType<VxlanNI> {
     }
 
     public static VxlanNI ofVni(int vni) {
-        if (vni == ZERO_INVALID.vni || (vni & VALIDATION_MASK) != vni) {
+        if (vni == ZERO_VAL)
+            return ZERO;
+        if ((vni & VALIDATION_MASK) != vni) {
             throw new IllegalArgumentException(String.format("Illegal VNI value: %x", vni));
         }
         return new VxlanNI(vni);
