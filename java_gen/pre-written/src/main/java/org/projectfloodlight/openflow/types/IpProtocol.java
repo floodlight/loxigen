@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
@@ -615,11 +615,11 @@ public class IpProtocol implements OFValueType<IpProtocol> {
         return "0x" + Integer.toHexString(proto);
     }
 
-    public void writeByte(ChannelBuffer c) {
+    public void writeByte(ByteBuf c) {
         c.writeByte(this.proto);
     }
 
-    public static IpProtocol readByte(ChannelBuffer c) {
+    public static IpProtocol readByte(ByteBuf c) {
         return IpProtocol.of(c.readUnsignedByte());
     }
 

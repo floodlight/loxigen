@@ -1,20 +1,20 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
-
-import org.projectfloodlight.openflow.protocol.Writeable;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 /**
  * Wrapper around an IPv4Address address
@@ -44,7 +44,7 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
 
     private static class Reader implements OFMessageReader<IPv4Address> {
         @Override
-        public IPv4Address readFrom(ChannelBuffer bb) throws OFParseError {
+        public IPv4Address readFrom(ByteBuf bb) throws OFParseError {
             return new IPv4Address(bb.readInt());
         }
     }
@@ -91,13 +91,13 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     /**
-     * IPv4 multicast addresses are defined by the leading address bits of 1110 
+     * IPv4 multicast addresses are defined by the leading address bits of 1110
      */
     @Override
     public boolean isMulticast() {
         return ((rawValue >>> 24) & 0xF0) == 0xE0;
     }
-    
+
     @Override
     public IPv4Address and(IPv4Address other) {
         Preconditions.checkNotNull(other, "other must not be null");
@@ -319,11 +319,11 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         return res.toString();
     }
 
-    public void write4Bytes(ChannelBuffer c) {
+    public void write4Bytes(ByteBuf c) {
         c.writeInt(rawValue);
     }
 
-    public static IPv4Address read4Bytes(ChannelBuffer c) {
+    public static IPv4Address read4Bytes(ByteBuf c) {
         return IPv4Address.of(c.readInt());
     }
 
@@ -365,7 +365,7 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeInt(rawValue);
     }
 }
