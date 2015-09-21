@@ -2,7 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
@@ -71,12 +71,12 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
         return true;
     }
 
-    public void write16Bytes(ChannelBuffer cb) {
+    public void write16Bytes(ByteBuf cb) {
         cb.writeLong(raw1);
         cb.writeLong(raw2);
     }
 
-    public static U128 read16Bytes(ChannelBuffer cb) {
+    public static U128 read16Bytes(ByteBuf cb) {
         long raw1 = cb.readLong();
         long raw2 = cb.readLong();
         return of(raw1, raw2);

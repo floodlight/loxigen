@@ -2,7 +2,7 @@ package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
 
-import org.jboss.netty.buffer.ChannelBuffers;
+import io.netty.buffer.Unpooled;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -74,7 +74,7 @@ public class MacAddressTest {
     @Test
     public void testReadFrom() throws OFParseError {
         for(int i=0; i < testAddresses.length; i++ ) {
-            MacAddress ip = MacAddress.read6Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
+            MacAddress ip = MacAddress.read6Bytes(Unpooled.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());

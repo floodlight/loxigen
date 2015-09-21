@@ -17,7 +17,7 @@
 
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -79,13 +79,13 @@ public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeByte(getInt());
     }
 
     private static class Reader implements OFMessageReader<OFBooleanValue> {
         @Override
-        public OFBooleanValue readFrom(ChannelBuffer bb) throws OFParseError {
+        public OFBooleanValue readFrom(ByteBuf bb) throws OFParseError {
             return of(bb.readByte() != 0);
         }
     }

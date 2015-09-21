@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -530,19 +530,19 @@ public class OFPort implements OFValueType<OFPort> {
         return result;
     }
 
-    public void write2Bytes(ChannelBuffer c) {
+    public void write2Bytes(ByteBuf c) {
         c.writeShort(this.portNumber);
     }
 
-    public static OFPort read2Bytes(ChannelBuffer c) throws OFParseError {
+    public static OFPort read2Bytes(ByteBuf c) throws OFParseError {
         return OFPort.ofShort(c.readShort());
     }
 
-    public void write4Bytes(ChannelBuffer c) {
+    public void write4Bytes(ByteBuf c) {
         c.writeInt(this.portNumber);
     }
 
-    public static OFPort read4Bytes(ChannelBuffer c) throws OFParseError {
+    public static OFPort read4Bytes(ByteBuf c) throws OFParseError {
         return OFPort.of((int)(c.readUnsignedInt() & 0xFFFFFFFF));
     }
 

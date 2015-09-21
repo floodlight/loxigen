@@ -1,8 +1,9 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+
 import java.util.Arrays;
 
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -86,15 +87,15 @@ public class VlanVid implements OFValueType<VlanVid> {
         return Arrays.copyOf(bytesCache, bytesCache.length);
     }
 
-    public void write2Bytes(ChannelBuffer c) {
+    public void write2Bytes(ByteBuf c) {
         c.writeShort(this.vid);
     }
 
-    public void write2BytesOF10(ChannelBuffer c) {
+    public void write2BytesOF10(ByteBuf c) {
         c.writeShort(this.getVlan());
     }
 
-    public static VlanVid read2Bytes(ChannelBuffer c) throws OFParseError {
+    public static VlanVid read2Bytes(ByteBuf c) throws OFParseError {
         return VlanVid.ofVlan(c.readShort());
     }
 

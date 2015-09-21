@@ -1,8 +1,8 @@
 package org.projectfloodlight.openflow.protocol;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 public interface OFMessageReader<T> {
-    T readFrom(ChannelBuffer bb) throws OFParseError;
+    T readFrom(ByteBuf bb) throws OFParseError;
 }

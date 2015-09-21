@@ -19,7 +19,7 @@ package org.projectfloodlight.openflow.types;
 
 import java.math.BigInteger;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -118,7 +118,7 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeLong(raw);
     }
 
@@ -174,7 +174,7 @@ public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
 
     private static class Reader implements OFMessageReader<U64> {
         @Override
-        public U64 readFrom(ChannelBuffer bb) throws OFParseError {
+        public U64 readFrom(ByteBuf bb) throws OFParseError {
             return U64.ofRaw(bb.readLong());
         }
     }

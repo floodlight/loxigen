@@ -45,7 +45,7 @@ public class ${class_name} {
     public final static ${int_wire_type} ${entry.name}_VAL = ${entry.format_value(version)};
     //:: #endfor
 
-    public static Set<${enum.name}> readFrom(ChannelBuffer bb) throws OFParseError {
+    public static Set<${enum.name}> readFrom(ByteBuf bb) throws OFParseError {
         try {
             return ofWireValue(${wire_type.read_op(version)});
         } catch (IllegalArgumentException e) {
@@ -53,7 +53,7 @@ public class ${class_name} {
         }
     }
 
-    public static void writeTo(ChannelBuffer bb, Set<${enum.name}> set) {
+    public static void writeTo(ByteBuf bb, Set<${enum.name}> set) {
         ${wire_type.write_op(version=version, name="toWireValue(set)")};
     }
 

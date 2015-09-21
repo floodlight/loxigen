@@ -3,7 +3,7 @@ package org.projectfloodlight.openflow.protocol.ver10;
 import java.util.EnumSet;
 import java.util.Set;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.match.Match;
@@ -11,17 +11,17 @@ import org.projectfloodlight.openflow.protocol.match.Match;
 import com.google.common.hash.PrimitiveSink;
 
 /**
- * Collection of helper functions for reading and writing into ChannelBuffers
+ * Collection of helper functions for reading and writing into Unpooled
  *
  * @author capveg
  */
 
 public class ChannelUtilsVer10 {
-    public static Match readOFMatch(final ChannelBuffer bb) throws OFParseError {
+    public static Match readOFMatch(final ByteBuf bb) throws OFParseError {
         return OFMatchV1Ver10.READER.readFrom(bb);
     }
 
-    public static Set<OFActionType> readSupportedActions(ChannelBuffer bb) {
+    public static Set<OFActionType> readSupportedActions(ByteBuf bb) {
         int actions = bb.readInt();
         EnumSet<OFActionType> supportedActions = EnumSet.noneOf(OFActionType.class);
         if ((actions & (1 << OFActionTypeSerializerVer10.OUTPUT_VAL)) != 0)
@@ -84,7 +84,7 @@ public class ChannelUtilsVer10 {
         sink.putInt(supportedActionsToWire(supportedActions));
     }
 
-    public static void writeSupportedActions(ChannelBuffer bb, Set<OFActionType> supportedActions) {
+    public static void writeSupportedActions(ByteBuf bb, Set<OFActionType> supportedActions) {
         bb.writeInt(supportedActionsToWire(supportedActions));
     }
 

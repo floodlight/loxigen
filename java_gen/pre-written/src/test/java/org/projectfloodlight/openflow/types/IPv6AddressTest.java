@@ -1,6 +1,13 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import io.netty.buffer.Unpooled;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
@@ -8,7 +15,6 @@ import java.net.UnknownHostException;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -277,7 +283,7 @@ public class IPv6AddressTest {
     public void testReadFrom() throws OFParseError, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
-            IPv6Address ip = IPv6Address.read16Bytes(ChannelBuffers.copiedBuffer(bytes));
+            IPv6Address ip = IPv6Address.read16Bytes(Unpooled.copiedBuffer(bytes));
             assertEquals(testStrings[i], ip.toString());
             assertArrayEquals(bytes, ip.getBytes());
         }

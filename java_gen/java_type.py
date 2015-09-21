@@ -88,7 +88,7 @@ class VersionOp:
 class JType(object):
     """ Wrapper class to hold C to Java type conversion information. JTypes can have a 'public'
         and or 'private' java type associated with them and can define how those types can be
-        read from and written to ChannelBuffers.
+        read from and written to ByteBufs.
 
     """
     def __init__(self, pub_type, priv_type=None):
@@ -163,7 +163,7 @@ class JType(object):
             return reduce(lambda a,repl: a.replace("$%s" % repl[0], str(repl[1])),  arguments.items(), _op)
 
     def read_op(self, version=None, length=None, pub_type=True):
-        """ return a Java stanza that reads a value of this JType from ChannelBuffer bb.
+        """ return a Java stanza that reads a value of this JType from ByteBuf bb.
         @param version int - OF wire version to generate expression for
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
         @param length string, for operations that need it (e.g., read a list of unknown length)
@@ -184,7 +184,7 @@ class JType(object):
 
     def write_op(self, version=None, name=None, pub_type=True):
         """ return a Java stanza that writes a value of this JType contained in Java expression
-        'name' to ChannelBuffer bb.
+        'name' to ByteBuf bb.
         @param name string containing Java expression that evaluations to the value to be written
         @param version int - OF wire version to generate expression for
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
@@ -208,7 +208,7 @@ class JType(object):
         )
 
     def skip_op(self, version=None, length=None):
-        """ return a java stanza that skips an instance of JType in the input ChannelBuffer 'bb'.
+        """ return a java stanza that skips an instance of JType in the input ByteBuf 'bb'.
             This is used in the Reader implementations for virtual classes (because after the
             discriminator field, the concrete Reader instance will re-read all the fields)
             Currently just delegates to read_op + throws away the result."""
@@ -259,7 +259,7 @@ def gen_enum_jtype(java_name, is_bitmask=False):
 
 def gen_list_jtype(java_base_name):
     # read op assumes the class has a public final static field READER that implements
-    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
+    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ByteBuf
     # write op assumes class implements Writeable
     return JType("List<{}>".format(java_base_name)) \
         .op(

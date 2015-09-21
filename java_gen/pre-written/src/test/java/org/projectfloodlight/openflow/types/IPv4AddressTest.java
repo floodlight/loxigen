@@ -8,13 +8,13 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import io.netty.buffer.Unpooled;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
 
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -307,7 +307,7 @@ public class IPv4AddressTest {
     @Test
     public void testReadFrom() throws OFParseError {
         for(int i=0; i < testAddresses.length; i++ ) {
-            IPv4Address ip = IPv4Address.read4Bytes(ChannelBuffers.copiedBuffer(testAddresses[i]));
+            IPv4Address ip = IPv4Address.read4Bytes(Unpooled.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getInt());
             assertArrayEquals(testAddresses[i], ip.getBytes());
             assertEquals(testStrings[i], ip.toString());
