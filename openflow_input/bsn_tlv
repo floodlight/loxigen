@@ -552,3 +552,21 @@ struct of_bsn_tlv_ipv6 : of_bsn_tlv {
     uint16_t length;
     of_ipv6_t value; 
 };
+
+enum ofp_bsn_decap(wire_type=uint16_t) {
+    OFP_BSN_DECAP_VXLAN = 0,
+    OFP_BSN_DECAP_ERSPAN = 1,
+    OFP_BSN_DECAP_L2_GRE = 2,
+    OFP_BSN_DECAP_NVGRE = 3,
+    OFP_BSN_DECAP_CAPWAP = 4,
+    OFP_BSN_DECAP_L2_MPLS = 5,
+    OFP_BSN_DECAP_L3_GRE = 6,
+    OFP_BSN_DECAP_GTP = 7,
+    OFP_BSN_DECAP_L3_MPLS = 8,
+};
+
+struct of_bsn_tlv_decap : of_bsn_tlv {
+    uint16_t type == 85;
+    uint16_t length;
+    enum ofp_bsn_decap value;
+};
