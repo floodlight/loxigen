@@ -592,3 +592,38 @@ struct of_bsn_tlv_port_vxlan_mode : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_port_vxlan_mode value;
 };
+
+enum ofp_bsn_rate_unit(wire_type=uint8_t) {
+    OFP_BSN_RATE_UNIT_PPS = 0, /* Packets per second */
+    OFP_BSN_RATE_UNIT_KBITPS = 1, /* Kilobits per second */
+};
+
+struct of_bsn_tlv_rate_unit : of_bsn_tlv {
+    uint16_t type == 89;
+    uint16_t length;
+    enum ofp_bsn_rate_unit value;
+};
+
+struct of_bsn_tlv_broadcast_rate : of_bsn_tlv {
+    uint16_t type == 90;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_known_multicast_rate : of_bsn_tlv {
+    uint16_t type == 91;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_unknown_multicast_rate : of_bsn_tlv {
+    uint16_t type == 92;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_unicast_rate : of_bsn_tlv {
+    uint16_t type == 93;
+    uint16_t length;
+    uint32_t value;
+};
