@@ -47,4 +47,6 @@ enum ofp_bsn_pktin_flag(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_PKTIN_FLAG_SFLOW = 0x800,
     OFP_BSN_PKTIN_FLAG_ARP_CACHE = 0x1000,
     OFP_BSN_PKTIN_FLAG_ARP_TARGET = 0x2000,
+    OFP_BSN_PKTIN_FLAG_IGMP = 0x4000,
+    OFP_BSN_PKTIN_FLAG_PIM = 0x8000,
 };
