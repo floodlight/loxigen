@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
@@ -10,8 +11,6 @@ import org.projectfloodlight.openflow.util.HexString;
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
-
-import io.netty.buffer.ByteBuf;
 
 /**
  * Wrapper around a 6 byte mac address.
@@ -38,8 +37,10 @@ public class MacAddress implements OFValueType<MacAddress> {
            MacAddress.of("01:00:5E:00:00:00");
 
     private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
-            "It must consist of 6 hex digit pairs separated by colons: ";
+            "It must consist of 6 hex digit pairs separated by colons or hyphens: ";
     private static final int MAC_STRING_LENGTH = 6 * 2 + 5;
+
+    private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$");
 
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
@@ -65,26 +66,25 @@ public class MacAddress implements OFValueType<MacAddress> {
         return new MacAddress(raw);
     }
 
-    /** Parse a mac adress from the canonical string representation as
-     *  6 hex bytes separated by colons (01:02:03:04:05:06).
+    /** Parse a mac adress from a string representation as
+     *  6 hex bytes separated by colons or hyphens (01:02:03:04:05:06,
+     *  01-02-03-04-05-06).
      *
-     * @param macString - a mac address in canonical string representation
+     * @param macString - a mac address in string representation
      * @return the parsed MacAddress
      * @throws IllegalArgumentException if macString is not a valid mac adddress
      */
     @Nonnull
     public static MacAddress of(@Nonnull final String macString) throws IllegalArgumentException {
-        if (macString == null) {
-            throw new NullPointerException("macString must not be null");
-        }
+        Preconditions.checkNotNull(macString, "macStringmust not be null");
+        Preconditions.checkArgument(macString.length() == MAC_STRING_LENGTH,
+                FORMAT_ERROR + macString);
+        Preconditions.checkArgument(MAC_ADDRESS_PATTERN.matcher(macString).matches(),
+                                    FORMAT_ERROR + macString);
 
         int index = 0;
         int shift = 40;
         long raw = 0;
-
-        if (macString.length() != MAC_STRING_LENGTH) {
-            throw new IllegalArgumentException(FORMAT_ERROR + macString);
-        }
 
         while (shift >= 0) {
             int digit1 = Character.digit(macString.charAt(index++), 16);
@@ -93,10 +93,13 @@ public class MacAddress implements OFValueType<MacAddress> {
                 throw new IllegalArgumentException(FORMAT_ERROR + macString);
             raw |= ((long) (digit1 << 4 | digit2)) << shift;
 
-            if (shift == 0)
+            if (shift == 0) {
                 break;
-            if (macString.charAt(index++) != ':')
-                throw new IllegalArgumentException(FORMAT_ERROR + macString);
+            }
+
+            // Iterate over separators
+            index++;
+
             shift -= 8;
         }
         return MacAddress.of(raw);

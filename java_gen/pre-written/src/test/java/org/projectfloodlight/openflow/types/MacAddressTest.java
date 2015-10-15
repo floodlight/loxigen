@@ -2,7 +2,6 @@ package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
 
-import io.netty.buffer.Unpooled;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -25,7 +24,7 @@ public class MacAddressTest {
     String[] testStrings = {
             "01:02:03:04:05:06",
             "80:00:00:00:00:01",
-            "ff:ff:ff:ff:ff:ff"
+            "ff-ff-ff-ff-ff-ff",
     };
 
     long[] testInts = {
@@ -43,7 +42,14 @@ public class MacAddressTest {
             "00:fff:ef:12:12:ff",
             "01:02:03:04:05;06",
             "0:1:2:3:4:5:6",
-            "01:02:03:04"
+            "01-02-03-04",
+            "0T-00-01-02-03-04",
+            "00-01-02-03-04-05-06",
+            "00-ff-ef-12-12-ff-",
+            "00-fff-ef-12-12-ff",
+            "01-02-03-04-05:06",
+            "0-1-2-3-4-5-6",
+            "01-02-03-04",
     };
 
     byte[][] invalidMacBytes = {
@@ -157,8 +163,7 @@ public class MacAddressTest {
 
     @Test
 
-    public void testForIPv4MulticastAddress()
-    {
+    public void testForIPv4MulticastAddress() {
         IPv4Address ip = IPv4Address.of("224.1.1.1");
         MacAddress mac = MacAddress.forIPv4MulticastAddress(ip);
         MacAddress expectedMac = MacAddress.of("01:00:5E:01:01:01");
@@ -189,7 +194,7 @@ public class MacAddressTest {
         expectedMac = MacAddress.of("01:00:5E:01:02:03");
         assertTrue(mac.equals(expectedMac));
     }
-    
+
     public void testOfDatapathid() {
         MacAddress mac = MacAddress.of(DatapathId.NONE);
         assertThat(mac, is(MacAddress.NONE));
