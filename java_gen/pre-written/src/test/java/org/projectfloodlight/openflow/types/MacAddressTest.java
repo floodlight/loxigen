@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.Unpooled;
+
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -21,11 +23,17 @@ public class MacAddressTest {
             {(byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255, (byte) 255 }
     };
 
-    String[] testStrings = {
+    String[] testColonStrings = {
             "01:02:03:04:05:06",
             "80:00:00:00:00:01",
-            "ff-ff-ff-ff-ff-ff",
+            "ff:ff:ff:ff:ff:ff",
     };
+
+    String[] testHyphenStrings = {
+             "01-02-03-04-05-06",
+             "80-00-00-00-00-01",
+             "ff-ff-ff-ff-ff-ff",
+     };
 
     long[] testInts = {
             0x00010203040506L,
@@ -42,14 +50,7 @@ public class MacAddressTest {
             "00:fff:ef:12:12:ff",
             "01:02:03:04:05;06",
             "0:1:2:3:4:5:6",
-            "01-02-03-04",
-            "0T-00-01-02-03-04",
-            "00-01-02-03-04-05-06",
-            "00-ff-ef-12-12-ff-",
-            "00-fff-ef-12-12-ff",
-            "01-02-03-04-05:06",
-            "0-1-2-3-4-5-6",
-            "01-02-03-04",
+            "01-02-03-04"
     };
 
     byte[][] invalidMacBytes = {
@@ -59,11 +60,16 @@ public class MacAddressTest {
 
     @Test
     public void testOfString() {
+        testOfStringForArray(testColonStrings);
+        testOfStringForArray(testColonStrings);
+    }
+
+    private void testOfStringForArray(String [] strings) {
         for(int i=0; i < testAddresses.length; i++ ) {
-            MacAddress ip = MacAddress.of(testStrings[i]);
+            MacAddress ip = MacAddress.of(strings[i]);
             assertEquals(testInts[i], ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
-            assertEquals(testStrings[i], ip.toString());
+            assertEquals(strings[i], ip.toString());
         }
     }
 
@@ -73,7 +79,7 @@ public class MacAddressTest {
             MacAddress ip = MacAddress.of(testAddresses[i]);
             assertEquals("error checking long representation of "+Arrays.toString(testAddresses[i]) + "(should be "+Long.toHexString(testInts[i]) +")", testInts[i],  ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
-            assertEquals(testStrings[i], ip.toString());
+            assertEquals(testColonStrings[i], ip.toString());
         }
     }
 
@@ -83,7 +89,7 @@ public class MacAddressTest {
             MacAddress ip = MacAddress.read6Bytes(Unpooled.copiedBuffer(testAddresses[i]));
             assertEquals(testInts[i], ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
-            assertEquals(testStrings[i], ip.toString());
+            assertEquals(testColonStrings[i], ip.toString());
         }
     }
 
@@ -199,7 +205,7 @@ public class MacAddressTest {
         MacAddress mac = MacAddress.of(DatapathId.NONE);
         assertThat(mac, is(MacAddress.NONE));
 
-        for (String s : testStrings) {
+        for (String s : testColonStrings) {
             DatapathId dpid = DatapathId.of("00:00:" + s);
             mac = MacAddress.of(dpid);
             assertThat(mac, is(MacAddress.of(s)));

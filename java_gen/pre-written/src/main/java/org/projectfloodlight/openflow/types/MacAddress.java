@@ -12,6 +12,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  * Wrapper around a 6 byte mac address.
  *
@@ -19,6 +21,9 @@ import com.google.common.primitives.Longs;
  */
 
 public class MacAddress implements OFValueType<MacAddress> {
+
+    private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9Aa-f-F]{2})$");
+
     static final int MacAddrLen = 6;
     private final long rawValue;
 
@@ -40,7 +45,6 @@ public class MacAddress implements OFValueType<MacAddress> {
             "It must consist of 6 hex digit pairs separated by colons or hyphens: ";
     private static final int MAC_STRING_LENGTH = 6 * 2 + 5;
 
-    private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$");
 
     private MacAddress(final long rawValue) {
         this.rawValue = rawValue;
