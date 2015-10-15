@@ -627,3 +627,8 @@ struct of_bsn_tlv_unicast_rate : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_nexthop_type_vxlan : of_bsn_tlv {
+    uint16_t type == 94;
+    uint16_t length;
+};
