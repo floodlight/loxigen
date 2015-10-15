@@ -1,8 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
-
 import javax.annotation.Nonnull;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -21,8 +19,6 @@ import io.netty.buffer.ByteBuf;
  */
 
 public class MacAddress implements OFValueType<MacAddress> {
-
-    private static final Pattern MAC_ADDRESS_PATTERN = Pattern.compile("^([0-9A-Fa-f]{2}[:-]){5}([0-9Aa-f-F]{2})$");
 
     static final int MacAddrLen = 6;
     private final long rawValue;
@@ -83,8 +79,9 @@ public class MacAddress implements OFValueType<MacAddress> {
         Preconditions.checkNotNull(macString, "macStringmust not be null");
         Preconditions.checkArgument(macString.length() == MAC_STRING_LENGTH,
                 FORMAT_ERROR + macString);
-        Preconditions.checkArgument(MAC_ADDRESS_PATTERN.matcher(macString).matches(),
-                                    FORMAT_ERROR + macString);
+        final char separator = macString.charAt(2);
+        Preconditions.checkArgument(separator == ':' || separator == '0',
+                FORMAT_ERROR + macString + " (invalid separator)");
 
         int index = 0;
         int shift = 40;
@@ -102,7 +99,10 @@ public class MacAddress implements OFValueType<MacAddress> {
             }
 
             // Iterate over separators
-            index++;
+            if (macString.charAt(index++) != separator) {
+                throw new IllegalArgumentException(FORMAT_ERROR + macString +
+                                                   " (inconsistent separators");
+            }
 
             shift -= 8;
         }
