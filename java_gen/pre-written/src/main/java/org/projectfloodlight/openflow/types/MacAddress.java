@@ -80,7 +80,7 @@ public class MacAddress implements OFValueType<MacAddress> {
         Preconditions.checkArgument(macString.length() == MAC_STRING_LENGTH,
                 FORMAT_ERROR + macString);
         final char separator = macString.charAt(2);
-        Preconditions.checkArgument(separator == ':' || separator == '0',
+        Preconditions.checkArgument(separator == ':' || separator == '-',
                 FORMAT_ERROR + macString + " (invalid separator)");
 
         int index = 0;
