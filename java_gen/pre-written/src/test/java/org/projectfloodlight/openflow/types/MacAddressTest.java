@@ -62,7 +62,7 @@ public class MacAddressTest {
     @Test
     public void testOfString() {
         testOfStringForArray(testColonStrings);
-        testOfStringForArray(testColonStrings);
+        testOfStringForArray(testHyphenStrings);
     }
 
     private void testOfStringForArray(String [] strings) {
@@ -70,7 +70,6 @@ public class MacAddressTest {
             MacAddress ip = MacAddress.of(strings[i]);
             assertEquals(testInts[i], ip.getLong());
             assertArrayEquals(testAddresses[i], ip.getBytes());
-            assertEquals(strings[i], ip.toString());
         }
     }
 
