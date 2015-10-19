@@ -550,7 +550,7 @@ struct of_bsn_tlv_negate : of_bsn_tlv {
 struct of_bsn_tlv_ipv6 : of_bsn_tlv {
     uint16_t type == 84;
     uint16_t length;
-    of_ipv6_t value; 
+    of_ipv6_t value;
 };
 
 enum ofp_bsn_decap(wire_type=uint16_t) {
@@ -631,4 +631,10 @@ struct of_bsn_tlv_unicast_rate : of_bsn_tlv {
 struct of_bsn_tlv_nexthop_type_vxlan : of_bsn_tlv {
     uint16_t type == 94;
     uint16_t length;
+};
+
+struct of_bsn_tlv_multicast_interface_id : of_bsn_tlv {
+    uint16_t type == 95;
+    uint16_t length;
+    uint32_t value;
 };
