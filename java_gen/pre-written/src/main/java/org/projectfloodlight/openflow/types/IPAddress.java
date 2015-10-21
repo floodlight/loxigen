@@ -3,6 +3,7 @@ package org.projectfloodlight.openflow.types;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.annotation.Nonnull;
 
@@ -111,6 +112,19 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract byte[] getBytes();
 
+    /**
+     * Returns an {@link InetAddress} object representing this IP address.
+     *
+     * <p>The resulting {@link InetAddress} object:
+     * <ul>
+     * <li>will not carry a hostname
+     * <li>will not carry a non-zero scope ID or scoped interface,
+     *     in the case of {@link Inet6Address}
+     * </ul>
+     */
+    @Nonnull
+    public abstract InetAddress toInetAddress();
+
     @Override
     public abstract String toString();
 
@@ -168,5 +182,27 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     @Nonnull
     public static IPAddress<?> fromInetAddress(@Nonnull InetAddress address) {
         return of(address);
+    }
+
+    @Nonnull
+    protected <T extends InetAddress> T toInetAddressSubclassChecked(
+            @Nonnull Class<T> expected) {
+        InetAddress inetAddress;
+        try {
+            inetAddress = InetAddress.getByAddress(getBytes());
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(
+                    "Error getting InetAddress for the IPAddress " + this, e);
+        }
+        if (inetAddress == null) {
+            throw new NullPointerException(
+                    "Null InetAddress returned for the IPAddress " + this);
+        }
+        try {
+            return expected.cast(inetAddress);
+        } catch (ClassCastException e) {
+            throw new ClassCastException(
+                    e.getMessage() + " for the IPAddress " + this);
+        }
     }
 }

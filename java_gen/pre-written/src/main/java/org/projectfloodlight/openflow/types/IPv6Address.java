@@ -428,6 +428,12 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return LENGTH;
     }
 
+    @Nonnull
+    @Override
+    public Inet6Address toInetAddress() {
+        return toInetAddressSubclassChecked(Inet6Address.class);
+    }
+
     @Override
     public String toString() {
         return toString(true, false);

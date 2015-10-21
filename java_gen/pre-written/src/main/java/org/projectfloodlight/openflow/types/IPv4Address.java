@@ -309,6 +309,12 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         return LENGTH;
     }
 
+    @Nonnull
+    @Override
+    public Inet4Address toInetAddress() {
+        return toInetAddressSubclassChecked(Inet4Address.class);
+    }
+
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
