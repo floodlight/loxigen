@@ -168,6 +168,38 @@ public class IPAddressTest {
     }
 
     @Test
+    public void testIsLoopback() {
+        List<String> loopbacks = ImmutableList.of(
+                "127.0.0.0",
+                "127.0.0.1",
+                "127.0.0.2",
+                "127.0.0.255",
+                "127.1.2.3",
+                "127.101.102.103",
+                "127.201.202.203",
+                "127.255.255.255",
+                "::1");
+        for (String loopback : loopbacks) {
+            assertThat(IPAddress.of(loopback).isLoopback(), is(true));
+        }
+        List<String> others = ImmutableList.of(
+                "0.0.0.0",
+                "0.0.0.1",
+                "10.0.0.1",
+                "126.255.255.255",
+                "128.0.0.0",
+                "255.255.255.255",
+                "::",
+                "::2",
+                "2001:db8::1:2:3:4",
+                "fe80:7:6:5:4:3:2:1",
+                "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
+        for (String other : others) {
+            assertThat(IPAddress.of(other).isLoopback(), is(false));
+        }
+    }
+
+    @Test
     public void testMulticastIp() {
         IPAddress<?> ip0 = IPAddress.of("240.2.3.4");
         IPAddress<?> ip1 = IPAddress.of("224.0.1.1");

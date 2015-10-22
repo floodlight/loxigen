@@ -92,6 +92,11 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
+    public boolean isLoopback() {
+        return ((rawValue >>> 24) & 0xFF) == 127;
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
     }

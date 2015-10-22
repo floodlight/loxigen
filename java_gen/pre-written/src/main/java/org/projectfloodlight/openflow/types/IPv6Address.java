@@ -117,6 +117,11 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     @Override
+    public boolean isLoopback() {
+        return raw1 == 0 && raw2 == 1;
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
     }

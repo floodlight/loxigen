@@ -46,6 +46,17 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract boolean isUnspecified();
 
     /**
+     * Returns {@code true} if the IPAddress is a loopback address.
+     *
+     * <p><em>Loopback</em> addresses refer to:
+     * <ul>
+     * <li>any {@link IPv4Address} within {@code 127.0.0.0/8}
+     * <li>the {@link IPv6Address} of {@code ::1}
+     * </ul>
+     */
+    public abstract boolean isLoopback();
+
+    /**
      * Checks if the IPAddress is the global broadcast address
      * 255.255.255.255 in case of IPv4
      * @return boolean true or false
