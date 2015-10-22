@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -431,7 +432,12 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     @Nonnull
     @Override
     public Inet6Address toInetAddress() {
-        return toInetAddressSubclassChecked(Inet6Address.class);
+        try {
+            return (Inet6Address) InetAddress.getByAddress(getBytes());
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(
+                    "Error getting InetAddress for the IPAddress " + this, e);
+        }
     }
 
     @Override
