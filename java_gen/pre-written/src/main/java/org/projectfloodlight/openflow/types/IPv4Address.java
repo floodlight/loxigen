@@ -87,6 +87,11 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
+    public boolean isUnspecified() {
+        return this.equals(NONE);
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
     }

@@ -34,12 +34,23 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract int asCidrMaskLength();
 
     /**
+     * Returns {@code true} if the IPAddress is unspecified.
+     *
+     * <p>The <em>unspecified</em> addresses, also known as the
+     * <em>wildcard</em> addresses, refer to:
+     * <ul>
+     * <li>the {@link IPv4Address} of {@code 0.0.0.0}
+     * <li>the {@link IPv6Address} of {@code ::}
+     * </ul>
+     */
+    public abstract boolean isUnspecified();
+
+    /**
      * Checks if the IPAddress is the global broadcast address
      * 255.255.255.255 in case of IPv4
      * @return boolean true or false
      */
     public abstract boolean isBroadcast();
-
 
     /**
      * Checks if the IPAddress is the multicast address

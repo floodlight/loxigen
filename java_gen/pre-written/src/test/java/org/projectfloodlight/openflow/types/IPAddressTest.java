@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -8,8 +10,11 @@ import static org.junit.Assert.fail;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.List;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 /**
  * Most tests are in IPv4AddressTest and IPv6AddressTest
@@ -137,6 +142,28 @@ public class IPAddressTest {
             fail("Should have thrown NullPointerException");
         } catch (NullPointerException e) {
             assertNotNull(e.getMessage());
+        }
+    }
+
+    @Test
+    public void testIsUnspecified() {
+        IPAddress<?> unspecifiedV4 = IPAddress.of("0.0.0.0");
+        IPAddress<?> unspecifiedV6 = IPAddress.of("::");
+        assertThat(unspecifiedV4.isUnspecified(), is(true));
+        assertThat(unspecifiedV6.isUnspecified(), is(true));
+        List<String> others = ImmutableList.of(
+                "0.0.0.1",
+                "1.2.3.4",
+                "10.0.0.0",
+                "127.0.0.1",
+                "255.255.255.255",
+                "::1",
+                "2001:db8:1:2::5:6",
+                "fc00::4:5:6:7",
+                "fe80::1234",
+                "ff02::1");
+        for (String other : others) {
+            assertThat(IPAddress.of(other).isUnspecified(), is(false));
         }
     }
 
