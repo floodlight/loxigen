@@ -92,6 +92,16 @@ public class IPAddressTest {
     }
 
     @Test
+    public void testToInetAddress() throws Exception {
+        IPAddress<?> ip0 = IPAddress.of("201.202.3.4");
+        IPAddress<?> ip1 = IPAddress.of("2001:db8:abcd::1:2:3:4");
+        InetAddress ia0 = ip0.toInetAddress();
+        InetAddress ia1 = ip1.toInetAddress();
+        assertEquals(ia0, InetAddress.getByName("201.202.3.4"));
+        assertEquals(ia1, InetAddress.getByName("2001:db8:abcd:0:1:2:3:4"));
+    }
+
+    @Test
     public void testContains() {
 
         // Test IPv4 Mask

@@ -111,6 +111,19 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      */
     public abstract byte[] getBytes();
 
+    /**
+     * Returns an {@link InetAddress} object representing this IP address.
+     *
+     * <p>The resulting {@link InetAddress} object:
+     * <ul>
+     * <li>will not carry a hostname
+     * <li>will not carry a non-zero scope ID or scoped interface,
+     *     in the case of {@link Inet6Address}
+     * </ul>
+     */
+    @Nonnull
+    public abstract InetAddress toInetAddress();
+
     @Override
     public abstract String toString();
 
