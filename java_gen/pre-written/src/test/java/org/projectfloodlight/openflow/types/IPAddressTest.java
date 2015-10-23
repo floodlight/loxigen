@@ -200,6 +200,39 @@ public class IPAddressTest {
     }
 
     @Test
+    public void testIsLinkLocal() {
+        List<String> linkLocals = ImmutableList.of(
+                "169.254.0.0",
+                "169.254.0.1",
+                "169.254.1.2",
+                "169.254.101.102",
+                "169.254.201.202",
+                "169.254.255.255",
+                "fe80::",
+                "fe80::1",
+                "fe80::1:2:3:4:5:6:7",
+                "fe80:aaaa:bbbb:cccc:dddd:eeee:ffff:1234",
+                "febf::",
+                "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff");
+        for (String linkLocal : linkLocals) {
+            assertThat(IPAddress.of(linkLocal).isLinkLocal(), is(true));
+        }
+        List<String> others = ImmutableList.of(
+                "0.0.0.0",
+                "1.2.3.4",
+                "169.253.255.255",
+                "169.255.0.0",
+                "255.255.255.255",
+                "::",
+                "fe7f:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+                "fec0::",
+                "ff02::1");
+        for (String other : others) {
+            assertThat(IPAddress.of(other).isLinkLocal(), is(false));
+        }
+    }
+
+    @Test
     public void testMulticastIp() {
         IPAddress<?> ip0 = IPAddress.of("240.2.3.4");
         IPAddress<?> ip1 = IPAddress.of("224.0.1.1");

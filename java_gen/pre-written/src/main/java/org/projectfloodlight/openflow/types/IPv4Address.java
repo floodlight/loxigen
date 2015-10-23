@@ -97,6 +97,12 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
+    public boolean isLinkLocal() {
+        return ((rawValue >>> 24) & 0xFF) == 169
+                && ((rawValue >>> 16) & 0xFF) == 254;
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
     }

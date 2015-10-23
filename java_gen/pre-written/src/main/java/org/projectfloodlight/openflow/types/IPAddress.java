@@ -57,6 +57,17 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract boolean isLoopback();
 
     /**
+     * Returns {@code true} if the IPAddress is a link local address.
+     *
+     * <p><em>Link local</em> addresses refer to:
+     * <ul>
+     * <li>any {@link IPv4Address} within {@code 169.254.0.0/16}
+     * <li>any {@link IPv6Address} within {@code fe80::/10}
+     * </ul>
+     */
+    public abstract boolean isLinkLocal();
+
+    /**
      * Checks if the IPAddress is the global broadcast address
      * 255.255.255.255 in case of IPv4
      * @return boolean true or false
