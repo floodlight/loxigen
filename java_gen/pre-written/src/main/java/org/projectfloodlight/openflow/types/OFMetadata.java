@@ -66,7 +66,7 @@ public class OFMetadata implements OFValueType<OFMetadata> {
 
     @Override
     public String toString() {
-        return "Metadata: " + u64.toString();
+        return u64.toString();
     }
 
     @Override
