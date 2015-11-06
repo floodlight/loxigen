@@ -638,3 +638,9 @@ struct of_bsn_tlv_multicast_interface_id : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_use_packet_state : of_bsn_tlv {
+    uint16_t type == 96;
+    uint16_t length;
+    uint8_t value;
+};
