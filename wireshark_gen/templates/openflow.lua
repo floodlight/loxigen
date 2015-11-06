@@ -39,7 +39,7 @@
 
 :: include('_ofreader.lua')
 
-p_of = Proto ("of", "OpenFlow")
+p_of = Proto ("of", "OpenFlow (LOXI)")
 ethernet_dissector = Dissector.get("eth")
 
 current_pkt = nil
