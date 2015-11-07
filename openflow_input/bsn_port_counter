@@ -60,6 +60,8 @@ enum ofp_bsn_port_counter(wire_type=uint8_t, complete=False, stable=True) {
   OFP_BSN_PORT_COUNTER_RX_OVERFLOW_ERRORS = 25,
   OFP_BSN_PORT_COUNTER_TX_CARRIER_ERRORS = 26,
   OFP_BSN_PORT_COUNTER_RX_PACKETS_BAD_VLAN = 27,
+  OFP_BSN_PORT_COUNTER_LINK_UP = 28,
+  OFP_BSN_PORT_COUNTER_LINK_DOWN = 29,
 };
 
 struct of_bsn_port_counter_stats_request : of_bsn_stats_request {
