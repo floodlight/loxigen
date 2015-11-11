@@ -160,6 +160,26 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
                 | 0x0000_0000_00FF_FFFFL & macAddress.getLong();
     }
 
+    /**
+     * Returns {@code true} if the second (lower-order) 64-bit block of
+     * this address is equal to the Modified EUI-64 format interface
+     * identifier that corresponds to the specified MAC address.
+     *
+     * <p>Refer to the followings for the details of conversions between
+     * MAC addresses and Modified EUI-64 format interface identifiers:
+     * <ul>
+     * <li>RFC 7042 - Section 2.2.1
+     * <li>RFC 5342 - Section 2.2.1 (Obsoleted by RFC 7042)
+     * <li>RFC 4291 - Appendix A
+     * </ul>
+     *
+     * <p>This method assumes the second (lower-order) 64-bit block to be
+     * a 64-bit interface identifier, which may not always be true.
+     */
+    public boolean isDerivedFrom(@Nonnull MacAddress macAddress) {
+        return raw2 == toModifiedEui64(macAddress);
+    }
+
     @Override
     public IPv6Address and(IPv6Address other) {
         Preconditions.checkNotNull(other, "other must not be null");
