@@ -2,6 +2,8 @@ package org.projectfloodlight.openflow.types;
 
 import io.netty.buffer.ByteBuf;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -137,6 +139,25 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     @Override
     public boolean isMulticast() {
         return (raw1 >>> 56) == 0xFFL;
+    }
+
+    /**
+     * Returns the Modified EUI-64 format interface identifier that
+     * corresponds to the specified MAC address.
+     *
+     * <p>Refer to the followings for the conversion details:
+     * <ul>
+     * <li>RFC 7042 - Section 2.2.1
+     * <li>RFC 5342 - Section 2.2.1 (Obsoleted by RFC 7042)
+     * <li>RFC 4291 - Appendix A
+     * </ul>
+     */
+    private static long toModifiedEui64(@Nonnull MacAddress macAddress) {
+        checkNotNull(macAddress, "macAddress must not be null");
+        return    0xFFFF_FF00_0000_0000L & macAddress.getLong() << 16
+                ^ 0x0200_0000_0000_0000L
+                | 0x0000_00FF_FE00_0000L
+                | 0x0000_0000_00FF_FFFFL & macAddress.getLong();
     }
 
     @Override
