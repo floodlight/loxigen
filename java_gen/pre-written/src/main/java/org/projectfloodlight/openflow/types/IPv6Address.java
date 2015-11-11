@@ -413,13 +413,12 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
      * @throws IllegalArgumentException if the specified network does not
      *         meet the aforementioned requirements
      */
+    @Nonnull
     public static IPv6Address of(
             @Nonnull IPv6AddressWithMask network,
             @Nonnull MacAddress macAddress) {
 
         checkNotNull(network, "network must not be null");
-        checkNotNull(macAddress, "macAddress must not be null");
-
         checkArgument(network.getMask().isCidrMask()
                 && network.getMask().asCidrMaskLength() <= 64,
                 "network must consist of a mask of 64 or less leading 1 bits"
