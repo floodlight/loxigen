@@ -177,7 +177,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
      * <p>This method assumes the second (lower-order) 64-bit block to be
      * a 64-bit interface identifier, which may not always be true.
      */
-    public boolean isDerivedFrom(@Nonnull MacAddress macAddress) {
+    public boolean isModifiedEui64Derived(@Nonnull MacAddress macAddress) {
         return raw2 == toModifiedEui64(macAddress);
     }
 
