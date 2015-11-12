@@ -155,10 +155,10 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
      */
     private static long toModifiedEui64(@Nonnull MacAddress macAddress) {
         checkNotNull(macAddress, "macAddress must not be null");
-        return    (0xFFFF_FF00_0000_0000L & (macAddress.getLong() << 16))
-                ^ (0x0200_0000_0000_0000L)
+        return   ((0xFFFF_FF00_0000_0000L & (macAddress.getLong() << 16))
+                ^ (0x0200_0000_0000_0000L))
                 | (0x0000_00FF_FE00_0000L)
-                | (0x0000_0000_00FF_FFFFL & (macAddress.getLong()));
+                | (0x0000_0000_00FF_FFFFL & macAddress.getLong());
     }
 
     /**
