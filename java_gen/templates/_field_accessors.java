@@ -28,7 +28,7 @@
     }
 //:: #endif
 
-//:: if generate_setters:
+//:: if generate_setters and prop.needs_setter:
     //:: setter_template_file_name = "%s/custom/%s_%s.java" % (template_dir, msg.name if not builder else msg.name + '.Builder', prop.setter_name)
     //:: if os.path.exists(setter_template_file_name):
     //:: include(setter_template_file_name, msg=msg, builder=builder, has_parent=has_parent)

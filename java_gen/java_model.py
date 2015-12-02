@@ -890,6 +890,16 @@ class JavaMember(object):
         else:
             return self.java_type.format_value(self.member.value, pub_type=False)
 
+    @property
+    def needs_setter(self):
+        if self.is_writeable:
+            return True
+        super_class = self.msg.super_class
+        if super_class:
+            super_member = super_class.member_by_name(self.name)
+            if super_member:
+                return super_member.needs_setter
+        return False
 
     @property
     def is_writeable(self):
