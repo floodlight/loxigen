@@ -53,7 +53,7 @@ public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotati
         ${msg.name}${msg.type_variable} build();
 //:: for prop in msg.members:
         ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
-//:: if prop.is_writeable:
+//:: if prop.needs_setter:
         Builder${msg.type_variable} ${prop.setter_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endif
 //:: #endfor
