@@ -638,3 +638,20 @@ struct of_bsn_tlv_multicast_interface_id : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_use_packet_state : of_bsn_tlv {
+    uint16_t type == 96;
+    uint16_t length;
+    uint8_t value;
+};
+
+enum ofp_bsn_status(wire_type=uint8_t) {
+    OFP_BSN_STATUS_DISABLE = 0,
+    OFP_BSN_STATUS_ENABLE = 1,
+};
+
+struct of_bsn_tlv_status: of_bsn_tlv {
+    uint16_t type == 97;
+    uint16_t length;
+    enum ofp_bsn_status value;
+};
