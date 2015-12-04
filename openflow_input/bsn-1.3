@@ -36,3 +36,29 @@ struct of_instruction_bsn : of_instruction_experimenter {
     uint32_t subtype == ?;
     pad(4);
 };
+
+// BSN base error message
+struct of_bsn_base_error : of_experimenter_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype == ?;
+    uint32_t experimenter == 0x5c16c7;
+    of_desc_str_t err_msg;
+    of_octets_t data;
+};
+
+// BSN error message
+struct of_bsn_error : of_bsn_base_error {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype == 1;
+    uint32_t experimenter == 0x5c16c7;
+    of_desc_str_t err_msg;
+    of_octets_t data;
+};
