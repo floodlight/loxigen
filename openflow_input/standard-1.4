@@ -2604,7 +2604,6 @@ struct of_async_get_request : of_header {
     uint8_t type == 26;
     uint16_t length;
     uint32_t xid;
-    list(of_async_config_prop_t) properties;
 };
 
 struct of_async_get_reply : of_header {
