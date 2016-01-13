@@ -12,7 +12,7 @@
      * Returns the current generation ID of this port.
      *
      * The generationId is reported by the switch as a @{link OFPortDescProp} in
-     * @link{OFPortDescStatsReply} and @link{OFPortStatus} messages. If the
+     * {@link OFPortDescStatsReply} and {@link OFPortStatus} messages. If the
      * current OFPortDesc does not contain a generation Id, returns U64.ZERO;
      *
      * For OpenFlow versions earlier than 1.4, always returns U64.ZERO;
