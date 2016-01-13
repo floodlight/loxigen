@@ -1,9 +1,1 @@
-
-    @Override
-    public OFFlowModifyStrict.Builder setActions(List<OFAction> actions) throws UnsupportedOperationException {
-        OFInstructionApplyActionsVer12.Builder builder = new OFInstructionApplyActionsVer12.Builder();
-        builder.setActions(actions);
-        this.instructions = Collections.singletonList((OFInstruction)builder.build());
-        this.instructionsSet = true;
-        return this;
-    }
+//:: include("custom/OFFlowModifyStrict.Builder_setActions.java", msg=msg, version=version, has_parent=False)
