@@ -125,6 +125,8 @@ class JavaGenerator(object):
             for java_class in interface.versioned_classes:
                 if self.java_model.generate_class(java_class):
                     if not java_class.is_virtual:
+                        if(java_class.name in ["OFFlowMonitorEntryVer15"]):
+                            continue
                         self.render_class(clazz=java_class,
                                 template='of_class.java', version=java_class.version, msg=java_class,
                                 impl_class=java_class.name)

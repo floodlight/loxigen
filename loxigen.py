@@ -165,6 +165,7 @@ if __name__ == '__main__':
     # Import the language file
     lang_file = "lang_%s" % options.lang
     lang_module = __import__(lang_file)
+    print lang_module
 
     log("\nGenerating files for target language %s\n" % options.lang)
 

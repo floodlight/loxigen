@@ -1,0 +1,61 @@
+
+#version 6
+
+struct of_oxs {
+    uint32_t type_len == ?;
+};
+
+struct of_oxs_duration : of_oxs {
+    uint32_t type_len == 0x80020008 ;
+    uint16_t value;
+};
+
+struct of_oxs_duration_masked : of_oxs{
+    uint32_t type_len == 0x80020110 ;
+    uint16_t value;
+    uint16_t value_mask;
+};
+
+struct of_oxs_idle_time : of_oxs {
+    uint32_t type_len == 0x80020208 ;
+    uint16_t value;
+};
+
+struct of_oxs_idle_time_masked : of_oxs{
+    uint32_t type_len == 0x80020310 ;
+    uint16_t value;
+    uint16_t value_mask;
+};
+
+struct of_oxs_flow_count : of_oxs {
+    uint32_t type_len == 0x80020404 ;
+    uint16_t value;
+};
+
+struct of_oxs_flow_count_masked : of_oxs{
+    uint32_t type_len == 0x80020508 ;
+    uint16_t value;
+    uint16_t value_mask;
+};
+
+struct of_oxs_packet_count : of_oxs {
+    uint32_t type_len == 0x80020608 ;
+    uint16_t value;
+};
+
+struct of_oxs_packet_count_masked : of_oxs{
+    uint32_t type_len == 0x80020710 ;
+    uint16_t value;
+    uint16_t value_mask;
+};
+
+struct of_oxs_byte_count : of_oxs {
+    uint32_t type_len == 0x80020808 ;
+    uint16_t value;
+};
+
+struct of_oxs_byte_count_masked : of_oxs{
+    uint32_t type_len == 0x80020910 ;
+    uint16_t value;
+    uint16_t value_mask;
+};

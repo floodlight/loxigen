@@ -163,6 +163,10 @@ class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual',
         return self.is_instanceof("of_oxm")
 
     @property
+    def is_oxs(self):
+        return self.is_instanceof("of_oxs")
+
+    @property
     def is_action(self):
         return self.is_instanceof("of_action")
 

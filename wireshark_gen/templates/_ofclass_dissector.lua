@@ -43,7 +43,7 @@ function ${name}(reader, subtree)
 :: if ofclass.virtual:
     return ${ofclass.name}_v${version.wire_version}_dissectors[reader.peek(${ofclass.discriminator.offset},${ofclass.discriminator.length}):uint()](reader, subtree)
 :: else:
-:: if not ofclass.is_fixed_length:
+:: if not ofclass.is_fixed_length and ofclass.length_member is not None:
     local _length = reader.peek(${ofclass.length_member.offset}, ${ofclass.length_member.base_length}):uint()
     local orig_reader = reader
     reader = orig_reader.slice(_length)

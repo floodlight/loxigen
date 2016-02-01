@@ -33,7 +33,7 @@ from loxi_globals import OFVersions
 # The default configuration dictionary for LOXI code generation
 options_default = {
     "lang"               : "c",
-    "version-list"       : "1.0 1.1 1.2 1.3 1.4",
+    "version-list"       : "1.0 1.1 1.2 1.3 1.4 1.5",
     "install-dir"        : "loxi_output",
 }
 

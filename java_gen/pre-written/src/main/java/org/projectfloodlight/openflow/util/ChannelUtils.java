@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList.Builder;
 
 public class ChannelUtils {
     private static final Logger logger = LoggerFactory.getLogger(ChannelUtils.class);
+    
     public static String readFixedLengthString(ByteBuf bb, int length) {
         byte[] dst = new byte[length];
         bb.readBytes(dst, 0, length);

@@ -74,6 +74,7 @@ class JavaModel(object):
     write_blacklist = defaultdict(
         lambda: set(),
         OFOxm=set(('typeLen',)),
+        OFOxs=set(('typeLen',)),
         OFAction=set(('type',)),
         OFInstruction=set(('type',)),
         OFFlowMod=set(('command', )),
@@ -81,7 +82,7 @@ class JavaModel(object):
         OFActionExperimenter=set(('data',)),
         OFBsnTlv=set(('type',)))
     # interfaces that are virtual
-    virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport' ])
+    virtual_interfaces = set(['OFOxm', 'OFInstruction', 'OFFlowMod', 'OFBsnVport', 'OFOxs' ])
 
     # Registry of nullable properties:
     # ${java_class_name} -> set(${java_property_name})
@@ -223,13 +224,13 @@ class JavaModel(object):
 
         factories = OrderedDict()
 
-        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp", "OFErrorMsg", "OFActionId", "OFInstructionId", "OFBsnTlv")
+        sub_factory_classes = ("OFAction", "OFInstruction", "OFMeterBand", "OFOxm", "OFQueueProp", "OFErrorMsg", "OFActionId", "OFInstructionId", "OFBsnTlv", "OFOxs")
         for base_class in sub_factory_classes:
             package = base_class[2:].lower()
             remove_prefix = base_class[2].lower() + base_class[3:]
 
             # HACK need to have a better way to deal with parameterized base classes
-            annotated_base_class = base_class + "<?>" if base_class == "OFOxm" else base_class
+            annotated_base_class = base_class + "<?>" if base_class == "OFOxm" or base_class == "OFOxs" else base_class
 
             factories[base_class] = OFFactory(package="%s.%s" % (prefix, package),
                     name=base_class + "s", members=[], remove_prefix=remove_prefix, base_class=annotated_base_class, sub_factories={}, xid_generator= (base_class == "OFErrorMsg"))
@@ -279,6 +280,8 @@ class JavaModel(object):
             return True
         if loxi_utils.class_is_instruction(clazz.interface.c_name):
             return True
+        if loxi_utils.class_is_oxs(clazz.interface.c_name):
+            return True
         else:
             return True
 
@@ -290,6 +293,15 @@ class JavaModel(object):
                                        value=re.sub(r'^of_oxm_', r'', re.sub(r'_masked$', r'', oxm.ir_class.name)).upper(),
                                        masked=oxm.ir_class.name.endswith("_masked")))
                   for oxm in self.interfaces if oxm.ir_class.is_subclassof("of_oxm") )
+
+    @property
+    @memoize
+    def oxs_map(self):
+        OxsMapEntry = namedtuple("OxsMapEntry", ["type_name", "value", "masked" ])
+        return OrderedDict( (oxs.name, OxsMapEntry(type_name=oxs.member_by_name("value").java_type.public_type,
+                                       value=re.sub(r'^of_oxs_', r'', re.sub(r'_masked$', r'', oxs.ir_class.name)).upper(),
+                                       masked=oxs.ir_class.name.endswith("_masked")))
+                  for oxs in self.interfaces if oxs.ir_class.is_subclassof("of_oxs") )
 
 class OFFactory(namedtuple("OFFactory", ("package", "name", "members", "remove_prefix", "base_class", "sub_factories", "xid_generator"))):
     @property
@@ -467,6 +479,8 @@ class JavaOFInterface(object):
                 return "instructionid"
             elif i.is_instanceof("of_oxm"):
                 return "oxm"
+            elif i.is_instanceof("of_oxs"):
+                return "oxs"
             elif i.is_instanceof("of_meter_band"):
                 return "meterband"
             elif i.is_instanceof("of_queue_prop"):
@@ -479,6 +493,8 @@ class JavaOFInterface(object):
         def calc_super_name(i):
             if re.match('of_match_.*', i.name):
                 return "Match"
+            elif re.match('of_stat_.*', i.name):
+                return "Stat"
             else:
                 ir_super_class = self.ir_class.superclass
                 return java_class_name(ir_super_class.name) if ir_super_class else ""
@@ -501,12 +517,20 @@ class JavaOFInterface(object):
                     type_annotation)
         elif self.name == "OFOxm":
             return (package, None, "T extends OFValueType<T>")
+        elif self.name == "OFOxs":
+            return (package, None, "T extends OFValueType<T>")
         elif loxi_utils.class_is_oxm(self.c_name):
             # look up type from member value for OFValueType type annotation
             if self.member_by_name("value") is not None:
                 return (package, "OFOxm<%s>" % self.member_by_name("value").java_type.public_type, None)
             else:
                 return (package, "OFOxm", None)
+        elif loxi_utils.class_is_oxs(self.c_name):
+            # look up type from member value for OFValueType type annotation
+            if self.member_by_name("value") is not None:
+                return (package, "OFOxs<%s>" % self.member_by_name("value").java_type.public_type, None)
+            else:
+                return (package, "OFOxs", None)
         else:
             return (package, super_name, None)
 
@@ -571,6 +595,14 @@ class JavaOFInterface(object):
                     JavaVirtualMember(self, "masked", java_type.boolean),
                     JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype("T"))
                    ]
+        elif self.name == "OFOxs":
+            virtual_members += [
+                    JavaVirtualMember(self, "value", java_type.generic_t),
+                    JavaVirtualMember(self, "mask", java_type.generic_t),
+                    JavaVirtualMember(self, "statField", java_type.make_stat_field_jtype("T")),
+                    JavaVirtualMember(self, "masked", java_type.boolean),
+                    JavaVirtualMember(self, "canonical", java_type.make_oxs_jtype("T"))
+                   ]
         elif self.ir_class.is_subclassof("of_oxm"):
             value = find(lambda m: m.name=="value", self.ir_model_members)
             if value:
@@ -583,6 +615,22 @@ class JavaOFInterface(object):
                     JavaVirtualMember(self, "masked", java_type.boolean),
                     JavaVirtualMember(self, "canonical", java_type.make_oxm_jtype(value.java_type.public_type),
                             custom_template=lambda builder: "OFOxm{}_getCanonical.java".format(".Builder" if builder else "")),
+                   ]
+            if not find(lambda x: x.name == "mask", self.ir_model_members):
+                virtual_members.append(
+                        JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+        elif self.ir_class.is_subclassof("of_oxs"):
+            value = find(lambda m: m.name=="value", self.ir_model_members)
+            if value:
+                field_type = java_type.make_stat_field_jtype(value.java_type.public_type)
+            else:
+                field_type = java_type.make_stat_field_jtype()
+
+            virtual_members += [
+                    JavaVirtualMember(self, "statField", field_type),
+                    JavaVirtualMember(self, "masked", java_type.boolean),
+                    JavaVirtualMember(self, "canonical", java_type.make_oxs_jtype(value.java_type.public_type),
+                            custom_template=lambda builder: "OFOxs{}_getCanonical.java".format(".Builder" if builder else "")),
                    ]
             if not find(lambda x: x.name == "mask", self.ir_model_members):
                 virtual_members.append(
@@ -718,6 +766,19 @@ class JavaOFClass(object):
             else:
                 virtual_members += [
                     JavaVirtualMember(self, "matchField", java_type.make_match_field_jtype(), "null"),
+                    JavaVirtualMember(self, "masked", java_type.boolean, "false"),
+                 ]
+        elif self.ir_class.is_subclassof("of_oxs"):
+            value_member = find(lambda m: m.name, self.ir_model_members)
+            if value_member:
+                oxs_entry = model.oxs_map[self.interface.name]
+                virtual_members += [
+                    JavaVirtualMember(self, "statField", java_type.make_stat_field_jtype(value_member.java_type.public_type), "StatField.%s" % oxs_entry.value),
+                    JavaVirtualMember(self, "masked", java_type.boolean, "true" if oxs_entry.masked else "false"),
+                    ]
+            else:
+                virtual_members += [
+                    JavaVirtualMember(self, "statField", java_type.make_stat_field_jtype(), "null"),
                     JavaVirtualMember(self, "masked", java_type.boolean, "false"),
                  ]
         if not find(lambda m: m.name == "version", self.ir_model_members):

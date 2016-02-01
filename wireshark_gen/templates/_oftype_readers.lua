@@ -78,8 +78,28 @@ function read_of_match_t(reader, version, subtree, field_name)
         dissect_of_match_v3_v4(reader, subtree:add("of_match"))
     elseif version == 5 then
         dissect_of_match_v3_v5(reader, subtree:add("of_match"))
+    elseif version == 6 then
+        dissect_of_match_v3_v6(reader, subtree:add("of_match"))
     else
         error("Unsupported match version")
+    end
+end
+
+function read_of_stat_t(reader, version, subtree, field_name)
+    if version == 1 then
+        error("Unsupported statistics version")
+    elseif version == 2 then
+        error("Unsupported statistics version")
+    elseif version == 3 then
+        error("Unsupported statistics version")
+    elseif version == 4 then
+        error("Unsupported statistics version")
+    elseif version == 5 then
+        error("Unsupported statistics version")
+    elseif version == 6 then
+        dissect_of_stat_v6_v6(reader, subtree:add("of_stat"))
+    else
+        error("Unsupported statistics version")
     end
 end
 
@@ -154,6 +174,15 @@ function read_of_oxm_t(reader, version, subtree, field_name)
     end
     local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
     local info = of_oxm_dissectors[version](reader, child_subtree)
+    child_subtree:set_text(info)
+end
+
+function read_of_oxs_t(reader, version, subtree, field_name)
+    if reader.is_empty() then
+        return
+    end
+    local child_subtree = subtree:add(fields[field_name], reader.peek_all(0))
+    local info = of_oxs_dissectors[version](reader, child_subtree)
     child_subtree:set_text(info)
 end
 

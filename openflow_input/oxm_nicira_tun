@@ -28,6 +28,7 @@
 #version 3
 #version 4
 #version 5
+#version 6
 
 // Nicira extension for tun_ipv4_src (31)
 struct of_oxm_tunnel_ipv4_src : of_oxm {

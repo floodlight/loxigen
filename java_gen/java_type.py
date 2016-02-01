@@ -344,6 +344,8 @@ of_match = JType('Match') \
         .op(read='ChannelUtilsVer$version.readOFMatch(bb)', \
             write='$name.writeTo(bb)',
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
+of_stat = JType('Stat') \
+         .op(read='ChannelUtilsVer$version.readOFStat(bb)', write='$name.writeTo(bb)')
 group_mod_cmd = JType('OFGroupModCommand', 'short') \
         .op(version=ANY, read="bb.readShort()", write="bb.writeShort($name)")
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
@@ -357,8 +359,6 @@ vxlan_ni = JType('VxlanNI') \
         .op(read="VxlanNI.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
             default="VxlanNI.ZERO")
-
-
 port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
@@ -429,6 +429,9 @@ ipv6_flabel = JType("IPv6FlowLabel")\
         .op(read="IPv6FlowLabel.read4Bytes(bb)",
             write="$name.write4Bytes(bb)",
             default="IPv6FlowLabel.NONE")
+packet_type = JType("PacketType") \
+        .op(read="PacketType.read4Bytes(bb)",
+            write="$name.write4Bytes(bb)")
 metadata = JType("OFMetadata")\
         .op(read="OFMetadata.read8Bytes(bb)",
             write="$name.write8Bytes(bb)",
@@ -441,6 +444,32 @@ oxm_list = JType("OFOxmList") \
             read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', \
             write='$name.writeTo(bb)',
             default="OFOxmList.EMPTY")
+duration = JType("OFDuration") \
+        .op(read="OFDuration.read8Bytes(bb)",
+            write="$name.write8Bytes(bb)")
+idle_time = JType("OFIdleTime") \
+        .op(read="OFIdleTime.read8Bytes(bb)",
+            write="$name.write8Bytes(bb)")
+flow_count = JType("OFFlowCount") \
+        .op(read="OFFlowCount.read8Bytes(bb)",
+            write="$name.write8Bytes(bb)")
+packet_count = JType("OFPacketCount") \
+        .op(read="OFPacketCount.read8Bytes(bb)",
+            write="$name.write8Bytes(bb)")
+byte_count = JType("OFByteCount") \
+        .op(read="OFByteCount.read8Bytes(bb)",
+            write="$name.write8Bytes(bb)")
+connection_uri = JType("OFConnectionURI") \
+        .op(read="OFConnectionURI.read4Bytes(bb)",
+            write="$name.write4Bytes(bb)")
+#Fixed Ver15
+oxs = JType("OFOxs<?>")\
+        .op(read="OFOxsVer15.READER.readFrom(bb)",
+            write="$name.writeTo(bb)")
+oxs_list = JType("OFOxsList") \
+        .op(read= 'OFOxsList.readFrom(bb, $length, OFOxsVer15.READER)', \
+            write='$name.writeTo(bb)',
+            default="OFOxsList.EMPTY")
 meter_features = JType("OFMeterFeatures")\
         .op(read="OFMeterFeaturesVer$version.READER.readFrom(bb)",
             write="$name.writeTo(bb)")
@@ -478,6 +507,7 @@ of_version = JType("OFVersion", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 
 port_speed = JType("PortSpeed")
+
 error_type = JType("OFErrorType")
 of_message = JType("OFMessage")\
             .op(read="OFMessageVer$version.READER.readFrom(bb)",
@@ -549,6 +579,10 @@ table_desc = JType('OFTableDesc') \
         .op(read='OFTableDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
+controller_status_entry = JType('OFControllerStatusEntry') \
+        .op(read='OFControllerStatusEntryVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
 
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,
@@ -565,10 +599,13 @@ default_mtype_to_jtype_convert_map = {
         'list(of_uint32_t)' : u32_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
+        'list(of_oxs_t)' : oxs_list,
         'list(of_ipv4_t)' : ipv4_list,
         'list(of_ipv6_t)' : ipv6_list,
         'of_octets_t' : octets,
         'of_match_t': of_match,
+        'of_stat_t' : of_stat,
+        'of_controller_uri_t' : connection_uri,
         'of_fm_cmd_t': flow_mod_cmd,
         'of_mac_addr_t': mac_addr,
         'of_port_desc_t': port_desc,
@@ -581,12 +618,14 @@ default_mtype_to_jtype_convert_map = {
         'of_ipv6_t': ipv6,
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
+        'of_oxs_t': oxs,
         'of_meter_features_t': meter_features,
         'of_bitmap_128_t': port_bitmap_128,
         'of_bitmap_512_t': port_bitmap_512,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
+        'of_controller_status_entry_t' : controller_status_entry,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -646,6 +685,24 @@ exceptions = {
         'of_oxm_ipv6_exthdr_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
         'of_oxm_pbb_uca' : { 'value' : boolean_value },
         'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
+        'of_oxm_tcp_flags' : { 'value' : u16obj },
+        'of_oxm_tcp_flags_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+        'of_oxm_actset_output' : { 'value' : transport_port },
+        'of_oxm_actset_output_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_packet_type' : { 'value' : packet_type },
+        'of_oxm_packet_type_masked' : { 'value' : packet_type, 'value_mask' : packet_type },
+
+        'of_oxs_byte_count' : { 'value' : byte_count },
+        'of_oxs_byte_count_masked' : {'value' : byte_count, 'value_mask' : byte_count },
+        'of_oxs_duration' : { 'value' : duration },
+        'of_oxs_duration_masked' : {'value' : duration, 'value_mask' : duration },
+        'of_oxs_flow_count' : { 'value' : flow_count },
+        'of_oxs_flow_count_masked' : {'value' : flow_count, 'value_mask' : flow_count },
+        'of_oxs_idle_time' : { 'value' : idle_time },
+        'of_oxs_idle_time_masked' : {'value' : idle_time, 'value_mask' : idle_time },
+        'of_oxs_packet_count' : { 'value' : packet_count },
+        'of_oxs_packet_count_masked' : {'value' : packet_count, 'value_mask' : packet_count },
 
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap_128 },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap_128, 'value_mask': port_bitmap_128 },
@@ -752,6 +809,8 @@ exceptions = {
         'of_group_add' : { 'command' : group_mod_cmd },
         'of_group_modify' : { 'command' : group_mod_cmd },
         'of_group_delete' : { 'command' : group_mod_cmd },
+        'of_group_insert_bucket': {'command' : group_mod_cmd },
+        'of_group_remove_bucket' : {'command' : group_mod_cmd },
 
         'of_bucket' : { 'watch_group': of_group },
 
@@ -777,8 +836,14 @@ def enum_java_types():
 def make_match_field_jtype(sub_type_name="?"):
     return JType("MatchField<{}>".format(sub_type_name))
 
+def make_stat_field_jtype(sub_type_name="?"):
+    return JType("StatField<{}>".format(sub_type_name))
+
 def make_oxm_jtype(sub_type_name="?"):
     return JType("OFOxm<{}>".format(sub_type_name))
+
+def make_oxs_jtype(sub_type_name="?"):
+    return JType("OFOxs<{}>".format(sub_type_name))
 
 def list_cname_to_java_name(c_type):
     m = re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type)
