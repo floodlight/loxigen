@@ -656,6 +656,17 @@ struct of_bsn_tlv_status: of_bsn_tlv {
     enum ofp_bsn_status value;
 };
 
+struct of_bsn_vlan_mac {
+    uint16_t vlan_vid;
+    of_mac_addr_t mac;
+};
+
+struct of_bsn_tlv_vlan_mac_list {
+    uint16_t type == 98;
+    uint16_t length;
+    list(of_bsn_vlan_mac_t) key;
+};
+
 struct of_bsn_tlv_vfi : of_bsn_tlv {
     uint16_t type == 99;
     uint16_t length;
