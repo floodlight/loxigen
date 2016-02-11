@@ -595,7 +595,7 @@ of_match_v2_to_match(of_match_v2_t *src, of_match_t *dst)
     if (OF_VARIABLE_IS_NON_ZERO(&dst->masks.%(key)s)) { /* Matching something */
         of_match_v2_%(key)s_get(src, &dst->fields.%(key)s);
     }
-    of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
+    of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(dst->fields.%(key)s));
 """ % dict(ku=key.upper(), key=key))
         else:
             out.write("""
@@ -649,7 +649,7 @@ of_match_v3_to_match(of_match_v3_t *src, of_match_t *dst)
             of_oxm_%(key)s_masked_value_get(
                 &oxm_entry,
                 &dst->fields.%(key)s);
-            of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(&dst->fields.%(key)s));
+            of_memmask(&dst->fields.%(key)s, &dst->masks.%(key)s, sizeof(dst->fields.%(key)s));
             break;
         case OF_OXM_%(ku)s:
             OF_MATCH_MASK_%(ku)s_EXACT_SET(dst);
