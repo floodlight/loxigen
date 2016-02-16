@@ -655,3 +655,9 @@ struct of_bsn_tlv_status: of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_status value;
 };
+
+struct of_bsn_tlv_vfi : of_bsn_tlv {
+    uint16_t type == 99;
+    uint16_t length;
+    uint16_t value;
+};
