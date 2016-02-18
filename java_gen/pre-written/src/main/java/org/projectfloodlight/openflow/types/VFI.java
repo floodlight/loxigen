@@ -72,8 +72,8 @@ import com.google.common.primitives.Shorts;
         c.writeShort(this.vfi);
     }
 
-    public static VlanVid read2Bytes(ByteBuf c) throws OFParseError {
-        return VlanVid.ofVlan(c.readShort());
+    public static VFI read2Bytes(ByteBuf c) throws OFParseError {
+        return VFI.ofVfi(c.readShort());
     }
 
     @Override
