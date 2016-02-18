@@ -357,7 +357,10 @@ vxlan_ni = JType('VxlanNI') \
         .op(read="VxlanNI.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
             default="VxlanNI.ZERO")
-
+vfi = JType('VFI') \
+        .op(read="VFI.read2Bytes(bb)", \
+            write="$name.write2Bytes(bb)",
+            default="VFI.ZERO")
 
 port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
