@@ -5,7 +5,6 @@ import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
-import com.google.common.primitives.Shorts;
 
 /** Represents a two byte virtual forwarding instance.
 *
@@ -83,7 +82,7 @@ import com.google.common.primitives.Shorts;
 
     @Override
     public int compareTo(VFI o) {
-        return Shorts.compare(vfi, o.vfi);
+        return Integer.compare(vfi & 0xffff, o.vfi & 0xffff);
     }
 
     @Override
