@@ -29,6 +29,7 @@ import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VxlanNI;
+import org.projectfloodlight.openflow.types.VFI;
 
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
@@ -274,6 +275,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<OFVlanVidMatch> BSN_INNER_VLAN_VID =
             new MatchField<OFVlanVidMatch>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
+
+    public final static MatchField<VFI> BSN_VFI =
+            new MatchField<VFI>("bsn_vfi", MatchFields.BSN_VFI);
 
     public String getName() {
         return name;
