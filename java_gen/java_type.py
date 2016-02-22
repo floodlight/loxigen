@@ -725,6 +725,9 @@ exceptions = {
         'of_oxm_bsn_inner_vlan_vid' : { 'value' : vlan_vid_match },
         'of_oxm_bsn_inner_vlan_vid_masked' : { 'value' : vlan_vid_match, 'value_mask' : vlan_vid_match },
 
+        'of_oxm_bsn_vfi' : { 'value' : vfi },
+        'of_oxm_bsn_vfi_masked' : { 'value' : vfi, 'value_mask' : vfi },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,
