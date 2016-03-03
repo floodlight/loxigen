@@ -672,3 +672,66 @@ struct of_bsn_tlv_vfi : of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_hash_seed : of_bsn_tlv {
+    uint16_t type == 100;
+    uint16_t length;
+    uint32_t seed1;
+    uint32_t seed2;
+};
+
+enum of_bsn_hash_type(wire_type=uint8_t) {
+    OFP_BSN_HASH_TYPE_L2 = 0,
+    OFP_BSN_HASH_TYPE_L3 = 1,
+    OFP_BSN_HASH_TYPE_ENHANCED = 2,
+};
+
+struct of_bsn_tlv_hash_type : of_bsn_tlv {
+    uint16_t type == 101;
+    uint16_t length;
+    enum of_bsn_hash_type value;
+};
+
+enum of_bsn_hash_packet_type(wire_type=uint8_t) {
+    OF_BSN_HASH_PACKET_L2 = 0,
+    OF_BSN_HASH_PACKET_L2GRE = 1,
+    OF_BSN_HASH_PACKET_IPV4 = 3,
+    OF_BSN_HASH_PACKET_IPV6 = 4,
+    OF_BSN_HASH_PACKET_GTP = 5,
+    OF_BSN_HASH_PACKET_MPLS = 6,
+    OF_BSN_HASH_PACKET_SYMMETRIC = 7,
+};
+
+struct of_bsn_tlv_hash_packet_type : of_bsn_tlv {
+    uint16_t type == 102;
+    uint16_t length;
+    enum of_bsn_hash_packet_type value;
+};
+
+enum of_bsn_hash_packet_field(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_HASH_FIELD_DISABLE =     0x1,
+    OFP_BSN_HASH_FIELD_DST_MAC =     0x2,
+    OFP_BSN_HASH_FIELD_SRC_MAC =     0x4,
+    OFP_BSN_HASH_FIELD_ETH_TYPE =    0x8,
+    OFP_BSN_HASH_FIELD_VLAN_ID =     0x10,
+    OFP_BSN_HASH_FIELD_INNER_L2 =    0x20,
+    OFP_BSN_HASH_FIELD_INNER_L3 =    0x40,
+    OFP_BSN_HASH_FIELD_SRC_IP =      0x80,
+    OFP_BSN_HASH_FIELD_DST_IP =      0x100,
+    OFP_BSN_HASH_FIELD_IP_PROTO =    0x200,
+    OFP_BSN_HASH_FIELD_SRC_L4_PORT = 0x400,
+    OFP_BSN_HASH_FIELD_DST_L4_PORT = 0x800,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL1 = 0x1000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL2 = 0x2000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL3 = 0x4000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL_HI_BITS  = 0x8000,
+    OFP_BSN_HASH_FIELD_MPLS_PAYLOAD_SRC_IP = 0x10000,
+    OFP_BSN_HASH_FIELD_MPLS_PAYLOAD_DST_IP = 0x20000,
+    OFP_BSN_HASH_FIELD_SYMMETRIC =           0x40000,
+};
+
+struct of_bsn_tlv_hash_packet_field : of_bsn_tlv {
+    uint16_t type == 103;
+    uint16_t length;
+    enum of_bsn_hash_packet_field value;
+};
