@@ -49,14 +49,14 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
     private final long monitorId;
     private final long outPort;
     private final long outGroup;
-    private final OFFlowMonitorFlags flags;
+    private final Set<OFFlowMonitorFlags> flags;
     private final TableId tableId;
-    private final short command;
+    private final OFFlowMonitorCommand command;
     private final Match match;
 //
 
     // package private constructor - used by readers, builders, and factory
-    OFFlowMonitorEntryVer15(long monitorId, long outPort, long outGroup, OFFlowMonitorFlags flags, TableId tableId, short command, Match match) {
+    OFFlowMonitorEntryVer15(long monitorId, long outPort, long outGroup, Set<OFFlowMonitorFlags> flags, TableId tableId, OFFlowMonitorCommand command, Match match) {
         if(flags == null) {
             throw new NullPointerException("OFFlowMonitorEntryVer15: property flags cannot be null");
         }
@@ -65,6 +65,9 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         }
         if(match == null) {
             throw new NullPointerException("OFFlowMonitorEntryVer15: property match cannot be null");
+        }
+        if(command == null) {
+        	throw new NullPointerException("OFFlowMonitorEntryVer15: property command cannot be null");
         }
         this.monitorId = monitorId;
         this.outPort = outPort;
@@ -92,7 +95,7 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
     }
 
     @Override
-    public OFFlowMonitorFlags getFlags() {
+    public Set<OFFlowMonitorFlags> getFlags() {
         return flags;
     }
 
@@ -102,7 +105,7 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
     }
 
     @Override
-    public short getCommand() {
+    public OFFlowMonitorCommand getCommand() {
         return command;
     }
 
@@ -133,11 +136,11 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         private boolean outGroupSet;
         private long outGroup;
         private boolean flagsSet;
-        private OFFlowMonitorFlags flags;
+        private Set<OFFlowMonitorFlags> flags;
         private boolean tableIdSet;
         private TableId tableId;
         private boolean commandSet;
-        private short command;
+        private OFFlowMonitorCommand command;
         private boolean matchSet;
         private Match match;
 
@@ -179,12 +182,12 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         return this;
     }
     @Override
-    public OFFlowMonitorFlags getFlags() {
+    public Set<OFFlowMonitorFlags> getFlags() {
         return flags;
     }
 
     @Override
-    public OFFlowMonitorEntry.Builder setFlags(OFFlowMonitorFlags flags) {
+    public OFFlowMonitorEntry.Builder setFlags(Set<OFFlowMonitorFlags> flags) {
         this.flags = flags;
         this.flagsSet = true;
         return this;
@@ -201,12 +204,12 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         return this;
     }
     @Override
-    public short getCommand() {
+    public OFFlowMonitorCommand getCommand() {
         return command;
     }
 
     @Override
-    public OFFlowMonitorEntry.Builder setCommand(short command) {
+    public OFFlowMonitorEntry.Builder setCommand(OFFlowMonitorCommand command) {
         this.command = command;
         this.commandSet = true;
         return this;
@@ -234,13 +237,13 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
                 long monitorId = this.monitorIdSet ? this.monitorId : parentMessage.monitorId;
                 long outPort = this.outPortSet ? this.outPort : parentMessage.outPort;
                 long outGroup = this.outGroupSet ? this.outGroup : parentMessage.outGroup;
-                OFFlowMonitorFlags flags = this.flagsSet ? this.flags : parentMessage.flags;
+                Set<OFFlowMonitorFlags> flags = this.flagsSet ? this.flags : parentMessage.flags;
                 if(flags == null)
                     throw new NullPointerException("Property flags must not be null");
                 TableId tableId = this.tableIdSet ? this.tableId : parentMessage.tableId;
                 if(tableId == null)
                     throw new NullPointerException("Property tableId must not be null");
-                short command = this.commandSet ? this.command : parentMessage.command;
+                OFFlowMonitorCommand command = this.commandSet ? this.command : parentMessage.command;
                 Match match = this.matchSet ? this.match : parentMessage.match;
                 if(match == null)
                     throw new NullPointerException("Property match must not be null");
@@ -268,11 +271,11 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         private boolean outGroupSet;
         private long outGroup;
         private boolean flagsSet;
-        private OFFlowMonitorFlags flags;
+        private Set<OFFlowMonitorFlags> flags;
         private boolean tableIdSet;
         private TableId tableId;
         private boolean commandSet;
-        private short command;
+        private OFFlowMonitorCommand command;
         private boolean matchSet;
         private Match match;
 
@@ -310,12 +313,12 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         return this;
     }
     @Override
-    public OFFlowMonitorFlags getFlags() {
+    public Set<OFFlowMonitorFlags> getFlags() {
         return flags;
     }
 
     @Override
-    public OFFlowMonitorEntry.Builder setFlags(OFFlowMonitorFlags flags) {
+    public OFFlowMonitorEntry.Builder setFlags(Set<OFFlowMonitorFlags> flags) {
         this.flags = flags;
         this.flagsSet = true;
         return this;
@@ -332,12 +335,12 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         return this;
     }
     @Override
-    public short getCommand() {
+    public OFFlowMonitorCommand getCommand() {
         return command;
     }
 
     @Override
-    public OFFlowMonitorEntry.Builder setCommand(short command) {
+    public OFFlowMonitorEntry.Builder setCommand(OFFlowMonitorCommand command) {
         this.command = command;
         this.commandSet = true;
         return this;
@@ -371,7 +374,8 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
             TableId tableId = this.tableIdSet ? this.tableId : DEFAULT_TABLE_ID;
             if(tableId == null)
                 throw new NullPointerException("Property tableId must not be null");
-            short command = this.commandSet ? this.command : DEFAULT_COMMAND;
+            if(command == null)
+            	throw new NullPointerException("Property command must not be null");
             Match match = this.matchSet ? this.match : DEFAULT_MATCH;
             if(match == null)
                 throw new NullPointerException("Property match must not be null");
@@ -398,9 +402,9 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
             long monitorId = U32.f(bb.readInt());
             long outPort = U32.f(bb.readInt());
             long outGroup = U32.f(bb.readInt());
-            OFFlowMonitorFlags flags = OFFlowMonitorFlagsSerializerVer15.readFrom(bb);
+            Set<OFFlowMonitorFlags> flags = OFFlowMonitorFlagsSerializerVer15.readFrom(bb);
             TableId tableId = TableId.readByte(bb);
-            short command = U8.f(bb.readByte());
+            OFFlowMonitorCommand command = OFFlowMonitorCommandSerializerVer15.readFrom(bb);
             Match match = ChannelUtilsVer15.readOFMatch(bb);
 
             OFFlowMonitorEntryVer15 flowMonitorEntryVer15 = new OFFlowMonitorEntryVer15(
@@ -432,7 +436,7 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
             sink.putLong(message.outGroup);
             OFFlowMonitorFlagsSerializerVer15.putTo(message.flags, sink);
             message.tableId.putTo(sink);
-            sink.putShort(message.command);
+            OFFlowMonitorCommandSerializerVer15.putTo(message.command, sink);
             message.match.putTo(sink);
         }
     }
@@ -452,7 +456,7 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
             bb.writeInt(U32.t(message.outGroup));
             OFFlowMonitorFlagsSerializerVer15.writeTo(bb, message.flags);
             message.tableId.writeByte(bb);
-            bb.writeByte(U8.t(message.command));
+            OFFlowMonitorCommandSerializerVer15.writeTo(bb, message.command);
             message.match.writeTo(bb);
 
             // update length field
@@ -528,7 +532,7 @@ class OFFlowMonitorEntryVer15 implements OFFlowMonitorEntry {
         result = prime *  (int) (outGroup ^ (outGroup >>> 32));
         result = prime * result + ((flags == null) ? 0 : flags.hashCode());
         result = prime * result + ((tableId == null) ? 0 : tableId.hashCode());
-        result = prime * result + command;
+        result = prime * result + ((command == null) ? 0 : command.hashCode());
         result = prime * result + ((match == null) ? 0 : match.hashCode());
         return result;
     }

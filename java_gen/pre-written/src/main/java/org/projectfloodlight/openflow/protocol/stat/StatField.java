@@ -1,11 +1,8 @@
 package org.projectfloodlight.openflow.protocol.stat;
 
 import org.projectfloodlight.openflow.types.OFValueType;
-import org.projectfloodlight.openflow.types.OFDuration;
-import org.projectfloodlight.openflow.types.OFIdleTime;
-import org.projectfloodlight.openflow.types.OFFlowCount;
-import org.projectfloodlight.openflow.types.OFPacketCount;
-import org.projectfloodlight.openflow.types.OFByteCount;
+import org.projectfloodlight.openflow.types.U64;
+import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.protocol.stat.StatFields;
 
 public class StatField<F extends OFValueType<F>> {
@@ -18,20 +15,20 @@ public class StatField<F extends OFValueType<F>> {
         this.id = id;
     }
     
-    public final static StatField<OFDuration> DURATION =
-            new StatField<OFDuration>("of_duration", StatFields.DURATION);
+    public final static StatField<U64> DURATION =
+            new StatField<U64>("of_duration", StatFields.DURATION);
     
-    public final static StatField<OFIdleTime> IDLE_TIME =
-            new StatField<OFIdleTime>("of_duration", StatFields.IDLE_TIME);
+    public final static StatField<U64> IDLE_TIME =
+            new StatField<U64>("of_idle_time", StatFields.IDLE_TIME);
     
-    public final static StatField<OFFlowCount> FLOW_COUNT =
-            new StatField<OFFlowCount>("of_duration", StatFields.FLOW_COUNT);
+    public final static StatField<U32> FLOW_COUNT =
+            new StatField<U32>("of_flow_count", StatFields.FLOW_COUNT);
     
-    public final static StatField<OFPacketCount> PACKET_COUNT =
-            new StatField<OFPacketCount>("of_duration", StatFields.PACKET_COUNT);
+    public final static StatField<U64> PACKET_COUNT =
+            new StatField<U64>("of_packet_count", StatFields.PACKET_COUNT);
     
-    public final static StatField<OFByteCount> BYTE_COUNT =
-            new StatField<OFByteCount>("of_duration", StatFields.BYTE_COUNT);
+    public final static StatField<U64> BYTE_COUNT =
+            new StatField<U64>("of_byte_count", StatFields.BYTE_COUNT);
     
     public String getName() {
         return name;

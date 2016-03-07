@@ -1,0 +1,6 @@
+-- binary
+06 15 # version, type
+00 08 # length
+12 34 56 78 # xid
+-- java
+builder.setXid(0x12345678).build()

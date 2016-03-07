@@ -1,0 +1,8 @@
+-- binary
+00 00 # type
+00 10 # length
+00 00 00 32 # port
+ff ff # max_len
+00 00 00 00 00 00 # pad
+-- java
+builder.setPort(OFPort.of(50)).setMaxLen(65535)

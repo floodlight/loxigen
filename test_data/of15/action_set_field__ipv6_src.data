@@ -1,0 +1,8 @@
+-- binary
+00 19 # type
+00 18 # length
+80 00 34 10 # OXM header
+00 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f # OXM value
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_15).oxms();
+builder.setField(oxms.ipv6Src(IPv6Address.of("0001:0203:0405:0607:0809:0a0b:0c0d:0e0f")))

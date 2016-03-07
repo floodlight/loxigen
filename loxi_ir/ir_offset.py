@@ -98,6 +98,10 @@ of_mixed_types = dict(
         6: "of_stat_v6_t",
         "short_name":"stat"
         },
+    of_time_t = { # time object
+        6: "of_time_t",
+        "short_name":"time"
+        }
 )
 
 ## basic lengths
@@ -124,6 +128,7 @@ of_base_lengths = dict(
     of_bitmap_128_t = (16, True),
     of_checksum_128_t = (16, True),
     of_bitmap_512_t = (64, True),
+    of_time_t = (16, True)
 )
 
 def type_dec_to_count_base(m_type):

@@ -433,8 +433,8 @@ struct of_port_mod : of_header {
     uint32_t xid;
     of_port_no_t port_no;
     of_mac_addr_t hw_addr;
-    uint32_t config;
-    uint32_t mask;
+    enum ofp_port_config config;
+    enum ofp_port_config mask;
     uint32_t advertise;
     pad(4);
 };
@@ -687,7 +687,7 @@ struct of_flow_removed : of_header {
     of_match_t match;
     uint64_t cookie;
     uint16_t priority;
-    uint8_t reason;
+    enum ofp_flow_removed_reason reason;
     pad(1);
     uint32_t duration_sec;
     uint32_t duration_nsec;

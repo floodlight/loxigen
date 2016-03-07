@@ -269,6 +269,8 @@ class JavaModel(object):
         """
         if clazz.interface.name.startswith("OFMatchV"):
             return True
+        if clazz.interface.name.startswith("OFStatV"):
+            return True
         elif clazz.name == "OFTableModVer10":
             # tablemod ver 10 is a hack and has no oftype defined
             return False

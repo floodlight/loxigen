@@ -1,0 +1,9 @@
+-- binary
+00 19 # type
+00 10 # length
+80 00 06 06 # OXM header
+00 01 02 03 04 05 # OXM value
+00 00 # pad
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_15).oxms();
+builder.setField(oxms.ethDst(MacAddress.of("00:01:02:03:04:05")))

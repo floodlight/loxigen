@@ -154,7 +154,7 @@ enum ofp_port_state(wire_type=uint32_t, bitmask=True) {
 };
 
 /* Port description property types */
-/* Önceki loxigen input dosyalarýnda yok */
+/* not in before */
 /* Used in of_port_desc_prop_ethernet */
 enum ofp_port_desc_prop_type {
    OFPPDPT_ETHERNET = 0, 
@@ -183,7 +183,7 @@ enum ofp_port_features(wire_type=uint32_t, bitmask=True) {
     OFPPF_AUTONEG = 0x2000,
     OFPPF_PAUSE = 0x4000,
     OFPPF_PAUSE_ASYM = 0x8000,
-    OFPPF_BSN_BREAKOUT_CAPABLE = 0x80000000, /* spec de yok */
+    OFPPF_BSN_BREAKOUT_CAPABLE = 0x80000000, /* not in spec. */
 };
 
 /* Features of optical ports available in switch. */
@@ -274,7 +274,7 @@ struct of_port_desc_prop_experimenter : of_port_desc_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-   // of_octets_t experimenter_data;
+    //of_octets_t experimenter_data;
 };
 
 /* ----------------------------------------------- FLOW MATCH -------------------------------------- */
@@ -329,7 +329,7 @@ struct of_match_v3(align=8, length_includes_align=False) {
 /* --------------------------------------------------------- FLOW STATS ----------------------------------------------- */
 
 /* stats oxs class */
-/* 1.4 de yok */
+/* not in 1.4  */
 enum ofp_oxs_class(wire_type=uint16_t) {
     OFPXSC_OPENFLOW_BASIC = 0x8002, 
     OFPXSC_EXPERIMENTER = 0xFFFF,
@@ -356,8 +356,7 @@ enum ofp_instruction_type(wire_type=uint16_t, bitmask=True) {
 };
 
 /* stat trigger instruction flags */
-/* bitmask true kýsmý ? */
-/* 1.4 de yok */
+/* not in 1.4 */
 enum ofp_stat_trigger_flags(wire_type=uint32_t, bitmask=True) {
     OFPSTF_PERIODIC = 0x1,
     OFPSTF_ONLY_FIRST = 0x2, 
@@ -410,11 +409,11 @@ struct of_instruction_clear_actions : of_instruction {
 };
 
 /* Instruction structure for OFPIT_STAT_TRIGGER */
-/* 1.4 de yok */
-struct ofp_instruction_stat_trigger {
+/* not in 1.4 */
+struct of_instruction_stat_trigger : of_instruction {
     uint16_t type == 7; 
     uint16_t len; 
-    uint32_t flags; 
+    enum ofp_stat_trigger_flags flags; 
     list(of_oxs_t) thresholds; 
 };
 
@@ -591,7 +590,7 @@ struct of_action_set_field(align=8, length_includes_align=True) : of_action {
 };
 
 /* Action structure for OFPAT_COPY_FIELD */
-/* 1.4 de yok */
+/* not in 1.4 */
 struct ofp_action_copy_field {
     uint16_t type == 28;
     uint16_t len; 
@@ -610,10 +609,10 @@ struct of_action_experimenter(align=8, length_includes_align=True): of_action {
 };
 
 /* ---------------------------------------------------------- CONTROLLER STATUS STRUCTURE ------------------------- */
-/* 1.4 de yok */
+/* not in 1.4 */
 
 /* Why is the controller status being reported? */
-enum ofp_controller_status_reason {
+enum ofp_controller_status_reason(wire_type=uint8_t) {
     OFPCSR_REQUEST = 0, 
     OFPCSR_CHANNEL_STATUS = 1, 
     OFPCSR_ROLE = 2, 
@@ -624,7 +623,7 @@ enum ofp_controller_status_reason {
 };
 
 /* Control channel status. */
-enum ofp_control_channel_status {
+enum ofp_control_channel_status(wire_type=uint8_t) {
     OFPCT_STATUS_UP = 0, 
     OFPCT_STATUS_DOWN = 1, 
 };
@@ -644,9 +643,9 @@ struct of_controller_status_prop {
 struct of_controller_status_entry {
     uint16_t length; 
     uint16_t short_id; 
-    uint32_t role; 
-    uint8_t reason; 
-    uint8_t channel_status; 
+    enum ofp_controller_role role;
+    enum ofp_controller_status_reason reason;
+    enum ofp_control_channel_status channel_status; 
     pad(6);
     list(of_controller_status_prop_t) properties;
 };
@@ -661,14 +660,14 @@ struct of_controller_status : of_header {
 };
 
 /* Connection URI controller status property */
-struct ofp_controller_status_prop_uri {
+struct ofp_controller_status_prop_uri : of_controller_status_prop {
     uint16_t type; 
     uint16_t length; 
     of_controller_uri_t uri;
 };
 
 /* Experimenter controller status property */
-struct ofp_controller_status_prop_experimenter {
+struct ofp_controller_status_prop_experimenter : of_controller_status_prop {
     uint16_t type; 
     uint16_t length; 
     uint32_t experimenter; 
@@ -860,7 +859,7 @@ enum ofp_stats_type(wire_type=uint16_t) {
 };
 
 /* Reason for generating flow stats. */
-enum ofp_flow_stats_reason {
+enum ofp_flow_stats_reason(wire_type=uint8_t) {
     OFPFSR_STATS_REQUEST = 0, 
     OFPFSR_STAT_TRIGGER = 1, 
 };
@@ -910,7 +909,7 @@ enum ofp_meter_feature_flags(wire_type=uint32_t, bitmask=True) {
 };
 
 /* Table Features request commands */
-enum ofp_table_features_command {
+enum ofp_table_features_command(wire_type=uint8_t) {
     OFPTFC_REPLACE = 0, 
     OFPTFC_MODIFY = 1,
     OFPTFC_ENABLE = 2, 
@@ -949,6 +948,14 @@ enum ofp_table_feature_prop_type(wire_type=uint16_t) {
     OFPTFPT_EXPERIMENTER = 0xfffe,
     OFPTFPT_EXPERIMENTER_MISS = 0xffff,
 };
+
+/* Table Mod property types.*/
+enum ofp_table_mod_prop_type {
+	OFPTMPT_EVICTION = 0x2, 
+	OFPTMPT_VACANCY = 0x3,
+	OFPTMPT_EXPERIMENTER = 0xFFFF, 
+};
+
 
 /* controller roles */
 enum ofp_controller_role(wire_type=uint32_t) {
@@ -1206,7 +1213,7 @@ enum ofp_flow_mod_failed_code(wire_type=uint16_t) {
 };
 
 /* ’flags’ bits in struct of_flow_monitor_request. */
-enum ofp_flow_monitor_flags (wire_type=uint16_t){
+enum ofp_flow_monitor_flags (wire_type=uint16_t, bitmask=True){
     OFPFMF_INITIAL = 0x1, 
     OFPFMF_ADD = 0x2, 
     OFPFMF_REMOVED = 0x4, 
@@ -1359,7 +1366,7 @@ enum ofp_bundle_failed_code(wire_type=uint16_t) {
     OFPBFC_SCHED_PAST = 18, 
 };
 
-enum ofp_bundle_feature_flags(wire_type=uint32_t) {
+enum ofp_bundle_feature_flags(wire_type=uint32_t, bitmask=True) {
     OFPBF_TIMESTAMP = 0x1, 
     OFPBF_TIME_SET_SCHED = 0x2, 
 };
@@ -1383,14 +1390,14 @@ struct of_table_mod_prop {
 };
 
 /* Eviction table mod Property. Mostly used in OFPMP_TABLE_DESC replies. */
-struct of_table_mod_prop_eviction {
+struct of_table_mod_prop_eviction : of_table_mod_prop {
     uint16_t type == 2;
     uint16_t length;
     enum ofp_table_mod_prop_eviction_flag flags;
 };
 
 /* Vacancy table mod property */
-struct of_table_mod_prop_vacancy {
+struct of_table_mod_prop_vacancy : of_table_mod_prop {
     uint16_t type == 3;
     uint16_t length;
     uint8_t vacancy_down;
@@ -1400,7 +1407,7 @@ struct of_table_mod_prop_vacancy {
 };
 
 /* Experimenter table mod property */
-struct of_table_mod_prop_experimenter {
+struct of_table_mod_prop_experimenter : of_table_mod_prop {
     uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == ?;
@@ -1443,6 +1450,7 @@ struct of_group_mod : of_header {
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Bucket for use in groups. */
@@ -1451,6 +1459,7 @@ struct of_bucket {
     uint16_t action_array_len;
     enum ofp_group_bucket bucket_id;
     list(of_action_t) actions;
+    list(of_group_bucket_prop_t) properties;
 };
 
 /* Common header for all group bucket properties. */
@@ -1460,7 +1469,7 @@ struct of_group_bucket_prop {
 };
 
 /* Group bucket weight property, for select groups only. */
-struct of_group_bucket_prop_weight {
+struct of_group_bucket_prop_weight : of_group_bucket_prop {
     uint16_t type == 0;
     uint16_t length; 
     uint16_t weight; 
@@ -1468,21 +1477,21 @@ struct of_group_bucket_prop_weight {
 };
 
 /* Group bucket watch port */
-struct of_group_bucket_prop_watch_port {
+struct of_group_bucket_prop_watch_port : of_group_bucket_prop {
     uint16_t type == 1; 
     uint16_t length; 
     uint32_t watch; 
 };
 
 /* Group bucket watch group */
-struct of_group_bucket_prop_watch_group {
+struct of_group_bucket_prop_watch_group : of_group_bucket_prop{
     uint16_t type == 2; 
     uint16_t length; 
     uint32_t watch; 
 };
 
 /* Experimenter group bucket property */
-struct of_group_bucket_prop_experimenter {
+struct of_group_bucket_prop_experimenter : of_group_bucket_prop {
     uint16_t type == 3;
     uint16_t length; 
     uint32_t experimenter == ?; 
@@ -1515,8 +1524,8 @@ struct of_port_mod : of_header {
     pad(4);
     of_mac_addr_t hw_addr;
     pad(2);
-    uint32_t config;
-    uint32_t mask;
+    enum ofp_port_config config;
+    enum ofp_port_config mask;
     list(of_port_mod_prop_t) properties;
 };
 
@@ -1530,7 +1539,7 @@ struct of_port_mod_prop {
 struct of_port_mod_prop_ethernet : of_port_mod_prop {
     uint16_t type == 0;
     uint16_t length;
-    uint32_t advertise;
+    enum ofp_port_features advertise;
 };
 
 /* Optical port mod property */
@@ -1558,8 +1567,8 @@ struct of_meter_mod : of_header {
     uint8_t type == 29;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
-    uint16_t flags;
+    enum ofp_meter_mod_command command;
+    enum ofp_meter_flags flags;
     uint32_t meter_id;
     list(of_meter_band_t) bands;
 };
@@ -1656,8 +1665,8 @@ struct of_flow_stats_reply : of_stats_reply {
     list(of_flow_stats_entry_t) entries;
 };
 
-/* Body for ofp_multipart_request of type OFPMP_FLOW_STAT */
-struct of_flow_desc_request : of_stats_request {
+/* Body for ofp_multipart_request of type OFPMP_FLOW_STATS */
+struct of_individual_flow_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1687,19 +1696,22 @@ struct of_flow_stats_entry {
     uint16_t importance;
     uint64_t cookie;
     of_match_t match;
+    of_stat_t stats;
+    list(of_instruction_t) instructions;
 };
 
-struct of_flow_desc_entry {
+struct of_individual_flow_stats_entry {
     uint16_t length;
     pad(2); 
     uint8_t table_id; 
-    uint8_t reason; 
+    enum ofp_flow_stats_reason reason; 
     uint16_t priority;
     of_match_t match; 
+    of_stat_t stats;
 };
 
 /* Body of reply to OFPMP_FLOW_STAT request */
-struct of_flow_desc_reply : of_stats_reply {
+struct of_individual_flow_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1707,7 +1719,7 @@ struct of_flow_desc_reply : of_stats_reply {
     uint16_t stats_type == 17;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_flow_desc_entry_t) entries;
+    list(of_individual_flow_stats_entry_t) entries;
 };
 
 /* Body for ofp_multipart_request of type OFPMP_AGGREGATE_STATS. */
@@ -1740,6 +1752,7 @@ struct of_aggregate_stats_reply : of_stats_reply {
     pad(4);
     of_stat_t stats; 
 };
+
 
 /* Body for ofp_multipart_request of types OFPMP_PORT_STATS */
 struct of_port_stats_request : of_stats_request {
@@ -1849,7 +1862,7 @@ struct of_port_desc_stats_reply : of_stats_reply {
     uint16_t stats_type == 13;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    //of_stat_t stats; 
+    list(of_port_desc_t) ports; 
 };
 
 /* Body for ofp_multipart_request of OFPMP_QUEUE_STATS. */
@@ -2026,14 +2039,14 @@ struct of_group_desc_stats_request : of_stats_request {
 };
 
 struct of_group_desc_stats_entry {
- uint16_t length;
+    uint16_t length;
     enum ofp_group_type group_type; 
     pad(1);
     uint32_t group_id; 
     uint16_t bucket_array_len; 
     pad(6);
     list(of_bucket_t) buckets;
-   //struct ofp_group_prop_header properties[0];
+    list(of_group_prop_t) properties;
 };
 
 /* Body of reply to OFPMP_GROUP_DESC request. */
@@ -2048,7 +2061,7 @@ struct of_group_desc_stats_reply : of_stats_reply {
     list(of_group_desc_stats_entry_t) entries;
 };
 
-/* Body of reply to OFPMP_GROUP_FEATURES request. Group features. */
+/* Body of OFPMP_GROUP_FEATURES request. Group features. */
 struct of_group_features_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
@@ -2069,7 +2082,7 @@ struct of_group_features_stats_reply : of_stats_reply {
     enum ofp_stats_reply_flags flags;
     pad(4);
     uint32_t types;
-    uint32_t capabilities;
+    enum ofp_group_capabilities capabilities;
     uint32_t max_groups_all;
     uint32_t max_groups_select;
     uint32_t max_groups_indirect;
@@ -2123,7 +2136,7 @@ struct of_meter_band_stats {
     uint64_t byte_band_count;
 };
 
-/* Body of OFPMP_METER_STATS request */
+/* Body of OFPMP_METER_DESC request */
 struct of_meter_config_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
@@ -2138,12 +2151,12 @@ struct of_meter_config_stats_request : of_stats_request {
 
 struct of_meter_config {
     uint16_t length;
-    uint16_t flags;
+    enum ofp_meter_flags flags;
     uint32_t meter_id;
     list(of_meter_band_t) entries;
 };
 
-/* Body of reply to OFPMP_METER_STATS request */
+/* Body of reply to OFPMP_METER_DESC request */
 struct of_meter_config_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
@@ -2222,13 +2235,20 @@ struct of_table_stats_reply : of_stats_reply {
     list(of_table_stats_entry_t) entries;
 };
 
+/* Flow monitor commands */
+enum ofp_flow_monitor_command(wire_type=uint8_t) {
+    OFPFMC_ADD = 0, 
+    OFPFMC_MODIFY = 1, 
+    OFPFMC_DELETE = 2, 
+};
+
 struct of_flow_monitor_entry {
     uint32_t monitor_id; 
     uint32_t out_port; 
     uint32_t out_group; 
     enum ofp_flow_monitor_flags flags;
     uint8_t table_id; 
-    uint8_t command; 
+    enum ofp_flow_monitor_command command; 
     of_match_t match;   
 };
 
@@ -2244,15 +2264,25 @@ struct of_flow_monitor_request : of_stats_request {
     list(of_flow_monitor_entry_t) entries;
 };
 
+enum ofp_flow_update_event(wire_type=uint16_t) {
+    OFPFME_INITIAL = 0, 
+    OFPFME_ADDED = 1, 
+    OFPFME_REMOVED = 2, 
+    OFPFME_MODIFIED = 3, 
+    OFPFME_ABBREV = 4, 
+    OFPFME_PAUSED = 5, 
+    OFPFME_RESUMED = 6,
+};
+
 struct of_flow_monitor_reply_entry {
     uint16_t length; 
-    uint16_t event; 
+    enum ofp_flow_update_event event; 
 };
 
 /* Body of OFPMP_FLOW_MONITOR reply */
 struct of_flow_monitor_reply : of_stats_reply {
     uint8_t version;
-    uint8_t type == 18;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
     uint16_t stats_type == 16;
@@ -2300,12 +2330,12 @@ struct of_table_feature_stats_request : of_stats_request {
 struct of_table_features {
     uint16_t length;
     uint8_t table_id;
-    uint8_t command;
-    uint32_t features;
+    enum ofp_table_features_command command;
+    enum ofp_table_feature_flag features;
     of_table_name_t name;
     uint64_t metadata_match;
     uint64_t metadata_write;
-    uint32_t capabilities;
+    enum ofp_table_config capabilities;
     uint32_t max_entries;
     list(of_table_feature_prop_t) properties;
 };
@@ -2519,6 +2549,7 @@ struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
     uint16_t actions_len;
     pad(2);
     of_match_t match;
+    list(of_action_t) actions;
     of_octets_t data;
 };
 
@@ -2583,8 +2614,8 @@ struct of_bundle_add_msg : of_header {
     uint32_t bundle_id;
     pad(1);
     enum ofp_bundle_flags flags;
-    of_octets_t data;
-    /* bundle property list */
+    of_header_t message;
+    list(of_bundle_prop_t) properties;
 };
 
 /* Bundle property types. */
@@ -2776,12 +2807,13 @@ struct of_flow_removed : of_header {
     uint16_t length;
     uint32_t xid;
     uint8_t table_id;
-    uint8_t reason;
+    enum ofp_flow_removed_reason reason;
     uint16_t priority;
     uint16_t idle_timeout;
     uint16_t hard_timeout;
     uint64_t cookie;
     of_match_t match;
+    of_stat_t stats;
 };
 
 /* A physical port has changed in the datapath */
@@ -2801,7 +2833,7 @@ struct of_role_status : of_header {
     uint8_t type == 30;
     uint16_t length;
     uint32_t xid;
-    uint32_t role;
+    enum ofp_controller_role role;
     enum ofp_controller_role_reason reason;
     pad(3);
     uint64_t generation_id;
@@ -2850,9 +2882,7 @@ struct of_requestforward : of_header {
     uint8_t type == 32;
     uint16_t length;
     uint32_t xid;
-    uint32_t role;
-    // TODO support embedding of_header
-    of_octets_t data;
+    of_header_t request;
 };
 
 /* OFPT_HELLO. This message includes zero or more hello elements having
@@ -3088,7 +3118,11 @@ struct of_group_add : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
+    uint16_t bucket_array_len;
+    pad(2);
+    enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Group Modify Message */
@@ -3101,7 +3135,11 @@ struct of_group_modify : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
+    uint16_t bucket_array_len;
+    pad(2);
+    enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Group Delete Message */
@@ -3114,7 +3152,11 @@ struct of_group_delete : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
+    uint16_t bucket_array_len;
+    pad(2);
+    enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Group Insert Bucket Message */
@@ -3127,7 +3169,11 @@ struct of_group_insert_bucket : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
+    uint16_t bucket_array_len;
+    pad(2);
+    enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Group Remove Bucket Message */
@@ -3140,7 +3186,11 @@ struct of_group_remove_bucket : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
+    uint16_t bucket_array_len;
+    pad(2);
+    enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
+	list(of_group_prop_t) properties; 
 };
 
 /* Hello Failed Error Message */
@@ -3427,7 +3477,7 @@ struct of_controller_status_stats_reply : of_stats_reply {
     uint16_t stats_type == 18;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_controller_status_t) controller_status;
+    list(of_controller_status_entry_t) controller_status;
 };
 
 /* Bundle features properties header */
@@ -3445,7 +3495,7 @@ struct of_bundle_features_stats_request : of_stats_request {
     uint16_t stats_type == 19;
     enum ofp_stats_request_flags flags;
     pad(4);
-    uint32_t feature_request_flags;
+    enum ofp_bundle_feature_flags feature_request_flags;
     pad(4);
     list(of_bundle_features_prop_t) properties;
 };
@@ -3459,7 +3509,7 @@ struct of_bundle_features_stats_reply : of_stats_reply {
     uint16_t stats_type == 19;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    uint16_t capabilities;
+    enum ofp_bundle_feature_flags capabilities;
     pad(6);
     list(of_bundle_features_prop_t) properties;
 };
@@ -3469,10 +3519,10 @@ struct of_bundle_features_prop_time : of_bundle_features_prop{
     uint16_t type == 1; 
     uint16_t length; 
     pad(4);
-    list(of_time_t) sched_accuracy; 
-    list(of_time_t) sched_max_future; 
-    list(of_time_t) sched_max_past; 
-    list(of_time_t) timestamp; 
+    of_time_t sched_accuracy; 
+    of_time_t sched_max_future; 
+    of_time_t sched_max_past; 
+    of_time_t timestamp; 
 };
 
 /* Experimenter stats request */

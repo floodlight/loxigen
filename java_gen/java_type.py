@@ -346,6 +346,9 @@ of_match = JType('Match') \
             default="OFFactoryVer$version.MATCH_WILDCARD_ALL");
 of_stat = JType('Stat') \
          .op(read='ChannelUtilsVer$version.readOFStat(bb)', write='$name.writeTo(bb)')
+of_time = JType('OFTime') \
+         .op(read='OFTimeVer$version.READER.readFrom(bb)', \
+             write='$name.writeTo(bb)')
 group_mod_cmd = JType('OFGroupModCommand', 'short') \
         .op(version=ANY, read="bb.readShort()", write="bb.writeShort($name)")
 flow_mod_cmd = JType('OFFlowModCommand', 'short') \
@@ -444,25 +447,10 @@ oxm_list = JType("OFOxmList") \
             read= 'OFOxmList.readFrom(bb, $length, OFOxmVer$version.READER)', \
             write='$name.writeTo(bb)',
             default="OFOxmList.EMPTY")
-duration = JType("OFDuration") \
-        .op(read="OFDuration.read8Bytes(bb)",
-            write="$name.write8Bytes(bb)")
-idle_time = JType("OFIdleTime") \
-        .op(read="OFIdleTime.read8Bytes(bb)",
-            write="$name.write8Bytes(bb)")
-flow_count = JType("OFFlowCount") \
-        .op(read="OFFlowCount.read8Bytes(bb)",
-            write="$name.write8Bytes(bb)")
-packet_count = JType("OFPacketCount") \
-        .op(read="OFPacketCount.read8Bytes(bb)",
-            write="$name.write8Bytes(bb)")
-byte_count = JType("OFByteCount") \
-        .op(read="OFByteCount.read8Bytes(bb)",
-            write="$name.write8Bytes(bb)")
-connection_uri = JType("OFConnectionURI") \
-        .op(read="OFConnectionURI.read4Bytes(bb)",
+connection_uri = JType("OFConnectionIndex") \
+        .op(read="OFConnectionIndex.read4Bytes(bb)",
             write="$name.write4Bytes(bb)")
-#Fixed Ver15
+#Fixed Ver15 (FIXME for 1.5 + versions)
 oxs = JType("OFOxs<?>")\
         .op(read="OFOxsVer15.READER.readFrom(bb)",
             write="$name.writeTo(bb)")
@@ -626,6 +614,8 @@ default_mtype_to_jtype_convert_map = {
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
         'of_controller_status_entry_t' : controller_status_entry,
+        'of_time_t' : of_time,
+        'of_header_t' : of_message,
         }
 
 ## Map that defines exceptions from the standard loxi->java mapping scheme
@@ -693,16 +683,16 @@ exceptions = {
         'of_oxm_packet_type' : { 'value' : packet_type },
         'of_oxm_packet_type_masked' : { 'value' : packet_type, 'value_mask' : packet_type },
 
-        'of_oxs_byte_count' : { 'value' : byte_count },
-        'of_oxs_byte_count_masked' : {'value' : byte_count, 'value_mask' : byte_count },
-        'of_oxs_duration' : { 'value' : duration },
-        'of_oxs_duration_masked' : {'value' : duration, 'value_mask' : duration },
-        'of_oxs_flow_count' : { 'value' : flow_count },
-        'of_oxs_flow_count_masked' : {'value' : flow_count, 'value_mask' : flow_count },
-        'of_oxs_idle_time' : { 'value' : idle_time },
-        'of_oxs_idle_time_masked' : {'value' : idle_time, 'value_mask' : idle_time },
-        'of_oxs_packet_count' : { 'value' : packet_count },
-        'of_oxs_packet_count_masked' : {'value' : packet_count, 'value_mask' : packet_count },
+        'of_oxs_byte_count' : { 'value' : u64 },
+        'of_oxs_byte_count_masked' : {'value' : u64, 'value_mask' : u64 },
+        'of_oxs_duration' : { 'value' : u64 },
+        'of_oxs_duration_masked' : {'value' : u64, 'value_mask' : u64 },
+        'of_oxs_flow_count' : { 'value' : u32obj },
+        'of_oxs_flow_count_masked' : {'value' : u32obj, 'value_mask' : u32obj },
+        'of_oxs_idle_time' : { 'value' : u64 },
+        'of_oxs_idle_time_masked' : {'value' : u64, 'value_mask' : u64 },
+        'of_oxs_packet_count' : { 'value' : u64 },
+        'of_oxs_packet_count_masked' : {'value' : u64, 'value_mask' : u64 },
 
         'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap_128 },
         'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap_128, 'value_mask': port_bitmap_128 },
