@@ -697,9 +697,8 @@ enum of_bsn_hash_packet_type(wire_type=uint8_t) {
     OF_BSN_HASH_PACKET_L2GRE = 1,
     OF_BSN_HASH_PACKET_IPV4 = 3,
     OF_BSN_HASH_PACKET_IPV6 = 4,
-    OF_BSN_HASH_PACKET_GTP = 5,
-    OF_BSN_HASH_PACKET_MPLS = 6,
-    OF_BSN_HASH_PACKET_SYMMETRIC = 7,
+    OF_BSN_HASH_PACKET_MPLS = 5,
+    OF_BSN_HASH_PACKET_SYMMETRIC = 6,
 };
 
 struct of_bsn_tlv_hash_packet_type : of_bsn_tlv {
@@ -709,7 +708,7 @@ struct of_bsn_tlv_hash_packet_type : of_bsn_tlv {
 };
 
 enum of_bsn_hash_packet_field(wire_type=uint64_t, bitmask=True) {
-    OFP_BSN_HASH_FIELD_DISABLE =     0x1,
+    // 0x1 is unused
     OFP_BSN_HASH_FIELD_DST_MAC =     0x2,
     OFP_BSN_HASH_FIELD_SRC_MAC =     0x4,
     OFP_BSN_HASH_FIELD_ETH_TYPE =    0x8,
@@ -734,4 +733,26 @@ struct of_bsn_tlv_hash_packet_field : of_bsn_tlv {
     uint16_t type == 103;
     uint16_t length;
     enum of_bsn_hash_packet_field value;
+};
+
+struct of_bsn_tlv_hash_gtp_header_match : of_bsn_tlv {
+    uint16_t type == 104;
+    uint16_t length;
+    uint8_t first_header_byte;
+    uint8_t first_header_mask;
+};
+
+enum of_bsn_hash_gtp_port_match(wire_type=uint8_t) {
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC = 1,
+    OF_BSN_HASH_GTP_PORT_MATCH_DST = 2,
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC_OR_DST = 3,
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC_AND_DST = 4,
+};
+
+struct of_bsn_tlv_hash_gtp_port_match : of_bsn_tlv {
+    uint16_t type == 105;
+    uint16_t length;
+    enum of_bsn_hash_gtp_port_match match;
+    uint16_t src_port;
+    uint16_t dst_port;
 };
