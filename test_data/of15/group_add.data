@@ -6,7 +6,7 @@
 01 # type (OFPGT_SELECT)
 00 # pad
 00 00 00 01 # group_id
-00 00 # bucket_array_len
+00 01 # bucket_array_len
 00 00 # pad
 ff ff ff 00 # command_bucket_id (BUCKET_MAX)
 

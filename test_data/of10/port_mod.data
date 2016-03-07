@@ -4,8 +4,8 @@
 00 00 00 02 # xid
 ff fd # port_no
 01 02 03 04 05 06 # hw_addr
-90 ab cd ef # config
-ff 11 ff 11 # mask
+80 00 00 6f # config
+80 00 00 11 # mask
 ca fe 67 89 # advertise
 00 00 00 00 # pad
 -- python
