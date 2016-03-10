@@ -756,3 +756,14 @@ struct of_bsn_tlv_hash_gtp_port_match : of_bsn_tlv {
     uint16_t src_port;
     uint16_t dst_port;
 };
+
+struct of_bsn_tlv_untagged : of_bsn_tlv {
+    uint16_t type == 106;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_vfp_class_id : of_bsn_tlv {
+    uint16_t type == 107;
+    uint16_t length;
+    uint8_t value;
+};
