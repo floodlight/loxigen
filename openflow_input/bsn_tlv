@@ -765,5 +765,5 @@ struct of_bsn_tlv_untagged : of_bsn_tlv {
 struct of_bsn_tlv_vfp_class_id : of_bsn_tlv {
     uint16_t type == 107;
     uint16_t length;
-    uint8_t value;
+    uint32_t value;
 };
