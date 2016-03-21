@@ -773,3 +773,51 @@ struct of_bsn_tlv_qos_priority : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_parent_port : of_bsn_tlv {
+    uint16_t type == 109;
+    uint16_t length;
+    of_port_no_t value;
+};
+
+struct of_bsn_tlv_loopback_port : of_bsn_tlv {
+    uint16_t type == 110;
+    uint16_t length;
+    of_port_no_t value;
+};
+
+struct of_bsn_tlv_vpn_key : of_bsn_tlv {
+    uint16_t type == 111;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_dscp : of_bsn_tlv {
+    uint16_t type == 112;
+    uint16_t length;
+    uint16_t value;  // 0-63
+};
+
+struct of_bsn_tlv_ttl : of_bsn_tlv {
+    uint16_t type == 113;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_next_hop_mac : of_bsn_tlv {
+    uint16_t type == 114;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_next_hop_ipv4 : of_bsn_tlv {
+    uint16_t type == 115;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_rate_limit : of_bsn_tlv {
+    uint16_t type == 116;
+    uint16_t length;
+    uint32_t value;  // in Kbps
+};
