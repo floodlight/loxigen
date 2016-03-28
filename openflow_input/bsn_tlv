@@ -821,3 +821,13 @@ struct of_bsn_tlv_rate_limit : of_bsn_tlv {
     uint16_t length;
     uint32_t value;  // in Kbps
 };
+
+struct of_bsn_tlv_vxlan_egress_lag : of_bsn_tlv {
+    uint16_t type == 117;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_cpu_lag : of_bsn_tlv {
+    uint16_t type == 118;
+    uint16_t length;
+};
