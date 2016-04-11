@@ -831,3 +831,9 @@ struct of_bsn_tlv_cpu_lag : of_bsn_tlv {
     uint16_t type == 118;
     uint16_t length;
 };
+
+struct of_bsn_tlv_uint64_list : of_bsn_tlv {
+    uint16_t type == 119;
+    uint16_t length;
+    list(of_uint64_t) value;
+};
