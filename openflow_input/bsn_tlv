@@ -655,3 +655,185 @@ struct of_bsn_tlv_status: of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_status value;
 };
+
+struct of_bsn_vlan_mac {
+    uint16_t vlan_vid;
+    of_mac_addr_t mac;
+};
+
+struct of_bsn_tlv_vlan_mac_list : of_bsn_tlv {
+    uint16_t type == 98;
+    uint16_t length;
+    list(of_bsn_vlan_mac_t) key;
+};
+
+struct of_bsn_tlv_vfi : of_bsn_tlv {
+    uint16_t type == 99;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_hash_seed : of_bsn_tlv {
+    uint16_t type == 100;
+    uint16_t length;
+    uint32_t seed1;
+    uint32_t seed2;
+};
+
+enum of_bsn_hash_type(wire_type=uint8_t) {
+    OFP_BSN_HASH_TYPE_L2 = 0,
+    OFP_BSN_HASH_TYPE_L3 = 1,
+    OFP_BSN_HASH_TYPE_ENHANCED = 2,
+};
+
+struct of_bsn_tlv_hash_type : of_bsn_tlv {
+    uint16_t type == 101;
+    uint16_t length;
+    enum of_bsn_hash_type value;
+};
+
+enum of_bsn_hash_packet_type(wire_type=uint8_t) {
+    OF_BSN_HASH_PACKET_L2 = 0,
+    OF_BSN_HASH_PACKET_L2GRE = 1,
+    OF_BSN_HASH_PACKET_IPV4 = 3,
+    OF_BSN_HASH_PACKET_IPV6 = 4,
+    OF_BSN_HASH_PACKET_MPLS = 5,
+    OF_BSN_HASH_PACKET_SYMMETRIC = 6,
+};
+
+struct of_bsn_tlv_hash_packet_type : of_bsn_tlv {
+    uint16_t type == 102;
+    uint16_t length;
+    enum of_bsn_hash_packet_type value;
+};
+
+enum of_bsn_hash_packet_field(wire_type=uint64_t, bitmask=True) {
+    // 0x1 is unused
+    OFP_BSN_HASH_FIELD_DST_MAC =     0x2,
+    OFP_BSN_HASH_FIELD_SRC_MAC =     0x4,
+    OFP_BSN_HASH_FIELD_ETH_TYPE =    0x8,
+    OFP_BSN_HASH_FIELD_VLAN_ID =     0x10,
+    OFP_BSN_HASH_FIELD_INNER_L2 =    0x20,
+    OFP_BSN_HASH_FIELD_INNER_L3 =    0x40,
+    OFP_BSN_HASH_FIELD_SRC_IP =      0x80,
+    OFP_BSN_HASH_FIELD_DST_IP =      0x100,
+    OFP_BSN_HASH_FIELD_IP_PROTO =    0x200,
+    OFP_BSN_HASH_FIELD_SRC_L4_PORT = 0x400,
+    OFP_BSN_HASH_FIELD_DST_L4_PORT = 0x800,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL1 = 0x1000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL2 = 0x2000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL3 = 0x4000,
+    OFP_BSN_HASH_FIELD_MPLS_LABEL_HI_BITS  = 0x8000,
+    OFP_BSN_HASH_FIELD_MPLS_PAYLOAD_SRC_IP = 0x10000,
+    OFP_BSN_HASH_FIELD_MPLS_PAYLOAD_DST_IP = 0x20000,
+    OFP_BSN_HASH_FIELD_SYMMETRIC =           0x40000,
+};
+
+struct of_bsn_tlv_hash_packet_field : of_bsn_tlv {
+    uint16_t type == 103;
+    uint16_t length;
+    enum of_bsn_hash_packet_field value;
+};
+
+struct of_bsn_tlv_hash_gtp_header_match : of_bsn_tlv {
+    uint16_t type == 104;
+    uint16_t length;
+    uint8_t first_header_byte;
+    uint8_t first_header_mask;
+};
+
+enum of_bsn_hash_gtp_port_match(wire_type=uint8_t) {
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC = 1,
+    OF_BSN_HASH_GTP_PORT_MATCH_DST = 2,
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC_OR_DST = 3,
+    OF_BSN_HASH_GTP_PORT_MATCH_SRC_AND_DST = 4,
+};
+
+struct of_bsn_tlv_hash_gtp_port_match : of_bsn_tlv {
+    uint16_t type == 105;
+    uint16_t length;
+    enum of_bsn_hash_gtp_port_match match;
+    uint16_t src_port;
+    uint16_t dst_port;
+};
+
+struct of_bsn_tlv_untagged : of_bsn_tlv {
+    uint16_t type == 106;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_vfp_class_id : of_bsn_tlv {
+    uint16_t type == 107;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_qos_priority : of_bsn_tlv {
+    uint16_t type == 108;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_parent_port : of_bsn_tlv {
+    uint16_t type == 109;
+    uint16_t length;
+    of_port_no_t value;
+};
+
+struct of_bsn_tlv_loopback_port : of_bsn_tlv {
+    uint16_t type == 110;
+    uint16_t length;
+    of_port_no_t value;
+};
+
+struct of_bsn_tlv_vpn_key : of_bsn_tlv {
+    uint16_t type == 111;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_dscp : of_bsn_tlv {
+    uint16_t type == 112;
+    uint16_t length;
+    uint16_t value;  // 0-63
+};
+
+struct of_bsn_tlv_ttl : of_bsn_tlv {
+    uint16_t type == 113;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_next_hop_mac : of_bsn_tlv {
+    uint16_t type == 114;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_next_hop_ipv4 : of_bsn_tlv {
+    uint16_t type == 115;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_rate_limit : of_bsn_tlv {
+    uint16_t type == 116;
+    uint16_t length;
+    uint32_t value;  // in Kbps
+};
+
+struct of_bsn_tlv_vxlan_egress_lag : of_bsn_tlv {
+    uint16_t type == 117;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_cpu_lag : of_bsn_tlv {
+    uint16_t type == 118;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_uint64_list : of_bsn_tlv {
+    uint16_t type == 119;
+    uint16_t length;
+    list(of_uint64_t) value;
+};

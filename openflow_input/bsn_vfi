@@ -1,4 +1,4 @@
-// Copyright 2014, Big Switch Networks, Inc.
+// Copyright 2016, Big Switch Networks, Inc.
 //
 // LoxiGen is licensed under the Eclipse Public License,
 // version 1.0 (EPL), with the following special exception:
@@ -28,21 +28,20 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-#version 3
 #version 4
 #version 5
 
 /*
- * L2 Cache Hit
+ * VXLAN VFI INDEX
  */
 
-struct of_oxm_bsn_l2_cache_hit : of_oxm {
-    uint32_t type_len == 0x00032401;
-    uint8_t value;
+struct of_oxm_bsn_vfi : of_oxm {
+    uint32_t type_len == 0x00033202;
+    uint16_t value;
 };
 
-struct of_oxm_bsn_l2_cache_hit_masked : of_oxm {
-    uint32_t type_len == 0x00032502;
-    uint8_t value;
-    uint8_t value_mask;
+struct of_oxm_bsn_vfi_masked : of_oxm {
+    uint32_t type_len == 0x00033304;
+    uint16_t value;
+    uint16_t value_mask;
 };
