@@ -2333,6 +2333,8 @@ struct of_queue_desc_stats_request : of_stats_request {
     uint16_t stats_type == 15;
     enum ofp_stats_request_flags flags;
     pad(4);
+    of_port_no_t port_no;
+    uint32_t queue_id;
 };
 
 struct of_queue_desc_prop {
