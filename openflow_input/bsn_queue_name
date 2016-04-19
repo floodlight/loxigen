@@ -32,5 +32,5 @@ struct of_queue_desc_prop_bsn_queue_name : of_queue_desc_prop_bsn {
     uint16_t length;
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 0;
-    of_str64_t name;
+    of_octets_t name; /* UTF-8 encoded. Not null terminated. */
 };
