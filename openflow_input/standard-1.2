@@ -1121,7 +1121,7 @@ struct of_experimenter_error_msg : of_error_msg {
     uint32_t xid;
     uint16_t err_type == 0xffff;
     uint16_t subtype;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
