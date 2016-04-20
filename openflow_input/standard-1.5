@@ -274,7 +274,6 @@ struct of_port_desc_prop_experimenter : of_port_desc_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-    //of_octets_t experimenter_data;
 };
 
 /* ----------------------------------------------- FLOW MATCH -------------------------------------- */
@@ -672,7 +671,6 @@ struct ofp_controller_status_prop_experimenter : of_controller_status_prop {
     uint16_t length; 
     uint32_t experimenter == ?;
     uint32_t exp_type; 
-    of_octets_t experimenter_data;
 };
 
 /* -------------------------------------------------- MESSAGES --------------------------------------------- */
@@ -1496,7 +1494,6 @@ struct of_group_bucket_prop_experimenter : of_group_bucket_prop {
     uint16_t length; 
     uint32_t experimenter == ?; 
     uint32_t exp_type; 
-    of_octets_t experimenter_data;
 };
 
 /* Common header for all group properties. */
@@ -1511,7 +1508,6 @@ struct of_group_prop_experimenter {
     uint16_t length; 
     uint32_t experimenter == ?; 
     uint32_t exp_type; 
-    of_octets_t experimenter_data;
 };
 
 /* Modify behavior of the physical port */
@@ -1837,7 +1833,6 @@ struct of_port_stats_prop_experimenter : of_port_stats_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-    of_octets_t experimenter_data;
 };
 
 /* Body for ofp_multipart_request of OFPMP_PORT_DESC. */
@@ -1914,7 +1909,6 @@ struct of_queue_stats_prop_experimenter : of_queue_stats_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-    of_octets_t experimenter_data;
 };  
 
 /* Body for ofp_multipart_request of OFPMP_QUEUE_DESC */
@@ -1978,7 +1972,6 @@ struct of_queue_desc_prop_experimenter : of_queue_desc_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-    of_octets_t experimenter_data;
 };
 
 /* Body of OFPMP_GROUP_STATS */
@@ -2519,7 +2512,6 @@ struct of_table_feature_prop_experimenter : of_table_feature_prop {
     uint16_t         length;
     uint32_t         experimenter == ?;
     uint32_t         subtype;
-    of_octets_t      experimenter_data;
 };
 
 /* OFPTFPT_EXPERIMENTER_MISS property */
@@ -2528,7 +2520,6 @@ struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
     uint16_t         length;
     uint32_t         experimenter == ?;
     uint32_t         subtype;
-    of_octets_t      experimenter_data;
 };
 
 /*
@@ -2638,7 +2629,6 @@ struct of_bundle_prop_experimenter : of_bundle_prop {
     uint16_t length; 
     uint32_t experimenter == ?; 
     uint32_t exp_type;
-    of_octets_t experimenter_data;
 };
 
 /* Time Format. */
@@ -2772,7 +2762,6 @@ struct of_async_config_prop_experimenter_slave : of_async_config_prop {
     uint16_t length;
     //uint32_t experimenter == ?;
     //uint32_t exp_type;
-    //of_octets_t experimenter_data;
 };
 
 /* OFPTFPT_EXPERIMENTER_MASTER property */
@@ -2781,7 +2770,6 @@ struct of_async_config_prop_experimenter_master : of_async_config_prop {
     uint16_t length;
     //uint32_t experimenter == ?;
     //uint32_t exp_type;
-    //of_octets_t experimenter_data;
 };
 
 /* Packet received on port (datapath -> controller). */
@@ -2852,7 +2840,6 @@ struct of_role_prop_experimenter : of_role_prop {
     uint16_t length;
     uint32_t experimenter == ?;
     uint32_t exp_type;
-    of_octets_t experimenter_data;
 };
 
 /* Table descriotion */
