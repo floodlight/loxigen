@@ -86,7 +86,7 @@ struct of_bsn_gentable_entry_add : of_bsn_header {
     uint32_t experimenter == 0x5c16c7;
     uint32_t subtype == 46;
     uint16_t table_id;
-    uint16_t key_length;
+    uint16_t key_length == length(key);
     of_checksum_128_t checksum;
     list(of_bsn_tlv_t) key;
     list(of_bsn_tlv_t) value;
@@ -181,7 +181,7 @@ struct of_bsn_gentable_entry_desc_stats_request : of_bsn_stats_request {
 
 struct of_bsn_gentable_entry_desc_stats_entry {
     uint16_t length;
-    uint16_t key_length;
+    uint16_t key_length == length(key);
     of_checksum_128_t checksum;
     list(of_bsn_tlv_t) key;
     list(of_bsn_tlv_t) value;
@@ -224,7 +224,7 @@ struct of_bsn_gentable_entry_stats_request : of_bsn_stats_request {
 
 struct of_bsn_gentable_entry_stats_entry {
     uint16_t length;
-    uint16_t key_length;
+    uint16_t key_length == length(key);
     list(of_bsn_tlv_t) key;
     list(of_bsn_tlv_t) stats;
 };
