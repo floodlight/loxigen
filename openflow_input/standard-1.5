@@ -636,7 +636,7 @@ enum ofp_controller_status_prop_type {
 
 /* Common header for all Controller Status Properties */
 struct of_controller_status_prop {
-    uint16_t type; 
+    uint16_t type == ?;
     uint16_t length; 
 };
 
@@ -661,16 +661,16 @@ struct of_controller_status : of_header {
 
 /* Connection URI controller status property */
 struct ofp_controller_status_prop_uri : of_controller_status_prop {
-    uint16_t type; 
+    uint16_t type == 0; 
     uint16_t length; 
     of_controller_uri_t uri;
 };
 
 /* Experimenter controller status property */
 struct ofp_controller_status_prop_experimenter : of_controller_status_prop {
-    uint16_t type; 
+    uint16_t type == 0xffff;
     uint16_t length; 
-    uint32_t experimenter; 
+    uint32_t experimenter == ?;
     uint32_t exp_type; 
     of_octets_t experimenter_data;
 };
@@ -1464,7 +1464,7 @@ struct of_bucket {
 
 /* Common header for all group bucket properties. */
 struct of_group_bucket_prop {
-    uint16_t type; 
+    uint16_t type == ?;
     uint16_t length; 
 };
 
@@ -1501,7 +1501,7 @@ struct of_group_bucket_prop_experimenter : of_group_bucket_prop {
 
 /* Common header for all group properties. */
 struct of_group_prop {
-    uint16_t type; 
+    uint16_t type == ?;
     uint16_t length; 
 };
 
@@ -3399,7 +3399,7 @@ struct of_experimenter_error_msg : of_error_msg {
     uint32_t xid;
     uint16_t err_type == 0xffff;
     uint16_t subtype;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
