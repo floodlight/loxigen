@@ -172,10 +172,13 @@ def initialize_versions():
 
     for version in loxi_globals.OFVersions.target_versions:
         wire_version = version.wire_version
-        version_name = of_g.of_version_wire2name[wire_version]
-        of_g.wire_ver_map[wire_version] = version_name
-        versions[version_name] = dict(
-            version_name = version_name,
+        long_constant = version.constant_version('OF_VERSION_')
+        of_g.wire_ver_map[wire_version] = long_constant
+        of_g.short_version_names[wire_version] = version.short_constant
+        of_g.of_version_range.append(wire_version)
+        of_g.of_version_wire2name[wire_version] = long_constant
+        versions[long_constant] = dict(
+            version_name = version.constant,
             wire_version = wire_version,
             classes = {})
         of_g.ordered_classes[wire_version] = []
