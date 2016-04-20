@@ -1,4 +1,4 @@
-#!/bin/bash -eu
+#!/bin/bash -eux
 
 # Push the loxigen artifacts to a dedicated git repository,
 # along with a nice commit message and a tag
