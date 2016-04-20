@@ -195,5 +195,44 @@ struct of_queue_prop_min_rate : of_queue_prop {
         ]
         self.assertEquals(expected_classes, ofinput.classes)
 
+    def test_field_length(self):
+        ast = parser.parse("""
+#version 1
+
+struct of_test_entry {
+    uint32_t x;
+};
+
+struct of_test {
+    uint16_t list_len == length(list);
+    list(of_test_entry_t) list;
+};
+""")
+
+        # Not testing the parser, just making sure the AST is what we expect
+        expected_ast = [
+            ['metadata', 'version', '1'],
+
+            ['struct', 'of_test_entry', [], None, [
+                ['data', ['scalar', 'uint32_t'], 'x']]],
+
+            ['struct', 'of_test', [], None, [
+                ['field_length', ['scalar', 'uint16_t'], 'list_len', 'list'],
+                ['data', ['list', 'list(of_test_entry_t)'], 'list']]]
+        ]
+        self.assertEquals(expected_ast, ast)
+
+        ofinput = frontend.create_ofinput("standard-1.0", ast)
+        expected_classes = [
+            OFClass(name='of_test_entry', superclass=None, virtual=False, params={},
+                members=[
+                    OFDataMember('x', 'uint32_t')]),
+            OFClass(name='of_test', superclass=None, virtual=False, params={},
+                members=[
+                    OFFieldLengthMember('list_len', 'uint16_t', 'list'),
+                    OFDataMember('list', 'list(of_test_entry_t)')])
+        ]
+        self.assertEquals(expected_classes, ofinput.classes)
+
 if __name__ == '__main__':
     unittest.main()

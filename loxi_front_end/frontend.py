@@ -61,6 +61,8 @@ def create_member(m_ast, ctx):
             return ir.OFDataMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
     elif m_ast[0] == 'discriminator':
         return ir.OFDiscriminatorMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx))
+    elif m_ast[0] == 'field_length':
+        return ir.OFFieldLengthMember(name=m_ast[2], oftype=get_type(m_ast[1], ctx), field_name=m_ast[3])
     else:
         raise InputError("Dont know how to create member: %s" % m_ast[0])
 
