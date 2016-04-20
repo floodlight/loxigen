@@ -16,10 +16,6 @@ ARTIFACT_REPO=$(mktemp -d --tmpdir "push-artifacts-repo.XXXXXXX")
 
 git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO} -b ${ARTIFACT_REPO_BRANCH}
 
-if [[ $ARTIFACT_REPO_BRANCH != $ARTIFACT_TARGET_BRANCH ]]; then
-    git checkout -b ${ARTIFACT_TARGET_BRANCH} -t ${ARTIFACT_REPO_BRANCH}
-fi
-
 find ${ARTIFACT_REPO} -mindepth 1 -maxdepth 1 -type d \! -name '.*' -print0 | xargs -0 rm -r
 make LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
 
@@ -63,8 +59,12 @@ fi
     ) | git commit --file=-
 
     git tag -a -f "loxi/${loxi_head}" -m "Tag Loxigen Revision ${loxi_head}"
-    git push --tags
-    git push origin HEAD
+    git push --tags -f
+    if [[ $ARTIFACT_TARGET_BRANCH != $ARTIFACT_REPO_BRANCH ]]; then
+        git push -f origin HEAD:${ARTIFACT_TARGET_BRANCH}
+    else
+        git push origin HEAD
+    fi
 )
 
 rm -rf ${ARTIFACT_REPO}
