@@ -53,6 +53,8 @@ any_type = P.Group(enum_type | array_type | list_type | scalar_type).setName("ty
 # Structs
 pad_member = P.Group(kw('pad') - s('(') - integer - s(')'))
 discriminator_member = P.Group(tag('discriminator') + any_type + identifier + s('==') + s('?'))
+field_length_member = P.Group(tag('field_length') + any_type + identifier + \
+    s('==') + s('length') + s('(') + identifier + s(')'))
 type_member = P.Group(tag('type') + any_type + identifier + s('==') + integer)
 data_member = P.Group(tag('data') + any_type - identifier)
 
@@ -61,7 +63,7 @@ struct_param = P.Group(struct_param_name - s('=') - word)
 struct_param_list = P.Forward()
 struct_param_list << struct_param + P.Optional(s(',') - P.Optional(struct_param_list))
 
-struct_member = pad_member | type_member | discriminator_member | data_member;
+struct_member = pad_member | type_member | discriminator_member | field_length_member | data_member;
 parent = (s(':') - identifier) | tag(None)
 struct = kw('struct') - identifier - P.Group(P.Optional(s('(') - struct_param_list - s(')'))) - parent - s('{') + \
          P.Group(P.ZeroOrMore(struct_member - s(';'))) + \

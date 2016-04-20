@@ -139,6 +139,19 @@ struct foo {
         self.assertEquals(ast,
             [['struct', 'foo', [], None, [['discriminator', ['scalar', 'uint16_t'], 'foo']]]])
 
+    def test_field_length(self):
+        src = """\
+struct foo {
+    uint16_t list_len == length(list);
+    list(of_uint32_t) list;
+};
+"""
+        ast = parser.parse(src)
+        self.assertEquals(ast,
+            [['struct', 'foo', [], None, [
+                ['field_length', ['scalar', 'uint16_t'], 'list_len', 'list'],
+                ['data', ['list', 'list(of_uint32_t)'], 'list']]]])
+
 class EnumTests(unittest.TestCase):
     def test_empty(self):
         src = """\
