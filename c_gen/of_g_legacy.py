@@ -297,11 +297,7 @@ of_version_range = []
 of_version_wire2name = {}
 
 for version in loxi_globals.OFVersions.all_supported:
-    v = version.version.replace('.', '_')
-    short_version_names[version.wire_version] = 'OF_' + v
-    of_version_range.append(version.wire_version)
-    of_version_wire2name[version.wire_version] = 'OF_VERSION_' + v
-    globals()['VERSION_' + v] = version.wire_version
+    globals()[version.constant] = version.wire_version
 
 
 ################################################################

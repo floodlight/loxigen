@@ -52,7 +52,7 @@ all: c python java wireshark
 c: .loxi_ts.c
 
 .loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
-	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c --version-list=1.0,1.1,1.2,1.3,1.4
 	touch $@
 
 python: .loxi_ts.python
