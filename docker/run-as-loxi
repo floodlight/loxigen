@@ -1,0 +1,13 @@
+#!/bin/bash -e
+
+loxi_uid=$(stat -c'%u' /loxi/loxigen.py)
+loxi_gid=$(stat -c'%g' /loxi/loxigen.py)
+usermod -u $loxi_uid -g $loxi_gid loxi || echo "ok"
+
+cd /loxi
+if [[ "$*" ]]; then
+    sudo -u loxi -i /bin/bash -c "$*"
+else
+    sudo -u loxi -i /bin/bash
+fi
+
