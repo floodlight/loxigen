@@ -38,4 +38,8 @@ match = match_v3
 :: elif version == OFVersions.VERSION_1_4:
 :: # HACK
 match = match_v3
+:: elif version == OFVersions.VERSION_1_5:
+:: # HACK
+match = match_v3
+stat = stat_v6
 :: #endif
