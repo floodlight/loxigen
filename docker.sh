@@ -5,4 +5,4 @@ else
     tty_flag=""
 fi
 dir=$(python -c 'import os; import sys; print os.path.abspath(sys.argv[1])' $(dirname "$0"))
-docker run -i $tty_flag --rm -v $dir:/loxi --rm floodlight/loxi-builder-ubuntu14 "$@"
+docker run -i $tty_flag --rm -v $dir:/loxi floodlight/loxi-builder-ubuntu14 "$@"
