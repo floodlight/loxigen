@@ -1,3 +1,8 @@
 #!/bin/bash
-dir=$(readlink -f $(dirname "$0"))
-docker run -it -v $dir:/loxi --rm floodlight/loxi-builder "$@"
+if [ -t 1 ]; then
+    tty_flag="-t"
+else
+    tty_flag=""
+fi
+dir=$(python -c 'import os; import sys; print os.path.abspath(sys.argv[1])' $(dirname "$0"))
+docker run -i $tty_flag --rm -v $dir:/loxi --rm floodlight/loxi-builder-ubuntu14 "$@"
