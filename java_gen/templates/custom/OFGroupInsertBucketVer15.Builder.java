@@ -10,7 +10,7 @@ public List<OFBucket> insertBucketBasedOnCommandBucketId(OFBucket bucket) {
 }
 
 
-public List<OFBucket> insertBucketBasedOnSpesificIndex(OFBucket bucket, int index) {
+public List<OFBucket> insertBucketBasedOnSpecificIndex(OFBucket bucket, int index) {
 	if(index <= buckets.size())
 		buckets.add(index,bucket);
 	else

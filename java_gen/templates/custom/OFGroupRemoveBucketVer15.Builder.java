@@ -12,7 +12,7 @@
 	}
 
 
-	public List<OFBucket> removeBucketBasedOnSpesificIndex(int index) {
+	public List<OFBucket> removeBucketBasedOnSpecificIndex(int index) {
 		if(index <= buckets.size())
 			buckets.remove(index);
 		else
