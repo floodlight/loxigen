@@ -19,16 +19,16 @@ ff 00 ff 00 ff 00 ff 00 # cookie_mask
 00 00 00 05 # match.oxm_list[0].mask
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
-	   .setTableId(TableId.of(1))
-	   .setOutPort(OFPort.of(4))
-	   .setOutGroup(OFGroup.of(1))
-       .setCookie(U64.parseHex("FEDCBA9876543210"))
-       .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
-	   .setMatch(
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setTableId(TableId.of(1))
+        .setOutPort(OFPort.of(4))
+        .setOutGroup(OFGroup.of(1))
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
+        .setMatch(
         factory.buildMatch()
             .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
-        	.build()
-    )
-	.build()
+            .build())
+        .build()

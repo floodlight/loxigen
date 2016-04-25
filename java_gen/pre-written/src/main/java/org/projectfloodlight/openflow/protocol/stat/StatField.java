@@ -6,7 +6,7 @@ import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.protocol.stat.StatFields;
 
 public class StatField<F extends OFValueType<F>> {
-	
+
     private final String name;
     public final StatFields id;
     

@@ -11,8 +11,9 @@
 00 00 00 03 # elements[1].bitmaps[0]
 00 00 00 04 # elements[1].bitmaps[1]
 --java
-builder.setXid(0x12345678)
-	   .setElements(ImmutableList.<OFHelloElem>of(
-				factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(1),U32.of(2))).build(),
-				factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(3),U32.of(4))).build()))
-		.build()
+builder
+        .setXid(0x12345678)
+        .setElements(ImmutableList.<OFHelloElem>of(
+                factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(1),U32.of(2))).build(),
+                factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(3),U32.of(4))).build()))
+        .build()

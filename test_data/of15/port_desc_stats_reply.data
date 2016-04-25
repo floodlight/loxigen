@@ -24,19 +24,20 @@
 00 00 00 06 # max_speed
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	    .setPorts(ImmutableList.<OFPortDesc>of(factory.buildPortDesc().setPortNo(OFPort.of(1))
-																	 .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
-																	 .setName("Port1")
-																	 .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
-																	 .setState(ImmutableSet.<OFPortState>of(OFPortState.LIVE))
-																	 .setProperties(ImmutableList.<OFPortDescProp>of(factory.buildPortDescPropEthernet().setCurr(1)
-																																								.setAdvertised(2)
-																																								.setSupported(3)
-																																								.setPeer(4)
-																																								.setCurrSpeed(5)
-																																								.setMaxSpeed(6)
-																																								.build()
-																	 )).build()))
-	   .build();
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setPorts(ImmutableList.<OFPortDesc>of(factory.buildPortDesc().setPortNo(OFPort.of(1))
+                                                                    .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
+                                                                    .setName("Port1")
+                                                                    .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
+                                                                    .setState(ImmutableSet.<OFPortState>of(OFPortState.LIVE))
+                                                                    .setProperties(ImmutableList.<OFPortDescProp>of(factory.buildPortDescPropEthernet().setCurr(1)
+                                                                                                                                                        .setAdvertised(2)
+                                                                                                                                                        .setSupported(3)
+                                                                                                                                                        .setPeer(4)
+                                                                                                                                                        .setCurrSpeed(5)
+                                                                                                                                                        .setMaxSpeed(6)
+                                                                                                                                                        .build()
+                                            )).build()))
+        .build();

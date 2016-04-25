@@ -23,14 +23,15 @@ b2 d0 5e 00 # properties[0].sched_max_past.nanoseconds
 b2 d0 5e 00 # properties[0].timestamp;.nanoseconds
 00 00 00 00 # properties[0].timestamp;.pad
 --  java
-builder.setXid(0x12345678)
-       .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
-	   .setFeatureRequestFlags(ImmutableSet.<OFBundleFeatureFlags>of(OFBundleFeatureFlags.TIMESTAMP))
-	   .setProperties(ImmutableList.<OFBundleFeaturesProp>of(factory.buildBundleFeaturesPropTime().setSchedAccuracy(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
-																								.setSchedMaxFuture(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
-																								.setSchedMaxPast(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
-																								.setTimestamp(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
-																								.build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setFeatureRequestFlags(ImmutableSet.<OFBundleFeatureFlags>of(OFBundleFeatureFlags.TIMESTAMP))
+        .setProperties(ImmutableList.<OFBundleFeaturesProp>of(factory.buildBundleFeaturesPropTime().setSchedAccuracy(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
+                                                                                                .setSchedMaxFuture(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
+                                                                                                .setSchedMaxPast(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
+                                                                                                .setTimestamp(factory.buildTime().setSeconds(U64.of(3)).setNanoseconds(3000000000L).build())
+                                                                                                .build()))
+        .build()
 
  

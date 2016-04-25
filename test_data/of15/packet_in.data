@@ -19,16 +19,15 @@ fe dc ba 98 76 54 32 10 # cookie
 61 62 63 # data
 -- java
 builder
-   .setXid(0x12345678)
-   .setBufferId(OFBufferId.of(100))
-   .setTotalLen(17000)
-   .setReason(OFPacketInReason.ACTION)
-   .setTableId(TableId.of(20))
-   .setCookie(U64.parseHex("FEDCBA9876543210"))
-   .setMatch(
-        factory.buildMatchV3()
-            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
-            .setExact(MatchField.ARP_OP, ArpOpcode.REQUEST)
-        	.build()
-    )
-    .setData(new byte[] { 97, 98, 99 } );
+        .setXid(0x12345678)
+        .setBufferId(OFBufferId.of(100))
+        .setTotalLen(17000)
+        .setReason(OFPacketInReason.ACTION)
+        .setTableId(TableId.of(20))
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setMatch(
+            factory.buildMatchV3()
+                .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                .setExact(MatchField.ARP_OP, ArpOpcode.REQUEST)
+                .build())
+        .setData(new byte[] { 97, 98, 99 } );

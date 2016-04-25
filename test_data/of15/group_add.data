@@ -31,17 +31,17 @@ ff ff ff fd # bucket_id of this bucket (fd == first bucket in list)
 
 -- java 
 builder
-	.setXid(0x12345678)
-	.setGroupType(OFGroupType.SELECT)
-	.setGroup(OFGroup.of(1))
-	.setCommandBucketId(OFGroupBucket.BUCKET_MAX)
-	.setBuckets(ImmutableList.<OFBucket>of(factory.buildBucket()
-		.setBucketId(OFGroupBucket.BUCKET_FIRST)
-	       	.setActions(ImmutableList.<OFAction>of(
-			factory.actions().output(OFPort.of(1),3),
-                	factory.actions().group(OFGroup.of(1))))
-	       	.setProperties(ImmutableList.<OFGroupBucketProp>of(factory.buildGroupBucketPropWeight()
-                   	.setWeight(0)
-                   	.build()))
-               	.build()))
+        .setXid(0x12345678)
+        .setGroupType(OFGroupType.SELECT)
+        .setGroup(OFGroup.of(1))
+        .setCommandBucketId(OFGroupBucket.BUCKET_MAX)
+        .setBuckets(ImmutableList.<OFBucket>of(factory.buildBucket()
+                    .setBucketId(OFGroupBucket.BUCKET_FIRST)
+                    .setActions(ImmutableList.<OFAction>of(
+                        factory.actions().output(OFPort.of(1),3),
+                        factory.actions().group(OFGroup.of(1))))
+                    .setProperties(ImmutableList.<OFGroupBucketProp>of(factory.buildGroupBucketPropWeight()
+                                                            .setWeight(0)
+                                                            .build()))
+                    .build()))
 

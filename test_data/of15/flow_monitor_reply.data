@@ -8,7 +8,8 @@
 00 04 # length
 00 01 # event 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFFlowMonitorReplyEntry>of(factory.buildFlowMonitorReplyEntry().setEvent(OFFlowUpdateEvent.ADDED).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFFlowMonitorReplyEntry>of(factory.buildFlowMonitorReplyEntry().setEvent(OFFlowUpdateEvent.ADDED).build()))
+        .build()

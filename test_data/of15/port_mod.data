@@ -12,11 +12,12 @@
 00 08 # properties[0].length 
 00 00 00 01 # properties[0].advertise (OFPPF_10MB_HD)
 -- java
-builder.setXid(0x12345678)
-       .setPortNo(OFPort.of(1))
-	   .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
-	   .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
-	   .setMask(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
-	   .setProperties(ImmutableList.<OFPortModProp>of(factory.buildPortModPropEthernet().setAdvertise(ImmutableSet.<OFPortFeatures>of(OFPortFeatures.PF_10MB_HD)).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setPortNo(OFPort.of(1))
+        .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
+        .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
+        .setMask(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
+        .setProperties(ImmutableList.<OFPortModProp>of(factory.buildPortModPropEthernet().setAdvertise(ImmutableSet.<OFPortFeatures>of(OFPortFeatures.PF_10MB_HD)).build()))
+        .build()
 

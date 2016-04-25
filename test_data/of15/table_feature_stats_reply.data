@@ -20,16 +20,16 @@
 00 04 # instruction_id[0].len
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFTableFeatures>of(factory.buildTableFeatures().setTableId(TableId.of(1))
-																				 .setCommand(OFTableFeaturesCommand.ENABLE)
-																				 .setFeatures(ImmutableSet.<OFTableFeatureFlag>of(OFTableFeatureFlag.INGRESS_TABLE))
-																				 .setName("abc")
-																				 .setMetadataMatch(U64.of(1))
-																				 .setMetadataWrite(U64.of(1))
-																				 .setCapabilities(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
-																				 .setMaxEntries(10)
-																				 .setProperties(ImmutableList.<OFTableFeatureProp>of(factory.buildTableFeaturePropInstructionsMiss().setInstructionIds(ImmutableList.<OFInstructionId>of(factory.instructionIds().applyActions())).build())).build()))
-																				 
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFTableFeatures>of(factory.buildTableFeatures().setTableId(TableId.of(1))
+                                                                                .setCommand(OFTableFeaturesCommand.ENABLE)
+                                                                                .setFeatures(ImmutableSet.<OFTableFeatureFlag>of(OFTableFeatureFlag.INGRESS_TABLE))
+                                                                                .setName("abc")
+                                                                                .setMetadataMatch(U64.of(1))
+                                                                                .setMetadataWrite(U64.of(1))
+                                                                                .setCapabilities(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
+                                                                                .setMaxEntries(10)
+                                                                                .setProperties(ImmutableList.<OFTableFeatureProp>of(factory.buildTableFeaturePropInstructionsMiss().setInstructionIds(ImmutableList.<OFInstructionId>of(factory.instructionIds().applyActions())).build())).build()))
+        .build()

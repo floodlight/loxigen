@@ -6,6 +6,7 @@
 00 00 # code
 61 62 63 # data
 -- java
-builder.setXid(0x12345678)
-    .setCode(OFHelloFailedCode.INCOMPATIBLE)
-    .setData(OFErrorCauseData.of(new byte[] { 0x61, 0x62, 0x63 }, OFVersion.OF_15));
+builder
+        .setXid(0x12345678)
+        .setCode(OFHelloFailedCode.INCOMPATIBLE)
+        .setData(OFErrorCauseData.of(new byte[] { 0x61, 0x62, 0x63 }, OFVersion.OF_15));

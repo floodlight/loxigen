@@ -8,7 +8,8 @@
 00 00 00 01 # meterId
 00 00 00 00 # pad
 -- java
-builder.setXid(0x12345678)
-       .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
-	   .setMeterId(1L)
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setMeterId(1L)
+        .build()

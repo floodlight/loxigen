@@ -18,21 +18,22 @@ b2 d0 5e 00 # duration_nsec
 00 00 00 00 00 00 00 0c # band_stats[1].packet_band_count
 00 00 00 00 00 00 00 0d # band_stats[1].byte_band_count
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFMeterStats>of(factory.buildMeterStats().setMeterId(1)
-																		   .setRefCount(1)
-																		   .setPacketInCount(U64.of(10))
-																		   .setByteInCount(U64.of(10))
-																		   .setDurationSec(3)
-																		   .setDurationNsec(3000000000L)
-																		   .setBandStats(ImmutableList.<OFMeterBandStats>of(factory.buildMeterBandStats().setPacketBandCount(U64.of(10))
-																																						 .setByteBandCount(U64.of(11))
-																																						 .build(),
-																															factory.buildMeterBandStats().setPacketBandCount(U64.of(12))
-																																						 .setByteBandCount(U64.of(13))
-																																						 .build()))
-																		   .build()))
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFMeterStats>of(factory.buildMeterStats().setMeterId(1)
+                                                                            .setRefCount(1)
+                                                                            .setPacketInCount(U64.of(10))
+                                                                            .setByteInCount(U64.of(10))
+                                                                            .setDurationSec(3)
+                                                                            .setDurationNsec(3000000000L)
+                                                                            .setBandStats(ImmutableList.<OFMeterBandStats>of(factory.buildMeterBandStats().setPacketBandCount(U64.of(10))
+                                                                                                                                                            .setByteBandCount(U64.of(11))
+                                                                                                                                                            .build(),
+                                                                                                                            factory.buildMeterBandStats().setPacketBandCount(U64.of(12))
+                                                                                                                                                            .setByteBandCount(U64.of(13))
+                                                                                                                                                            .build()))
+                                                                            .build()))
 
-	   .build()
+        .build()
 

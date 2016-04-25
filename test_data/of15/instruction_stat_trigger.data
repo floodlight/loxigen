@@ -7,6 +7,7 @@
 80 02 02 08 # stats.oxs_list[1].type_len - IDLE_TIME (02 -> 0000 0010 -> oxs_field width 7, oxs_reserved width 1)
 00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
 -- java
- builder.setFlags(ImmutableSet.<OFStatTriggerFlags>of(OFStatTriggerFlags.PERIODIC))
-       .setThresholds(OFOxsList.of(OFFactories.getFactory(OFVersion.OF_15).oxss().buildDuration().setValue(U64.of(4)).build(),
-					OFFactories.getFactory(OFVersion.OF_15).oxss().buildIdleTime().setValue(U64.of(6)).build()))
+builder
+        .setFlags(ImmutableSet.<OFStatTriggerFlags>of(OFStatTriggerFlags.PERIODIC))
+        .setThresholds(OFOxsList.of(OFFactories.getFactory(OFVersion.OF_15).oxss().buildDuration().setValue(U64.of(4)).build(),
+                        OFFactories.getFactory(OFVersion.OF_15).oxss().buildIdleTime().setValue(U64.of(6)).build()))

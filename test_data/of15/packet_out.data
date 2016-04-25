@@ -23,14 +23,14 @@ ff ff # actions[0].max_len
 00 00 00 00 # pad
 61 62 63 # data
 --java
-builder.setXid(0x12345678)
-       .setBufferId(OFBufferId.of(100))
-	   .setMatch(
+builder
+        .setXid(0x12345678)
+        .setBufferId(OFBufferId.of(100))
+        .setMatch(
         factory.buildMatchV3()
             .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
             .setExact(MatchField.ARP_OP, ArpOpcode.REQUEST)
-        	.build()
-		)
-	   .setActions(Arrays.asList(new OFAction[] {factory.actions().buildOutput().setPort(OFPort.of(2)).setMaxLen(65535).build(), factory.actions().decNwTtl()}))
-	   .setData(new byte[] {97,98,99})
-	   .build()
+            .build())
+        .setActions(Arrays.asList(new OFAction[] {factory.actions().buildOutput().setPort(OFPort.of(2)).setMaxLen(65535).build(), factory.actions().decNwTtl()}))
+        .setData(new byte[] {97,98,99})
+        .build()

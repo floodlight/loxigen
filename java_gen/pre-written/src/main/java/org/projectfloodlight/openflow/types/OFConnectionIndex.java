@@ -9,8 +9,8 @@ import com.google.common.primitives.UnsignedInts;
 
 @Immutable
 public class OFConnectionIndex implements OFValueType<OFConnectionIndex>  {
-	
-	static final int LENGTH = 4;
+
+    static final int LENGTH = 4;
     private final int connectionIndex;
     
     private OFConnectionIndex(final int connectionIndex) {
@@ -31,12 +31,12 @@ public class OFConnectionIndex implements OFValueType<OFConnectionIndex>  {
     
     @Override
     public OFConnectionIndex applyMask(OFConnectionIndex mask) {
-		return OFConnectionIndex.of(this.connectionIndex & mask.connectionIndex);
+        return OFConnectionIndex.of(this.connectionIndex & mask.connectionIndex);
     }
 
     @Override
     public int compareTo(OFConnectionIndex o) {
-		return UnsignedInts.compare(this.connectionIndex,o.connectionIndex);
+        return UnsignedInts.compare(this.connectionIndex,o.connectionIndex);
     }
 
     @Override
@@ -44,9 +44,8 @@ public class OFConnectionIndex implements OFValueType<OFConnectionIndex>  {
         sink.putInt(connectionIndex);
     }   
     
-	@Override
-	public int getLength() {
-		return LENGTH;
-	}  
-	
+    @Override
+    public int getLength() {
+        return LENGTH;
+    }
 }

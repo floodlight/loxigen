@@ -21,18 +21,18 @@ ff ff # properties[0].type (OFPQSPT_EXPERIMENTER)
 00 00 00 02 # properties[0].experimenter_data
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFQueueStatsEntry>of(factory.buildQueueStatsEntry().setPortNo(OFPort.of(1))
-																					 .setQueueId(1)
-																					 .setTxBytes(U64.of(10))
-																					 .setTxPackets(U64.of(7))
-																					 .setTxErrors(U64.of(1))
-																					 .setDurationSec(3)
-																					 .setDurationNsec(3000000000L)
-																					 .setProperties(ImmutableList.<OFQueueStatsProp>of(factory.buildQueueStatsPropBsn()
-																																						  .setExperimenterData(new byte[] {0x0, 0x0, 0x0, 0x2})
-																																						  .build())).build()))
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFQueueStatsEntry>of(factory.buildQueueStatsEntry().setPortNo(OFPort.of(1))
+                                                                                    .setQueueId(1)
+                                                                                    .setTxBytes(U64.of(10))
+                                                                                    .setTxPackets(U64.of(7))
+                                                                                    .setTxErrors(U64.of(1))
+                                                                                    .setDurationSec(3)
+                                                                                    .setDurationNsec(3000000000L)
+                                                                                    .setProperties(ImmutableList.<OFQueueStatsProp>of(factory.buildQueueStatsPropBsn()
+                                                                                                                                    .setExperimenterData(new byte[] {0x0, 0x0, 0x0, 0x2})
+                                                                                                                                    .build())).build()))
 
-	   .build()
-	   
+        .build()

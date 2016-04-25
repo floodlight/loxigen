@@ -12,9 +12,10 @@
 3b 9a ca 00 # properties[0].ofp_time.nanoseconds
 00 00 00 00 # properties[0].ofp_time.pad
 -- java
-builder.setXid(0x12345678)
-       .setBundleId(BundleId.of(1))
-	   .setBundleCtrlType(OFBundleCtrlType.OPEN_REQUEST)
-	   .setFlags(ImmutableSet.<OFBundleFlags>of(OFBundleFlags.ATOMIC))
-	   .setProperties(ImmutableList.<OFBundleProp>of(factory.buildBundlePropTime().setScheduledTime(ImmutableList.<OFTime>of(factory.buildTime().setSeconds(U64.of(1)).setNanoseconds(1000000000L).build())).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setBundleId(BundleId.of(1))
+        .setBundleCtrlType(OFBundleCtrlType.OPEN_REQUEST)
+        .setFlags(ImmutableSet.<OFBundleFlags>of(OFBundleFlags.ATOMIC))
+        .setProperties(ImmutableList.<OFBundleProp>of(factory.buildBundlePropTime().setScheduledTime(ImmutableList.<OFTime>of(factory.buildTime().setSeconds(U64.of(1)).setNanoseconds(1000000000L).build())).build()))
+        .build()

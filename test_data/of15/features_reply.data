@@ -10,11 +10,12 @@ c8 # n_tables
 00 00 01 01 # capabilities
 00 00 00 00 # reserved
 --java
-builder.setXid(0x12345678)
-       .setDatapathId(DatapathId.of(new byte[] {16,16,16,16,16,16,16,16}))
-       .setNBuffers(64)
-       .setNTables((short)200)
-       .setAuxiliaryId(OFAuxId.of(5))
-       .setCapabilities(Sets.immutableEnumSet(OFCapabilities.FLOW_STATS, OFCapabilities.PORT_BLOCKED))
-       .setReserved(0)
-       .build()
+builder
+        .setXid(0x12345678)
+        .setDatapathId(DatapathId.of(new byte[] {16,16,16,16,16,16,16,16}))
+        .setNBuffers(64)
+        .setNTables((short)200)
+        .setAuxiliaryId(OFAuxId.of(5))
+        .setCapabilities(Sets.immutableEnumSet(OFCapabilities.FLOW_STATS, OFCapabilities.PORT_BLOCKED))
+        .setReserved(0)
+        .build()

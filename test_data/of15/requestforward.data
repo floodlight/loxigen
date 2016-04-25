@@ -14,10 +14,11 @@
 00 00 00 02 # bands[0].burst_size
 00 00 00 00 # pad
 -- java
-builder.setXid(0x12345678)
-       .setRequest(factory.buildMeterMod().setXid(0x11111111).setCommand(OFMeterModCommand.ADD)
-															 .setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
-															 .setMeterId(1)
-															 .setBands(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1).setBurstSize(2).build()))
-															 .build())
-	    .build()
+builder
+        .setXid(0x12345678)
+        .setRequest(factory.buildMeterMod().setXid(0x11111111).setCommand(OFMeterModCommand.ADD)
+                                                            .setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
+                                                            .setMeterId(1)
+                                                            .setBands(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1).setBurstSize(2).build()))
+                                                            .build())
+        .build()

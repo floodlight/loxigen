@@ -1,6 +1,0 @@
--- binary
-00 05 # type
-00 08 # length
-00 00 00 00 # pad
--- java
-        

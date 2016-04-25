@@ -12,9 +12,10 @@ ff ff # properties[0].type (OFPRPT_EXPERIMENTER)
 00 00 00 37 # properties[0].exp_type
 00 00 00 00 # properties[0]exp_data
 -- java
-builder.setXid(0x12345678)
-       .setRole(OFControllerRole.ROLE_SLAVE)
-	   .setReason(OFControllerRoleReason.MASTER_REQUEST)
-	   .setGenerationId(U64.of(1))
-	   .setProperties(ImmutableList.<OFRoleProp>of(factory.buildRolePropBsn().setExperimenterData(new byte[] {0x0, 0x0, 0x0, 0x0}).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setRole(OFControllerRole.ROLE_SLAVE)
+        .setReason(OFControllerRoleReason.MASTER_REQUEST)
+        .setGenerationId(U64.of(1))
+        .setProperties(ImmutableList.<OFRoleProp>of(factory.buildRolePropBsn().setExperimenterData(new byte[] {0x0, 0x0, 0x0, 0x0}).build()))
+        .build()

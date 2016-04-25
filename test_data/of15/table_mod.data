@@ -9,8 +9,9 @@
 00 08 # properties[0].length
 00 00 00 02 # properties[0].flags (OFPTMPEF_IMPORTANCE)
 -- java
-builder.setXid(0x12345678)
-	   .setTableId(TableId.of(1))
-	   .setConfig(4)
-	   .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropEviction().setFlags(ImmutableSet.<OFTableModPropEvictionFlag>of(OFTableModPropEvictionFlag.IMPORTANCE)).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setTableId(TableId.of(1))
+        .setConfig(4)
+        .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropEviction().setFlags(ImmutableSet.<OFTableModPropEvictionFlag>of(OFTableModPropEvictionFlag.IMPORTANCE)).build()))
+        .build()

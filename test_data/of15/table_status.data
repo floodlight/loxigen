@@ -15,11 +15,12 @@
 05 # vacancy
 00 # pad
 -- java
-builder.setXid(0x12345678)
-       .setReason(OFTableReason.VACANCY_DOWN)
-	   .setTable(factory.buildTableDesc().setTableId(TableId.of(1)).setConfig(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
-																	 .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropVacancy().setVacancyDown((short)3)
-																																					   .setVacancyUp((short)4)
-																																					   .setVacancy((short)5)
-																																					   .build())).build())
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setReason(OFTableReason.VACANCY_DOWN)
+        .setTable(factory.buildTableDesc().setTableId(TableId.of(1)).setConfig(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
+                                                                    .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropVacancy().setVacancyDown((short)3)
+                                                                                                                                                    .setVacancyUp((short)4)
+                                                                                                                                                    .setVacancy((short)5)
+                                                                                                                                                    .build())).build())
+        .build()

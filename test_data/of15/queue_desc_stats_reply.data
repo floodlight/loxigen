@@ -15,11 +15,12 @@
 00 00 # pad 
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFQueueDesc>of(factory.buildQueueDesc().setPortNo(1)
-																		 .setQueueId(1)
-																		.setProperties(ImmutableList.<OFQueueDescProp>of(factory.buildQueueDescPropMinRate()
-																																.setRate(1)
-																																.build())).build()))
-	   .build();
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFQueueDesc>of(factory.buildQueueDesc().setPortNo(1)
+                                                                        .setQueueId(1)
+                                                                        .setProperties(ImmutableList.<OFQueueDescProp>of(factory.buildQueueDescPropMinRate()
+                                                                                                                                .setRate(1)
+                                                                                                                                .build())).build()))
+        .build();

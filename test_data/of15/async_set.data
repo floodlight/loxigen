@@ -6,6 +6,7 @@
 00 08 # properties[0].length
 00 00 00 00 # mask
 -- java
-builder.setXid(0x12345678)
-       .setProperties(ImmutableList.<OFAsyncConfigProp>of(factory.buildAsyncConfigPropPacketInMaster().setMask(0).build()))
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setProperties(ImmutableList.<OFAsyncConfigProp>of(factory.buildAsyncConfigPropPacketInMaster().setMask(0).build()))
+        .build()

@@ -11,13 +11,13 @@
 00 00 00 00 00 00 00 07 # lookup_count
 00 00 00 00 00 00 00 05 # matched_count
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFTableStatsEntry>of(
-								factory.buildTableStatsEntry().setTableId(TableId.of(1))
-															  .setActiveCount(10)
-															  .setLookupCount(U64.parseHex("7"))
-															  .setMatchedCount(U64.parseHex("5"))
-															  .build()))
-
-	   .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFTableStatsEntry>of(
+                                factory.buildTableStatsEntry().setTableId(TableId.of(1))
+                                                            .setActiveCount(10)
+                                                            .setLookupCount(U64.parseHex("7"))
+                                                            .setMatchedCount(U64.parseHex("5"))
+                                                            .build()))
+        .build()

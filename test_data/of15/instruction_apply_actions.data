@@ -6,5 +6,5 @@
 00 08 # actions[0].length
 00 00 00 00 # pad
 -- java
-        OFActions actions = OFFactories.getFactory(OFVersion.OF_15).actions();
-        builder.setActions(ImmutableList.<OFAction>of(actions.copyTtlIn()))
+OFActions actions = OFFactories.getFactory(OFVersion.OF_15).actions();
+builder.setActions(ImmutableList.<OFAction>of(actions.copyTtlIn()))

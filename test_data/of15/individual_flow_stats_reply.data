@@ -23,20 +23,18 @@
 00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
 00 00 00 00 # stats.pad
 -- java
- builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFIndividualFlowStatsEntry>of(factory.buildIndividualFlowStatsEntry().setTableId(TableId.of(1))
-			   .setReason(OFFlowStatsReason.STATS_REQUEST)
-			   .setPriority(1)
-			    .setMatch(
-		        factory.buildMatch()
-		            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
-		        	.build()
-		    )
-			   .setStats(
-			    factory.buildStatV6()
-					.setOxsFields(OFOxsList.of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
-											   factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
-					.build()
-			).build()))
-	.build();
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFIndividualFlowStatsEntry>of(factory.buildIndividualFlowStatsEntry().setTableId(TableId.of(1))
+                                                                .setReason(OFFlowStatsReason.STATS_REQUEST)
+                                                                .setPriority(1)
+                                                                .setMatch(factory.buildMatch()
+                                                                                .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                                                                                .build())
+                                                                .setStats(factory.buildStatV6()
+                                                                                .setOxsFields(OFOxsList.of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
+                                                                                factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
+                                                                                .build())
+                                                                .build()))
+        .build();

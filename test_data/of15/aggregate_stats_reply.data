@@ -13,11 +13,12 @@
 00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
 00 00 00 00 # stats.pad
 --java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setStats(
-			factory.buildStatV6()
-				.setOxsFields(OFOxsList.of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
-									       factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
-			.build()
-	   );
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setStats(
+            factory.buildStatV6()
+            .setOxsFields(OFOxsList
+                                    .of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
+                                        factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
+            .build());

@@ -5,7 +5,8 @@
 00 02 # flags
 ff ff # miss_send_len
 --java
-builder.setXid(0x12345678)
-       .setFlags(Sets.immutableEnumSet(OFConfigFlags.FRAG_REASM))
-       .setMissSendLen(0xffff)
-       .build()
+builder
+        .setXid(0x12345678)
+        .setFlags(Sets.immutableEnumSet(OFConfigFlags.FRAG_REASM))
+        .setMissSendLen(0xffff)
+        .build()

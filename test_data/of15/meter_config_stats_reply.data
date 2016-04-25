@@ -15,13 +15,14 @@
 00 00 00 00 # pad
 
 -- java
-builder.setXid(0x12345678)
-	   .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-	   .setEntries(ImmutableList.<OFMeterConfig>of(factory.buildMeterConfig().setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
-																			 .setMeterId(1)
-																			 .setEntries(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1)
-																					                                                                   .setBurstSize(2)
-																					                                                                   .build()))
-				 .build()))
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFMeterConfig>of(factory.buildMeterConfig().setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
+                                                                            .setMeterId(1)
+                                                                            .setEntries(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1)
+                                                                                                                                                    .setBurstSize(2)
+                                                                                                                                                    .build()))
+                                                    .build()))
 
-	   .build();
+        .build();

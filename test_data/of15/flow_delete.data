@@ -49,30 +49,31 @@ FF FF FF FF FF F0 FF FF 1C 2C 3C 00 00 00 00 00 # match.oxm_list[3].mask
 07 # instructions[1].table_id
 00 00 00 # pad
 -- java
-builder.setXid(0x12345678)
-    .setCookie(U64.parseHex("FEDCBA9876543210"))
-    .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
-    .setTableId(TableId.of(3))
-    .setIdleTimeout(5)
-    .setHardTimeout(10)
-    .setPriority(6000)
-    .setBufferId(OFBufferId.of(50))
-    .setOutPort(OFPort.of(6))
-    .setOutGroup(OFGroup.of(8))
-    .setFlags(ImmutableSet.<OFFlowModFlags>of())
-    .setMatch(
-        factory.buildMatch()
-            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
-            .setExact(MatchField.ETH_TYPE, EthType.IPv6)
-            .setExact(MatchField.IP_PROTO, IpProtocol.TCP)
-            .setMasked(MatchField.IPV6_SRC, 
-                       IPv6Address.of(0x1CCAFE1CB1101C00l, 0x0028000000000000l),
-                       IPv6Address.of(0xFFFFFFFFFFF0FFFFl, 0x1C2C3C0000000000l))
-        	.build()
-    )
-    .setInstructions(
-        ImmutableList.<OFInstruction>of(
+builder
+        .setXid(0x12345678)
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
+        .setTableId(TableId.of(3))
+        .setIdleTimeout(5)
+        .setHardTimeout(10)
+        .setPriority(6000)
+        .setBufferId(OFBufferId.of(50))
+        .setOutPort(OFPort.of(6))
+        .setOutGroup(OFGroup.of(8))
+        .setFlags(ImmutableSet.<OFFlowModFlags>of())
+        .setMatch(
+            factory.buildMatch()
+                .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                .setExact(MatchField.ETH_TYPE, EthType.IPv6)
+                .setExact(MatchField.IP_PROTO, IpProtocol.TCP)
+                .setMasked(MatchField.IPV6_SRC,
+                        IPv6Address.of(0x1CCAFE1CB1101C00l, 0x0028000000000000l),
+                        IPv6Address.of(0xFFFFFFFFFFF0FFFFl, 0x1C2C3C0000000000l))
+            .build()
+        )
+        .setInstructions(
+            ImmutableList.<OFInstruction>of(
                 factory.instructions().gotoTable(TableId.of(4)),
                 factory.instructions().gotoTable(TableId.of(7))
-        )
-    );
+            )
+        );
