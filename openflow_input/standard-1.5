@@ -1444,7 +1444,7 @@ struct of_group_mod : of_header {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
@@ -1454,7 +1454,7 @@ struct of_group_mod : of_header {
 /* Bucket for use in groups. */
 struct of_bucket {
     uint16_t len;
-    uint16_t action_array_len;
+    uint16_t action_array_len == length(actions);
     enum ofp_group_bucket bucket_id;
     list(of_action_t) actions;
     list(of_group_bucket_prop_t) properties;
@@ -2036,7 +2036,7 @@ struct of_group_desc_stats_entry {
     enum ofp_group_type group_type; 
     pad(1);
     uint32_t group_id; 
-    uint16_t bucket_array_len; 
+    uint16_t bucket_array_len == length(buckets);
     pad(6);
     list(of_bucket_t) buckets;
     list(of_group_prop_t) properties;
@@ -2537,7 +2537,7 @@ struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
     uint16_t length;
     uint32_t xid;
     uint32_t buffer_id;
-    uint16_t actions_len;
+    uint16_t actions_len == length(actions);
     pad(2);
     of_match_t match;
     list(of_action_t) actions;
@@ -3105,7 +3105,7 @@ struct of_group_add : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
@@ -3122,7 +3122,7 @@ struct of_group_modify : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
@@ -3139,7 +3139,7 @@ struct of_group_delete : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
@@ -3156,7 +3156,7 @@ struct of_group_insert_bucket : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;
@@ -3173,7 +3173,7 @@ struct of_group_remove_bucket : of_group_mod {
     enum ofp_group_type group_type;
     pad(1);
     uint32_t group_id;
-    uint16_t bucket_array_len;
+    uint16_t bucket_array_len == length(buckets);
     pad(2);
     enum ofp_group_bucket command_bucket_id;
     list(of_bucket_t) buckets;

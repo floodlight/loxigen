@@ -761,7 +761,7 @@ struct of_packet_out : of_header {
     uint32_t xid;
     uint32_t buffer_id;
     of_port_no_t in_port;
-    uint16_t actions_len;
+    uint16_t actions_len == length(actions);
     pad(6);
     list(of_action_t) actions;
     of_octets_t data;
