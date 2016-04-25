@@ -949,9 +949,9 @@ enum ofp_table_feature_prop_type(wire_type=uint16_t) {
 
 /* Table Mod property types.*/
 enum ofp_table_mod_prop_type {
-	OFPTMPT_EVICTION = 0x2, 
-	OFPTMPT_VACANCY = 0x3,
-	OFPTMPT_EXPERIMENTER = 0xFFFF, 
+    OFPTMPT_EVICTION = 0x2, 
+    OFPTMPT_VACANCY = 0x3,
+    OFPTMPT_EXPERIMENTER = 0xFFFF, 
 };
 
 
@@ -3538,7 +3538,7 @@ struct of_experimenter_stats_reply : of_stats_reply {
     uint32_t subtype;
 };
 
-/* ------------------------------------------- 1.3.1 den Queue Structure -------------------------------------- */
+/* ------------------------------------------- 1.3.1 Queue Structure -------------------------------------- */
 struct of_queue_prop {
     uint16_t type == ?;
     uint16_t len;
