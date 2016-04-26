@@ -1107,11 +1107,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-    
+
     @property
     def interface(self):
         return self.java_class.interface
-    
+
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)

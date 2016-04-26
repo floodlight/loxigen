@@ -28,7 +28,7 @@
 #version 6
 
 struct of_queue_stats_prop_bsn : of_queue_stats_prop_experimenter {
-	uint16_t type == 0xffff;
+    uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 0; // 0 is written for test - fix me ?

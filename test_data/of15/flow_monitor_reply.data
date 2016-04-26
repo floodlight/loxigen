@@ -6,7 +6,7 @@
 00 01 # flags (OFPMPF_REPLY_MORE)
 00 00 00 00 # pad
 00 04 # length
-00 01 # event 
+00 01 # event
 -- java
 builder
         .setXid(0x12345678)

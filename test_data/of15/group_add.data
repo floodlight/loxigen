@@ -29,7 +29,7 @@ ff ff ff fd # bucket_id of this bucket (fd == first bucket in list)
 00 00 # default weight of SELECT group
 00 00 # pad to 8 bytes
 
--- java 
+-- java
 builder
         .setXid(0x12345678)
         .setGroupType(OFGroupType.SELECT)

@@ -755,7 +755,7 @@ struct of_match_v3(align=8, length_includes_align=False) {
     list(of_oxm_t) oxm_list;
 };
 
-// This looks like an action header, but is standalone.  See 
+// This looks like an action header, but is standalone.  See
 // ofp_table_features_prop_actions
 struct of_action_id {
     uint16_t type;
@@ -1452,7 +1452,7 @@ struct of_group_desc_stats_entry {
     list(of_bucket_t) buckets;
 };
 
-// STATS: 
+// STATS:
 //  Desc, flow, agg, table, port, queue, group, group_desc, group_feat, experi
 
 struct of_stats_request : of_header {
@@ -1987,8 +1987,8 @@ struct of_meter_stats {
 };
 
 struct of_meter_config {
-    uint16_t		length;
-    enum ofp_meter_flags		flags;
+    uint16_t        length;
+    enum ofp_meter_flags        flags;
     uint32_t        meter_id;
     list(of_meter_band_t) entries;
 };

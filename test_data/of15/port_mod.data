@@ -9,7 +9,7 @@
 00 00 00 01 # config (OFPPC_PORT_DOWN)
 00 00 00 01 # mask (OFPPC_PORT_DOWN)
 00 00 # properties[0].type (OFPPMPT_ETHERNET)
-00 08 # properties[0].length 
+00 08 # properties[0].length
 00 00 00 01 # properties[0].advertise (OFPPF_10MB_HD)
 -- java
 builder
