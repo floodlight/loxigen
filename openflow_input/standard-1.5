@@ -96,25 +96,25 @@ struct of_header {
 
 /* Namespaces */
 /* Used in header_type */
-enum ofp_header_type_namespaces {
-    OFPHTN_ONF = 0, 
-    OFPHTN_ETHERTYPE = 1, 
+enum ofp_header_type_namespace(wire_type=uint16_t, stable=True) {
+    OFPHTN_ONF = 0,
+    OFPHTN_ETHERTYPE = 1,
     OFPHTN_IP_PROTO = 2,
-    OFPHTN_UDP_TCP_PORT = 3, 
-    OFPHTN_IPV4_OPTION = 4, 
+    OFPHTN_UDP_TCP_PORT = 3,
+    OFPHTN_IPV4_OPTION = 4,
 };
 
 /* ONF namespaces */
-enum ofp_header_type_onf {
+enum ofp_header_type_onf(wire_type=uint16_t, stable=True, complete=False) {
     OFPHTO_ETHERNET = 0,
-    OFPHTO_NO_HEADER = 1, 
+    OFPHTO_NO_HEADER = 1,
     OFPHTO_OXM_EXPERIMENTER = 0xFFFF,
 };
 
 /* Header type structure. */
 struct of_header_type {
-    uint16_t namespace == ?; 
-    uint16_t ns_type; 
+    enum ofp_header_type_namespace namespace == ?;
+    uint16_t ns_type;
 };
 
 /* --------------------------------------------------- PORT -------------------------------------------------- */
