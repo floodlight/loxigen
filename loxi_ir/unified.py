@@ -54,7 +54,7 @@ def build_unified_ir(name_protocol_map):
                     else:
                         if not type(self.members[v_member.name]) == type(v_member):
                             raise Exception("Error unifying ir class {} - adding version: {} - member_type {} <-> {}".format(
-                                    self.name, v_class.protocol.version, self.members[v_member.name], v_member)) 
+                                    self.name, v_class.protocol.version, self.members[v_member.name], v_member))
 
             if not self.superclass_set:
                 self.superclass_name = v_class.superclass.name if v_class.superclass else None

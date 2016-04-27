@@ -195,14 +195,14 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<OFBooleanValue> PBB_UCA =
             new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.PBB));
-    
+
     public final static MatchField<U16> TCP_FLAGS =
             new MatchField<U16>("tcp_flags", MatchFields.TCP_FLAGS,
                     new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
-    
+
     public final static MatchField<PacketType> PACKET_TYPE =
             new MatchField<PacketType>("packet_type", MatchFields.PACKET_TYPE);
-    
+
     public final static MatchField<TransportPort> ACTSET_OUTPUT =
             new MatchField<TransportPort>("actset_output", MatchFields.ACTSET_OUTPUT);
 

@@ -4,20 +4,20 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.oxs.OFOxs;
 import org.projectfloodlight.openflow.protocol.stat.StatField;
 import org.projectfloodlight.openflow.protocol.stat.StatFields;
-import org.projectfloodlight.openflow.protocol.oxs.OFOxs;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.PrimitiveSinkable;
 import org.projectfloodlight.openflow.util.ChannelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
 
 
 public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkable {
@@ -69,15 +69,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
         Map<StatFields, OFOxs<?>> map = new EnumMap<StatFields, OFOxs<?>>(
                 StatFields.class);
         for (OFOxs<?> o : oxsList) {
-            OFOxs<?> canonical = o.getCanonical();
-
-            if(logger.isDebugEnabled() && !Objects.equal(o, canonical)) {
-                logger.debug("OFOxsList: normalized non-canonical OXS {} to {}", o, canonical);
-            }
-
-            if(canonical != null)
-                map.put(canonical.getStatField().id, canonical);
-
+            map.put(o.getStatField().id, o);
         }
         return new OFOxsList(map);
     }
@@ -86,14 +78,7 @@ public class OFOxsList implements Iterable<OFOxs<?>>, Writeable, PrimitiveSinkab
         Map<StatFields, OFOxs<?>> map = new EnumMap<StatFields, OFOxs<?>>(
                 StatFields.class);
         for (OFOxs<?> o : oxss) {
-            OFOxs<?> canonical = o.getCanonical();
-
-            if(logger.isDebugEnabled() && !Objects.equal(o, canonical)) {
-                logger.debug("OFOxsList: normalized non-canonical OXS {} to {}", o, canonical);
-            }
-
-            if(canonical != null)
-                map.put(canonical.getStatField().id, canonical);
+            map.put(o.getStatField().id, o);
         }
         return new OFOxsList(map);
     }

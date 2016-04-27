@@ -2,7 +2,7 @@
 06 12 # version, type
 00 40 # length
 12 34 56 78 # xid
-00 11 # multipart message type (OFPMP_FLOW_STATS) 
+00 11 # multipart message type (OFPMP_FLOW_STATS)
 00 01 # flags (REQ_MORE)
 00 00 00 00 # pad
 01 # tableId

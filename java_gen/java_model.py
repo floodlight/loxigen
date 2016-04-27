@@ -600,10 +600,7 @@ class JavaOFInterface(object):
         elif self.name == "OFOxs":
             virtual_members += [
                     JavaVirtualMember(self, "value", java_type.generic_t),
-                    JavaVirtualMember(self, "mask", java_type.generic_t),
                     JavaVirtualMember(self, "statField", java_type.make_stat_field_jtype("T")),
-                    JavaVirtualMember(self, "masked", java_type.boolean),
-                    JavaVirtualMember(self, "canonical", java_type.make_oxs_jtype("T"))
                    ]
         elif self.ir_class.is_subclassof("of_oxm"):
             value = find(lambda m: m.name=="value", self.ir_model_members)
@@ -1110,11 +1107,11 @@ class JavaUnitTest(object):
     @property
     def name(self):
         return self.test_class_name
-    
+
     @property
     def interface(self):
         return self.java_class.interface
-    
+
     @property
     def has_test_data(self):
         return test_data.exists(self.data_file_name)

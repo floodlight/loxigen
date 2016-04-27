@@ -12,7 +12,7 @@
 00 01 # properties[0].type (OFPQDPT_MIN_RATE)
 00 08 # properties[0].length
 00 01 # rate
-00 00 # pad 
+00 00 # pad
 
 -- java
 builder
