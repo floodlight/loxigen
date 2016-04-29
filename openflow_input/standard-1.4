@@ -1933,7 +1933,7 @@ struct of_table_feature_prop {
     uint16_t         length;
 };
 
-struct of_table_feature_prop_instructions : of_table_feature_prop {
+struct of_table_feature_prop_instructions(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 0;
     uint16_t         length;
     // FIXME Check if instruction_t is right for ids here
@@ -2032,7 +2032,7 @@ struct of_table_feature_prop_experimenter(align=8, length_includes_align=False) 
     of_octets_t      experimenter_data;
 };
 
-struct of_table_feature_prop_experimenter_miss(align=8, length_includes_align=False)  : of_table_feature_prop {
+struct of_table_feature_prop_experimenter_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 65535;
     uint16_t         length;
     uint32_t         experimenter == ?;
