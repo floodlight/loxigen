@@ -303,8 +303,8 @@ public class MatchField<F extends OFValueType<F>> {
 
     /**
      * Retrieve what also must be matched in order to
-     * use this particular MatchField. The returened
-     * set is read-only and unmodifiable.
+     * use this particular MatchField.
+     *
      * @return unmodifiable view of the prerequisites
      */
     public Set<Prerequisite<?>> getPrerequisites() {
