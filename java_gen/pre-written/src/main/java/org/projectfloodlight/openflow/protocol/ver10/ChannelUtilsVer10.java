@@ -7,6 +7,7 @@ import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFActionType;
 import org.projectfloodlight.openflow.protocol.match.Match;
+import org.projectfloodlight.openflow.protocol.stat.Stat;
 
 import com.google.common.hash.PrimitiveSink;
 
@@ -86,6 +87,10 @@ public class ChannelUtilsVer10 {
 
     public static void writeSupportedActions(ByteBuf bb, Set<OFActionType> supportedActions) {
         bb.writeInt(supportedActionsToWire(supportedActions));
+    }
+
+    public static Stat readOFStat(final ByteBuf bb) throws OFParseError {
+        throw new UnsupportedOperationException("not supported");
     }
 
 }

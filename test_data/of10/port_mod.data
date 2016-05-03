@@ -4,8 +4,8 @@
 00 00 00 02 # xid
 ff fd # port_no
 01 02 03 04 05 06 # hw_addr
-90 ab cd ef # config
-ff 11 ff 11 # mask
+80 00 00 6f # config
+80 00 00 11 # mask
 ca fe 67 89 # advertise
 00 00 00 00 # pad
 -- python
@@ -13,17 +13,17 @@ ofp.message.port_mod(
     xid=2,
     port_no=ofp.OFPP_CONTROLLER,
     hw_addr=[1,2,3,4,5,6],
-    config=0x90ABCDEF,
-    mask=0xFF11FF11,
+    config=0x8000006f,
+    mask=0x80000011,
     advertise=0xCAFE6789)
 -- c
 obj = of_port_mod_new(OF_VERSION_1_0);
 of_port_mod_advertise_set(obj, 0xCAFE6789);
-of_port_mod_config_set(obj, 0x90ABCDEF);
+of_port_mod_config_set(obj, 0x8000006f);
 {
     of_mac_addr_t hw_addr = { { 1, 2, 3, 4, 5, 6 } };
     of_port_mod_hw_addr_set(obj, hw_addr);
 }
-of_port_mod_mask_set(obj, 0xFF11FF11);
+of_port_mod_mask_set(obj, 0x80000011);
 of_port_mod_port_no_set(obj, 65533);
 of_port_mod_xid_set(obj, 2);

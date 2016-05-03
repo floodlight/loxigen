@@ -1,0 +1,32 @@
+-- binary
+06 13 # version, type
+00 38 # length
+12 34 56 78 # xid
+00 08 # multipart message type (OFPMP_GROUP_FEATURES)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 00 00 00 # types (ALL)
+00 00 00 04 # capabilities (CHAINING)
+00 00 00 05 # max_groups_all
+00 00 00 00 # max_groups_select
+00 00 00 00 # max_groups_indirect
+00 00 00 00 # max_groups_ff
+00 00 00 08 # actions_all
+00 00 00 00 # actions_select
+00 00 00 00 # actions_indirect
+00 00 00 00 # actions_ff
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setTypes(0)
+        .setCapabilities(ImmutableSet.<OFGroupCapabilities>of(OFGroupCapabilities.CHAINING))
+        .setMaxGroupsAll(5)
+        .setMaxGroupsSelect(0)
+        .setMaxGroupsIndirect(0)
+        .setMaxGroupsFf(0)
+        .setActionsAll(8)
+        .setActionsSelect(0)
+        .setActionsIndirect(0)
+        .setActionsFf(0)
+        .build()

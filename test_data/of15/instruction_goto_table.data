@@ -1,0 +1,7 @@
+-- binary
+00 01 # type
+00 08 # length
+05 # table_id
+00 00 00 # pad
+-- java
+builder.setTableId(TableId.of(5)).build()

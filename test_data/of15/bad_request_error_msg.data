@@ -1,0 +1,12 @@
+-- binary
+06 01 # version / type
+00 0f # length
+12 34 56 78 # xid
+00 01 # err_type
+00 08 # code
+61 62 63 # data
+-- java
+builder
+        .setXid(0x12345678)
+        .setCode(OFBadRequestCode.BUFFER_UNKNOWN)
+        .setData(OFErrorCauseData.of(new byte[] { 0x61, 0x62, 0x63 }, OFVersion.OF_15));

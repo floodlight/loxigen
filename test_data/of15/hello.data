@@ -1,0 +1,19 @@
+-- binary
+06 00 # version, type
+00 20 # length
+12 34 56 78 # xid
+00 01 # elements[0].type
+00 0c # elements[0].length
+00 00 00 01 # elements[0].bitmaps[0]
+00 00 00 02 # elements[0].bitmaps[1]
+00 01 # elements[1].type
+00 0c # elements[1].length
+00 00 00 03 # elements[1].bitmaps[0]
+00 00 00 04 # elements[1].bitmaps[1]
+--java
+builder
+        .setXid(0x12345678)
+        .setElements(ImmutableList.<OFHelloElem>of(
+                factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(1),U32.of(2))).build(),
+                factory.buildHelloElemVersionbitmap().setBitmaps(ImmutableList.<U32>of(U32.of(3),U32.of(4))).build()))
+        .build()

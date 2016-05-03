@@ -1,0 +1,21 @@
+--binary
+06 06 # version, type
+00 20 # length
+12 34 56 78 # xid
+10 10 10 10 10 10 10 10 # datapath_id
+00 00 00 40 # n_buffers
+c8 # n_tables
+05 # auxiliary_id
+00 00 # pad
+00 00 01 01 # capabilities
+00 00 00 00 # reserved
+--java
+builder
+        .setXid(0x12345678)
+        .setDatapathId(DatapathId.of(new byte[] {16,16,16,16,16,16,16,16}))
+        .setNBuffers(64)
+        .setNTables((short)200)
+        .setAuxiliaryId(OFAuxId.of(5))
+        .setCapabilities(Sets.immutableEnumSet(OFCapabilities.FLOW_STATS, OFCapabilities.PORT_BLOCKED))
+        .setReserved(0)
+        .build()

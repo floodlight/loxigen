@@ -1,0 +1,43 @@
+--binary
+06 0c # version, type
+00 58 # length
+12 34 56 78 # xid
+00 # reason
+00 00 00 00 00 00 00 # pad
+00 00 00 04 # port_no
+00 48 # length
+00 00 # pad
+00 00 00 12 34 56 # hw_addr
+00 00 # pad
+61 62 63 00 00 00 00 00 # name
+00 00 00 00 # config
+00 00 00 00 # state
+00 00 00 01 # port_desc_prop_header - type, length
+00 00 00 01 # properties[0].type
+00 00 00 20 # properties[0].length
+00 00 00 00 # properties.pad
+00 00 00 01 # properties[0].curr
+00 00 00 02 # properties[0].advertised
+00 00 00 04 # properties[0].supported
+00 00 00 08 # properties[0].peer
+00 00 00 0a # properties[0].curr_speed
+00 00 00 0e # properties[0].max_speed
+
+--java
+builder
+        .setXid(0x12345678)
+        .setReason(OFPortReason.ADD)
+        .setDesc(factory.buildPortDesc()
+                        .setPortNo(OFPort.ofInt(4))
+                        .setHwAddr(MacAddress.of(0x123456))
+                        .setName("abc")
+                        .setConfig(Sets.immutableEnumSet(OFPortConfig.PORT_DOWN))
+                        .setState(Sets.immutableEnumSet(OFPortState.LINK_DOWN))
+                        .setProperties(Arrays.asList(new OFPortDescProp[] {factory.buildPortDescPropEthernet()
+                        .setCurr(1)
+                        .setAdvertised(2)
+                        .setSupported(4)
+                        .setPeer(8)
+                        .setCurrSpeed(10)
+                        .setMaxSpeed(14)
+                        .build()})).build())

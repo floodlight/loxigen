@@ -38,7 +38,7 @@ templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templ
 
 DissectorField = namedtuple("DissectorField", ["fullname", "name", "type", "base", "enum_table"])
 
-proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13', 5: 'of14' }
+proto_names = { 1: 'of10', 2: 'of11', 3: 'of12', 4: 'of13', 5: 'of14' , 6: 'of15' }
 def make_field_name(version, ofclass_name, member_name):
     return "%s.%s.%s" % (proto_names[version.wire_version],
                          ofclass_name[3:],

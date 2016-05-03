@@ -1,0 +1,12 @@
+-- binary
+06 12 # version, type
+00 10 # length
+12 34 56 78 # xid
+00 03 # multipart message type (OFPMP_TABLE_STATS)
+00 01 # flags
+00 00 00 00 # pad
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .build()

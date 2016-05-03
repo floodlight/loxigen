@@ -1,0 +1,38 @@
+--binary
+06 13 # version, type
+00 50 # length
+12 34 56 78 # xid
+00 05 # multipart message type (OFPMP_QUEUE_STATS)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 40 # length
+00 00 00 00 00 00 # pad
+00 00 00 01 # port_no
+00 00 00 01 # queue_id
+00 00 00 00 00 00 00 0a # tx_bytes
+00 00 00 00 00 00 00 07 # tx_packets
+00 00 00 00 00 00 00 01 # tx_errors
+00 00 00 03 # duration_sec
+b2 d0 5e 00 # duration_nsec
+ff ff # properties[0].type (OFPQSPT_EXPERIMENTER)
+00 10 # properties[0].length
+00 5c 16 c7 # properties[0].experimenter
+00 00 00 00 # properties[0].exp_type
+00 00 00 02 # properties[0].experimenter_data
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFQueueStatsEntry>of(factory.buildQueueStatsEntry().setPortNo(OFPort.of(1))
+                                                                                    .setQueueId(1)
+                                                                                    .setTxBytes(U64.of(10))
+                                                                                    .setTxPackets(U64.of(7))
+                                                                                    .setTxErrors(U64.of(1))
+                                                                                    .setDurationSec(3)
+                                                                                    .setDurationNsec(3000000000L)
+                                                                                    .setProperties(ImmutableList.<OFQueueStatsProp>of(factory.buildQueueStatsPropBsn()
+                                                                                                                                    .setExperimenterData(new byte[] {0x0, 0x0, 0x0, 0x2})
+                                                                                                                                    .build())).build()))
+
+        .build()

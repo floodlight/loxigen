@@ -43,15 +43,19 @@ oftype_to_wireshark_type = {
     "of_octets_t": "bytes",
     "of_port_no_t": "uint32",
     "of_port_desc_t": "stringz",
+    "of_table_desc_t": "stringz",
     "of_bsn_vport_t": "bytes",
     "of_bsn_vport_q_in_q_t": "bytes",
     "of_fm_cmd_t": "uint16",
     "of_wc_bmap_t": "uint64",
     "of_match_bmap_t": "uint64",
     "of_match_t": "bytes",
+    "of_stat_t": "bytes",
     "of_oxm_t": "bytes",
+    "of_oxs_t": "bytes",
     "of_meter_features_t": "bytes",
     "of_bitmap_128_t": "bytes",
+    "of_controller_uri_t":"stringz",
 }
 
 # Map from LOXI type to Wireshark base
@@ -78,7 +82,9 @@ oftype_to_base = {
     "of_wc_bmap_t": "HEX",
     "of_match_bmap_t": "HEX",
     "of_match_t": "NONE",
+    "of_stat_t":"NONE",
     "of_oxm_t": "NONE",
+    "of_oxs_t" : "NONE",
     "of_meter_features_t": "NONE",
     "of_bitmap_128_t": "NONE",
 }
@@ -110,6 +116,7 @@ class_field_to_enum = {
     ('of_flow_add', 'type'): 'ofp_type',
     ('of_port_status', 'type'): 'ofp_type',
     ('of_match_v3', 'type'): 'ofp_match_type',
+    ('of_stat_v6' , 'type'): 'ofp_stat_type',
     ('of_action_set_nw_ttl', 'type'): 'ofp_action_type',
     ('of_action_set_field', 'type'): 'ofp_action_type',
     ('of_action_output', 'type'): 'ofp_action_type',

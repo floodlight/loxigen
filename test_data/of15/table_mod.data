@@ -1,0 +1,17 @@
+-- binary
+06 11 # version, type
+00 18 # length
+12 34 56 78 # xid
+01 # table_id
+00 00 00 # pad
+00 00 00 04 # config (OFPTC_EVICTION)
+00 02 # properties[0].type (OFPTMPT_EVICTION)
+00 08 # properties[0].length
+00 00 00 02 # properties[0].flags (OFPTMPEF_IMPORTANCE)
+-- java
+builder
+        .setXid(0x12345678)
+        .setTableId(TableId.of(1))
+        .setConfig(4)
+        .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropEviction().setFlags(ImmutableSet.<OFTableModPropEvictionFlag>of(OFTableModPropEvictionFlag.IMPORTANCE)).build()))
+        .build()

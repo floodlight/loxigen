@@ -1,0 +1,23 @@
+-- binary
+06 10 # version, type
+00 28 # length
+12 34 56 78 # xid
+00 00 00 01 # port_no
+00 00 00 00 # pad
+00 01 02 03 04 05 # hw_addr
+00 00 # pad
+00 00 00 01 # config (OFPPC_PORT_DOWN)
+00 00 00 01 # mask (OFPPC_PORT_DOWN)
+00 00 # properties[0].type (OFPPMPT_ETHERNET)
+00 08 # properties[0].length
+00 00 00 01 # properties[0].advertise (OFPPF_10MB_HD)
+-- java
+builder
+        .setXid(0x12345678)
+        .setPortNo(OFPort.of(1))
+        .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
+        .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
+        .setMask(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
+        .setProperties(ImmutableList.<OFPortModProp>of(factory.buildPortModPropEthernet().setAdvertise(ImmutableSet.<OFPortFeatures>of(OFPortFeatures.PF_10MB_HD)).build()))
+        .build()
+

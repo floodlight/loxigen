@@ -1,0 +1,26 @@
+--binary
+06 13 # version, type
+00 28 # length
+12 34 56 78 # xid
+00 0F # multipart message type (OFPMP_QUEUE_DESC)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 00 00 01 # port_no
+00 00 00 01 # queue_id
+00 18 # length
+00 00 00 00 00 00 # pad
+00 01 # properties[0].type (OFPQDPT_MIN_RATE)
+00 08 # properties[0].length
+00 01 # rate
+00 00 # pad
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFQueueDesc>of(factory.buildQueueDesc().setPortNo(1)
+                                                                        .setQueueId(1)
+                                                                        .setProperties(ImmutableList.<OFQueueDescProp>of(factory.buildQueueDescPropMinRate()
+                                                                                                                                .setRate(1)
+                                                                                                                                .build())).build()))
+        .build();

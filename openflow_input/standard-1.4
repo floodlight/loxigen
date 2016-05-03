@@ -934,7 +934,7 @@ struct of_port_mod_prop {
 struct of_port_mod_prop_ethernet : of_port_mod_prop {
     uint16_t type == 0;
     uint16_t length;
-    uint32_t advertise;
+    enum ofp_port_features advertise;
 };
 
 struct of_port_mod_prop_optical : of_port_mod_prop {
@@ -963,8 +963,8 @@ struct of_port_mod : of_header {
     pad(4);
     of_mac_addr_t hw_addr;
     pad(2);
-    uint32_t config;
-    uint32_t mask;
+    enum ofp_port_config config;
+    enum ofp_port_config mask;
     list(of_port_mod_prop_t) properties;
 };
 
@@ -1375,7 +1375,7 @@ struct of_flow_removed : of_header {
     uint32_t xid;
     uint64_t cookie;
     uint16_t priority;
-    uint8_t reason;
+    enum ofp_flow_removed_reason reason;
     uint8_t table_id;
     uint32_t duration_sec;
     uint32_t duration_nsec;
@@ -1423,8 +1423,8 @@ struct of_meter_mod : of_header {
     uint8_t type == 29;
     uint16_t length;
     uint32_t xid;
-    uint16_t command;
-    uint16_t flags;
+    enum ofp_meter_mod_command command;
+    enum ofp_meter_flags flags;
     uint32_t meter_id;
     list(of_meter_band_t) bands;
 };
@@ -1682,7 +1682,7 @@ struct of_port_stats_prop_optical : of_port_stats_prop {
     uint16_t         length;
     pad(4);
 
-    uint32_t flags;       
+    uint32_t flags;
     uint32_t tx_freq_lmda;
     uint32_t tx_offset;
     uint32_t tx_grid_span;
@@ -2170,7 +2170,7 @@ struct of_group_features_stats_reply : of_stats_reply {
     enum ofp_stats_reply_flags flags;
     pad(4);
     uint32_t types;
-    uint32_t capabilities;
+    enum ofp_group_capabilities capabilities;
     uint32_t max_groups_all;
     uint32_t max_groups_select;
     uint32_t max_groups_indirect;
@@ -2408,7 +2408,7 @@ struct of_meter_stats {
 
 struct of_meter_config {
     uint16_t        length;
-    uint16_t        flags;
+    enum ofp_meter_flags        flags;
     uint32_t        meter_id;
     list(of_meter_band_t) entries;
 };
@@ -2606,6 +2606,7 @@ struct of_async_get_request : of_header {
     uint8_t type == 26;
     uint16_t length;
     uint32_t xid;
+    list(of_async_config_prop_t) properties;
 };
 
 struct of_async_get_reply : of_header {
@@ -2643,7 +2644,7 @@ struct of_role_status : of_header {
     uint8_t type == 30;
     uint16_t length;
     uint32_t xid;
-    uint32_t role;
+    enum ofp_controller_role role;
     enum ofp_controller_role_reason reason;
     pad(3);
     uint64_t generation_id;

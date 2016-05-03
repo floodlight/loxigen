@@ -1,0 +1,33 @@
+-- binary
+06 12 # version, type
+00 30 # length
+12 34 56 78 # xid
+00 10 # multipart message type (OFPMP_FLOW_MONITOR)
+00 01 # flags
+00 00 00 00 # pad
+00 00 00 01 # monitor_id
+00 00 00 01 # out_port
+00 00 00 01 # out_group
+00 01 # flags (INITIAL)
+01 # table_id
+00 # command (ADD)
+00 01 # match.type
+00 10 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setEntries(ImmutableList.<OFFlowMonitorEntry>of(factory.buildFlowMonitorEntry().setMonitorId(1)
+                                                                                        .setOutPort(1)
+                                                                                        .setOutGroup(1)
+                                                                                        .setFlags(ImmutableSet.<OFFlowMonitorFlags>of(OFFlowMonitorFlags.INITIAL))
+                                                                                        .setTableId(TableId.of(1))
+                                                                                        .setCommand(OFFlowMonitorCommand.ADD)
+                                                                                        .setMatch(factory.buildMatch()
+                                                                                                            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                                                                                                            .build())
+                                                                                        .build()))
+        .build()

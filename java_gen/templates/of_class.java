@@ -316,6 +316,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             int startIndex = bb.writerIndex();
 //:: #endif
 //:: fields_with_length_member = {}
+//:: has_length_value = False
 //:: for prop in msg.members:
 //:: if prop.c_name in fields_with_length_member:
             int ${prop.name}StartIndex = bb.writerIndex();
@@ -331,6 +332,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             // fixed value property ${prop.name} = ${prop.value}
             ${prop.java_type.write_op(version, prop.priv_value, pub_type=False)};
 //:: elif prop.is_length_value:
+//::     has_length_value = True
             // ${prop.name} is length of variable message, will be updated at the end
 //:: if not msg.is_fixed_length:
             int lengthIndex = bb.writerIndex();
@@ -354,7 +356,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: #endif
 //:: #endfor
 
-//:: if not msg.is_fixed_length:
+//:: if not msg.is_fixed_length and has_length_value:
             // update length field
             int length = bb.writerIndex() - startIndex;
             //:: if msg.align:

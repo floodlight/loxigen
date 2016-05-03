@@ -1,0 +1,31 @@
+
+#version 6
+
+struct of_oxs {
+    uint32_t type_len == ?;
+};
+
+struct of_oxs_duration : of_oxs {
+    uint32_t type_len == 0x80020008 ;
+    uint16_t value;
+};
+
+struct of_oxs_idle_time : of_oxs {
+    uint32_t type_len == 0x80020208 ;
+    uint16_t value;
+};
+
+struct of_oxs_flow_count : of_oxs {
+    uint32_t type_len == 0x80020404 ;
+    uint16_t value;
+};
+
+struct of_oxs_packet_count : of_oxs {
+    uint32_t type_len == 0x80020608 ;
+    uint16_t value;
+};
+
+struct of_oxs_byte_count : of_oxs {
+    uint32_t type_len == 0x80020808 ;
+    uint16_t value;
+};

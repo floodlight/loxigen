@@ -1,0 +1,12 @@
+-- binary
+06 1c # version, type
+00 10 # length
+12 34 56 78 # xid
+00 01 # properties[0].type (OFPACPT_PACKET_IN_MASTER)
+00 08 # properties[0].length
+00 00 00 00 # mask
+-- java
+builder
+        .setXid(0x12345678)
+        .setProperties(ImmutableList.<OFAsyncConfigProp>of(factory.buildAsyncConfigPropPacketInMaster().setMask(0).build()))
+        .build()

@@ -1,0 +1,52 @@
+--binary
+06 13 # version, type
+00 88 # length
+12 34 56 78 # xid
+00 04 # multipart message type (OFPMP_PORT_STATS)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 78 # length
+00 00 # pad
+00 00 00 01 # port_no
+00 00 00 03 # duration_sec
+b2 d0 5e 00 # duration_nsec
+00 00 00 00 00 00 00 0a # rx_packets
+00 00 00 00 00 00 00 07 # tx_packets
+00 00 00 00 00 00 00 0a # rx_bytes
+00 00 00 00 00 00 00 07 # tx_bytes
+00 00 00 00 00 00 00 02 # rx_dropped
+00 00 00 00 00 00 00 01 # tx_dropped
+00 00 00 00 00 00 00 01 # rx_errors
+00 00 00 00 00 00 00 01 # tx_errors
+00 00 # properties[0].type (OFPPSPT_ETHERNET)
+00 28 # properties[0].length
+00 00 00 00 # properties[0].pad
+00 00 00 00 00 00 00 1a # properties[0].rx_frame_err
+00 00 00 00 00 00 00 1b # properties[0].rx_over_err
+00 00 00 00 00 00 00 1c # properties[0].rx_crc_err
+00 00 00 00 00 00 00 1d # properties[0].collisions
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFPortStatsEntry>of(factory.buildPortStatsEntry().setPortNo(OFPort.of(1))
+                                                                                    .setDurationSec(3)
+                                                                                    .setDurationNsec(3000000000L)
+                                                                                    .setRxPackets(U64.of(10))
+                                                                                    .setTxPackets(U64.of(7))
+                                                                                    .setRxBytes(U64.of(10))
+                                                                                    .setTxBytes(U64.of(7))
+                                                                                    .setRxDropped(U64.of(2))
+                                                                                    .setTxDropped(U64.of(1))
+                                                                                    .setRxErrors(U64.of(1))
+                                                                                    .setTxErrors(U64.of(1))
+                                                                                    .setProperties(ImmutableList.<OFPortStatsProp>of(factory.buildPortStatsPropEthernet()
+                                                                                                                                            .setRxFrameErr(U64.of(26))
+                                                                                                                                            .setRxOverErr(U64.of(27))
+                                                                                                                                            .setRxCrcErr(U64.of(28))
+                                                                                                                                            .setCollisions(U64.of(29))
+                                                                                                                                            .build()))
+                                                                                    .build()))
+
+        .build()

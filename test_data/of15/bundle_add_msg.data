@@ -1,0 +1,25 @@
+-- binary
+06 22 # version, type
+00 32 # length
+12 34 56 78 # xid
+00 00 00 01 # bundle_id
+00 # pad
+00 01 # flags (OFPBF_ATOMIC)
+06 02 # message.version, type
+00 0b # message.length
+11 11 11 11 # message.xid
+61 62 63 # data
+00 01 # properties[0].type (OFPBPT_TIME)
+00 18 # properties[0].length
+00 00 00 00 # properties[0].pad
+00 00 00 00 00 00 00 01  # properties[0].scheduled_time.seconds
+3b 9a ca 00 # properties[0].scheduled_time.nanoseconds
+00 00 00 00 # properties[0].scheduled_time.pad
+-- java
+builder
+        .setXid(0x12345678)
+        .setBundleId(BundleId.of(1))
+        .setFlags(ImmutableSet.<OFBundleFlags>of(OFBundleFlags.ATOMIC))
+        .setProperties(ImmutableList.<OFBundleProp>of(factory.buildBundlePropTime().setScheduledTime(ImmutableList.<OFTime>of(factory.buildTime().setSeconds(U64.of(1)).setNanoseconds(1000000000L).build())).build()))
+        .setMessage(factory.buildEchoRequest().setXid(0x11111111).setData(new byte[] {97,98,99}).build())
+        .build()

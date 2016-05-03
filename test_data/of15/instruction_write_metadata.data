@@ -1,0 +1,8 @@
+-- binary
+00 02 # type
+00 18 # len
+00 00 00 00 # pad
+00 00 00 00 00 00 0a bc # metadata
+00 00 00 00 00 00 0a bc # metadata_mask
+-- java
+builder.setMetadata(U64.parseHex("abc")).setMetadataMask(U64.parseHex("abc"))

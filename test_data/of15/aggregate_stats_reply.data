@@ -1,0 +1,24 @@
+--binary
+06 13 # version, type
+00 30 # length
+12 34 56 78 # xid
+00 02 # multipart message type (OFPMP_AGGREGATE_STATS)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 00 # reserved
+00 1c # stats.length
+80 02 00 08 # stats.oxs_list[0].type_len - DURATION
+00 00 00 00 00 00 00 04 # stats.oxs_list[0].value
+80 02 02 08 # stats.oxs_list[1].type_len - IDLE_TIME (02 -> 0000 0010 -> oxs_field width 7, oxs_reserved width 1)
+00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
+00 00 00 00 # stats.pad
+--java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setStats(
+            factory.buildStatV6()
+            .setOxsFields(OFOxsList
+                                    .of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
+                                        factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
+            .build());

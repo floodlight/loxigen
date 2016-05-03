@@ -1,0 +1,28 @@
+-- binary
+06 13 # version, type
+00 28 # length
+12 34 56 78 # xid
+00 0a # multipart message type (OFPMP_METER_DESC)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 18 # length
+00 01 # flags (OFPMF_KBPS)
+00 00 00 01 # meter_id
+00 01 # meter_band[0].type (OFPMBT_DROP)
+00 10 # meter_band[0].len
+00 00 00 01 # meter_band[0].rate
+00 00 00 02 # meter_band[0].burst_size
+00 00 00 00 # pad
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFMeterConfig>of(factory.buildMeterConfig().setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
+                                                                            .setMeterId(1)
+                                                                            .setEntries(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1)
+                                                                                                                                                    .setBurstSize(2)
+                                                                                                                                                    .build()))
+                                                    .build()))
+
+        .build();

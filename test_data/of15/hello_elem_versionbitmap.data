@@ -1,0 +1,7 @@
+-- binary
+00 01 # type
+00 0c # length
+01 23 45 67 # bitmaps[0]
+89 ab cd ef # bitmaps[1]
+--java
+builder.setBitmaps(ImmutableList.<U32>of(U32.of(0x01234567),U32.of(0x89abcdef))).build()

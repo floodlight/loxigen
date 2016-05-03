@@ -1,0 +1,25 @@
+-- binary
+00 01 # type
+00 3C # length
+80 00 # oxm_list[0].class
+05 10 # oxm_list[0].type_len - METADATA
+FE DC BA 98 12 14 12 10 # oxm_list[0].value
+FF FF FF FF 12 34 56 78 # oxm_list[0].mask
+80 00 # oxm_list[1].class
+08 06 # oxm_list[1].type_len - ETH_SRC
+01 02 03 04 05 06 # oxm_list[1].value
+80 00 # oxm_list[2].class
+20 02 # oxm_list[2].type_len - UDP_DST
+00 35 # oxm_list[2].value
+80 00 # oxm_list[3].class
+36 10 # oxm_list[4].type_len - IPV6_DST
+12 12 12 12 12 12 12 12 # oxm_list[4].value
+12 12 12 12 12 12 12 12 # ...
+00 00 00 00 # pad
+-- java
+builder
+        .setMasked(MatchField.METADATA, OFMetadata.ofRaw(0xFEDCBA9812141210l), OFMetadata.ofRaw(0xFFFFFFFF12345678l))
+        .setExact(MatchField.ETH_SRC, MacAddress.of(new byte[] {1,2,3,4,5,6}))
+        .setExact(MatchField.UDP_DST, TransportPort.of(53))
+        .setExact(MatchField.IPV6_DST, IPv6Address.of(new byte[] { 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12,
+                                                                  0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12, 0x12 }))

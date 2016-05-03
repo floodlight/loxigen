@@ -21,6 +21,7 @@ import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
+import org.projectfloodlight.openflow.types.PacketType;
 import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U64;
@@ -188,10 +189,22 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
 
     public final static MatchField<U16> IPV6_EXTHDR =
-            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR);
+            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<OFBooleanValue> PBB_UCA =
-            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
+            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.PBB));
+
+    public final static MatchField<U16> TCP_FLAGS =
+            new MatchField<U16>("tcp_flags", MatchFields.TCP_FLAGS,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+
+    public final static MatchField<PacketType> PACKET_TYPE =
+            new MatchField<PacketType>("packet_type", MatchFields.PACKET_TYPE);
+
+    public final static MatchField<TransportPort> ACTSET_OUTPUT =
+            new MatchField<TransportPort>("actset_output", MatchFields.ACTSET_OUTPUT);
 
     public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
             new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,

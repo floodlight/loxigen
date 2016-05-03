@@ -56,6 +56,9 @@ from generic_utils import find, memoize
 # OXM
 #    An extensible match object
 #
+# OXS
+#    Extensible Stats Object
+#
 # Message
 #    A top level OpenFlow message
 #
@@ -85,6 +88,12 @@ def class_is_oxm(cls):
     Return True if cls_name is an OXM object
     """
     return _unified_by_name(cls).is_instanceof("of_oxm")
+
+def class_is_oxs(cls):
+    """
+    Return True if cls_name is an OXS object
+    """
+    return _unified_by_name(cls).is_instanceof("of_oxs")
 
 def class_is_action(cls):
     """

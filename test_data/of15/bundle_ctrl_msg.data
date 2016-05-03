@@ -1,0 +1,21 @@
+-- binary
+06 21 # version, type
+00 28 # length
+12 34 56 78 # xid
+00 00 00 01 # bundle_id
+00 00 # type (OFPBCT_OPEN_REQUEST)
+00 01 # flags (OFPBF_ATOMIC)
+00 01 # properties[0].type (OFPBPT_TIME)
+00 18 # properties[0].length
+00 00 00 00 # properties[0].pad
+00 00 00 00 00 00 00 01 # properties[0].ofp_time.seconds
+3b 9a ca 00 # properties[0].ofp_time.nanoseconds
+00 00 00 00 # properties[0].ofp_time.pad
+-- java
+builder
+        .setXid(0x12345678)
+        .setBundleId(BundleId.of(1))
+        .setBundleCtrlType(OFBundleCtrlType.OPEN_REQUEST)
+        .setFlags(ImmutableSet.<OFBundleFlags>of(OFBundleFlags.ATOMIC))
+        .setProperties(ImmutableList.<OFBundleProp>of(factory.buildBundlePropTime().setScheduledTime(ImmutableList.<OFTime>of(factory.buildTime().setSeconds(U64.of(1)).setNanoseconds(1000000000L).build())).build()))
+        .build()

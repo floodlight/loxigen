@@ -1,0 +1,15 @@
+-- binary
+06 13 # version, type
+00 14 # length
+12 34 56 78 # xid
+00 10 # multipart message type (OFPMP_FLOW_MONITOR)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 04 # length
+00 01 # event
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFFlowMonitorReplyEntry>of(factory.buildFlowMonitorReplyEntry().setEvent(OFFlowUpdateEvent.ADDED).build()))
+        .build()

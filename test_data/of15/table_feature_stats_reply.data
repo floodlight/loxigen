@@ -1,0 +1,35 @@
+--binary
+06 13 # version, type
+00 58 # length
+12 34 56 78 # xid
+00 0c # multipart message type (OFPMP_TABLE_FEATURES)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 48 # length
+01 # table_id
+02 # command (OFPTFC_ENABLE)
+00 00 00 01 # features (OFPTFF_INGRESS_TABLE)
+61 62 63 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 # name
+00 00 00 00 00 00 00 01 # metadata_match
+00 00 00 00 00 00 00 01 # metadata_write
+00 00 00 08 # capabilities (OFPTC_VACANCY_EVENTS)
+00 00 00 0a # max_entries
+00 01 # properties[0].type (OFPTFPT_INSTRUCTIONS_MISS)
+00 08 # properties[0].length
+00 04 # instruction_id[0].type (OFPIT_APPLY_ACTIONS)
+00 04 # instruction_id[0].len
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFTableFeatures>of(factory.buildTableFeatures().setTableId(TableId.of(1))
+                                                                                .setCommand(OFTableFeaturesCommand.ENABLE)
+                                                                                .setFeatures(ImmutableSet.<OFTableFeatureFlag>of(OFTableFeatureFlag.INGRESS_TABLE))
+                                                                                .setName("abc")
+                                                                                .setMetadataMatch(U64.of(1))
+                                                                                .setMetadataWrite(U64.of(1))
+                                                                                .setCapabilities(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
+                                                                                .setMaxEntries(10)
+                                                                                .setProperties(ImmutableList.<OFTableFeatureProp>of(factory.buildTableFeaturePropInstructionsMiss().setInstructionIds(ImmutableList.<OFInstructionId>of(factory.instructionIds().applyActions())).build())).build()))
+        .build()

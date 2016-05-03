@@ -1,0 +1,33 @@
+--binary
+06 0a # version, type
+00 35 # length
+12 34 56 78 # xid
+00 00 00 64 # buffer_id
+42 68 # total_len
+01 # reason
+14 # table_id
+fe dc ba 98 76 54 32 10 # cookie
+00 01 # match.type
+00 16 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - Input Port
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+80 00 2A 02 # match.oxm_list[1].type_len - ARP OpCode
+00 01 # match.oxm_list[1].value
+00 00 # match.pad
+00 00 # pad
+61 62 63 # data
+-- java
+builder
+        .setXid(0x12345678)
+        .setBufferId(OFBufferId.of(100))
+        .setTotalLen(17000)
+        .setReason(OFPacketInReason.ACTION)
+        .setTableId(TableId.of(20))
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setMatch(
+            factory.buildMatchV3()
+                .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                .setExact(MatchField.ARP_OP, ArpOpcode.REQUEST)
+                .build())
+        .setData(new byte[] { 97, 98, 99 } );

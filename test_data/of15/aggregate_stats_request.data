@@ -1,0 +1,33 @@
+-- binary
+06 12 # version, type
+00 40 # length
+12 34 56 78 # xid
+00 02 # multipart message type (OFPMP_AGGREGATE_STATS)
+00 01 # flags
+00 00 00 00 # pad
+ff # tableId
+00 00 00  # pad
+00 00 00 04 # out_port
+00 00 00 01 # out_group
+00 00 00 00 # pad
+fe dc ba 98 76 54 32 10 # cookie
+ff 00 ff 00 ff 00 ff 00 # cookie_maskk
+00 01 # match.type
+00 10 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setTableId(TableId.ALL)
+        .setOutPort(OFPort.of(4))
+        .setOutGroup(OFGroup.of(1))
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setCookieMask(U64.parseHex("FF00FF00FF00FF00"))
+        .setMatch(
+                factory.buildMatch()
+                        .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                        .build())
+        .build()

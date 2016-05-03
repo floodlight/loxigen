@@ -1,0 +1,9 @@
+-- binary
+00 19 # type
+00 10 # length
+80 00 1a 02 # OXM header
+00 32 # OXM value
+00 00 00 00 00 00 # pad
+-- java
+OFOxms oxms = OFFactories.getFactory(OFVersion.OF_15).oxms();
+builder.setField(oxms.tcpSrc(TransportPort.of(50)))

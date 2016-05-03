@@ -1,0 +1,10 @@
+-- binary
+00 04 # type
+00 10 # length
+00 00 00 00 # pad
+00 0c # actions[0].type (OFPAT_COPY_TTL_IN)
+00 08 # actions[0].length
+00 00 00 00 # pad
+-- java
+OFActions actions = OFFactories.getFactory(OFVersion.OF_15).actions();
+builder.setActions(ImmutableList.<OFAction>of(actions.copyTtlIn()))

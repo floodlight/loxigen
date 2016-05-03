@@ -1,0 +1,44 @@
+-- binary
+06 0b # version, type
+00 48 # length
+12 34 56 78 # xid
+14 # table_id
+02 # reason
+42 68 # priority
+00 05 # idle_timeout
+00 1e # hard_timeout
+fe dc ba 98 76 54 32 10 # cookie
+00 01 # match.type
+00 10 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+00 00 # match.pad
+00 1c # stats.length
+80 02 00 08 # stats.oxs_list[0].type_len - DURATION
+00 00 00 00 00 00 00 04 # stats.oxs_list[0].value
+80 02 02 08 # stats.oxs_list[1].type_len - IDLE_TIME (02 -> 0000 0010 -> oxs_field width 7, oxs_reserved width 1)
+00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
+00 00 00 00 # stats.pad
+--java
+builder
+        .setXid(0x12345678)
+        .setTableId(TableId.of(20))
+        .setReason(OFFlowRemovedReason.DELETE)
+        .setPriority(17000)
+        .setIdleTimeout(5)
+        .setHardTimeout(30)
+        .setCookie(U64.parseHex("FEDCBA9876543210"))
+        .setMatch(
+            factory.buildMatch()
+                .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                .build())
+        .setStats(
+            factory.buildStatV6()
+                .setOxsFields(OFOxsList.of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
+                                            factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
+                .build())
+        .build()
+
+
+

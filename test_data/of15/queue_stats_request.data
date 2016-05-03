@@ -1,0 +1,16 @@
+-- binary
+06 12 # version, type
+00 18 # length
+12 34 56 78 # xid
+00 05 # multipart message type (OFPMP_QUEUE_STATS)
+00 01 # flags
+00 00 00 00 # pad
+00 00 00 01 # port_no
+00 00 00 01 # queue_id
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsRequestFlags>of(OFStatsRequestFlags.REQ_MORE))
+        .setPortNo(OFPort.of(1))
+        .setQueueId(1)
+        .build()

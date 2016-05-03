@@ -124,6 +124,13 @@ local of_oxm_dissectors = {
 :: #endfor
 }
 
+
+local of_oxs_dissectors = {
+:: for version in ir:
+    [${version.wire_version}] = dissect_of_oxs_v${version.wire_version},
+:: #endfor
+}
+
 local of_bsn_vport_q_in_q_dissectors = {
 :: for version in ir:
     [${version.wire_version}] = dissect_of_bsn_vport_q_in_q_v${version.wire_version},
@@ -169,8 +176,8 @@ function p_of.dissector (buf, pkt, root)
             local msg_len = buf(offset+2,2):uint()
 
             -- Detect obviously broken messages
-            if msg_version == 0 or msg_version > 5 then break end
-            if msg_type > 34 then break end
+            if msg_version == 0 or msg_version > 6 then break end
+            if msg_type > 35 then break end
             if msg_len < 8 then break end
 
             if offset + msg_len > buf:len() then

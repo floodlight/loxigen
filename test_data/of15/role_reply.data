@@ -1,0 +1,15 @@
+-- binary
+06 19 # version, type
+00 18 # length
+12 34 56 78 # xid
+00 00 00 02 # role (OFPCR_ROLE_MASTER)
+00 01 # short_id
+00 00 # pad
+00 00 00 00 00 00 00 01 # generation_id
+-- java
+builder
+        .setXid(0x12345678)
+        .setRole(OFControllerRole.ROLE_MASTER)
+        .setShortId(1)
+        .setGenerationId(U64.of(1))
+        .build()

@@ -1,0 +1,7 @@
+--binary
+06 02 # version, type
+00 0b # length
+12 34 56 78 # xid
+61 62 63 # data
+--java
+builder.setXid(0x12345678).setData(new byte[] {97,98,99}).build()

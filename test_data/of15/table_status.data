@@ -1,0 +1,26 @@
+-- binary
+06 1f # version, type
+00 20 # length
+12 34 56 78 # xid
+03 # reason (OFPTR_VACANCY_DOWN)
+00 00 00 00 00 00 00 # pad
+00 10 # table.length
+01 # table.table_id
+00 # table.pad
+00 00 00 08 # table.config (OFPTC_VACANCY_EVENTS)
+00 03 # table.properties[0].type (OFPTMPT_VACANCY)
+00 08 # length.properties[0].length
+03 # vacancy_down
+04 # vacancy_up
+05 # vacancy
+00 # pad
+-- java
+builder
+        .setXid(0x12345678)
+        .setReason(OFTableReason.VACANCY_DOWN)
+        .setTable(factory.buildTableDesc().setTableId(TableId.of(1)).setConfig(ImmutableSet.<OFTableConfig>of(OFTableConfig.VACANCY_EVENTS))
+                                                                    .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropVacancy().setVacancyDown((short)3)
+                                                                                                                                                    .setVacancyUp((short)4)
+                                                                                                                                                    .setVacancy((short)5)
+                                                                                                                                                    .build())).build())
+        .build()

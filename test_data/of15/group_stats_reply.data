@@ -1,0 +1,40 @@
+-- binary
+06 13 # version, type
+00 58 # length
+12 34 56 78 # xid
+00 06 # multipart message type (OFPMP_GROUP_STATS)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 48 # length
+00 00 # pad
+00 00 00 01 # group_id
+00 00 00 01 # ref_count
+00 00 00 00 # pad
+00 00 00 00 00 00 00 07 # packet_count
+00 00 00 00 00 00 00 12 # byte_count
+00 00 00 03 # duration_sec
+b2 d0 5e 00 # duration_nsec
+00 00 00 00 00 00 00 07 # bucket_counter[0].packet_count
+00 00 00 00 00 00 00 0c # bucket_counter[0].byte_count
+00 00 00 00 00 00 00 03 # bucket_counter[1].packet_count
+00 00 00 00 00 00 00 0a # bucket_counter[1].byte_count
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFGroupStatsEntry>of(factory.buildGroupStatsEntry().setGroup(OFGroup.of(1))
+                                                                                    .setRefCount(1)
+                                                                                    .setPacketCount(U64.of(7))
+                                                                                    .setByteCount(U64.of(18))
+                                                                                    .setDurationSec(3)
+                                                                                    .setDurationNsec(3000000000L)
+                                                                                    .setBucketStats(ImmutableList.<OFBucketCounter>of(
+                                                                                                                                    factory.buildBucketCounter().setPacketCount(U64.of(7))
+                                                                                                                                                                .setByteCount(U64.of(12))
+                                                                                                                                                                .build(),
+                                                                                                                                    factory.buildBucketCounter().setPacketCount(U64.of(3))
+                                                                                                                                                                .setByteCount(U64.of(10))
+                                                                                                                                                                .build()))
+                                                                                    .build()))
+
+        .build()

@@ -149,6 +149,7 @@ embedded_structs = {
     'of_meter_features_t': 'ofp.meter_features',
     'of_bsn_vport_t': 'ofp.bsn_vport',
     'of_table_desc_t': 'ofp.table_desc',
+    'of_stat_t': 'ofp.stat',
 }
 
 for (cls, pyclass) in embedded_structs.items():

@@ -52,7 +52,7 @@ all: c python java wireshark
 c: .loxi_ts.c
 
 .loxi_ts.c: ${LOXI_PY_FILES} ${LOXI_TEMPLATE_FILES} ${INPUT_FILES} ${TEST_DATA}
-	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c
+	./loxigen.py --install-dir=${LOXI_OUTPUT_DIR} --lang=c --version-list=1.0,1.1,1.2,1.3,1.4
 	touch $@
 
 python: .loxi_ts.python
@@ -133,6 +133,7 @@ check-py: python
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of12.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of13.py
 	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of14.py
+	PYTHONPATH=${LOXI_OUTPUT_DIR}/pyloxi:. python py_gen/tests/of15.py
 
 check-c: c
 	make -j4 -C ${LOXI_OUTPUT_DIR}/locitest

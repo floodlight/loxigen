@@ -1,0 +1,24 @@
+-- binary
+06 20 # version, type
+00 28 # length
+12 34 56 78 # xid
+06 1d # version, type (METER_MOD)
+00 20 # length
+11 11 11 11 # xid
+00 00 # command (OFPMC_ADD)
+00 01 # flags (OFPMF_KBPS)
+00 00 00 01 # meter_id
+00 01 # bands[0].type (OFPMBT_DROP)
+00 10 # bands[0].length
+00 00 00 01 # bands[0].rate
+00 00 00 02 # bands[0].burst_size
+00 00 00 00 # pad
+-- java
+builder
+        .setXid(0x12345678)
+        .setRequest(factory.buildMeterMod().setXid(0x11111111).setCommand(OFMeterModCommand.ADD)
+                                                            .setFlags(ImmutableSet.<OFMeterFlags>of(OFMeterFlags.KBPS))
+                                                            .setMeterId(1)
+                                                            .setBands(ImmutableList.<OFMeterBand>of(factory.meterBands().buildDrop().setRate(1).setBurstSize(2).build()))
+                                                            .build())
+        .build()

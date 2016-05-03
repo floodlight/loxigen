@@ -1,0 +1,68 @@
+-- binary
+06 13 # version, type
+00 68 # length
+12 34 56 78 # xid
+00 01 # multipart message type (OFPMP_FLOW_DESC) -- old name is OFPMP_FLOW for spec 1.3.1, 1.4.0, 1.4.1
+00 01 # flags
+00 00 00 00 # pad
+
+00 58 # length
+00 00 # pad
+01 # table_id
+00 # pad
+00 01 # priority
+00 10 # idle_timeout
+00 60 # hard_timeout
+00 01 # flags (OFPFF_SEND_FLOW_REM) Send flow removed message when flow expires or is deleted
+00 01 # importance
+fe dc ba 98 76 54 32 10 # cookie
+
+00 01 # match.type
+00 10 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - IN_PORT
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+00 00 # match.pad
+
+
+00 1c # stats.length
+80 02 00 08 # stats.oxs_list[0].type_len - DURATION
+00 00 00 00 00 00 00 04 # stats.oxs_list[0].value
+80 02 02 08 # stats.oxs_list[1].type_len - IDLE_TIME (8002 -> Openflow_basic oxs class and 02 -> 0000 0010 -> oxs_field width 7, oxs_reserved width 1 and 08 is length)
+00 00 00 00 00 00 00 06 # stats.oxs_list[1].value
+00 00 00 00 # stats.pad
+
+00 01 # instructions[0].type
+00 08 # instructions[0].length
+04 # instructions[0].table_id
+00 00 00 # pad
+
+00 01 # instructions[1].type
+00 08 # instructions[1].length
+07 # instructions[1].table_id
+00 00 00 # pad
+
+--java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFFlowStatsEntry>of(
+                        factory.buildFlowStatsEntry().setTableId(TableId.of(1))
+                                                    .setPriority(1)
+                                                    .setIdleTimeout(16)
+                                                    .setHardTimeout(96)
+                                                    .setFlags(ImmutableSet.<OFFlowModFlags>of(OFFlowModFlags.SEND_FLOW_REM))
+                                                    .setImportance(1)
+                                                    .setCookie(U64.parseHex("FEDCBA9876543210"))
+                                                    .setMatch(factory.buildMatch()
+                                                        .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+                                                        .build())
+                                                    .setStats(factory.buildStatV6()
+                                                        .setOxsFields(OFOxsList.of(factory.oxss().buildDuration().setValue(U64.of(4)).build(),
+                                                                                    factory.oxss().buildIdleTime().setValue(U64.of(6)).build()))
+                                                        .build())
+                                                    .setInstructions(ImmutableList.<OFInstruction>of(
+                                                                                    factory.instructions().gotoTable(TableId.of(4)),
+                                                                                    factory.instructions().gotoTable(TableId.of(7))))
+                                                    .build() ))
+        .build()

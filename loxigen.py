@@ -137,7 +137,9 @@ def read_input():
         ofinput = process_input_file(filename)
 
         for wire_version in ofinput.wire_versions:
-            ofinputs_by_version[wire_version].append(ofinput)
+            version = loxi_globals.OFVersions.from_wire(wire_version)
+            if version in loxi_globals.OFVersions.target_versions:
+                ofinputs_by_version[wire_version].append(ofinput)
     return ofinputs_by_version
 
 def build_ir(ofinputs_by_version):

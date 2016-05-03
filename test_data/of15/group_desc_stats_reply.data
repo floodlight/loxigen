@@ -1,0 +1,46 @@
+-- binary
+06 13 # version, type
+00 40 # length
+12 34 56 78 # xid
+00 07 # multipart message type (OFPMP_GROUP_DESC)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+
+00 30 # length
+00 # type
+00 # pad
+00 00 00 01 # group_id
+00 20 # bucket_array_len
+00 00 00 00 00 00 # pad
+
+00 20 # bucket_len
+00 18 # action_array_len
+ff ff ff fd # bucket_id
+
+00 00 # ofp_action[0].type (OFPAT_OUTPUT)
+00 10 # ofp_action[0].length
+00 00 00 01 # port
+00 03 # max_len
+00 00 00 00 00 00 # pad
+
+00 16 # ofp_action[0].type (OFPAT_GROUP)
+00 08 # ofp_action[0].length
+00 00 00 01 # group_id
+
+# no group_bucket_properties after this, since it's an ALL group
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFGroupDescStatsEntry>of(factory.buildGroupDescStatsEntry()
+            .setGroupType(OFGroupType.ALL)
+            .setGroup(OFGroup.of(1))
+            .setBuckets(ImmutableList.<OFBucket>of(factory.buildBucket()
+                    .setBucketId(OFGroupBucket.BUCKET_FIRST)
+                    .setActions(ImmutableList.<OFAction>of(
+                                factory.actions().output(OFPort.of(1),3),
+                                factory.actions().group(OFGroup.of(1))))
+                    .build()))
+            .build()))
+

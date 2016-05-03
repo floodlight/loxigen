@@ -1,0 +1,36 @@
+-- binary
+06 0d # version, type
+00 43 # length
+12 34 56 78 # xid
+00 00 00 64 # buffer_id
+00 18 # actions_len
+00 00 # pad
+00 01 # match.type
+00 16 # match.length
+80 00 01 08 # match.oxm_list[0].type_len - Input Port
+00 00 00 04 # match.oxm_list[0].value
+00 00 00 05 # match.oxm_list[0].mask
+80 00 2A 02 # match.oxm_list[1].type_len - ARP OpCode
+00 01 # match.oxm_list[1].value
+00 00 # match.pad
+00 00 # actions[0].type
+00 10 # actions[0].length
+00 00 00 02 # actions[0].port
+ff ff # actions[0].max_len
+00 00 00 00 00 00 # pad
+00 18 # actions[1].type
+00 08 # actions[1].length
+00 00 00 00 # pad
+61 62 63 # data
+--java
+builder
+        .setXid(0x12345678)
+        .setBufferId(OFBufferId.of(100))
+        .setMatch(
+        factory.buildMatchV3()
+            .setMasked(MatchField.IN_PORT, OFPort.of(4), OFPort.of(5))
+            .setExact(MatchField.ARP_OP, ArpOpcode.REQUEST)
+            .build())
+        .setActions(Arrays.asList(new OFAction[] {factory.actions().buildOutput().setPort(OFPort.of(2)).setMaxLen(65535).build(), factory.actions().decNwTtl()}))
+        .setData(new byte[] {97,98,99})
+        .build()

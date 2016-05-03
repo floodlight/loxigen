@@ -1,0 +1,35 @@
+#version 6
+
+struct of_oxm_tcp_flags : of_oxm {
+    uint32_t type_len == 0x80005402;
+    uint8_t value;
+};
+
+struct of_oxm_tcp_flags_masked : of_oxm {
+    uint32_t type_len == 0x80005504;
+    uint8_t value;
+    uint8_t value_mask;
+};
+
+struct of_oxm_actset_output : of_oxm {
+    uint32_t type_len == 0x80005604;
+    uint8_t value;
+};
+
+struct of_oxm_actset_output_masked : of_oxm {
+    uint32_t type_len == 0x80005708;
+    uint8_t value;
+    uint8_t value_mask;
+};
+
+
+struct of_oxm_packet_type : of_oxm {
+    uint32_t type_len == 0x80005804;
+    uint8_t value;
+};
+
+struct of_oxm_packet_type_masked : of_oxm {
+    uint32_t type_len == 0x80005908;
+    uint8_t value;
+    uint8_t value_mask;
+};

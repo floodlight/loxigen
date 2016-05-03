@@ -1,0 +1,23 @@
+--binary
+06 13 # version, type
+00 28 # length
+12 34 56 78 # xid
+00 03 # multipart message type (OFPMP_TABLE_STATS)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+01 # table_id
+00 00 00 # pad
+00 00 00 0a # active_count
+00 00 00 00 00 00 00 07 # lookup_count
+00 00 00 00 00 00 00 05 # matched_count
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFTableStatsEntry>of(
+                                factory.buildTableStatsEntry().setTableId(TableId.of(1))
+                                                            .setActiveCount(10)
+                                                            .setLookupCount(U64.parseHex("7"))
+                                                            .setMatchedCount(U64.parseHex("5"))
+                                                            .build()))
+        .build()

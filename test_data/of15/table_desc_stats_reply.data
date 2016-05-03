@@ -1,0 +1,26 @@
+--binary
+06 13 # version, type
+00 20 # length
+12 34 56 78 # xid
+00 0e # multipart message type (OFPMP_TABLE_DESC)
+00 01 # flags (OFPMPF_REPLY_MORE)
+00 00 00 00 # pad
+00 10 # length
+00 # table_id
+00 # pad
+00 00 00 04 # config (OFPTC_EVICTION)
+00 02 # properties[0].type (OFPTMPT_EVICTION)
+00 08 # properties[0].length
+00 00 00 02 # properties[0].flags (OFPTMPEF_IMPORTANCE)
+
+-- java
+builder
+        .setXid(0x12345678)
+        .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
+        .setEntries(ImmutableList.<OFTableDesc>of(factory.buildTableDesc().setTableId(TableId.of(0))
+                                                                        .setConfig(ImmutableSet.<OFTableConfig>of(OFTableConfig.EVICTION))
+                                                                        .setProperties(ImmutableList.<OFTableModProp>of(factory.buildTableModPropEviction()
+                                                                                                                        .setFlags(ImmutableSet.<OFTableModPropEvictionFlag>of(OFTableModPropEvictionFlag.IMPORTANCE))
+                                                                                                                        .build()))
+                                                .build()))
+        .build()
