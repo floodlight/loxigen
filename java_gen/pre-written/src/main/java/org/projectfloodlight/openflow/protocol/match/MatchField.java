@@ -31,15 +31,24 @@ import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VxlanNI;
 import org.projectfloodlight.openflow.types.VFI;
 
+import java.util.Collections;
+import java.util.Set;
+import java.util.HashSet;
+
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
     public final MatchFields id;
-    private final Prerequisite<?>[] prerequisites;
+    private final Set<Prerequisite<?>> prerequisites;
 
     private MatchField(final String name, final MatchFields id, Prerequisite<?>... prerequisites) {
         this.name = name;
         this.id = id;
-        this.prerequisites = prerequisites;
+        if (prerequisites == null || prerequisites.length == 0) {
+            this.prerequisites = Collections.emptySet();
+        } else {
+            this.prerequisites = new HashSet<Prerequisite<?>>();
+            Collections.addAll(this.prerequisites, prerequisites);
+        }
     }
 
     public final static MatchField<OFPort> IN_PORT =
@@ -290,6 +299,17 @@ public class MatchField<F extends OFValueType<F>> {
             }
         }
         return true;
+    }
+
+    /**
+     * Retrieve what also must be matched in order to
+     * use this particular MatchField. The returened
+     * set is read-only and unmodifiable.
+     * @return unmodifiable view of the prerequisites
+     */
+    public Set<Prerequisite<?>> getPrerequisites() {
+        /* assumes non-null; guaranteed by constructor */
+        return Collections.unmodifiableSet(this.prerequisites);
     }
 
 }

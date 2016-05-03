@@ -2,6 +2,7 @@ package org.projectfloodlight.openflow.protocol.match;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Collections;
 
 import org.projectfloodlight.openflow.types.OFValueType;
 
@@ -40,6 +41,24 @@ public class Prerequisite<T extends OFValueType<T>> {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Get valid/possible values for this prerequisite match.
+     *
+     * @return unmodifiable set of possible values
+     */
+    public Set<OFValueType<T>> getValues() {
+        return Collections.unmodifiableSet(this.values);   
+    }
+
+    /**
+     * Get the MatchField of this prerequisite.
+     *
+     * @return the MatchField that is required
+     */
+    public MatchField<T> getMatchField() {
+        return this.field; /* immutable */
     }
 
 }
