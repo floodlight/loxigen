@@ -22,10 +22,10 @@ public class MultiplePktInReasonUtil {
      * reasons in Match.MetaData field.
      * */
     public static Set<OFBsnPktinFlag> getOFBsnPktinFlags(OFPacketIn pktIn) {
-        if(pktIn.getVersion() != OFVersion.OF_13) {
+        if(pktIn.getVersion().compareTo(OFVersion.OF_13) < 0) {
             throw new IllegalArgumentException("multiple pkt in reasons are "
                                                + "only supported by BVS using "
-                                               + "openflow 1.3");
+                                               + "openflow version >= 1.3");
         }
 
         Match match = pktIn.getMatch();

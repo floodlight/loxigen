@@ -74,6 +74,13 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     ${impl_class}(${
         ", ".join("%s %s" %(prop.java_type.public_type, prop.name) for prop in msg.data_members) }) {
 //:: for prop in msg.data_members:
+//::   if not prop.java_type.is_primitive and (not prop.default_value or prop.default_value != "null"):
+        if(${prop.name} == null) {
+            throw new NullPointerException("${msg.name}: property ${prop.name} cannot be null");
+        }
+//::   #endif
+//:: #endfor
+//:: for prop in msg.data_members:
         this.${prop.name} = ${prop.name};
 //:: #endfor
     }
@@ -190,7 +197,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     final static Reader READER = new Reader();
     static class Reader implements OFMessageReader<${msg.interface.name}> {
         @Override
-        public ${msg.interface.name} readFrom(ChannelBuffer bb) throws OFParseError {
+        public ${msg.interface.name} readFrom(ByteBuf bb) throws OFParseError {
 //:: for prop in msg.members:
 //:: if not prop.is_virtual and (prop.is_length_value or prop.is_field_length_value):
             int start = bb.readerIndex();
@@ -297,14 +304,14 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     }
 
 
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         WRITER.write(bb, this);
     }
 
     final static Writer WRITER = new Writer();
     static class Writer implements OFMessageWriter<${impl_class}> {
         @Override
-        public void write(ChannelBuffer bb, ${impl_class} message) {
+        public void write(ByteBuf bb, ${impl_class} message) {
 //:: if not msg.is_fixed_length:
             int startIndex = bb.writerIndex();
 //:: #endif

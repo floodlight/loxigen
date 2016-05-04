@@ -34,6 +34,40 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract int asCidrMaskLength();
 
     /**
+     * Returns {@code true} if the IPAddress is unspecified.
+     *
+     * <p>The <em>unspecified</em> addresses, also known as the
+     * <em>wildcard</em> addresses, refer to:
+     * <ul>
+     * <li>the {@link IPv4Address} of {@code 0.0.0.0}
+     * <li>the {@link IPv6Address} of {@code ::}
+     * </ul>
+     */
+    public abstract boolean isUnspecified();
+
+    /**
+     * Returns {@code true} if the IPAddress is a loopback address.
+     *
+     * <p><em>Loopback</em> addresses refer to:
+     * <ul>
+     * <li>any {@link IPv4Address} within {@code 127.0.0.0/8}
+     * <li>the {@link IPv6Address} of {@code ::1}
+     * </ul>
+     */
+    public abstract boolean isLoopback();
+
+    /**
+     * Returns {@code true} if the IPAddress is a link local address.
+     *
+     * <p><em>Link local</em> addresses refer to:
+     * <ul>
+     * <li>any {@link IPv4Address} within {@code 169.254.0.0/16}
+     * <li>any {@link IPv6Address} within {@code fe80::/10}
+     * </ul>
+     */
+    public abstract boolean isLinkLocal();
+
+    /**
      * Checks if the IPAddress is the global broadcast address
      * 255.255.255.255 in case of IPv4
      * @return boolean true or false
@@ -41,22 +75,28 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
     public abstract boolean isBroadcast();
 
     /**
-     * Perform a low level AND operation on the bits of two IPAddress<?> objects
-     * @param   other IPAddress<?>
-     * @return  new IPAddress<?> object after the AND oper
+     * Checks if the IPAddress is the multicast address
+     * @return boolean true or false
+     */
+    public abstract boolean isMulticast();
+
+    /**
+     * Perform a low level AND operation on the bits of two IPAddress objects
+     * @param   other IPAddress
+     * @return  new IPAddress object after the AND oper
      */
     public abstract F and(F other);
 
     /**
-     * Perform a low level OR operation on the bits of two IPAddress<?> objects
-     * @param   other IPAddress<?>
-     * @return  new IPAddress<?> object after the AND oper
+     * Perform a low level OR operation on the bits of two IPAddress objects
+     * @param   other IPAddress
+     * @return  new IPAddress object after the AND oper
      */
     public abstract F or(F other);
 
     /**
      * Returns a new IPAddress object with the bits inverted
-     * @return  IPAddress<?>
+     * @return  IPAddress
      */
     public abstract F not();
 
@@ -79,13 +119,14 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @param cidrMaskLength  the prefix length of the CIDR subnet mask
      *                        (i.e. the number of leading one-bits),
      *                        where <code>
-     *                        0 <= cidrMaskLength <= (F.getLength() * 8)
+     *                        0 {@literal <=} cidrMaskLength {@literal <=} (F.getLength() * 8)
      *                        </code>
      * @return                an {@code IPAddressWithMask<F>} object that
      *                        represents this IP address masked by the CIDR
      *                        subnet mask of the given prefix length
      * @throws IllegalArgumentException  if the given prefix length was invalid
-     * @see #ofCidrMaskLength(int)
+     * @see org.projectfloodlight.openflow.types.IPv4Address#ofCidrMaskLength(int)
+     * @see org.projectfloodlight.openflow.types.IPv6Address#ofCidrMaskLength(int)
      */
     @Nonnull
     public abstract IPAddressWithMask<F> withMaskOfLength(
@@ -102,6 +143,19 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * @see InetAddress#getAddress()
      */
     public abstract byte[] getBytes();
+
+    /**
+     * Returns an {@link InetAddress} object representing this IP address.
+     *
+     * <p>The resulting {@link InetAddress} object:
+     * <ul>
+     * <li>will not carry a hostname
+     * <li>will not carry a non-zero scope ID or scoped interface,
+     *     in the case of {@link Inet6Address}
+     * </ul>
+     */
+    @Nonnull
+    public abstract InetAddress toInetAddress();
 
     @Override
     public abstract String toString();

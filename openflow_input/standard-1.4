@@ -165,6 +165,7 @@ enum ofp_port_features(wire_type=uint32_t, bitmask=True) {
     OFPPF_AUTONEG = 0x2000,
     OFPPF_PAUSE = 0x4000,
     OFPPF_PAUSE_ASYM = 0x8000,
+    OFPPF_BSN_BREAKOUT_CAPABLE = 0x80000000,
 };
 
 enum ofp_port_reason(wire_type=uint8_t) {
@@ -879,7 +880,7 @@ struct of_port_desc_prop_experimenter : of_port_desc_prop {
     uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == ?;
-    uint32_t exp_type;
+    //uint32_t exp_type;
 };
 
 struct of_port_desc {
@@ -1346,7 +1347,7 @@ struct of_packet_out : of_header {
     uint32_t xid;
     uint32_t buffer_id;
     of_port_no_t in_port;
-    uint16_t actions_len;
+    uint16_t actions_len == length(actions);
     pad(6);
     list(of_action_t) actions;
     of_octets_t data;
@@ -1576,6 +1577,46 @@ struct of_table_features_failed_error_msg : of_error_msg {
     of_octets_t data;
 };
 
+struct of_bad_property_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 14;
+    enum ofp_bad_property_code code;
+    of_octets_t data;
+};
+
+struct of_async_config_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 15;
+    enum ofp_async_config_failed_code code;
+    of_octets_t data;
+};
+
+struct of_flow_monitor_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 16;
+    enum ofp_flow_monitor_failed_code code;
+    of_octets_t data;
+};
+
+struct of_bundle_failed_error_msg : of_error_msg {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 17;
+    enum ofp_bundle_failed_code code;
+    of_octets_t data;
+};
+
 struct of_experimenter_error_msg : of_error_msg {
     uint8_t version;
     uint8_t type == 1;
@@ -1583,7 +1624,7 @@ struct of_experimenter_error_msg : of_error_msg {
     uint32_t xid;
     uint16_t err_type == 0xffff;
     uint16_t subtype;
-    uint32_t experimenter;
+    uint32_t experimenter == ?;
     of_octets_t data;
 };
 
@@ -1892,98 +1933,98 @@ struct of_table_feature_prop {
     uint16_t         length;
 };
 
-struct of_table_feature_prop_instructions : of_table_feature_prop {
+struct of_table_feature_prop_instructions(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 0;
     uint16_t         length;
     // FIXME Check if instruction_t is right for ids here
     list(of_instruction_id_t)   instruction_ids;
 };
 
-struct of_table_feature_prop_instructions_miss : of_table_feature_prop {
+struct of_table_feature_prop_instructions_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 1;
     uint16_t         length;
     list(of_instruction_id_t)   instruction_ids;
 };
 
-struct of_table_feature_prop_next_tables : of_table_feature_prop {
+struct of_table_feature_prop_next_tables(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 2;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct of_table_feature_prop_next_tables_miss : of_table_feature_prop {
+struct of_table_feature_prop_next_tables_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 3;
     uint16_t         length;
     list(of_uint8_t) next_table_ids;
 };
 
-struct of_table_feature_prop_write_actions : of_table_feature_prop {
+struct of_table_feature_prop_write_actions(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 4;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_write_actions_miss : of_table_feature_prop {
+struct of_table_feature_prop_write_actions_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 5;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_apply_actions : of_table_feature_prop {
+struct of_table_feature_prop_apply_actions(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 6;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_apply_actions_miss : of_table_feature_prop {
+struct of_table_feature_prop_apply_actions_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 7;
     uint16_t         length;
     list(of_action_id_t) action_ids;
 };
 
-struct of_table_feature_prop_match : of_table_feature_prop {
+struct of_table_feature_prop_match(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 8;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_wildcards : of_table_feature_prop {
+struct of_table_feature_prop_wildcards(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 10;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_write_setfield : of_table_feature_prop {
+struct of_table_feature_prop_write_setfield(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 12;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_write_setfield_miss : of_table_feature_prop {
+struct of_table_feature_prop_write_setfield_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 13;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_apply_setfield : of_table_feature_prop {
+struct of_table_feature_prop_apply_setfield(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 14;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_apply_setfield_miss : of_table_feature_prop {
+struct of_table_feature_prop_apply_setfield_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 15;
     uint16_t         length;
     list(of_uint32_t) oxm_ids;
 };
 
-struct of_table_feature_prop_table_sync_from : of_table_feature_prop {
+struct of_table_feature_prop_table_sync_from(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 16;
     uint16_t         length;
     list(of_uint8_t) table_ids;
 };
 
-struct of_table_feature_prop_experimenter : of_table_feature_prop {
+struct of_table_feature_prop_experimenter(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 65534;
     uint16_t         length;
     uint32_t         experimenter == ?;
@@ -1991,7 +2032,7 @@ struct of_table_feature_prop_experimenter : of_table_feature_prop {
     of_octets_t      experimenter_data;
 };
 
-struct of_table_feature_prop_experimenter_miss : of_table_feature_prop {
+struct of_table_feature_prop_experimenter_miss(align=8, length_includes_align=False) : of_table_feature_prop {
     uint16_t         type == 65535;
     uint16_t         length;
     uint32_t         experimenter == ?;
@@ -2183,7 +2224,7 @@ struct of_meter_config_stats_reply : of_stats_reply {
     uint16_t stats_type == 10;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_meter_band_t) entries;
+    list(of_meter_config_t) entries;
 };
 
 // FIXME stats added to get things working
@@ -2292,6 +2333,8 @@ struct of_queue_desc_stats_request : of_stats_request {
     uint16_t stats_type == 15;
     enum ofp_stats_request_flags flags;
     pad(4);
+    of_port_no_t port_no;
+    uint32_t queue_id;
 };
 
 struct of_queue_desc_prop {
@@ -2563,7 +2606,6 @@ struct of_async_get_request : of_header {
     uint8_t type == 26;
     uint16_t length;
     uint32_t xid;
-    list(of_async_config_prop_t) properties;
 };
 
 struct of_async_get_reply : of_header {

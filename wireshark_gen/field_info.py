@@ -194,4 +194,5 @@ reader_overrides = {
     ("of_role_request_failed_error_msg", "data"): "read_openflow",
     ("of_meter_mod_failed_error_msg", "data"): "read_openflow",
     ("of_table_features_failed_error_msg", "data"): "read_openflow",
+    ("of_bundle_add_msg", "data"): "read_openflow",
 }

@@ -888,6 +888,45 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
 #define of_wire_buffer_checksum_128_set(buf, offset, checksum) \
     (of_wire_buffer_u64_set(buf, offset, checksum.hi), of_wire_buffer_u64_set(buf, offset+8, checksum.lo))
 
+
+/**
+ * Get a bitmap_512 from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value Pointer to where to put value
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_bitmap_512_get(of_wire_buffer_t *wbuf, int offset, of_bitmap_512_t *value)
+{
+    OF_WIRE_BUFFER_ACCESS_CHECK(wbuf, offset + (int) sizeof(of_bitmap_512_t));
+    int i;
+    for (i = 0; i < 8; i++) {
+        buf_u64_get(OF_WIRE_BUFFER_INDEX(wbuf, offset+i*8), &value->words[i]);
+    }
+}
+
+/**
+ * Set a bitmap_512 in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param value The value to store
+ *
+ * The underlying buffer accessor funtions handle endian and alignment.
+ */
+
+static inline void
+of_wire_buffer_bitmap_512_set(of_wire_buffer_t *wbuf, int offset, of_bitmap_512_t value)
+{
+    OF_WIRE_BUFFER_ACCESS_CHECK(wbuf, offset + (int) sizeof(of_bitmap_512_t));
+    int i;
+    for (i = 0; i < 8; i++) {
+        buf_u64_set(OF_WIRE_BUFFER_INDEX(wbuf, offset+i*8), value.words[i]);
+    }
+}
+
 /* Relocate data from start offset to the end of the buffer to a new position */
 static inline void
 of_wire_buffer_move_end(of_wire_buffer_t *wbuf, int start_offset, int new_offset)

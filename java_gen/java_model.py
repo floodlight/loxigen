@@ -413,6 +413,9 @@ class JavaOFInterface(object):
                 reply_name = m.group(1) + "Reply"
                 if model.interface_by_name(reply_name):
                     return ["OFRequest<%s>" % reply_name ]
+            elif self.name == "OFBundleCtrlMsg":
+                reply_name = "OFBundleCtrlMsg"
+                return ["OFRequest<%s>" % reply_name ]
         return []
 
 
@@ -584,6 +587,8 @@ class JavaOFInterface(object):
             if not find(lambda x: x.name == "mask", self.ir_model_members):
                 virtual_members.append(
                         JavaVirtualMember(self, "mask", find(lambda x: x.name == "value", self.ir_model_members).java_type))
+        elif self.name =="OFErrorMsg":
+            virtual_members += [ JavaVirtualMember(self, "data", java_type.error_cause_data) ]
 
         if not find(lambda m: m.name == "version", self.ir_model_members):
             virtual_members.append(JavaVirtualMember(self, "version", java_type.of_version))
@@ -885,6 +890,16 @@ class JavaMember(object):
         else:
             return self.java_type.format_value(self.member.value, pub_type=False)
 
+    @property
+    def needs_setter(self):
+        if self.is_writeable:
+            return True
+        super_class = self.msg.super_class
+        if super_class:
+            super_member = super_class.member_by_name(self.name)
+            if super_member:
+                return super_member.needs_setter
+        return False
 
     @property
     def is_writeable(self):

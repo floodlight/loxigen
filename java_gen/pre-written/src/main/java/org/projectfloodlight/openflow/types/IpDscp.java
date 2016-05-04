@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -227,14 +227,14 @@ public enum IpDscp implements OFValueType<IpDscp> {
 
     @Override
     public String toString() {
-        return Integer.toHexString(dscp);
+        return "0x" + Integer.toHexString(dscp);
     }
 
-    public void writeByte(ChannelBuffer c) {
+    public void writeByte(ByteBuf c) {
         c.writeByte(this.dscp);
     }
 
-    public static IpDscp readByte(ChannelBuffer c) throws OFParseError {
+    public static IpDscp readByte(ByteBuf c) throws OFParseError {
         return IpDscp.of((byte)(c.readUnsignedByte()));
     }
 

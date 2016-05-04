@@ -616,19 +616,26 @@ typedef struct of_ipv6_s {
    uint8_t addr[OF_IPV6_BYTES];
 } of_ipv6_t;
 
+typedef struct of_bitmap_512_s {
+    uint64_t words[8];
+} of_bitmap_512_t;
+
 extern const of_mac_addr_t of_mac_addr_all_ones;
 extern const of_mac_addr_t of_mac_addr_all_zeros;
 
 extern const of_ipv6_t of_ipv6_all_ones;
 extern const of_ipv6_t of_ipv6_all_zeros;
 
+extern const of_bitmap_512_t of_bitmap_512_all_ones;
+extern const of_bitmap_512_t of_bitmap_512_all_zeroes;
+
 /**
  * Generic zero and all-ones values of size 16 bytes.
  *
- * IPv6 is longest data type we worry about for comparisons
+ * bitmap_512 is longest data type we worry about for comparisons
  */
-#define of_all_zero_value of_ipv6_all_zeros
-#define of_all_ones_value of_ipv6_all_ones
+#define of_all_zero_value of_bitmap_512_all_zeroes
+#define of_all_ones_value of_bitmap_512_all_ones
 
 /**
  * Non-zero/all ones check for arbitrary type of size <= 16 bytes
@@ -753,7 +760,6 @@ def external_h_top_matter(out, name):
  * Per-class static delete functions
  * Per-class, per-member accessor declarations
  * Per-class structure definitions
- * Generic union (inheritance) definitions
  * Pointer set function declarations
  * Some special case macros
  *
@@ -966,38 +972,14 @@ def v3_match_offset_get(cls):
 #
 ################################################################
 
-def gen_generics(out):
-    for (cls, subclasses) in type_maps.inheritance_map.items():
-        out.write("""
-/**
- * Inheritance super class for %(cls)s
- *
- * This class is the union of %(cls)s classes.  You can refer
- * to it untyped by refering to the member 'header' whose structure
- * is common across all sub-classes.
- */
-
-union %(cls)s_u {
-    %(cls)s_header_t header; /* Generic instance */
-""" % dict(cls=cls))
-        for subcls in sorted(subclasses):
-            instance = loxi_utils.class_to_instance(subcls, cls)
-            out.write("    %s_%s_t %s;\n" % (cls, instance, instance))
-        out.write("};\n")
-
 def gen_struct_typedefs(out):
     """
     Generate typedefs for all struct objects
     @param out The file for output, already open
     """
 
-    out.write("\n/* LOCI inheritance parent typedefs */\n")
-    for cls in type_maps.inheritance_map:
-        out.write("typedef union %(cls)s_u %(cls)s_t;\n" % dict(cls=cls))
     out.write("\n/* LOCI object typedefs */\n")
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            continue
         template = "typedef of_object_t %(cls)s_t;\n"
         out.write(template % dict(cls=cls))
 
@@ -1036,7 +1018,7 @@ def gen_accessor_declarations(out):
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
+        if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
             continue
         out.write("\n/* Unified accessor functions for %s */\n" % cls)
         for m_name in of_g.ordered_members[cls]:
@@ -1076,13 +1058,13 @@ extern %(get_ret_type)s %(base_name)s_get(
             e_type = loxi_utils.list_to_entry_type(cls)
             out.write("""
 extern int %(cls)s_first(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_next(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append_bind(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 extern int %(cls)s_append(
-    %(cls)s_t *list, %(e_type)s_t *obj);
+    %(cls)s_t *list, of_object_t *iter);
 
 /**
  * Iteration macro for list of type %(cls)s
@@ -1224,7 +1206,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     LOCI_ASSERT(cur_len + abs_offset <= WBUF_CURRENT_BYTES(wbuf));
     OF_TRY(of_match_deserialize(ver, %(m_name)s, obj, offset, cur_len));
 """ % dict(m_name=m_name))
-    elif m_type == "of_oxm_header_t":
+    elif m_type == "of_oxm_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1232,7 +1214,7 @@ def gen_get_accessor_body(out, cls, m_type, m_name):
     of_object_attach(obj, %(m_name)s, offset, cur_len);
     of_object_wire_init(%(m_name)s, OF_OXM, 0);
 """ % dict(m_type=m_type[:-2], m_name=m_name))
-    elif m_type == "of_bsn_vport_header_t":
+    elif m_type == "of_bsn_vport_t":
         out.write("""
     /* Initialize child */
     %(m_type)s_init(%(m_name)s, obj->version, 0, 1);
@@ -1556,10 +1538,6 @@ def gen_init_fn_body(cls, out):
     @param cls The class name for the function
     @param out The file to which to write
     """
-    if type_maps.class_is_inheritance_root(cls):
-        param = "obj_p"
-    else:
-        param = "obj"
 
     out.write("""
 /**
@@ -1580,20 +1558,9 @@ def gen_init_fn_body(cls, out):
  */
 
 void
-%(cls)s_init(%(cls)s_t *%(param)s,
+%(cls)s_init(of_object_t *obj,
     of_version_t version, int bytes, int clean_wire)
 {
-""" % dict(cls=cls, param=param))
-
-    # Use an extra pointer to deal with inheritance classes
-    if type_maps.class_is_inheritance_root(cls):
-        out.write("""\
-    %s_header_t *obj;
-
-    obj = &obj_p->header;  /* Need instantiable subclass */
-""" % cls)
-
-    out.write("""
     LOCI_ASSERT(of_object_fixed_len[version][%(enum)s] >= 0);
     if (clean_wire) {
         MEMSET(obj, 0, sizeof(*obj));
@@ -1604,9 +1571,7 @@ void
     obj->version = version;
     obj->length = bytes;
     obj->object_id = %(enum)s;
-""" % dict(cls=cls, enum=enum_name(cls)))
 
-    out.write("""
     /* Grow the wire buffer */
     if (obj->wbuf != NULL) {
         int tot_bytes;
@@ -1615,8 +1580,7 @@ void
         of_wire_buffer_grow(obj->wbuf, tot_bytes);
     }
 }
-
-""")
+""" % dict(cls=cls, enum=enum_name(cls)))
 
 def gen_new_fn_body(cls, out):
     """
@@ -1648,15 +1612,15 @@ def gen_new_fn_body(cls, out):
  * \\ingroup %(cls)s
  */
 
-%(cls)s_t *
+of_object_t *
 %(cls)s_new(of_version_t version)
 {
-    %(cls)s_t *obj;
+    of_object_t *obj;
     int bytes;
 
     bytes = of_object_fixed_len[version][%(enum)s];
 
-    if ((obj = (%(cls)s_t *)of_object_new(%(max_length)s)) == NULL) {
+    if ((obj = of_object_new(%(max_length)s)) == NULL) {
         return NULL;
     }
 
@@ -1717,11 +1681,11 @@ def gen_new_function_declarations(out):
 
     for cls in of_g.standard_class_order:
         out.write("""
-extern %(cls)s_t *
+extern of_object_t *
     %(cls)s_new(of_version_t version);
 """ % dict(cls=cls))
         out.write("""extern void %(cls)s_init(
-    %(cls)s_t *obj, of_version_t version, int bytes, int clean_wire);
+    of_object_t *obj, of_version_t version, int bytes, int clean_wire);
 """ % dict(cls=cls))
 
     out.write("""
@@ -1733,8 +1697,6 @@ extern %(cls)s_t *
  ****************************************************************/
 """)
     for cls in of_g.standard_class_order:
-#        if type_maps.class_is_inheritance_root(cls):
-#            continue
         out.write("""
 /**
  * Delete an object of type %(cls)s_t
@@ -1743,8 +1705,8 @@ extern %(cls)s_t *
  * \ingroup %(cls)s
  */
 static inline void
-%(cls)s_delete(%(cls)s_t *obj) {
-    of_object_delete((of_object_t *)(obj));
+%(cls)s_delete(of_object_t *obj) {
+    of_object_delete(obj);
 }
 """ % dict(cls=cls))
 
@@ -1792,8 +1754,8 @@ def gen_accessor_doc(out, name):
     out.write("/* DOCUMENTATION ONLY */\n")
 
     for cls in of_g.standard_class_order:
-        if type_maps.class_is_inheritance_root(cls):
-            pass # Check this
+        if type_maps.class_is_virtual(cls):
+            pass
 
         out.write("""
 /**

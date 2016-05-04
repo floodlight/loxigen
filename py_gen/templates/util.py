@@ -173,6 +173,28 @@ def unpack_bitmap_128(reader):
         x >>= 1
     return value
 
+def pack_bitmap_512(value):
+    words = [0] * 8
+    for v in value:
+        assert v < 512
+        words[7-v/64] |= 1 << (v % 64)
+    return struct.pack("!8Q", *words)
+
+def unpack_bitmap_512(reader):
+    words = reader.read("!8Q")
+    x = 0l
+    for word in words:
+        x <<= 64
+        x |= word
+    i = 0
+    value = set()
+    while x != 0:
+        if x & 1 == 1:
+            value.add(i)
+        i += 1
+        x >>= 1
+    return value
+
 def pack_checksum_128(value):
     return struct.pack("!QQ", (value >> 64) & MASK64, value & MASK64)
 

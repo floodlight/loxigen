@@ -37,7 +37,7 @@ import javax.annotation.concurrent.Immutable;
  *  matchBuilder.setMasked(MatchField.BSN_IN_PORTS_128, portBitmap);
  *  </pre>
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 @Immutable
 public class OFPortBitMap extends Masked<OFBitMask128> {
@@ -47,7 +47,7 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
     }
 
     /** @return whether or not the given port is logically included in the
-     *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+     *  match, i.e., whether a packet from in-port <em>port</em> be matched by
      *  this OXM.
      */
     public boolean isOn(OFPort port) {
@@ -71,7 +71,7 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
     }
 
     /** @return iterating over all ports that are logically included in the
-     *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+     *  match, i.e., whether a packet from in-port <em>port</em> be matched by
      *  this OXM.
      */
     public Iterable<OFPort> getOnPorts() {
@@ -105,7 +105,7 @@ public class OFPortBitMap extends Masked<OFBitMask128> {
         }
 
         /** @return whether or not the given port is logically included in the
-         *  match, i.e., whether a packet from in-port <emph>port</emph> be matched by
+         *  match, i.e., whether a packet from in-port <em>port</em> be matched by
          *  this OXM.
          */
         public boolean isOn(OFPort port) {

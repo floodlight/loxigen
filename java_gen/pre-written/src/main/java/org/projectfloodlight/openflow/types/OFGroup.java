@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -11,7 +11,7 @@ import com.google.common.primitives.UnsignedInts;
  * Abstraction of an logical / OpenFlow group (ofp_group) in OpenFlow.
  * Immutable.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 @Immutable
 public class OFGroup implements OFValueType<OFGroup> {
@@ -38,7 +38,7 @@ public class OFGroup implements OFValueType<OFGroup> {
     public final static OFGroup ANY = new NamedGroup(ANY_VAL, "any");
 
     /** group 0 in case we need it */
-    public static final OFGroup ZERO = OFGroup.of(ZERO_VAL);
+    public static final OFGroup ZERO = new OFGroup(ZERO_VAL);
 
     public static final OFGroup NO_MASK = ANY;
     public static final OFGroup FULL_MASK = ZERO;
@@ -62,7 +62,7 @@ public class OFGroup implements OFValueType<OFGroup> {
     public static OFGroup of(final int groupNumber) {
         switch(groupNumber) {
             case ZERO_VAL:
-                return MAX;
+                return ZERO;
             case MAX_VAL:
                 return MAX;
             case ALL_VAL:
@@ -131,11 +131,11 @@ public class OFGroup implements OFValueType<OFGroup> {
         return result;
     }
 
-    public void write4Bytes(ChannelBuffer c) {
+    public void write4Bytes(ByteBuf c) {
         c.writeInt(this.groupNumber);
     }
 
-    public static OFGroup read4Bytes(ChannelBuffer c) throws OFParseError {
+    public static OFGroup read4Bytes(ByteBuf c) throws OFParseError {
         return OFGroup.of(c.readInt());
     }
 

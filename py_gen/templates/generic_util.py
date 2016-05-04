@@ -105,7 +105,7 @@ class OFReader(object):
         self.offset += length
 
     def skip_align(self):
-        new_offset = ((self.start + self.offset + 7) / 8 * 8) - self.start
+        new_offset = (self.offset + 7) / 8 * 8
         if new_offset > self.length:
             raise loxi.ProtocolError("Buffer too short")
         self.offset = new_offset
@@ -114,9 +114,10 @@ class OFReader(object):
         return self.offset == self.length
 
     # Used when parsing objects that have their own length fields
-    def slice(self, length):
-        if self.offset + length > self.length:
+    def slice(self, length, rewind=0):
+        if self.offset + length - rewind > self.length:
             raise loxi.ProtocolError("Buffer too short")
-        reader = OFReader(self.buf, self.start + self.offset, length)
-        self.offset += length
+        reader = OFReader(self.buf, self.start + self.offset - rewind, length)
+        reader.skip(rewind)
+        self.offset += length - rewind
         return reader

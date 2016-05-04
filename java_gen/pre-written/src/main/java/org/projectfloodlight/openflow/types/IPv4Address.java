@@ -1,25 +1,28 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
 
-import org.projectfloodlight.openflow.protocol.Writeable;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
-
 /**
  * Wrapper around an IPv4Address address
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     static final int LENGTH = 4;
@@ -44,7 +47,7 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
 
     private static class Reader implements OFMessageReader<IPv4Address> {
         @Override
-        public IPv4Address readFrom(ChannelBuffer bb) throws OFParseError {
+        public IPv4Address readFrom(ByteBuf bb) throws OFParseError {
             return new IPv4Address(bb.readInt());
         }
     }
@@ -86,8 +89,32 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
+    public boolean isUnspecified() {
+        return this.equals(NONE);
+    }
+
+    @Override
+    public boolean isLoopback() {
+        return ((rawValue >>> 24) & 0xFF) == 127;
+    }
+
+    @Override
+    public boolean isLinkLocal() {
+        return ((rawValue >>> 24) & 0xFF) == 169
+                && ((rawValue >>> 16) & 0xFF) == 254;
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
+    }
+
+    /**
+     * IPv4 multicast addresses are defined by the leading address bits of 1110
+     */
+    @Override
+    public boolean isMulticast() {
+        return ((rawValue >>> 24) & 0xF0) == 0xE0;
     }
 
     @Override
@@ -140,6 +167,42 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         int raw =
                 (address[0] & 0xFF) << 24 | (address[1] & 0xFF) << 16
                         | (address[2] & 0xFF) << 8 | (address[3] & 0xFF) << 0;
+        return IPv4Address.of(raw);
+    }
+
+    /**
+     * Returns an {@code IPv4Address} object that represents the given
+     * IP address. The arguments are in network byte order: the highest
+     * order byte of the address is in {@code octet1}.
+     *
+     * <p>For example, {@code IPv4Address.of(192, 0, 2, 101)} yields
+     * the IPv4 address of {@code "192.0.2.101"}.
+     *
+     * <p>Use caution when providing byte-typed values as arguments.
+     * "Byte-typed values" here refer to values that are of either the
+     * primitive {@code byte} type or the corresponding object wrapper
+     * class {@link Byte}. Byte-typed values greater than 127 are
+     * essentially negative values and will be casted to negative
+     * {@code int} values, thus failing the numeric range checks
+     * enforced by this method. Consider using {@link #of(byte[])}
+     * instead when handling byte-typed values.
+     *
+     * @throws IllegalArgumentException if any of the octets were
+     *         negative or greater than 255
+     */
+    @Nonnull
+    public static IPv4Address of(
+            int octet1, int octet2, int octet3, int octet4) {
+        checkArgument((octet1 & 0xFF) == octet1
+                && (octet2 & 0xFF) == octet2
+                && (octet3 & 0xFF) == octet3
+                && (octet4 & 0xFF) == octet4,
+                "Invalid IPv4 address %s.%s.%s.%s",
+                octet1, octet2, octet3, octet4);
+        int raw = (octet1 & 0xFF) << 24
+                | (octet2 & 0xFF) << 16
+                | (octet3 & 0xFF) << 8
+                | (octet4 & 0xFF) << 0;
         return IPv4Address.of(raw);
     }
 
@@ -301,6 +364,17 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         return LENGTH;
     }
 
+    @Nonnull
+    @Override
+    public Inet4Address toInetAddress() {
+        try {
+            return (Inet4Address) InetAddress.getByAddress(getBytes());
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(
+                    "Error getting InetAddress for the IPAddress " + this, e);
+        }
+    }
+
     @Override
     public String toString() {
         StringBuilder res = new StringBuilder();
@@ -311,11 +385,11 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
         return res.toString();
     }
 
-    public void write4Bytes(ChannelBuffer c) {
+    public void write4Bytes(ByteBuf c) {
         c.writeInt(rawValue);
     }
 
-    public static IPv4Address read4Bytes(ChannelBuffer c) {
+    public static IPv4Address read4Bytes(ByteBuf c) {
         return IPv4Address.of(c.readInt());
     }
 
@@ -357,7 +431,7 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeInt(rawValue);
     }
 }

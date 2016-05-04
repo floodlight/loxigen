@@ -99,12 +99,13 @@ def var_name_map(m_type):
         of_octets_t="octets",
         of_meter_features_t="features",
         of_match_t="match",
-        of_oxm_header_t="oxm",
-        of_bsn_vport_header_t="bsn_vport",
+        of_oxm_t="oxm",
+        of_bsn_vport_t="bsn_vport",
         of_table_desc_t="table_desc",
         # BSN extensions
         of_bsn_vport_q_in_q_t="vport",
         of_bitmap_128_t="bitmap_128",
+        of_bitmap_512_t="bitmap_512",
         of_checksum_128_t="checksum_128",
         )
 
@@ -120,7 +121,7 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
 string_types = [ "of_port_name_t", "of_table_name_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                 "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
-                "of_str64_t"]
+                "of_str64_t", "of_bitmap_512_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
@@ -128,8 +129,8 @@ scalar_types.extend(string_types)
 # When embedding an object inside of another object we have to pick a single
 # subclass to use, unlike lists where we use all subclasses.
 embedded_subclasses = {
-    'of_oxm_header_t': 'of_oxm_eth_type',
-    'of_bsn_vport_header_t': 'of_bsn_vport_q_in_q',
+    'of_oxm_t': 'of_oxm_eth_type',
+    'of_bsn_vport_t': 'of_bsn_vport_q_in_q',
 }
 
 def ignore_member(cls, version, m_name, m_type):
@@ -380,7 +381,7 @@ extern int test_datafiles(void);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls) and not loxi_utils.class_is_list(cls):
                 continue
             out.write("""
 extern int %(cls)s_%(v_name)s_populate(
@@ -391,24 +392,6 @@ extern int %(cls)s_%(v_name)s_populate_scalars(
     %(cls)s_t *obj, int value);
 extern int %(cls)s_%(v_name)s_check_scalars(
     %(cls)s_t *obj, int value);
-""" % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
-
-    out.write("""
-/*
- * Declarations for list population and check primitives
- */
-""")
-
-    for version in of_g.of_version_range:
-        for cls in of_g.ordered_list_objects:
-            if version in of_g.unified[cls]:
-               out.write("""
-extern int
-    list_setup_%(cls)s_%(v_name)s(
-    %(cls)s_t *list, int value);
-extern int
-    list_check_%(cls)s_%(v_name)s(
-    %(cls)s_t *list, int value);
 """ % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
 
     out.write("\n#endif /* _TEST_COMMON_H_ */\n")
@@ -485,7 +468,6 @@ extern int run_message_tests(void);
 
     gen_fill_string(out)
     gen_scalar_set_check_funs(out)
-    gen_list_set_check_funs(out)
     gen_unified_accessor_funs(out)
 
     gen_ident_tests(out)
@@ -515,7 +497,7 @@ def gen_message_scalar_test(out, name):
  */
 """ % v_name)
         for cls in of_g.standard_class_order:
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             if version in of_g.unified[cls]:
                 message_scalar_test(out, version, cls)
@@ -528,7 +510,7 @@ run_scalar_acc_tests(void)
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
         for cls in of_g.standard_class_order:
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             if version in of_g.unified[cls]:
                 test_name = "%s_%s" % (cls, v_name)
@@ -701,6 +683,8 @@ def gen_scalar_set_check_funs(out):
     """
     for version in of_g.of_version_range:
         for cls in of_g.standard_class_order:
+            if type_maps.class_is_virtual(cls):
+                continue
             (members, member_types) = scalar_member_types_get(cls, version)
             scalar_funs_instance(out, cls, version, members, member_types)
 
@@ -710,8 +694,7 @@ def setup_instance(out, cls, subcls, instance, v_name, version):
     base_type = loxi_utils.list_to_entry_type(cls)
     setup_template = """
     %(subcls)s_init(%(inst)s, %(v_name)s, -1, 1);
-    %(cls)s_append_bind(list,
-            (%(base_type)s_t *)%(inst)s);
+    %(cls)s_append_bind(list, %(inst)s);
     value = %(subcls)s_%(v_name)s_populate(
         %(inst)s, value);
     cur_len += %(inst)s->length;
@@ -756,115 +739,6 @@ def check_instance(out, cls, subcls, instance, v_name, version, last):
     TEST_OK(%(cls)s_next(list, &elt));
 """ % dict(cls=cls))
 
-def setup_list_fn(out, version, cls):
-    """
-    Generate a helper function that populates a list with two
-    of each type of subclass it supports
-    """
-    out.write("""
-/**
- * Set up a list of type %(cls)s with two of each type of subclass
- */
-int
-list_setup_%(cls)s_%(v_name)s(
-    %(cls)s_t *list, int value)
-{
-""" % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
-    base_type = loxi_utils.list_to_entry_type(cls)
-    out.write("""
-    %(base_type)s_t elt;
-    int cur_len = 0;
-    (void) elt;
-    (void) cur_len;
-""" % dict(cls=cls, base_type=base_type))
-
-    sub_classes =  type_maps.sub_class_map(base_type, version)
-    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
-    v_name = loxi_utils.version_to_name(version)
-
-    if not type_maps.class_is_virtual(base_type):
-        out.write("    /* No subclasses for %s */\n"% base_type)
-        out.write("    %s_t *elt_p;\n" % base_type)
-        out.write("\n    elt_p = &elt;\n")
-    else:
-        out.write("    /* Declare pointers for each subclass */\n")
-        for instance, subcls in sub_classes:
-            out.write("    %s_t *%s;\n" % (subcls, instance))
-        out.write("\n    /* Instantiate pointers for each subclass */\n")
-        for instance, subcls in sub_classes:
-            out.write("    %s = &elt.%s;\n" % (instance, instance))
-
-    if not type_maps.class_is_virtual(base_type): # No inheritance case
-        setup_instance(out, cls, base_type, "elt_p", v_name, version)
-    else:
-        for instance, subcls in sub_classes:
-            setup_instance(out, cls, subcls, instance, v_name, version)
-    out.write("""
-
-    return value;
-}
-""")
-
-def check_list_fn(out, version, cls):
-    """
-    Generate a helper function that checks a list populated by above fn
-    """
-    out.write("""
-/**
- * Check a list of type %(cls)s generated by
- * list_setup_%(cls)s_%(v_name)s
- */
-int
-list_check_%(cls)s_%(v_name)s(
-    %(cls)s_t *list, int value)
-{
-""" % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
-    base_type = loxi_utils.list_to_entry_type(cls)
-    out.write("""
-    %(base_type)s_t elt;
-    (void) elt;
-""" % dict(cls=cls, base_type=base_type))
-
-    sub_classes =  type_maps.sub_class_map(base_type, version)
-    sub_classes = [(instance, subcls) for (instance, subcls) in sub_classes if not type_maps.class_is_virtual(subcls)]
-    v_name = loxi_utils.version_to_name(version)
-
-    if not type_maps.class_is_virtual(base_type):
-        out.write("    /* No subclasses for %s */\n"% base_type)
-        out.write("    %s_t *elt_p;\n" % base_type)
-        out.write("\n    elt_p = &elt;\n")
-    else:
-        out.write("    /* Declare pointers for each subclass */\n")
-        for instance, subcls in sub_classes:
-            out.write("    %s_t *%s;\n" % (subcls, instance))
-        out.write("\n    /* Instantiate pointers for each subclass */\n")
-        for instance, subcls in sub_classes:
-            out.write("    %s = &elt.%s;\n" % (instance, instance))
-
-    if not type_maps.class_is_virtual(base_type) or sub_classes:
-        out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
-
-    if not type_maps.class_is_virtual(base_type): # No inheritance case
-        check_instance(out, cls, base_type, "elt_p", v_name, version, True)
-    else:
-        count = 0
-        for instance, subcls in sub_classes:
-            count += 1
-            check_instance(out, cls, subcls, instance, v_name,
-                           version, count==len(sub_classes))
-
-    out.write("""
-    return value;
-}
-""" % dict(base_type=base_type))
-
-def gen_list_set_check_funs(out):
-    for version in of_g.of_version_range:
-        for cls in of_g.ordered_list_objects:
-            if version in of_g.unified[cls]:
-                setup_list_fn(out, version, cls)
-                check_list_fn(out, version, cls)
-
 # Maybe: Get a map from list class to parent, mem_name of container
 
 def list_test(out, version, cls):
@@ -887,7 +761,7 @@ test_%(cls)s_%(v_name)s(void)
     TEST_ASSERT(list->parent == NULL);
     TEST_ASSERT(list->object_id == %(enum_cls)s);
 
-    value = list_setup_%(cls)s_%(v_name)s(list, value);
+    value = %(cls)s_%(v_name)s_populate(list, value);
     TEST_ASSERT(value != 0);
 """ % dict(cls=cls, base_type=base_type, v_name=loxi_utils.version_to_name(version),
            enum_cls=loxi_utils.enum_name(cls)))
@@ -895,7 +769,7 @@ test_%(cls)s_%(v_name)s(void)
     out.write("""
     /* Now check values */
     value = 1;
-    value = list_check_%(cls)s_%(v_name)s(list, value);
+    value = %(cls)s_%(v_name)s_check(list, value);
     TEST_ASSERT(value != 0);
 """ % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
 
@@ -1181,10 +1055,17 @@ int
 """ % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
     base_type = loxi_utils.list_to_entry_type(cls)
     out.write("""
-    %(base_type)s_t elt;
+    of_object_t elt;
     int cur_len = 0;
+    static int recursion;
     (void) elt;
     (void) cur_len;
+
+    if (recursion > 0) {
+        return value;
+    }
+
+    recursion++;
 """ % dict(cls=cls, base_type=base_type))
 
     sub_classes =  type_maps.sub_class_map(base_type, version)
@@ -1201,7 +1082,7 @@ int
             out.write("    %s_t *%s;\n" % (subcls, instance))
         out.write("\n    /* Instantiate pointers for each subclass */\n")
         for instance, subcls in sub_classes:
-            out.write("    %s = &elt.%s;\n" % (instance, instance))
+            out.write("    %s = &elt;\n" % (instance))
 
     if not type_maps.class_is_virtual(base_type): # No inheritance case
         setup_instance(out, cls, base_type, "elt_p", v_name, version)
@@ -1209,6 +1090,7 @@ int
         for instance, subcls in sub_classes:
             setup_instance(out, cls, subcls, instance, v_name, version)
     out.write("""
+    recursion--;
     return value;
 }
 """)
@@ -1227,9 +1109,16 @@ int
 """ % dict(cls=cls, v_name=loxi_utils.version_to_name(version)))
     base_type = loxi_utils.list_to_entry_type(cls)
     out.write("""
-    %(base_type)s_t elt;
+    of_object_t elt;
     int count = 0;
     int rv;
+    static int recursion;
+
+    if (recursion > 0) {
+        return value;
+    }
+
+    recursion++;
 """ % dict(cls=cls, base_type=base_type))
 
 
@@ -1249,7 +1138,7 @@ int
             out.write("    %s_t *%s;\n" % (subcls, instance))
         out.write("\n    /* Instantiate pointers for each subclass */\n")
         for instance, subcls in sub_classes:
-            out.write("    %s = &elt.%s;\n" % (instance, instance))
+            out.write("    %s = &elt;\n" % (instance))
 
     if not type_maps.class_is_virtual(base_type) or sub_classes:
         out.write("    TEST_OK(%(cls)s_first(list, &elt));\n" % dict(cls=cls))
@@ -1298,6 +1187,7 @@ int
         of_object_delete((of_object_t *)dup);
     }
 
+    recursion--;
     return value;
 }
 """ % dict(cls=cls, u_cls=cls.upper(), entry_count=entry_count))
@@ -1587,11 +1477,9 @@ def gen_unified_accessor_funs(out):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
-                continue
             elif loxi_utils.class_is_list(cls):
                 gen_list_setup_check(out, cls, version)
-            else:
+            elif not type_maps.class_is_virtual(cls):
                 gen_class_setup_check(out, cls, version)
 
 def gen_unified_accessor_tests(out, name):
@@ -1610,7 +1498,7 @@ def gen_unified_accessor_tests(out, name):
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             unified_accessor_test_case(out, cls, version)
 
@@ -1624,7 +1512,7 @@ run_unified_accessor_tests(void)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             test_name = "%s_%s" % (cls, v_name)
             out.write("    RUN_TEST(%s);\n" % test_name)
@@ -1661,8 +1549,8 @@ def gen_dup_list(out, cls, version):
 %(cls)s_%(ver_name)s_dup(
     %(cls)s_t *src)
 {
-    %(elt_type)s_t src_elt;
-    %(elt_type)s_t *dst_elt;
+    of_object_t src_elt;
+    of_object_t *dst_elt;
     int rv;
     %(cls)s_t *dst;
 
@@ -1697,9 +1585,9 @@ def gen_dup_inheritance(out, cls, version):
  *
  * The caller is responsible for deleting the returned value
  */
-%(cls)s_t *
+of_object_t *
 %(cls)s_%(ver_name)s_dup(
-    %(cls)s_t *src)
+    of_object_t *src)
 {
 """ % dict(cls=cls, ver_name=ver_name))
 
@@ -1707,10 +1595,11 @@ def gen_dup_inheritance(out, cls, version):
     sub_classes = type_maps.sub_class_map(cls, version)
     for (_, sub_cls) in sub_classes:
         sub_enum = sub_cls.upper()
+        if type_maps.class_is_virtual(sub_cls):
+            continue
         out.write("""
-    if (src->header.object_id == %(sub_enum)s) {
-        return (%(cls)s_t *)%(sub_cls)s_%(ver_name)s_dup(
-            (of_object_t *)src);
+    if (src->object_id == %(sub_enum)s) {
+        return %(sub_cls)s_%(ver_name)s_dup(src);
     }
 """ % dict(sub_cls=sub_cls, ver_name=ver_name, sub_enum=sub_enum, cls=cls))
 
@@ -1841,7 +1730,7 @@ def gen_version_dup(out=sys.stdout):
                 gen_dup_inheritance(out, cls, version)
             elif loxi_utils.class_is_list(cls):
                 gen_dup_list(out, cls, version)
-            else:
+            elif not type_maps.class_is_virtual(cls):
                 gen_dup_cls(out, cls, version)
 
 def gen_dup(out=sys.stdout):
@@ -1851,22 +1740,26 @@ def gen_dup(out=sys.stdout):
 
     for cls in of_g.standard_class_order:
         out.write("""
-%(cls)s_t *
+of_object_t *
 %(cls)s_dup(
-    %(cls)s_t *src)
+    of_object_t *src)
 {
 """ % dict(cls=cls))
         for version in of_g.of_version_range:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            hdr = "header." if type_maps.class_is_inheritance_root(cls) else ""
-
+            elif type_maps.class_is_inheritance_root(cls):
+                pass
+            elif loxi_utils.class_is_list(cls):
+                pass
+            elif type_maps.class_is_virtual(cls):
+                continue
             ver_name = loxi_utils.version_to_name(version)
             out.write("""
-    if (src->%(hdr)sversion == %(ver_name)s) {
+    if (src->version == %(ver_name)s) {
         return %(cls)s_%(ver_name)s_dup(src);
     }
-""" % dict(cls=cls, ver_name=ver_name, hdr=hdr))
+""" % dict(cls=cls, ver_name=ver_name))
 
         out.write("""
     /* Class not supported in given version */
@@ -1920,20 +1813,26 @@ def dup_h_gen(out, name):
 
     for cls in of_g.standard_class_order:
         out.write("""
-extern %(cls)s_t *
+extern of_object_t *
     %(cls)s_dup(
-        %(cls)s_t *src);
+        of_object_t *src);
 """ % dict(cls=cls))
 
     for version in of_g.of_version_range:
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
+            elif type_maps.class_is_inheritance_root(cls):
+                pass
+            elif loxi_utils.class_is_list(cls):
+                pass
+            elif type_maps.class_is_virtual(cls):
+                continue
             ver_name = loxi_utils.version_to_name(version)
             out.write("""
-extern %(cls)s_t *
+extern of_object_t *
     %(cls)s_%(ver_name)s_dup(
-        %(cls)s_t *src);
+        of_object_t *src);
 """ % dict(cls=cls, ver_name=ver_name))
 
     out.write("\n#endif /* _OF_DUP_H_ */\n")
@@ -1963,7 +1862,7 @@ test_dump_objs(void)
         for j, cls in enumerate(of_g.all_class_order):
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             if cls == "of_bsn_virtual_port_create_request": # test q_in_q
                 out.write("""

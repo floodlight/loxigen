@@ -1,27 +1,31 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nonnull;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import org.projectfloodlight.openflow.exceptions.OFParseError;
+import org.projectfloodlight.openflow.protocol.OFMessageReader;
+import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
-import com.google.common.primitives.Longs;
-
-import org.projectfloodlight.openflow.protocol.Writeable;
-import org.projectfloodlight.openflow.protocol.OFMessageReader;
-import org.projectfloodlight.openflow.exceptions.OFParseError;
+import com.google.common.primitives.UnsignedLongs;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:
  * two 64 bit longs (not that you'd have to know).
  *
- * @author Andreas Wundsam <andreas.wundsam@teleteach.de>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@teleteach.de{@literal >}
  */
 public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     static final int LENGTH = 16;
@@ -50,7 +54,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     private static class Reader implements OFMessageReader<IPv6Address> {
         @Override
-        public IPv6Address readFrom(ChannelBuffer bb) throws OFParseError {
+        public IPv6Address readFrom(ByteBuf bb) throws OFParseError {
             return new IPv6Address(bb.readLong(), bb.readLong());
         }
     }
@@ -111,8 +115,70 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     @Override
+    public boolean isUnspecified() {
+        return this.equals(NONE);
+    }
+
+    @Override
+    public boolean isLoopback() {
+        return raw1 == 0 && raw2 == 1;
+    }
+
+    @Override
+    public boolean isLinkLocal() {
+        return (raw1 & 0xFFC0_0000_0000_0000L) == 0xFE80_0000_0000_0000L;
+    }
+
+    @Override
     public boolean isBroadcast() {
         return this.equals(NO_MASK);
+    }
+
+    /**
+     * IPv6 multicast addresses are defined by the prefix ff00::/8
+     */
+    @Override
+    public boolean isMulticast() {
+        return (raw1 >>> 56) == 0xFFL;
+    }
+
+    /**
+     * Returns the Modified EUI-64 format interface identifier that
+     * corresponds to the specified MAC address.
+     *
+     * <p>Refer to the followings for the conversion details:
+     * <ul>
+     * <li>RFC 7042 - Section 2.2.1
+     * <li>RFC 5342 - Section 2.2.1 (Obsoleted by RFC 7042)
+     * <li>RFC 4291 - Appendix A
+     * </ul>
+     */
+    private static long toModifiedEui64(@Nonnull MacAddress macAddress) {
+        checkNotNull(macAddress, "macAddress must not be null");
+        return   ((0xFFFF_FF00_0000_0000L & (macAddress.getLong() << 16))
+                ^ (0x0200_0000_0000_0000L))
+                | (0x0000_00FF_FE00_0000L)
+                | (0x0000_0000_00FF_FFFFL & macAddress.getLong());
+    }
+
+    /**
+     * Returns {@code true} if the second (lower-order) 64-bit block of
+     * this address is equal to the Modified EUI-64 format interface
+     * identifier that corresponds to the specified MAC address.
+     *
+     * <p>Refer to the followings for the details of conversions between
+     * MAC addresses and Modified EUI-64 format interface identifiers:
+     * <ul>
+     * <li>RFC 7042 - Section 2.2.1
+     * <li>RFC 5342 - Section 2.2.1 (Obsoleted by RFC 7042)
+     * <li>RFC 4291 - Appendix A
+     * </ul>
+     *
+     * <p>This method assumes the second (lower-order) 64-bit block to be
+     * a 64-bit interface identifier, which may not always be true.
+     */
+    public boolean isModifiedEui64Derived(@Nonnull MacAddress macAddress) {
+        return raw2 == toModifiedEui64(macAddress);
     }
 
     @Override
@@ -166,13 +232,13 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
                 (address[0] & 0xFFL) << 56 | (address[1] & 0xFFL) << 48
                         | (address[2] & 0xFFL) << 40 | (address[3] & 0xFFL) << 32
                         | (address[4] & 0xFFL) << 24 | (address[5] & 0xFFL) << 16
-                        | (address[6] & 0xFFL) << 8 | (address[7]);
+                        | (address[6] & 0xFFL) << 8 | (address[7] & 0xFFL);
 
         long raw2 =
                 (address[8] & 0xFFL) << 56 | (address[9] & 0xFFL) << 48
                         | (address[10] & 0xFFL) << 40 | (address[11] & 0xFFL) << 32
                         | (address[12] & 0xFFL) << 24 | (address[13] & 0xFFL) << 16
-                        | (address[14] & 0xFFL) << 8 | (address[15]);
+                        | (address[14] & 0xFFL) << 8 | (address[15] & 0xFFL);
 
         return IPv6Address.of(raw1, raw2);
     }
@@ -321,6 +387,50 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     /**
+     * Returns an {@code IPv6Address} object that represents the given
+     * MAC address in the specified network.
+     *
+     * <p>The first (higher-order) 64-bit block of the returned address
+     * will be the network prefix derived from the specified network.
+     * The specified network must satisfy the followings:
+     * <ul>
+     * <li>{@link #isCidrMask()} {@code == true}
+     * <li>{@literal 0 <= } {@link #asCidrMaskLength()} {@literal <= 64}
+     * </ul>
+     *
+     * <p>The second (lower-order) 64-bit block of the returned address
+     * will be equal to the Modified EUI-64 format interface identifier
+     * that corresponds to the specified MAC address.
+     *
+     * <p>Refer to the followings for the details of conversions between
+     * MAC addresses and Modified EUI-64 format interface identifiers:
+     * <ul>
+     * <li>RFC 7042 - Section 2.2.1
+     * <li>RFC 5342 - Section 2.2.1 (Obsoleted by RFC 7042)
+     * <li>RFC 4291 - Appendix A
+     * </ul>
+     *
+     * @throws IllegalArgumentException if the specified network does not
+     *         meet the aforementioned requirements
+     */
+    @Nonnull
+    public static IPv6Address of(
+            @Nonnull IPv6AddressWithMask network,
+            @Nonnull MacAddress macAddress) {
+
+        checkNotNull(network, "network must not be null");
+        checkArgument(network.getMask().isCidrMask()
+                && network.getMask().asCidrMaskLength() <= 64,
+                "network must consist of a mask of 64 or less leading 1 bits"
+                + " and no other 1 bits: %s", network);
+
+        long raw1 = network.getValue().raw1;
+        long raw2 = toModifiedEui64(macAddress);
+
+        return IPv6Address.of(raw1, raw2);
+    }
+
+    /**
      * Returns an {@code IPv6Address} object that represents the
      * CIDR subnet mask of the given prefix length.
      *
@@ -386,6 +496,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     private volatile byte[] bytesCache = null;
 
+    @Override
     public byte[] getBytes() {
         if (bytesCache == null) {
             synchronized (this) {
@@ -417,6 +528,17 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     @Override
     public int getLength() {
         return LENGTH;
+    }
+
+    @Nonnull
+    @Override
+    public Inet6Address toInetAddress() {
+        try {
+            return (Inet6Address) InetAddress.getByAddress(getBytes());
+        } catch (UnknownHostException e) {
+            throw new IllegalArgumentException(
+                    "Error getting InetAddress for the IPAddress " + this, e);
+        }
     }
 
     @Override
@@ -531,12 +653,12 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return true;
     }
 
-    public void write16Bytes(ChannelBuffer c) {
+    public void write16Bytes(ByteBuf c) {
         c.writeLong(this.raw1);
         c.writeLong(this.raw2);
     }
 
-    public static IPv6Address read16Bytes(ChannelBuffer c) throws OFParseError {
+    public static IPv6Address read16Bytes(ByteBuf c) throws OFParseError {
         return IPv6Address.of(c.readLong(), c.readLong());
     }
 
@@ -547,11 +669,11 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     @Override
     public int compareTo(IPv6Address o) {
-        int res = Longs.compare(raw1, o.raw1);
+        int res = UnsignedLongs.compare(raw1, o.raw1);
         if(res != 0)
             return res;
         else
-            return Longs.compare(raw2, o.raw2);
+            return UnsignedLongs.compare(raw2, o.raw2);
     }
 
     @Override
@@ -561,7 +683,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeLong(raw1);
         bb.writeLong(raw2);
     }

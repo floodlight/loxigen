@@ -2,10 +2,10 @@ package org.projectfloodlight.openflow.types;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import org.hamcrest.Matchers;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.protocol.OFFactories;
 import org.projectfloodlight.openflow.protocol.OFFlowAdd;
@@ -60,7 +60,7 @@ public class OFErrorCauseDataTest {
         .setPriority(6000)
         .build();
 
-        ChannelBuffer bb = ChannelBuffers.dynamicBuffer();
+        ByteBuf bb = Unpooled.buffer();
         flowAdd.writeTo(bb);
         byte[] flowAddBytes = new byte[bb.readableBytes()];
         bb.readBytes(flowAddBytes);

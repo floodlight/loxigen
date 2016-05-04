@@ -88,7 +88,7 @@ class VersionOp:
 class JType(object):
     """ Wrapper class to hold C to Java type conversion information. JTypes can have a 'public'
         and or 'private' java type associated with them and can define how those types can be
-        read from and written to ChannelBuffers.
+        read from and written to ByteBufs.
 
     """
     def __init__(self, pub_type, priv_type=None):
@@ -163,7 +163,7 @@ class JType(object):
             return reduce(lambda a,repl: a.replace("$%s" % repl[0], str(repl[1])),  arguments.items(), _op)
 
     def read_op(self, version=None, length=None, pub_type=True):
-        """ return a Java stanza that reads a value of this JType from ChannelBuffer bb.
+        """ return a Java stanza that reads a value of this JType from ByteBuf bb.
         @param version int - OF wire version to generate expression for
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
         @param length string, for operations that need it (e.g., read a list of unknown length)
@@ -184,7 +184,7 @@ class JType(object):
 
     def write_op(self, version=None, name=None, pub_type=True):
         """ return a Java stanza that writes a value of this JType contained in Java expression
-        'name' to ChannelBuffer bb.
+        'name' to ByteBuf bb.
         @param name string containing Java expression that evaluations to the value to be written
         @param version int - OF wire version to generate expression for
         @param pub_type boolean use this JTypes 'public' (True), or private (False) representation
@@ -208,7 +208,7 @@ class JType(object):
         )
 
     def skip_op(self, version=None, length=None):
-        """ return a java stanza that skips an instance of JType in the input ChannelBuffer 'bb'.
+        """ return a java stanza that skips an instance of JType in the input ByteBuf 'bb'.
             This is used in the Reader implementations for virtual classes (because after the
             discriminator field, the concrete Reader instance will re-read all the fields)
             Currently just delegates to read_op + throws away the result."""
@@ -259,7 +259,7 @@ def gen_enum_jtype(java_name, is_bitmask=False):
 
 def gen_list_jtype(java_base_name):
     # read op assumes the class has a public final static field READER that implements
-    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ChannelBuffer
+    # OFMessageReader<$class> i.e., can deserialize an instance of class from a ByteBuf
     # write op assumes class implements Writeable
     return JType("List<{}>".format(java_base_name)) \
         .op(
@@ -353,6 +353,14 @@ mac_addr = JType('MacAddress') \
         .op(read="MacAddress.read6Bytes(bb)", \
             write="$name.write6Bytes(bb)",
             default="MacAddress.NONE")
+vxlan_ni = JType('VxlanNI') \
+        .op(read="VxlanNI.read4Bytes(bb)", \
+            write="$name.write4Bytes(bb)",
+            default="VxlanNI.ZERO")
+vfi = JType('VFI') \
+        .op(read="VFI.read2Bytes(bb)", \
+            write="$name.write2Bytes(bb)",
+            default="VFI.ZERO")
 
 port_name = gen_fixed_length_string_jtype(16)
 desc_str = gen_fixed_length_string_jtype(256)
@@ -449,10 +457,14 @@ flow_wildcards = JType("int") \
 table_stats_wildcards = JType("int") \
         .op(read='bb.readInt()',
             write='bb.writeInt($name)')
-port_bitmap = JType('OFBitMask128') \
+port_bitmap_128 = JType('OFBitMask128') \
             .op(read='OFBitMask128.read16Bytes(bb)',
                 write='$name.write16Bytes(bb)',
                 default='OFBitMask128.NONE')
+port_bitmap_512 = JType('OFBitMask512') \
+            .op(read='OFBitMask512.read64Bytes(bb)',
+                write='$name.write64Bytes(bb)',
+                default='OFBitMask512.NONE')
 table_id = JType("TableId") \
         .op(read='TableId.readByte(bb)',
             write='$name.writeByte(bb)',
@@ -470,6 +482,10 @@ of_version = JType("OFVersion", 'byte') \
 
 port_speed = JType("PortSpeed")
 error_type = JType("OFErrorType")
+of_message = JType("OFMessage")\
+            .op(read="OFMessageVer$version.READER.readFrom(bb)",
+                write="$name.writeTo(bb)")
+
 of_type = JType("OFType", 'byte') \
             .op(read='bb.readByte()', write='bb.writeByte($name)')
 action_type= gen_enum_jtype("OFActionType")\
@@ -513,6 +529,10 @@ boolean_value = JType('OFBooleanValue', 'OFBooleanValue') \
 gen_table_id = JType("GenTableId") \
         .op(read='GenTableId.read2Bytes(bb)',
             write='$name.write2Bytes(bb)',
+           )
+bundle_id = JType("BundleId") \
+        .op(read='BundleId.read4Bytes(bb)',
+            write='$name.write4Bytes(bb)',
            )
 udf = JType("UDF") \
          .op(version=ANY, read="UDF.read4Bytes(bb)", write="$name.write4Bytes(bb)", default="UDF.ZERO")
@@ -565,7 +585,8 @@ default_mtype_to_jtype_convert_map = {
         'of_wc_bmap_t': flow_wildcards,
         'of_oxm_t': oxm,
         'of_meter_features_t': meter_features,
-        'of_bitmap_128_t': port_bitmap,
+        'of_bitmap_128_t': port_bitmap_128,
+        'of_bitmap_512_t': port_bitmap_512,
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
@@ -624,9 +645,16 @@ exceptions = {
         'of_oxm_mpls_tc_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
         'of_oxm_mpls_bos' : { 'value' : boolean_value },
         'of_oxm_mpls_bos_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+        'of_oxm_ipv6_exthdr' : { 'value' : u16obj },
+        'of_oxm_ipv6_exthdr_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+        'of_oxm_pbb_uca' : { 'value' : boolean_value },
+        'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
-        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap },
-        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap, 'value_mask': port_bitmap },
+        'of_oxm_bsn_in_ports_128' : { 'value': port_bitmap_128 },
+        'of_oxm_bsn_in_ports_128_masked' : { 'value': port_bitmap_128, 'value_mask': port_bitmap_128 },
+
+        'of_oxm_bsn_in_ports_512' : { 'value': port_bitmap_512 },
+        'of_oxm_bsn_in_ports_512_masked' : { 'value': port_bitmap_512, 'value_mask': port_bitmap_512 },
 
         'of_oxm_bsn_lag_id' : { 'value' : lag_id },
         'of_oxm_bsn_lag_id_masked' : { 'value' : lag_id, 'value_mask' : lag_id },
@@ -648,6 +676,9 @@ exceptions = {
 
         'of_oxm_bsn_egr_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_egr_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
+        'of_oxm_bsn_ingress_port_group_id' : { 'value' : class_id },
+        'of_oxm_bsn_ingress_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
 
         'of_oxm_bsn_udf0' : { 'value' : udf },
         'of_oxm_bsn_udf0_masked' : { 'value' : udf, 'value_mask' : udf },
@@ -678,6 +709,24 @@ exceptions = {
 
         'of_oxm_bsn_vlan_xlate_port_group_id' : { 'value' : class_id },
         'of_oxm_bsn_vlan_xlate_port_group_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
+        'of_oxm_bsn_l2_cache_hit' : { 'value' : boolean_value },
+        'of_oxm_bsn_l2_cache_hit_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
+        'of_oxm_bsn_vxlan_network_id' : { 'value' : vxlan_ni },
+        'of_oxm_bsn_vxlan_network_id_masked' : { 'value' : vxlan_ni, 'value_mask' : vxlan_ni},
+
+        'of_oxm_bsn_inner_eth_dst' : { 'value' : mac_addr },
+        'of_oxm_bsn_inner_eth_dst_masked' : { 'value' : mac_addr, 'value_mask' : mac_addr },
+
+        'of_oxm_bsn_inner_eth_src' : { 'value' : mac_addr },
+        'of_oxm_bsn_inner_eth_src_masked' : { 'value' : mac_addr, 'value_mask' : mac_addr },
+
+        'of_oxm_bsn_inner_vlan_vid' : { 'value' : vlan_vid_match },
+        'of_oxm_bsn_inner_vlan_vid_masked' : { 'value' : vlan_vid_match, 'value_mask' : vlan_vid_match },
+
+        'of_oxm_bsn_vfi' : { 'value' : vfi },
+        'of_oxm_bsn_vfi_masked' : { 'value' : vfi, 'value_mask' : vfi },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
@@ -718,6 +767,8 @@ exceptions = {
         'of_bsn_log': { 'data': var_string },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
+
+        'of_bundle_add_msg' : { 'data' : of_message },
 }
 
 
@@ -782,6 +833,8 @@ def convert_to_jtype(obj_name, field_name, c_type):
         return action_type_set
     elif field_name == "table_id" and re.match(r'of_bsn_gentable.*', obj_name):
         return gen_table_id
+    elif field_name == "bundle_id" and re.match(r'of_bundle_.*', obj_name):
+        return bundle_id
     elif c_type in default_mtype_to_jtype_convert_map:
         return default_mtype_to_jtype_convert_map[c_type]
     elif re.match(r'list\(of_([a-zA-Z_]+)_t\)', c_type):

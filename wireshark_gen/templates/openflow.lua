@@ -39,7 +39,7 @@
 
 :: include('_ofreader.lua')
 
-p_of = Proto ("of", "OpenFlow")
+p_of = Proto ("of", "OpenFlow (LOXI)")
 ethernet_dissector = Dissector.get("eth")
 
 current_pkt = nil
@@ -74,10 +74,13 @@ fields[${repr(field.fullname)}] = ProtoField.${field.type}("${field.fullname}", 
 :: #endif
 :: #endfor
 
+error_field = ProtoField.string("of.error", "Error")
+
 p_of.fields = {
 :: for field in fields:
     fields[${repr(field.fullname)}],
 :: #endfor
+    error_field,
 }
 
 -- Subclass maps for virtual classes
@@ -142,6 +145,13 @@ function dissect_of_message(buf, root)
         return "Unknown protocol", "Dissection error"
     end
 
+    if type_val == 1 then -- OpenFlow error message
+        local err = subtree:add(error_field, "")
+        err:set_hidden()
+        err:set_generated()
+        subtree:add_expert_info(PI_DEBUG, PI_WARN, "OpenFlow error message")
+    end
+
     local info = "unknown"
     info = of_message_dissectors[version_val](reader, subtree)
 
@@ -159,8 +169,8 @@ function p_of.dissector (buf, pkt, root)
             local msg_len = buf(offset+2,2):uint()
 
             -- Detect obviously broken messages
-            if msg_version == 0 or msg_version > 4 then break end
-            if msg_type > 29 then break end
+            if msg_version == 0 or msg_version > 5 then break end
+            if msg_type > 34 then break end
             if msg_len < 8 then break end
 
             if offset + msg_len > buf:len() then

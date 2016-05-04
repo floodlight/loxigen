@@ -11,7 +11,7 @@ import com.google.common.hash.PrimitiveSink;
 
 /** Utility methods for dumping collections into primitive sinks.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public class PrimitiveSinkUtils {
     private PrimitiveSinkUtils() {}
@@ -21,7 +21,7 @@ public class PrimitiveSinkUtils {
      *
      *
      * @param sink the sink to put the object
-     * @param nullableObj the potentially null string to put in the sink
+     * @param nullableChars the potentially null string to put in the sink
      */
     public static void putNullableStringTo(PrimitiveSink sink,
             @Nullable CharSequence nullableChars) {

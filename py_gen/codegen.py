@@ -88,6 +88,7 @@ def codegen(install_dir):
     render('__init__.py', template_name='toplevel_init.py')
     render('pp.py')
     render('generic_util.py')
+    render('connection.py')
 
     for version in loxi_globals.OFVersions.all_supported:
         subdir = 'of' + version.version.replace('.', '')
@@ -109,5 +110,5 @@ def codegen(install_dir):
         for name, ofclasses in modules.items():
             args = args_by_module.get(name, {})
             render(os.path.join(subdir, name + '.py'), template_name='module.py',
-                   version=version, ofclasses=ofclasses, modules=modules.keys(),
+                   version=version, ofclasses=ofclasses, subdir=subdir,
                    **args)

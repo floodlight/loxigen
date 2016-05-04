@@ -89,7 +89,6 @@ show_hex = set([
     ('uint64_t', 'generation_id'),
     ('uint16_t', 'value_mask'),
     ('uint32_t', 'value_mask'),
-    ('uint32_t', 'oxm_header'),
     ('uint8_t', 'value_mask'),
     ('uint64_t', 'value_mask'),
     ('uint64_t', 'write_setfields'),
@@ -104,6 +103,7 @@ show_hex = set([
     ('uint32_t', 'flow_removed_mask_slave'),
     ('uint32_t', 'band_types'),
     ('uint16_t', 'bsn_tcp_flags'),
+    ('uint8_t', 'bsn_l2_cache_hit'),
 ])
 
 def gen_emitter(cls, m_name, m_type):
@@ -163,10 +163,10 @@ int of_object_show(loci_writer_f writer, void* cookie, of_object_t* obj);
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""\
-int %(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, %(cls)s_t *obj);
+int %(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, of_object_t *obj);
 """ % dict(cls=cls, ver_name=loxi_utils.version_to_name(version)))
 
     out.write("""
@@ -202,11 +202,11 @@ unknown_show(loci_writer_f writer, void* cookie, of_object_t *obj)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
-            if type_maps.class_is_inheritance_root(cls):
+            if type_maps.class_is_virtual(cls):
                 continue
             out.write("""
 int
-%(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, %(cls)s_t *obj)
+%(cls)s_%(ver_name)s_show(loci_writer_f writer, void* cookie, of_object_t *obj)
 {
     int out = 0;
 """ % dict(cls=cls, ver_name=ver_name))
@@ -222,8 +222,7 @@ int
     %(m_type)s %(v_name)s;
 """  % dict(m_type=m_type, v_name=var_name_map(m_type)))
                     if loxi_utils.class_is_list(m_type):
-                        base_type = loxi_utils.list_to_entry_type(m_type)
-                        out.write("    %s elt;\n    int rv;\n" % base_type)
+                        out.write("    of_object_t elt;\n    int rv;\n")
             for member in members:
                 m_type = member["m_type"]
                 m_name = member["name"]
@@ -255,7 +254,7 @@ int
                     sub_cls = m_type[:-2] # Trim _t
                     out.write("""
     %(cls)s_%(m_name)s_bind(obj, &%(v_name)s);
-    out += %(sub_cls)s_%(ver_name)s_show(writer, cookie, &%(v_name)s);
+    out += of_object_show(writer, cookie, &%(v_name)s);
 """ % dict(cls=cls, sub_cls=sub_cls, m_name=m_name,
            v_name=var_name_map(m_type), ver_name=ver_name))
 
@@ -303,7 +302,7 @@ static const loci_obj_show_f show_funs_v%(version)s[OF_OBJECT_COUNT] = {
                 comma = ","
 
             if (not loxi_utils.class_in_version(cls, version) or
-                    type_maps.class_is_inheritance_root(cls)):
+                    type_maps.class_is_virtual(cls)):
                 out.write("    unknown_show%s\n" % comma);
             else:
                 out.write("    %s_%s_show%s\n" %

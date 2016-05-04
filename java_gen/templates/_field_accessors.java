@@ -16,7 +16,7 @@
         return ${version_prop.enum_value};
 //::    elif version_prop.is_length_value:
         // FIXME: Hacky and inperformant way to determine a message length. Should be replaced with something better
-        ChannelBuffer c = new LengthCountingPseudoChannelBuffer();
+        ByteBuf c = new LengthCountingPseudoByteBuf();
         WRITER.write(c, ${ "this" if not builder else "({0}) this.getMessage()".format(msg.name) });
         return c.writerIndex();
 //::    else:
@@ -28,7 +28,7 @@
     }
 //:: #endif
 
-//:: if generate_setters and prop.is_writeable:
+//:: if generate_setters and prop.needs_setter:
     //:: setter_template_file_name = "%s/custom/%s_%s.java" % (template_dir, msg.name if not builder else msg.name + '.Builder', prop.setter_name)
     //:: if os.path.exists(setter_template_file_name):
     //:: include(setter_template_file_name, msg=msg, builder=builder, has_parent=has_parent)
@@ -36,12 +36,14 @@
     //:: else:
     @Override
     public ${msg.interface.name}.Builder ${prop.setter_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop in msg.members else " throws UnsupportedOperationException"} {
-        //:: if prop in msg.members:
+        //:: if prop.is_writeable and prop in msg.members:
         this.${prop.name} = ${prop.name};
         this.${prop.name}Set = true;
         return this;
-        //:: else:
+        //:: elif prop.is_writeable:
             throw new UnsupportedOperationException("Property ${prop.name} not supported in version #{version}");
+        //:: else:
+            throw new UnsupportedOperationException("Property ${prop.name} is not writeable");
         //:: #endif
     }
     //:: #endif

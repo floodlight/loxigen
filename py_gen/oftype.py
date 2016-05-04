@@ -110,12 +110,17 @@ type_data_map = {
     'of_oxm_t': OFTypeData(
         init='None',
         pack='%s.pack()',
-        unpack='oxm.oxm.unpack(%s)'),
+        unpack='ofp.oxm.oxm.unpack(%s)'),
 
     'of_checksum_128_t': OFTypeData(
         init='0',
         pack='util.pack_checksum_128(%s)',
         unpack="util.unpack_checksum_128(%s)"),
+
+    'of_bitmap_512_t': OFTypeData(
+        init='set()',
+        pack='util.pack_bitmap_512(%s)',
+        unpack="util.unpack_bitmap_512(%s)"),
 }
 
 ## Fixed length strings
@@ -139,11 +144,11 @@ for (cls, length) in fixed_length_strings.items():
 
 # Map from class name to Python class name
 embedded_structs = {
-    'of_match_t': 'common.match',
-    'of_port_desc_t': 'common.port_desc',
-    'of_meter_features_t': 'common.meter_features',
-    'of_bsn_vport_t': 'common.bsn_vport',
-    'of_table_desc_t': 'common.table_desc',
+    'of_match_t': 'ofp.match',
+    'of_port_desc_t': 'ofp.port_desc',
+    'of_meter_features_t': 'ofp.meter_features',
+    'of_bsn_vport_t': 'ofp.bsn_vport',
+    'of_table_desc_t': 'ofp.table_desc',
 }
 
 for (cls, pyclass) in embedded_structs.items():
@@ -193,7 +198,7 @@ def gen_unpack_expr(oftype, reader_expr, version):
         ofclass = ofproto.class_by_name(oftype_list_elem(oftype))
         assert ofclass, "No class named %r" % oftype_list_elem(oftype)
         module_name, class_name = py_gen.codegen.generate_pyname(ofclass)
-        return 'loxi.generic_util.unpack_list(%s, %s.%s.unpack)' % \
+        return 'loxi.generic_util.unpack_list(%s, ofp.%s.%s.unpack)' % \
             (reader_expr, module_name, class_name)
     else:
         return "loxi.unimplemented('unpack %s')" % oftype

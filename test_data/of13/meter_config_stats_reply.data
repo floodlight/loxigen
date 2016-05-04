@@ -1,25 +1,25 @@
 -- binary
 04 13 # version, type
-00 30 # length
+00 28 # length
 12 34 56 78 # xid
 00 0a # stats_type
 00 00 # flags
 00 00 00 00 # pad
-00 01 # entries[0].type
-00 10 # entries[0].length
-00 00 00 01 # entries[0].rate
-00 00 00 02 # entries[0].burst_size
+00 18 # entires[0].len
+00 00 # entries[0].flags
+00 00 00 01 # entries[0].meterId
+00 01 # entries[0].bands[0].type
+00 10 # entries[0].bands[0].length
+00 00 00 01 # entries[0].bands[0].rate
+00 00 00 02 # entries[0]bands[0].burst_size
 00 00 00 00 # pad
-00 02 # entries[1].type
-00 10 # entries[1].length
-00 00 00 03 # entries[1].rate
-00 00 00 04 # entries[1].burst_size
-05 # entries[1].prec_level
-00 00 00 # pad
 -- python
 ofp.message.meter_config_stats_reply(
     xid=0x12345678,
     flags=0,
     entries=[
-        ofp.meter_band.drop(rate=1, burst_size=2),
-        ofp.meter_band.dscp_remark(rate=3, burst_size=4, prec_level=5)])
+        ofp.meter_config(flags = 0, 
+                         meter_id = 1,
+                         entries = [
+                                    ofp.meter_band.drop(rate=1, burst_size=2)])
+                         ])

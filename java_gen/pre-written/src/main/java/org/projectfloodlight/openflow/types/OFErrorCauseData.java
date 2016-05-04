@@ -1,9 +1,10 @@
 package org.projectfloodlight.openflow.types;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import java.util.Arrays;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFErrorMsg;
 import org.projectfloodlight.openflow.protocol.OFFactories;
@@ -24,7 +25,7 @@ import com.google.common.hash.PrimitiveSink;
  *  This attempts to parse the offending message on demand, and if successful
  *  will present the parsed message.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     private static final Logger logger =
@@ -55,7 +56,7 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     public Optional<OFMessage> getParsedMessage() {
         OFFactory factory = OFFactories.getFactory(version);
         try {
-            OFMessage msg = factory.getReader().readFrom(ChannelBuffers.wrappedBuffer(data));
+            OFMessage msg = factory.getReader().readFrom(Unpooled.wrappedBuffer(data));
             if(msg != null)
                 return Optional.of(msg);
             else
@@ -66,7 +67,7 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
         }
     }
 
-    public static OFErrorCauseData read(ChannelBuffer bb, int length, OFVersion version) {
+    public static OFErrorCauseData read(ByteBuf bb, int length, OFVersion version) {
         byte[] bytes = ChannelUtils.readBytes(bb, length);
         return of(bytes, version);
    }
@@ -77,7 +78,7 @@ public class OFErrorCauseData implements Writeable, PrimitiveSinkable {
     }
 
     @Override
-    public void writeTo(ChannelBuffer bb) {
+    public void writeTo(ByteBuf bb) {
         bb.writeBytes(data);
     }
 

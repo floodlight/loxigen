@@ -14,6 +14,7 @@ import org.projectfloodlight.openflow.types.IpProtocol;
 import org.projectfloodlight.openflow.types.LagId;
 import org.projectfloodlight.openflow.types.MacAddress;
 import org.projectfloodlight.openflow.types.OFBitMask128;
+import org.projectfloodlight.openflow.types.OFBitMask512;
 import org.projectfloodlight.openflow.types.OFBooleanValue;
 import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
@@ -21,14 +22,15 @@ import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.OFVlanVidMatch;
 import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.U16;
-import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.types.U32;
+import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
+import org.projectfloodlight.openflow.types.VxlanNI;
+import org.projectfloodlight.openflow.types.VFI;
 
-@SuppressWarnings("unchecked")
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
     public final MatchFields id;
@@ -182,11 +184,28 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<OFBooleanValue>("mpls_bos", MatchFields.MPLS_BOS,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
-    public final static MatchField<U64> TUNNEL_ID = 
+    public final static MatchField<U64> TUNNEL_ID =
             new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
+
+    public final static MatchField<U16> IPV6_EXTHDR =
+            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR);
+
+    public final static MatchField<OFBooleanValue> PBB_UCA =
+            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA);
+
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
+            new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+
+    public final static MatchField<IPv4Address> TUNNEL_IPV4_DST =
+            new MatchField<IPv4Address>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
+
+    public final static MatchField<OFBitMask512> BSN_IN_PORTS_512 =
+            new MatchField<OFBitMask512>("bsn_in_ports_512", MatchFields.BSN_IN_PORTS_512);
 
     public final static MatchField<LagId> BSN_LAG_ID =
             new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
@@ -208,6 +227,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_EGR_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
+
+    public final static MatchField<ClassId> BSN_INGRESS_PORT_GROUP_ID =
+            new MatchField<ClassId>("bsn_ingress_port_group_id", MatchFields.BSN_INGRESS_PORT_GROUP_ID);
 
     public final static MatchField<UDF> BSN_UDF0 =
             new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF0);
@@ -238,6 +260,24 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
             new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
+
+    public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
+            new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
+
+    public final static MatchField<VxlanNI> BSN_VXLAN_NETWORK_ID =
+            new MatchField<VxlanNI>("bsn_vxlan_network_id", MatchFields.BSN_VXLAN_NETWORK_ID);
+
+    public final static MatchField<MacAddress> BSN_INNER_ETH_DST =
+            new MatchField<MacAddress>("bsn_inner_eth_dst", MatchFields.BSN_INNER_ETH_DST);
+
+    public final static MatchField<MacAddress> BSN_INNER_ETH_SRC =
+            new MatchField<MacAddress>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
+
+    public final static MatchField<OFVlanVidMatch> BSN_INNER_VLAN_VID =
+            new MatchField<OFVlanVidMatch>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
+
+    public final static MatchField<VFI> BSN_VFI =
+            new MatchField<VFI>("bsn_vfi", MatchFields.BSN_VFI);
 
     public String getName() {
         return name;

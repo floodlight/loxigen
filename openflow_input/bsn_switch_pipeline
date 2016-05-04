@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 4
+#version 5
 
 struct of_bsn_get_switch_pipeline_request : of_bsn_header {
     uint8_t version;

@@ -30,6 +30,7 @@
 // Copyright (c) 2011, 2012 Open Networking Foundation
 
 #version 4
+#version 5
 
 struct of_instruction_bsn_require_vlan_xlate : of_instruction_bsn {
     uint16_t type == 65535;

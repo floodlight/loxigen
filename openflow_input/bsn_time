@@ -33,6 +33,7 @@
 // The timestamp must be monotonic (not affected by system time updates).
 
 #version 4
+#version 5
 
 struct of_bsn_time_request : of_bsn_header {
     uint8_t version;

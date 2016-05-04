@@ -8,12 +8,12 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.text.MessageFormat;
 
 import org.hamcrest.Matchers;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -36,12 +36,12 @@ public class U128Test {
 
     @Test
     public void testReadBytes() {
-        ChannelBuffer empty = ChannelBuffers.wrappedBuffer(new byte[16]);
+        ByteBuf empty = Unpooled.wrappedBuffer(new byte[16]);
         U128 uEmpty = U128.read16Bytes(empty);
         assertThat(uEmpty.getMsb(), equalTo(0L));
         assertThat(uEmpty.getLsb(), equalTo(0L));
 
-        ChannelBuffer value = ChannelBuffers.wrappedBuffer(
+        ByteBuf value = Unpooled.wrappedBuffer(
                 new byte[] { 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, (byte) 0x88,
                         (byte) 0x99, (byte) 0xaa, (byte) 0xbb, (byte) 0xcc, (byte) 0xdd,
                         (byte) 0xee, (byte) 0xff, 0x11 });

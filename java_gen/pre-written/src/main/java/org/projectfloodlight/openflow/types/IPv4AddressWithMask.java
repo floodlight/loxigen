@@ -31,7 +31,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
      *                  the given raw IP address masked by the given raw IP
      *                  address mask
      * @deprecated      replaced by {@link IPv4Address#of(int)} and
-     *                  {@link IPv4Address#withMask(IPv4Address), e.g. <code>
+     *                  {@link IPv4Address#withMask(IPv4Address)}, e.g. <code>
      *                  IPv4Address.of(int).withMask(IPv4Address.of(int))
      *                  </code>
      */
@@ -68,7 +68,7 @@ public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
      * the given string in CIDR notation or other acceptable notations.
      * <p>
      * The following notations are accepted.
-     * <table><tr>
+     * <table summary=""><tr>
      * <th>Notation</th><th>Example</th><th>Notes</th>
      * </tr><tr>
      * <td>IPv4 address only</td><td>{@code 1.2.3.4}</td><td>The subnet mask of

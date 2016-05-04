@@ -1,13 +1,21 @@
 package org.projectfloodlight.openflow.types;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import io.netty.buffer.Unpooled;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.hamcrest.CoreMatchers;
-import org.jboss.netty.buffer.ChannelBuffers;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
@@ -19,7 +27,8 @@ public class IPv6AddressTest {
             "::",
             "::1",
             "ffe0::",
-            "1:2:3:4:5:6:7:8"
+            "1:2:3:4:5:6:7:8",
+            "8091:a2b3:c4d5:e6f7:8495:a6b7:c1d2:e3d4",
     };
 
 
@@ -275,7 +284,7 @@ public class IPv6AddressTest {
     public void testReadFrom() throws OFParseError, UnknownHostException {
         for(int i=0; i < testStrings.length; i++ ) {
             byte[] bytes = Inet6Address.getByName(testStrings[i]).getAddress();
-            IPv6Address ip = IPv6Address.read16Bytes(ChannelBuffers.copiedBuffer(bytes));
+            IPv6Address ip = IPv6Address.read16Bytes(Unpooled.copiedBuffer(bytes));
             assertEquals(testStrings[i], ip.toString());
             assertArrayEquals(bytes, ip.getBytes());
         }
@@ -328,6 +337,26 @@ public class IPv6AddressTest {
             assertEquals(IPVersion.IPv6, superIp.getIpVersion());
             assertEquals(IPv6AddressWithMask.of(ipMaskedString), superIp);
         }
+    }
+
+    @Test
+    public void testCompareTo() {
+        assertThat(
+                IPv6Address.of("fc00::1").compareTo(IPv6Address.of("fc00::2")),
+                Matchers.lessThan(0));
+        assertThat(
+                IPv6Address.of("::1").compareTo(IPv6Address.of("fc00::")),
+                Matchers.lessThan(0));
+
+        // Make sure that unsigned comparison is used on the first 64 bits
+        assertThat(
+                IPv6Address.of("fc00::1").compareTo(IPv6Address.of("1234::3")),
+                Matchers.greaterThan(0));
+
+        // Make sure that unsigned comparison is used on the next 64 bits
+        assertThat(
+                IPv6Address.of("::8000:0:0:1").compareTo(IPv6Address.of("::1")),
+                Matchers.greaterThan(0));
     }
 
     @Test
@@ -404,5 +433,77 @@ public class IPv6AddressTest {
     public void testZoneId() throws OFParseError {
         assertEquals("::", IPv6Address.of("::%eth0").toString(true, false));
         assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8%2").toString(true, false));
+    }
+
+    private void testModifiedEui64(
+            String network, String macAddress, String expectedIpAddress) {
+
+        IPv6AddressWithMask networkObj = IPv6AddressWithMask.of(network);
+        MacAddress macAddressObj = MacAddress.of(macAddress);
+        MacAddress macAddressAdd1 = MacAddress.of(
+                macAddressObj.getLong() + 1 & 0xFFFF_FFFF_FFFFL);
+        MacAddress macAddressSub1 = MacAddress.of(
+                macAddressObj.getLong() - 1 & 0xFFFF_FFFF_FFFFL);
+        IPv6Address ipAddressObj = IPv6Address.of(networkObj, macAddressObj);
+        IPv6Address expectedObj = IPv6Address.of(expectedIpAddress);
+
+        assertThat(ipAddressObj, is(expectedObj));
+        assertThat(ipAddressObj.isModifiedEui64Derived(macAddressObj), is(true));
+        assertThat(ipAddressObj.isModifiedEui64Derived(macAddressAdd1), is(false));
+        assertThat(ipAddressObj.isModifiedEui64Derived(macAddressSub1), is(false));
+    }
+
+    @Test
+    public void testModifiedEui64() throws Exception {
+        testModifiedEui64(
+                "fe80::/64", "00:00:00:00:00:00", "fe80::0200:ff:fe00:0");
+        testModifiedEui64(
+                "fe80::/64", "12:34:56:78:9a:bc", "fe80::1034:56ff:fe78:9abc");
+        testModifiedEui64(
+                "fe80::/64", "ff:ff:ff:ff:ff:ff", "fe80::fdff:ffff:feff:ffff");
+        testModifiedEui64(
+                "fe80::/10", "5c:16:c7:12:34:56", "fe80::5e16:c7ff:fe12:3456");
+        testModifiedEui64(
+                "2001:db8:9876:5400::/56", "00:0c:29:ab:cd:ef",
+                "2001:db8:9876:5400:20c:29ff:feab:cdef");
+        testModifiedEui64(
+                "fd00:9999:8888::/48", "52:54:00:78:56:34",
+                "fd00:9999:8888::5054:00ff:fe78:5634");
+        testModifiedEui64(
+                "2001:db8:7777:aabb::/64", "14:10:9f:00:00:cd",
+                "2001:db8:7777:aabb:1610:9fff:fe00:00cd");
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void testModifiedEui64ExceptionNullNetwork() {
+        IPv6Address.of(
+                (IPv6AddressWithMask) null,
+                MacAddress.of("00:50:56:12:34:56"));
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void testModifiedEui64ExceptionNullMacAddress() {
+        IPv6Address.of(
+                IPv6AddressWithMask.LINK_LOCAL_NETWORK,
+                (MacAddress) null);
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void testModifiedEui64ExceptionNullDerivedMacAddress() {
+        IPv6Address.NONE.isModifiedEui64Derived(null);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testModifiedEui64ExceptionPrefixLengthNo() {
+        IPv6Address.of(
+                IPv6Address.of("fef::").withMask(IPv6Address.of("f0f0:1234::")),
+                MacAddress.of("5c:16:c7:00:00:00"));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void testModifiedEui64ExceptionPrefixLengthTooLong() {
+        IPv6Address.of(
+                IPv6AddressWithMask.of("fe80::/65"),
+                MacAddress.of("5c:16:c7:00:00:00"));
     }
 }

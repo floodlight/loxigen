@@ -1,6 +1,6 @@
 package org.projectfloodlight.openflow.types;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
@@ -49,11 +49,11 @@ public enum IpEcn implements OFValueType<IpEcn> {
         return (ecn < 3 ? "0" : "") + Integer.toBinaryString(ecn);
     }
 
-    public void writeByte(ChannelBuffer c) {
+    public void writeByte(ByteBuf c) {
         c.writeByte(this.ecn);
     }
 
-    public static IpEcn readByte(ChannelBuffer c) throws OFParseError {
+    public static IpEcn readByte(ByteBuf c) throws OFParseError {
         return IpEcn.of((byte)(c.readUnsignedByte()));
     }
 

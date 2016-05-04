@@ -58,6 +58,9 @@
         if (!supports(field))
             throw new UnsupportedOperationException("${msg.name} does not support matching on field " + field.getName());
 
+        if(!field.arePrerequisitesOK(this))
+            return false;
+
         OFOxm<?> oxm = this.oxmList.get(field);
 
         return oxm != null && !oxm.isMasked();
@@ -67,6 +70,8 @@
     public boolean isFullyWildcarded(MatchField<?> field) {
         if (!supports(field))
             throw new UnsupportedOperationException("${msg.name} does not support matching on field " + field.getName());
+        if(!field.arePrerequisitesOK(this))
+            return true;
 
         OFOxm<?> oxm = this.oxmList.get(field);
 
@@ -77,6 +82,8 @@
     public boolean isPartiallyMasked(MatchField<?> field) {
         if (!supports(field))
             throw new UnsupportedOperationException("${msg.name} does not support matching on field " + field.getName());
+        if(!field.arePrerequisitesOK(this))
+            return false;
 
         OFOxm<?> oxm = this.oxmList.get(field);
 

@@ -100,6 +100,8 @@ int of_object_can_grow(of_object_t *obj, int new_len);
 
 void of_object_parent_length_update(of_object_t *obj, int delta);
 
+void of_object_truncate(of_object_t *obj);
+
 struct of_object_s {
     /** A pointer to the underlying buffer's management structure. */
     of_wire_buffer_t *wbuf;
