@@ -3,15 +3,16 @@ Introduction
 
 LoxiGen is a tool that generates OpenFlow protocol libraries for a number of
 languages. It is composed of a frontend that parses wire protocol descriptions
-and a backend for each supported language (currently C, Python, and Java, with an 
-auto-generated wireshark dissector in Lua on the way). 
+and a backend for each supported language (currently C, Python, and Java, with an
+auto-generated wireshark dissector in Lua on the way).
 
-LoxiGen currently supports OpenFlow Versions **1.0**, **1.1**, **1.2**, and **1.3.1**. Versions 1.0
-and 1.3.1 are actively used in production. Support for versions 1.1 and 1.2 is considered experimental.
+LoxiGen currently supports OpenFlow Versions **1.0**, **1.1**, **1.2**, and **1.3.1**, **1.4.1**, and **1.5.1**.
+Versions 1.0, 1.3.1 and 1.4.1 are actively used in production. Support for versions 1.1 and 1.2 is considered experimental.
+Support for **1.5.1** is currently experimental and limited to the Java backend.
 
-Loxigen is free and open source software. The Loxigen tool itself is licensed under the [Eclipse Public 
-License,  version 1.0](http://www.eclipse.org/legal/epl-v10.html) (EPL), with an exception allowing for the distribution of the generated artifacts 
-under terms of your choice (copyright notices must be retained, see the [loxigen.py](loxigen.py) 
+Loxigen is free and open source software. The Loxigen tool itself is licensed under the [Eclipse Public
+License,  version 1.0](http://www.eclipse.org/legal/epl-v10.html) (EPL), with an exception allowing for the distribution of the generated artifacts
+under terms of your choice (copyright notices must be retained, see the [loxigen.py](loxigen.py)
 header for details.)
 
 
@@ -56,8 +57,8 @@ To generate the library for a single language:
 make c
 ```
 
-The currently supported languages are `c`, `python` and `java`. There is an 
-experimental/partially completed backend that generates a lua wireshark dissector
+The currently supported languages are `c`, `python` and `java`. There is an
+experimental backend that generates a lua wireshark dissector
 (`wireshark`).
 
 The generated libraries will be under the `loxi_output` directory. This can be
