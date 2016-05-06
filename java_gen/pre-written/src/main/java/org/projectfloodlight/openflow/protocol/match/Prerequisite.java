@@ -1,8 +1,7 @@
 package org.projectfloodlight.openflow.protocol.match;
 
-import java.util.HashSet;
 import java.util.Set;
-import java.util.Collections;
+import com.google.common.collect.ImmutableSet;
 
 import org.projectfloodlight.openflow.types.OFValueType;
 
@@ -13,15 +12,13 @@ public class Prerequisite<T extends OFValueType<T>> {
 
     @SafeVarargs
     public Prerequisite(MatchField<T> field, OFValueType<T>... values) {
-        this.values = new HashSet<OFValueType<T>>();
         this.field = field;
         if (values == null || values.length == 0) {
             this.any = true;
+            this.values = ImmutableSet.<OFValueType<T>>of();
         } else {
             this.any = false;
-            for (OFValueType<T> value : values) {
-                this.values.add(value);
-            }
+            this.values = ImmutableSet.<OFValueType<T>>copyOf(values);
         }
     }
 
@@ -49,7 +46,7 @@ public class Prerequisite<T extends OFValueType<T>> {
      * @return unmodifiable set of possible values
      */
     public Set<OFValueType<T>> getValues() {
-        return Collections.unmodifiableSet(this.values);   
+        return this.values;   
     }
 
     /**

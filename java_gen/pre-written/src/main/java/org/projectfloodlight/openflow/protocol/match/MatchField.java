@@ -31,9 +31,8 @@ import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VxlanNI;
 import org.projectfloodlight.openflow.types.VFI;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.HashSet;
+import com.google.common.collect.ImmutableSet;
 
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
@@ -43,11 +42,10 @@ public class MatchField<F extends OFValueType<F>> {
     private MatchField(final String name, final MatchFields id, Prerequisite<?>... prerequisites) {
         this.name = name;
         this.id = id;
-        if (prerequisites == null || prerequisites.length == 0) {
-            this.prerequisites = Collections.emptySet();
-        } else {
-            this.prerequisites = new HashSet<Prerequisite<?>>();
-            Collections.addAll(this.prerequisites, prerequisites);
+        if (prerequisites == null) {
+            this.prerequisites = ImmutableSet.<Prerequisite<?>>of();
+        } else { 
+            this.prerequisites = ImmutableSet.<Prerequisite<?>>copyOf(prerequisites);
         }
     }
 
@@ -309,7 +307,7 @@ public class MatchField<F extends OFValueType<F>> {
      */
     public Set<Prerequisite<?>> getPrerequisites() {
         /* assumes non-null; guaranteed by constructor */
-        return Collections.unmodifiableSet(this.prerequisites);
+        return this.prerequisites;
     }
 
 }
