@@ -31,6 +31,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // Instructions to express control flow in ACL tables
 

@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // Retrieves the checksum for every bucket in a table. The entries are ordered
 // by bucket index.

@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // This extension provides flexibility for stats requests like gentable
 // does for table programming.

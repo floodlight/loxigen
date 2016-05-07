@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 5
+#version 6
 
 // This extension provides flexibility for async messages like gentable
 // does for table programming.

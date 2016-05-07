@@ -27,6 +27,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // In a realistic switch pipeline there are multiple reasons a given packet
 // should be sent to the controller. The packet-in reason field is only 8 bits,

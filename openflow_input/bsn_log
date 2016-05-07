@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 enum ofp_bsn_loglevel(wire_type=uint8_t) {
     OFP_BSN_LOGLEVEL_MSG = 0,

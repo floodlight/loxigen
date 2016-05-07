@@ -39,6 +39,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // Upload chunks of Lua code to the switch
 //

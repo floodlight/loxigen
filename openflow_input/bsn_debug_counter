@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // Switches have many non-dataplane counters that are mainly useful for
 // debugging. An example is the number of packet-ins dropped due to

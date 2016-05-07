@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 enum ofp_bsn_vlan_counter_constants {
     OFP_BSN_VLAN_ALL = 0xffff,

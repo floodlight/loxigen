@@ -29,6 +29,7 @@
 // governing permissions and limitations under the EPL.
 
 #version 5
+#version 6
 
 // This message is used by IVS for hitless restart.
 

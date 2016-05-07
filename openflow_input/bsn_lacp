@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // LACP Convergence Status set in of_bsn_lacp_convergence_notif message
 enum of_bsn_lacp_convergence_status(wire_type=uint8_t, complete=False) {
