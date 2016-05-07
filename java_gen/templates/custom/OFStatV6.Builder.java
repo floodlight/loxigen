@@ -1,3 +1,17 @@
+    private OFOxsList.Builder oxsFieldsBuilder;
+
+    private void initBuilder() {
+        if (oxsFieldsBuilder != null)
+            return;
+        oxsFieldsBuilder = new OFOxsList.Builder();
+    }
+
+    private void updateOxsList() {
+        this.oxsFields = this.oxsFieldsBuilder.build();
+        this.oxsFieldsSet = true;
+    }
+
+
 
     @Override
     public <F extends OFValueType<F>> F get(StatField<F> field) throws UnsupportedOperationException{
@@ -11,6 +25,16 @@
 
         return oxs.getValue();
     }
+
+    @Override
+    public <F extends OFValueType<F>> Stat.Builder set(StatField<F> field, F value) {
+        initBuilder();
+        OFOxs<F> oxs = OFFactories.getFactory(OFVersion.${version.constant_version}).oxss().fromValue(value, field);
+        this.oxsFieldsBuilder.set(oxs);
+        updateOxsList();
+        return this;
+    }
+
 
     @Override
     public boolean supports(StatField<?> field){
