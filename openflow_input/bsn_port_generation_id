@@ -28,6 +28,7 @@
 // This generation ID is changed whenever a port goes link-down.
 
 #version 5
+#version 6
 
 struct of_port_desc_prop_bsn_generation_id : of_port_desc_prop_bsn {
     uint16_t type == 0xffff;

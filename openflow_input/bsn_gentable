@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 // We have a number of switch agents that need to be configured by the
 // controller and report stats. Some of them will have large tables (1000+

@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 enum ofp_bsn_vrf_counter_constants(wire_type=uint32_t) {
     OFP_BSN_VRF_ALL = 0xffffffff,
