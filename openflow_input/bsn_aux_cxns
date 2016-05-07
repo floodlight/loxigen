@@ -29,6 +29,7 @@
 //
 #version 4
 #version 5
+#version 6
 
 // Set the number of desired aux connections num_aux=(0-16) accompanying this main connection
 // This message is only allowed on the main connection. 

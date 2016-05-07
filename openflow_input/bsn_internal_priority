@@ -31,6 +31,7 @@
 
 #version 4
 #version 5
+#version 6
 
 struct of_instruction_bsn_internal_priority : of_instruction_bsn {
     uint16_t type == 65535;

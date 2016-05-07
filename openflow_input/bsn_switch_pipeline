@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 struct of_bsn_get_switch_pipeline_request : of_bsn_header {
     uint8_t version;

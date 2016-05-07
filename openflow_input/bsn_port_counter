@@ -30,6 +30,7 @@
 
 #version 4
 #version 5
+#version 6
 
 enum ofp_bsn_port_counter(wire_type=uint8_t, complete=False, stable=True) {
   OFP_BSN_PORT_COUNTER_RX_BYTES = 0,
