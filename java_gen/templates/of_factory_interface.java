@@ -55,6 +55,7 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
 //:: if factory.name == 'OFFactory':
     Match.Builder buildMatch();
     Match matchWildcardAll();
+    Stat.Builder buildStat();
 //:: #endif
 
     OFMessageReader<${factory.base_class}> getReader();
@@ -64,5 +65,9 @@ public interface ${factory.name}${" extends XidGenerator" if factory.xid_generat
     public <F extends OFValueType<F>> OFOxm<F> fromValue(F value, MatchField<F> field);
     public <F extends OFValueType<F>> OFOxm<F> fromValueAndMask(F value, F mask, MatchField<F> field);
     public <F extends OFValueType<F>> OFOxm<F> fromMasked(Masked<F> masked, MatchField<F> field);
+//:: #endif
+//:: if factory.name == 'OFOxss':
+
+    public <F extends OFValueType<F>> OFOxs<F> fromValue(F value, StatField<F> field);
 //:: #endif
 }

@@ -55,7 +55,7 @@ public class ${factory.name} implements ${factory.interface.name} {
     //:: if i.is_virtual:
     //::    continue
     //:: #endif
-    //:: is_match_object = re.match('OFMatch.*', i.name) # i.has_version(factory.version) and model.generate_class(i.versioned_class(factory.version)) and i.versioned_class(factory.version).interface.parent_interface == 'Match'
+    //:: is_match_object = re.match('OFMatch.*', i.name)
     //:: unsupported_match_object = is_match_object and not i.has_version(factory.version)
 
     //:: if len(i.writeable_members) > 0:
@@ -105,7 +105,12 @@ public class ${factory.name} implements ${factory.interface.name} {
 //:: #endif
     }
 
-//:: if factory.interface.name == 'OFOxms':
+//:: if factory.interface.name == "OFFactory":
+    @Override
+    public Stat.Builder buildStat() {
+            return buildStatV6();
+    }
+//:: elif factory.interface.name == 'OFOxms':
     @SuppressWarnings("unchecked")
     public <F extends OFValueType<F>> OFOxm<F> fromValue(F value, MatchField<F> field) {
         switch (field.id) {
@@ -162,6 +167,23 @@ public class ${factory.name} implements ${factory.interface.name} {
                 return null;
         }
     }
+//:: elif factory.interface.name == "OFOxss":
+    @SuppressWarnings("unchecked")
+    public <F extends OFValueType<F>> OFOxs<F> fromValue(F value, StatField<F> field) {
+        switch (field.id) {
+            //:: for oxs_name in model.oxs_map:
+            //::    type_name, value, masked = model.oxs_map[oxs_name]
+            //::    method_name = oxs_name.replace('OFOxs', '')
+            //::    method_name = method_name[0].lower() + method_name[1:]
+            case ${value}:
+                //:: # The cast to Object is done to avoid some javac bug that in some versions cannot handle cast from generic type to other types but Object
+                return (OFOxs<F>)((Object)${method_name}((${type_name})((Object)value)));
+            //:: #endfor
+            default:
+                throw new IllegalArgumentException("No OXM known for match field " + field);
+        }
+    }
+
 //:: #endif
 //:: if factory.interface.xid_generator:
     public long nextXid() {
