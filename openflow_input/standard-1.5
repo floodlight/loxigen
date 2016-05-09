@@ -334,7 +334,7 @@ enum ofp_oxs_class(wire_type=uint16_t) {
 };
 
 struct of_stat_v6 (align=8, length_includes_align=False){
-    uint16_t reserved;
+    pad(2); /* reserved */
     uint16_t length;
     list(of_oxs_t) oxs_fields;
 };
