@@ -32,15 +32,19 @@ import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VxlanNI;
 import org.projectfloodlight.openflow.types.VFI;
 
+import java.util.Set;
+import com.google.common.collect.ImmutableSet;
+
 public class MatchField<F extends OFValueType<F>> {
     private final String name;
     public final MatchFields id;
-    private final Prerequisite<?>[] prerequisites;
+    private final Set<Prerequisite<?>> prerequisites;
 
     private MatchField(final String name, final MatchFields id, Prerequisite<?>... prerequisites) {
         this.name = name;
         this.id = id;
-        this.prerequisites = prerequisites;
+        /* guaranteed non-null (private constructor); 'null' isn't passed as prerequisites */
+        this.prerequisites = ImmutableSet.copyOf(prerequisites);
     }
 
     public final static MatchField<OFPort> IN_PORT =
@@ -303,6 +307,17 @@ public class MatchField<F extends OFValueType<F>> {
             }
         }
         return true;
+    }
+
+    /**
+     * Retrieve what also must be matched in order to
+     * use this particular MatchField.
+     *
+     * @return unmodifiable view of the prerequisites
+     */
+    public Set<Prerequisite<?>> getPrerequisites() {
+        /* assumes non-null; guaranteed by constructor */
+        return this.prerequisites;
     }
 
 }
