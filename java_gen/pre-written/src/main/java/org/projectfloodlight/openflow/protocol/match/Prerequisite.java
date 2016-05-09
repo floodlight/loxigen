@@ -13,12 +13,13 @@ public class Prerequisite<T extends OFValueType<T>> {
     @SafeVarargs
     public Prerequisite(MatchField<T> field, OFValueType<T>... values) {
         this.field = field;
+        /* possible null values, since public constructor */
         if (values == null || values.length == 0) {
             this.any = true;
-            this.values = ImmutableSet.<OFValueType<T>>of();
+            this.values = ImmutableSet.of();
         } else {
             this.any = false;
-            this.values = ImmutableSet.<OFValueType<T>>copyOf(values);
+            this.values = ImmutableSet.copyOf(values);
         }
     }
 

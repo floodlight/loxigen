@@ -42,11 +42,8 @@ public class MatchField<F extends OFValueType<F>> {
     private MatchField(final String name, final MatchFields id, Prerequisite<?>... prerequisites) {
         this.name = name;
         this.id = id;
-        if (prerequisites == null) {
-            this.prerequisites = ImmutableSet.<Prerequisite<?>>of();
-        } else { 
-            this.prerequisites = ImmutableSet.<Prerequisite<?>>copyOf(prerequisites);
-        }
+        /* guaranteed non-null (private constructor); 'null' isn't passed as prerequisites */
+        this.prerequisites = ImmutableSet.copyOf(prerequisites);
     }
 
     public final static MatchField<OFPort> IN_PORT =
