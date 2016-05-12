@@ -684,8 +684,8 @@ exceptions = {
 
         'of_oxm_tcp_flags' : { 'value' : u16obj },
         'of_oxm_tcp_flags_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
-        'of_oxm_actset_output' : { 'value' : transport_port },
-        'of_oxm_actset_output_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+        'of_oxm_actset_output' : { 'value' : of_port },
+        'of_oxm_actset_output_masked' : { 'value' : of_port, 'value_mask' : of_port },
         'of_oxm_packet_type' : { 'value' : packet_type },
         'of_oxm_packet_type_masked' : { 'value' : packet_type, 'value_mask' : packet_type },
 
