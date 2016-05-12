@@ -843,3 +843,8 @@ struct of_bsn_tlv_disable_src_mac_check : of_bsn_tlv {
     uint16_t type == 120;
     uint16_t length;
 };
+
+struct of_bsn_tlv_drop : of_bsn_tlv {
+    uint16_t type == 121;
+    uint16_t length;
+};
