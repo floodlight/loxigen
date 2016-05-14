@@ -18,8 +18,8 @@ struct of_oxm_actset_output : of_oxm {
 
 struct of_oxm_actset_output_masked : of_oxm {
     uint32_t type_len == 0x80005708;
-    uint8_t value;
-    uint8_t value_mask;
+    of_port_no_t value;
+    of_port_no_t value_mask;
 };
 
 

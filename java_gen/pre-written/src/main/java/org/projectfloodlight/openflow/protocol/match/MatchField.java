@@ -207,8 +207,8 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<PacketType> PACKET_TYPE =
             new MatchField<PacketType>("packet_type", MatchFields.PACKET_TYPE);
 
-    public final static MatchField<TransportPort> ACTSET_OUTPUT =
-            new MatchField<TransportPort>("actset_output", MatchFields.ACTSET_OUTPUT);
+    public final static MatchField<OFPort> ACTSET_OUTPUT =
+            new MatchField<OFPort>("actset_output", MatchFields.ACTSET_OUTPUT);
 
     public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
             new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
