@@ -2308,7 +2308,7 @@ struct of_table_desc_stats_reply : of_stats_reply {
 
 
 /* Body of OFPMP_TABLE_FEATURES request. */
-struct of_table_feature_stats_request : of_stats_request {
+struct of_table_features_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -2333,7 +2333,7 @@ struct of_table_features {
 };
 
 /* Body of reply to OFPMP_TABLE_FEATURES request. */
-struct of_table_feature_stats_reply : of_stats_reply {
+struct of_table_features_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
