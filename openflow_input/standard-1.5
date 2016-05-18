@@ -1856,7 +1856,7 @@ struct of_port_desc_stats_reply : of_stats_reply {
     uint16_t stats_type == 13;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_port_desc_t) ports;
+    list(of_port_desc_t) entries;
 };
 
 /* Body for ofp_multipart_request of OFPMP_QUEUE_STATS. */

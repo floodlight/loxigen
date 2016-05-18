@@ -27,7 +27,7 @@
 builder
         .setXid(0x12345678)
         .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-        .setPorts(ImmutableList.<OFPortDesc>of(factory.buildPortDesc().setPortNo(OFPort.of(1))
+        .setEntries(ImmutableList.<OFPortDesc>of(factory.buildPortDesc().setPortNo(OFPort.of(1))
                                                                     .setHwAddr(MacAddress.of("00:01:02:03:04:05"))
                                                                     .setName("Port1")
                                                                     .setConfig(ImmutableSet.<OFPortConfig>of(OFPortConfig.PORT_DOWN))
