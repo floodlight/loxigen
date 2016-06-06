@@ -37,13 +37,17 @@ public final class HexString {
         char arr[] = new char[lenBytes * 2 + (lenBytes -1)];
 
         int charPos = 0;
-        for (int i=0; i < lenBytes; i++) {
-            if (i > 0) {
-              arr[charPos++] = ':';
-            }
+        int i = 0;
+
+        for (;;) {
             arr[charPos++] = CHARS[ (bytes[i] >>> 4) & 0xF ];
             arr[charPos++] = CHARS[ bytes[i] & 0xF ];
+            if (++i >= lenBytes) {
+                break;
+            }
+            arr[charPos++] = ':';
         }
+
         return new String(arr, 0, arr.length);
     }
 
