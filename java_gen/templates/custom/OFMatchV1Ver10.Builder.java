@@ -64,11 +64,11 @@
                 case SCTP_DST:
                     result = tcpDst;
                     break;
-                case ICMPV4_TYPE:
-                    result = tcpSrc;
+               case ICMPV4_TYPE:
+                    result = ICMPv4Type.of((short) tcpSrc.getPort());
                     break;
-                case ICMPV4_CODE:
-                    result = tcpDst;
+               case ICMPV4_CODE:
+                    result = ICMPv4Code.of((short) tcpDst.getPort());
                     break;
                 // NOT SUPPORTED:
                 default:

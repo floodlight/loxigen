@@ -101,10 +101,10 @@
                 result = tcpDst;
                 break;
             case ICMPV4_TYPE:
-                result = tcpSrc;
+                result = ICMPv4Type.of((short) tcpSrc.getPort());
                 break;
             case ICMPV4_CODE:
-                result = tcpDst;
+                result = ICMPv4Code.of((short) tcpDst.getPort());
                 break;
             // NOT SUPPORTED:
             default:
