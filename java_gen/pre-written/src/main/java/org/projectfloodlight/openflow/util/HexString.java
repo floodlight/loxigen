@@ -1,25 +1,28 @@
-/**
- *    Copyright (c) 2008 The Board of Trustees of The Leland Stanford Junior
- *    University
- *
- *    Licensed under the Apache License, Version 2.0 (the "License"); you may
- *    not use this file except in compliance with the License. You may obtain
- *    a copy of the License at
- *
- *         http://www.apache.org/licenses/LICENSE-2.0
- *
- *    Unless required by applicable law or agreed to in writing, software
- *    distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
- *    WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
- *    License for the specific language governing permissions and limitations
- *    under the License.
- **/
-
 package org.projectfloodlight.openflow.util;
 
-import org.projectfloodlight.openflow.types.U8;
+import io.netty.util.internal.EmptyArrays;
 
-public class HexString {
+/** Utility method to convert hexadecimal string from/to longs and byte arrays.
+ *
+ * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ */
+public final class HexString {
+
+    private HexString() {}
+
+    /* ================================================================================
+     * Implementation note:
+     * These implementations are optimized for small-O efficiency and thus rather ugly.
+     *
+     * When making changes, make sure *every line* is covered by a unit test.
+     *
+     * Do not use this as a blue print for normal code.
+     * ================================================================================
+     */
+
+    private final static char[] CHARS =
+        { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+
     /**
      * Convert a string of bytes to a ':' separated hex string
      *
@@ -27,44 +30,73 @@ public class HexString {
      * @return "0f:ca:fe:de:ad:be:ef"
      */
     public static String toHexString(final byte[] bytes) {
-        int i;
-        String ret = "";
-        String tmp;
-        for (i = 0; i < bytes.length; i++) {
-            if (i > 0)
-                ret += ":";
-            tmp = Integer.toHexString(U8.f(bytes[i]));
-            if (tmp.length() == 1)
-                ret += "0";
-            ret += tmp;
+        int lenBytes = bytes.length;
+        if (lenBytes == 0) {
+            return "";
         }
-        return ret;
+        char arr[] = new char[lenBytes * 2 + (lenBytes -1)];
+
+        int charPos = 0;
+        int i = 0;
+
+        for (;;) {
+            arr[charPos++] = CHARS[ (bytes[i] >>> 4) & 0xF ];
+            arr[charPos++] = CHARS[ bytes[i] & 0xF ];
+            if (++i >= lenBytes) {
+                break;
+            }
+            arr[charPos++] = ':';
+        }
+
+        return new String(arr, 0, arr.length);
     }
 
-    public static String toHexString(final long val, final int padTo) {
-        char arr[] = Long.toHexString(val).toCharArray();
-        String ret = "";
-        // prepend the right number of leading zeros
-        int i = 0;
-        for (; i < (padTo * 2 - arr.length); i++) {
-            ret += "0";
-            if ((i % 2) != 0)
-                ret += ":";
+    public static String toHexString(long val, final int padTo) {
+        int valBytes = (64 - Long.numberOfLeadingZeros(val) + 7)/8;
+        int lenBytes = valBytes > padTo ? valBytes : padTo;
+
+        char arr[] = new char[lenBytes * 2 + (lenBytes -1)];
+
+        // fill char array from the last position, shifting val by 4 bits
+        for (int charPos = arr.length - 1; charPos >= 0; charPos--) {
+            if ((charPos + 1) % 3 == 0) {
+                // every third char is a colon
+                arr[charPos] = ':';
+            } else {
+                arr[charPos] = CHARS[((int) val) & 0xF];
+                val >>>= 4;
+            }
         }
-        for (int j = 0; j < arr.length; j++) {
-            ret += arr[j];
-            if ((((i + j) % 2) != 0) && (j < (arr.length - 1)))
-                ret += ":";
-        }
-        return ret;
+        return new String(arr, 0, arr.length);
     }
 
     public static String toHexString(final long val) {
         return toHexString(val, 8);
     }
 
+
+    /** Deprecated version of {@link #toBytes(String)}.
+     *
+     * @throws NumberFormatException
+     * @{@link Deprecated} because of inconsistent naming
+     */
+    @Deprecated
+    public static byte[] fromHexString(final String values) throws NumberFormatException {
+        return toBytes(values);
+    }
+
+    /** state constants for toBytes */
+    /** expecting first digit */
+    private final static int FIRST_DIGIT = 1;
+    /** expecting second digit or colon */
+    private static final int SECOND_DIGIT_OR_COLON = 2;
+    /** expecting colon */
+    private static final int COLON = 3;
+    /** save byte and move back to FIRST_DIGIT */
+    private static final int SAVE_BYTE = 4;
+
     /**
-     * Convert a string of hex values into a string of bytes
+     * Convert a string of hex values into a string of bytes.
      *
      * @param values
      *            "0f:ca:fe:de:ad:be:ef"
@@ -72,29 +104,103 @@ public class HexString {
      * @throws NumberFormatException
      *             If the string can not be parsed
      */
-    public static byte[] fromHexString(final String values) throws NumberFormatException {
-        String[] octets = values.split(":");
-        byte[] ret = new byte[octets.length];
+    public static byte[] toBytes(final String values) throws NumberFormatException {
+        int start = 0;
+        int len = values.length();
 
-        for (int i = 0; i < octets.length; i++) {
-            if (octets[i].length() > 2)
-                throw new NumberFormatException("Invalid octet length");
-            ret[i] = Integer.valueOf(octets[i], 16).byteValue();
+        if (len == 0) {
+            return EmptyArrays.EMPTY_BYTES;
         }
-        return ret;
+
+        int numColons = 0;
+        for (int i=0; i < len; i++) {
+            if (values.charAt(i) == ':') {
+                numColons++;
+            }
+        }
+
+        byte[] res = new byte[numColons+1];
+        int pos = 0;
+
+        int state = FIRST_DIGIT;
+
+        byte b = 0;
+        while (start < len) {
+            char c = values.charAt(start++);
+            switch (state) {
+                case FIRST_DIGIT:
+                    int digit = Character.digit(c, 16);
+                    if(digit < 0) {
+                        throw new NumberFormatException("Invalid char at index " + start + ": " + values);
+                    }
+                    b = (byte) digit;
+                    state = start < len ? SECOND_DIGIT_OR_COLON : SAVE_BYTE;
+                    break;
+                case SECOND_DIGIT_OR_COLON:
+                    if(c != ':') {
+                        int digit2 = Character.digit(c, 16);
+                        if(digit2 < 0) {
+                            throw new NumberFormatException("Invalid char at index " + start + ": " + values);
+                        }
+                        b =  (byte) ((b<<4) | digit2);
+                        state = start < len ? COLON : SAVE_BYTE;
+                    } else {
+                        state = SAVE_BYTE;
+                    }
+                    break;
+                case COLON:
+                    if(c != ':') {
+                        throw new NumberFormatException("Separator expected at index " + start + ": " + values);
+                    }
+                    state = SAVE_BYTE;
+                    break;
+                default:
+                    throw new IllegalStateException("Should not be in state " + state);
+            }
+            if (state == SAVE_BYTE) {
+                res[pos++] = b;
+                b = 0;
+                state = FIRST_DIGIT;
+            }
+        }
+        if (pos != res.length) {
+            // detects a mal-formed input string, e.g., "01:02:"
+            throw new NumberFormatException("Invalid hex string: " + values);
+        }
+
+        return res;
     }
 
     public static long toLong(String value) throws NumberFormatException {
-        String[] octets = value.split(":");
-        if (octets.length > 8)
-            throw new NumberFormatException("Input string is too big to fit in long: " + value);
-        long l = 0;
-        for (String octet: octets) {
-            if (octet.length() > 2)
-                throw new NumberFormatException("Each colon-separated byte component must consist of 1 or 2 hex digits: " + value);
-            short s = Short.parseShort(octet, 16);
-            l = (l << 8) + s;
+        int shift = 0;
+        long result = 0L;
+
+        int sinceLastSeparator = 0;
+        for (int charPos=value.length() - 1; charPos >= 0; charPos--) {
+            char c = value.charAt(charPos);
+            if (c == ':') {
+                if (sinceLastSeparator == 0) {
+                    throw new NumberFormatException("Expected hex digit at index " + charPos +": " + value);
+                } else if(sinceLastSeparator == 1) {
+                    shift += 4;
+                }
+                sinceLastSeparator = 0;
+            } else {
+                int digit = Character.digit(c, 16);
+                if (digit < 0) {
+                    throw new NumberFormatException("Invalid hex digit at index " + charPos +": " + value);
+                }
+                result |= ((long) digit) << shift;
+                shift +=4;
+                sinceLastSeparator++;
+                if (sinceLastSeparator > 2) {
+                    throw new NumberFormatException("Expected colon at index " + charPos +": " + value);
+                }
+            }
+            if (shift > 64) {
+                throw new NumberFormatException("Too many bytes in hex string to convert to long: " + value);
+            }
         }
-        return l;
+        return result;
     }
 }

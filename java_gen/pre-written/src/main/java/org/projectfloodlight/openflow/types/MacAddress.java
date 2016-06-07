@@ -1,6 +1,7 @@
 package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
+
 import javax.annotation.Nonnull;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -232,8 +233,7 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     @Override
     public void putTo(PrimitiveSink sink) {
-        sink.putInt((int) (this.rawValue >> 16));
-        sink.putShort((short) (this.rawValue & 0xFFFF));
+        sink.putLong(rawValue);
     }
 
     /*
