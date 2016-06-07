@@ -419,8 +419,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return true;
     }
 
-    //:: for prop in msg.data_members:
-    //:: if prop.name == 'xid':
+    //:: if filter(lambda m: m.name == 'xid', msg.data_members):
     public boolean equalsIgnoreXid(Object obj) {
         if (this == obj)
             return true;
@@ -451,9 +450,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: #endfor
         return true;
     }
-    //:: break
     //:: #endif
-    //:: #endfor
 
     @Override
     public int hashCode() {
