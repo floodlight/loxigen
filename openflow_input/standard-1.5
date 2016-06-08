@@ -834,7 +834,7 @@ enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
  * Multipart Message Types 
  *
  * OF1.5 renames the OFPMP/ST for:
- * flow (1) -> flow_stats (17)
+ * flow (1) -> flow_desc (1)
  * aggregate (2) -> aggregate_stats (2)
  * table (3) -> table_stats (3)
  * group (6) -> group_stats (6)
@@ -857,12 +857,11 @@ enum ofp_stats_reply_flags(wire_type=uint16_t, bitmask=True) {
  * Using the _STATS is certainly more explicit; 
  * however, that would perhaps necessitate changing
  * OF1.3- OFPMP/ST names, which would break existing
- * applications that use OF1.3- OFPMP/ST names,
- * such as Floodlight, ONOS, etc.
+ * applications that use OF1.3- OFPMP/ST names.
  */
 enum ofp_stats_type(wire_type=uint16_t) {
     OFPST_DESC = 0,
-    OFPST_FLOW_DESC = 1,
+    OFPST_FLOW = 1, /* omit _desc */
     OFPST_AGGREGATE = 2, /* omit _stats */
     OFPST_TABLE = 3, /* omit _stats */
     OFPST_PORT = 4, /* omit _stats; historically omitted */
@@ -878,7 +877,7 @@ enum ofp_stats_type(wire_type=uint16_t) {
     OFPMP_TABLE_DESC = 14,
     OFPMP_QUEUE_DESC = 15,
     OFPMP_FLOW_MONITOR = 16,
-    OFPST_FLOW = 17, /* retain OFPST_ prefix; omit _stats */
+    OFPMP_FLOW_LIGHTWEIGHT = 17, /* omit _stats; use _lightweight to imply no desc included */
     OFPMP_CONTROLLER_STATUS = 18,
     OFPMP_BUNDLE_FEATURES = 19,
     OFPST_EXPERIMENTER = 0xffff,
@@ -1656,8 +1655,8 @@ struct of_stats_reply : of_header {
     pad(4);
 };
 
-/*Body for ofp_multipart_request of type OFPMP_FLOW_DESC */
-struct of_flow_desc_request : of_stats_request {
+/* Body for ofp_multipart_request of type OFPST_FLOW(_DESC) */
+struct of_flow_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1675,8 +1674,8 @@ struct of_flow_desc_request : of_stats_request {
     of_match_t match;
 };
 
-/*Body for ofp_multipart_reply of type OFPMP_FLOW_DESC */
-struct of_flow_desc_reply : of_stats_reply {
+/* Body for ofp_multipart_reply of type OFPST_FLOW(_DESC) */
+struct of_flow_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1684,11 +1683,11 @@ struct of_flow_desc_reply : of_stats_reply {
     uint16_t stats_type == 1;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_flow_desc_entry_t) entries;
+    list(of_flow_stats_entry_t) entries;
 };
 
-/* Body for ofp_multipart_request of type OFPMP_FLOW_STATS */
-struct of_flow_stats_request : of_stats_request {
+/* Body for ofp_multipart_request of type OFPMP_FLOW_(STATS)LIGHTWEIGHT */
+struct of_flow_lightweight_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
     uint16_t length;
@@ -1706,7 +1705,8 @@ struct of_flow_stats_request : of_stats_request {
     of_match_t match;
 };
 
-struct of_flow_desc_entry {
+/* Entry for OFPST_FLOW */
+struct of_flow_stats_entry {
     uint16_t length;
     pad(2);
     uint8_t table_id;
@@ -1722,7 +1722,8 @@ struct of_flow_desc_entry {
     list(of_instruction_t) instructions;
 };
 
-struct of_flow_stats_entry {
+/* Entry for OFPMP_FLOW_(STATS)LIGHTWEIGHT */
+struct of_flow_lightweight_stats_entry {
     uint16_t length;
     pad(2);
     uint8_t table_id;
@@ -1732,8 +1733,8 @@ struct of_flow_stats_entry {
     of_stat_t stats;
 };
 
-/* Body of reply to OFPMP_FLOW(_STAT) request */
-struct of_flow_stats_reply : of_stats_reply {
+/* Body of reply to OFPST_FLOW_(STATS)LIGHTWEIGHT request */
+struct of_flow_lightweight_stats_reply : of_stats_reply {
     uint8_t version;
     uint8_t type == 19;
     uint16_t length;
@@ -1741,7 +1742,7 @@ struct of_flow_stats_reply : of_stats_reply {
     uint16_t stats_type == 17;
     enum ofp_stats_reply_flags flags;
     pad(4);
-    list(of_flow_stats_entry_t) entries;
+    list(of_flow_lightweight_stats_entry_t) entries;
 };
 
 /* Body for ofp_multipart_request of type OFPMP_AGGREGATE_STATS. */
