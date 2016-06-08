@@ -101,10 +101,10 @@
                 result = tcpDst;
                 break;
             case ICMPV4_TYPE:
-                result = tcpSrc;
+                result = ICMPv4Type.of((short) tcpSrc.getPort());
                 break;
             case ICMPV4_CODE:
-                result = tcpDst;
+                result = ICMPv4Code.of((short) tcpDst.getPort());
                 break;
             // NOT SUPPORTED:
             default:
@@ -365,6 +365,8 @@
                 builder.add(MatchField.TCP_SRC);
             } else if (ipProto == IpProtocol.SCTP) {
                 builder.add(MatchField.SCTP_SRC);
+            } else if (ipProto == IpProtocol.ICMP) {
+                builder.add(MatchField.ICMPV4_TYPE);
             } else {
                 throw new UnsupportedOperationException(
                         "Unsupported IP protocol for matching on source port " + ipProto);
@@ -377,6 +379,8 @@
                 builder.add(MatchField.TCP_DST);
             } else if (ipProto == IpProtocol.SCTP) {
                 builder.add(MatchField.SCTP_DST);
+            } else if (ipProto == IpProtocol.ICMP) {
+                builder.add(MatchField.ICMPV4_CODE);
             } else {
                 throw new UnsupportedOperationException(
                         "Unsupported IP protocol for matching on destination port " + ipProto);
