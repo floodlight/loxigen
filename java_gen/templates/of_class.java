@@ -450,8 +450,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         //:: #endfor
         return true;
     }
-    //:: #endif
 
+    //:: #endif
     @Override
     public int hashCode() {
         //:: if len(msg.data_members) > 0:
