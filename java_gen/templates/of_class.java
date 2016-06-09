@@ -419,6 +419,39 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return true;
     }
 
+    //:: if filter(lambda m: m.name == 'xid', msg.data_members):
+    public boolean equalsIgnoreXid(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        //:: if len(msg.data_members) > 0:
+        ${msg.name} other = (${msg.name}) obj;
+        //:: #endif
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive and prop.name == 'xid':
+        // ignore XID
+        //:: elif prop.java_type.is_primitive:
+        if( ${prop.name} != other.${prop.name})
+            return false;
+        //:: elif prop.java_type.is_array:
+        if (!Arrays.equals(${prop.name}, other.${prop.name}))
+                return false;
+        //:: else:
+        if (${prop.name} == null) {
+            if (other.${prop.name} != null)
+                return false;
+        } else if (!${prop.name}.equals(other.${prop.name}))
+            return false;
+        //:: #endif
+        //:: #endfor
+        return true;
+    }
+
+    //:: #endif
     @Override
     public int hashCode() {
         //:: if len(msg.data_members) > 0:
