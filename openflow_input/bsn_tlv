@@ -848,3 +848,10 @@ struct of_bsn_tlv_drop : of_bsn_tlv {
     uint16_t type == 121;
     uint16_t length;
 };
+
+struct of_bsn_tlv_ipv6_prefix : of_bsn_tlv {
+    uint16_t type == 122;
+    uint16_t length;
+    of_ipv6_t value;
+    uint8_t prefix_length;
+};
