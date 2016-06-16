@@ -37,6 +37,8 @@ public class MacAddress implements OFValueType<MacAddress> {
     private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
     private final static MacAddress MULTICAST_BASE_ADDRESS =
            MacAddress.of("01:00:5E:00:00:00");
+    private final static MacAddress IPv6_MULTICAST_BASE_ADDRESS =
+           MacAddress.of("33:33:00:00:00:00");
 
     private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
             "It must consist of 6 hex digit pairs separated by colons or hyphens: ";
@@ -267,6 +269,37 @@ public class MacAddress implements OFValueType<MacAddress> {
         ipLong = ipLong & ipMask;
 
         long macLong = MULTICAST_BASE_ADDRESS.getLong(); // 01:00:5E:00:00:00
+        macLong = macLong | ipLong;
+        MacAddress returnMac = MacAddress.of(macLong);
+
+        return returnMac;
+    }
+
+    /**
+     * Generate a MAC address corresponding to multicast IPv6  address.
+     *
+     * Take the last 4 bytes of IPv6 address and copy them to the base IPv6
+     * multicast mac address - 33:33:00:00:00:00.
+     *
+     * @param ipv6 - IPv6 address corresponding to which multicast MAC addr
+     * need to be generated.
+     * @return - the generated multicast mac address.
+     * @throws IllegalArgumentException if ipv6 address is not a valid IPv6
+     * multicast address.
+     */
+    @Nonnull
+    public static MacAddress forIPv6MulticastAddr(IPv6Address ipv6)
+            throws IllegalArgumentException {
+        if (!ipv6.isMulticast()) {
+            throw new IllegalArgumentException(
+                    "Not a Multicast IPv6Address\"" + ipv6 + "\"");
+        }
+        long ipLong = ((ipv6.getUnsignedShortWord(6) << 16) |
+                                         ipv6.getUnsignedShortWord(7));
+        long ipMask = 0xFFFFFFFFl;
+        ipLong = ipLong & ipMask;
+
+        long macLong = IPv6_MULTICAST_BASE_ADDRESS.getLong();//33:33:00:00:00:00
         macLong = macLong | ipLong;
         MacAddress returnMac = MacAddress.of(macLong);
 
