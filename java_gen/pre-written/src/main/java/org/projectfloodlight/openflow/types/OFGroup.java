@@ -79,7 +79,11 @@ public class OFGroup implements OFValueType<OFGroup> {
         }
     }
 
-    /** return the group number as a int32 */
+    /** 
+     * get the group number of this group as a int32 
+     *
+     * @return the integer form of the this group
+     */
     public int getGroupNumber() {
         return groupNumber;
     }
