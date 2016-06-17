@@ -2,7 +2,7 @@
 06 13 # version, type
 00 48 # length
 12 34 56 78 # xid
-00 11 # multipart message type (OFPMP_FLOW_STATS)
+00 11 # multipart message type (OFPMP_FLOW_LIGHTWEIGHT(_STATS))
 00 01 # flags (REPLY_MORE)
 00 00 00 00 # pad
 00 38 # length
@@ -26,7 +26,7 @@
 builder
         .setXid(0x12345678)
         .setFlags(ImmutableSet.<OFStatsReplyFlags>of(OFStatsReplyFlags.REPLY_MORE))
-        .setEntries(ImmutableList.<OFIndividualFlowStatsEntry>of(factory.buildIndividualFlowStatsEntry().setTableId(TableId.of(1))
+        .setEntries(ImmutableList.<OFFlowLightweightStatsEntry>of(factory.buildFlowLightweightStatsEntry().setTableId(TableId.of(1))
                                                                 .setReason(OFFlowStatsReason.STATS_REQUEST)
                                                                 .setPriority(1)
                                                                 .setMatch(factory.buildMatch()
