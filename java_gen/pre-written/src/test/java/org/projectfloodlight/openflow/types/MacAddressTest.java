@@ -211,4 +211,29 @@ public class MacAddressTest {
             assertThat(mac, is(MacAddress.of(s)));
         }
     }
+
+    @Test
+    public void forIPv6MulticastAddr() {
+        IPv6Address ip = IPv6Address.of("ff02::1:ff00:0");
+        MacAddress mac = MacAddress.forIPv6MulticastAddr(ip);
+        MacAddress expectedMac = MacAddress.of("33:33:ff:00:00:00");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv6Address.of("ff02::1:ff01:0203");
+        mac = MacAddress.forIPv6MulticastAddr(ip);
+        expectedMac = MacAddress.of("33:33:ff:01:02:03");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv6Address.of("ff02::1:0102:0304");
+        mac = MacAddress.forIPv6MulticastAddr(ip);
+        expectedMac = MacAddress.of("33:33:01:02:03:04");
+        assertTrue(mac.equals(expectedMac));
+
+        ip = IPv6Address.of("2001::1:0102:0304");
+        try {
+            mac = MacAddress.forIPv6MulticastAddr(ip);
+        } catch(IllegalArgumentException e) {
+                // ok
+        }
+    }
 }
