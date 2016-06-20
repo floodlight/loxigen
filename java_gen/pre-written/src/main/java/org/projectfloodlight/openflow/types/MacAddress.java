@@ -35,9 +35,9 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     private static final long LLDP_MAC_ADDRESS_MASK = 0xfffffffffff0L;
     private static final long LLDP_MAC_ADDRESS_VALUE = 0x0180c2000000L;
-    private final static MacAddress MULTICAST_BASE_ADDRESS =
+    private final static MacAddress IPV4_MULTICAST_BASE_ADDRESS =
            MacAddress.of("01:00:5E:00:00:00");
-    private final static MacAddress IPv6_MULTICAST_BASE_ADDRESS =
+    private final static MacAddress IPV6_MULTICAST_BASE_ADDRESS =
            MacAddress.of("33:33:00:00:00:00");
 
     private static final String FORMAT_ERROR = "Mac address is not well-formed. " +
@@ -268,7 +268,7 @@ public class MacAddress implements OFValueType<MacAddress> {
         int ipMask = 0x007FFFFF;
         ipLong = ipLong & ipMask;
 
-        long macLong = MULTICAST_BASE_ADDRESS.getLong(); // 01:00:5E:00:00:00
+        long macLong = IPV4_MULTICAST_BASE_ADDRESS.getLong(); // 01:00:5E:00:00:00
         macLong = macLong | ipLong;
         MacAddress returnMac = MacAddress.of(macLong);
 
@@ -299,7 +299,7 @@ public class MacAddress implements OFValueType<MacAddress> {
         long ipMask = 0xFFFFFFFFl;
         ipLong = ipLong & ipMask;
 
-        long macLong = IPv6_MULTICAST_BASE_ADDRESS.getLong();//33:33:00:00:00:00
+        long macLong = IPV6_MULTICAST_BASE_ADDRESS.getLong();//33:33:00:00:00:00
         macLong = macLong | ipLong;
         MacAddress returnMac = MacAddress.of(macLong);
 
