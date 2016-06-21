@@ -420,6 +420,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     }
 
     //:: if filter(lambda m: m.name == 'xid', msg.data_members):
+    @Override
     public boolean equalsIgnoreXid(Object obj) {
         if (this == obj)
             return true;
@@ -475,4 +476,31 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return result;
     }
 
+    //:: if filter(lambda m: m.name == 'xid', msg.data_members):
+    @Override
+    public int hashCodeIgnoreXid() {
+        //:: if len(msg.data_members) > 0:
+        final int prime = 31;
+        //:: #endif
+        int result = 1;
+
+        //:: for prop in msg.data_members:
+        //:: if prop.java_type.is_primitive and prop.name == 'xid':
+        // ignore XID
+        //:: elif prop.java_type.pub_type == 'long':
+        result = prime *  (int) (${prop.name} ^ (${prop.name} >>> 32));
+        //:: elif prop.java_type.pub_type == 'boolean':
+        result = prime * result + (${prop.name} ? 1231 : 1237);
+        //:: elif prop.java_type.is_primitive:
+        result = prime * result + ${prop.name};
+        //:: elif prop.java_type.is_array:
+        result = prime * result + Arrays.hashCode(${prop.name});
+        //:: else:
+        result = prime * result + ((${prop.name} == null) ? 0 : ${prop.name}.hashCode());
+        //:: #endif
+        //:: #endfor
+        return result;
+    }
+
+    //:: #endif
 }

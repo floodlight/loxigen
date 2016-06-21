@@ -6,3 +6,10 @@
      * @return true if the messages are equal, ignoring the XID; false otherwise
      */
     boolean equalsIgnoreXid(Object obj);
+
+    /**
+     * Computes the hashcode of the message, ignoring the XID field.
+     *
+     * @return the hashcode of the message, ignoring the XID
+     */
+    int hashCodeIgnoreXid();
