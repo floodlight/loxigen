@@ -1,4 +1,3 @@
-    // Additional methods
     
     /**
      * Compares the two messages for equality, ignoring the XID field.
