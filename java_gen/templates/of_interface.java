@@ -43,7 +43,6 @@ public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotati
 //:: if os.path.exists("%s/custom/interface/%s.java" % (template_dir, msg.name)):
 //:: include("custom/interface/%s.java" % msg.name, msg=msg)
 //:: #endif
-    
 
     void writeTo(ByteBuf channelBuffer);
 
