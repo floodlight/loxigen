@@ -28,7 +28,9 @@ import com.google.common.primitives.UnsignedLongs;
  * @author Andreas Wundsam {@literal <}andreas.wundsam@teleteach.de{@literal >}
  */
 public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
-    static final int LENGTH = 16;
+    public static final int LENGTH_BYTES = 16;
+    public static final int LENGTH_BITS = 128;
+
     private final long raw1;
     private final long raw2;
 
@@ -223,7 +225,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
     public static IPv6Address of(@Nonnull final byte[] address) {
         Preconditions.checkNotNull(address, "address must not be null");
 
-        if (address.length != LENGTH) {
+        if (address.length != LENGTH_BYTES) {
             throw new IllegalArgumentException(
                     "Invalid byte array length for IPv6 address: " + address.length);
         }
@@ -527,7 +529,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
     @Override
     public int getLength() {
-        return LENGTH;
+        return LENGTH_BYTES;
     }
 
     @Nonnull
