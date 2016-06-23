@@ -189,6 +189,12 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
      *
      * @throws IllegalArgumentException if any of the octets were
      *         negative or greater than 255
+     * @param octet1 the highest order byte in network byte order
+     * @param octet2 the 2nd-highest order byte in network byte order
+     * @param octet3 the 2nd-lowest order byte in network byte order
+     * @param octet4 the lowest order byte in network byte order
+     * @return an {@code IPv4Address} object that represents the given
+     * IP address
      */
     @Nonnull
     public static IPv4Address of(

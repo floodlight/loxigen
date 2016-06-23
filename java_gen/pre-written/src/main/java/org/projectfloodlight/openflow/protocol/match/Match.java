@@ -56,6 +56,7 @@ public interface Match extends OFObject {
      * </ul>
      * If one of the above conditions does not hold, returns null. Value is returned masked if partially wildcarded.
      *
+     * @param <F> MatchField type
      * @param field Match field to retrieve
      * @return Value of match field (may be masked), or <code>null</code> if field is one of the conditions above does not hold.
      * @throws UnsupportedOperationException If field is not supported.
@@ -67,6 +68,7 @@ public interface Match extends OFObject {
      * Prerequisite: field is partially masked.
      * If prerequisite is not met, a <code>null</code> is returned.
      *
+     * @param <F> MatchField type
      * @param field Match field to retrieve.
      * @return Masked value of match field or null if no mask is set.
      * @throws UnsupportedOperationException If field is not supported.
@@ -128,7 +130,7 @@ public interface Match extends OFObject {
      * match. This includes the match fields that are exact or masked match
      * (but not fully wildcarded).
      *
-     * @return
+     * @return the Iterable of MatchField
      */
     public Iterable<MatchField<?>> getMatchFields();
 
@@ -169,6 +171,7 @@ public interface Match extends OFObject {
         /**
          * Sets a specific exact value for a field.
          *
+         * @param <F> MatchField and value type
          * @param field Match field to set.
          * @param value Value of match field.
          * @return the Builder instance used.
@@ -179,6 +182,7 @@ public interface Match extends OFObject {
         /**
          * Sets a masked value for a field.
          *
+         * @param <F> MatchField, value, and mask type
          * @param field Match field to set.
          * @param value Value of field.
          * @param mask Mask value.
@@ -190,6 +194,7 @@ public interface Match extends OFObject {
         /**
          * Sets a masked value for a field.
          *
+         * @param <F> MatchField and value with mask type
          * @param field Match field to set.
          * @param valueWithMask Compound Masked object contains the value and the mask.
          * @return the Builder instance used.
@@ -200,6 +205,7 @@ public interface Match extends OFObject {
         /**
          * Unsets any value given for the field and wildcards it so that it matches any value.
          *
+         * @param <F> MatchField type
          * @param field Match field to unset.
          * @return the Builder instance used.
          * @throws UnsupportedOperationException If field is not supported.

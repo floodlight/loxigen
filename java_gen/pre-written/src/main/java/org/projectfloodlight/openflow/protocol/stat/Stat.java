@@ -14,6 +14,7 @@ public interface Stat extends OFObject {
         /**
          * Sets a specific value for a stat field.
          *
+         * @param <F> StatField type
          * @param field Stat field to set.
          * @param value Value of stat field.
          * @return the Builder instance used.

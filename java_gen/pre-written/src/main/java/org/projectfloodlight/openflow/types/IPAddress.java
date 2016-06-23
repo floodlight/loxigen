@@ -42,6 +42,7 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * <li>the {@link IPv4Address} of {@code 0.0.0.0}
      * <li>the {@link IPv6Address} of {@code ::}
      * </ul>
+     * @return {@code true} if the IPAddress is unspecified, false otherwise
      */
     public abstract boolean isUnspecified();
 
@@ -53,6 +54,7 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * <li>any {@link IPv4Address} within {@code 127.0.0.0/8}
      * <li>the {@link IPv6Address} of {@code ::1}
      * </ul>
+     * @return {@code true} if the IPAddress is a loopback address, false otherwise
      */
     public abstract boolean isLoopback();
 
@@ -64,6 +66,7 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * <li>any {@link IPv4Address} within {@code 169.254.0.0/16}
      * <li>any {@link IPv6Address} within {@code fe80::/10}
      * </ul>
+     * @return {@code true} if the IPAddress is a link local address, false otherwise
      */
     public abstract boolean isLinkLocal();
 
@@ -153,6 +156,7 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
      * <li>will not carry a non-zero scope ID or scoped interface,
      *     in the case of {@link Inet6Address}
      * </ul>
+     * @return an {@link InetAddress} object representing this IP address
      */
     @Nonnull
     public abstract InetAddress toInetAddress();

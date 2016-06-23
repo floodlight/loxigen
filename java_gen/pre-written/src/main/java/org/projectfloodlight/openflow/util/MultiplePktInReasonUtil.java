@@ -20,7 +20,10 @@ public class MultiplePktInReasonUtil {
     /**
      * This function is used in BVS T5/6 to decode the multiple packet in
      * reasons in Match.MetaData field.
-     * */
+     *
+     * @param pktIn the packet in message
+     * @return the set of packet in reasons
+     */
     public static Set<OFBsnPktinFlag> getOFBsnPktinFlags(OFPacketIn pktIn) {
         if(pktIn.getVersion().compareTo(OFVersion.OF_13) < 0) {
             throw new IllegalArgumentException("multiple pkt in reasons are "

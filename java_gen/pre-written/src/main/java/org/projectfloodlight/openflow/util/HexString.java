@@ -4,7 +4,7 @@ import io.netty.util.internal.EmptyArrays;
 
 /** Utility method to convert hexadecimal string from/to longs and byte arrays.
  *
- * @author Andreas Wundsam <andreas.wundsam@bigswitch.com>
+ * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
 public final class HexString {
 
@@ -26,7 +26,7 @@ public final class HexString {
     /**
      * Convert a string of bytes to a ':' separated hex string
      *
-     * @param bytes
+     * @param bytes the byte[] to convert
      * @return "0f:ca:fe:de:ad:be:ef"
      */
     public static String toHexString(final byte[] bytes) {
@@ -77,8 +77,10 @@ public final class HexString {
 
     /** Deprecated version of {@link #toBytes(String)}.
      *
-     * @throws NumberFormatException
-     * @{@link Deprecated} because of inconsistent naming
+     * @throws NumberFormatException upon values parse error
+     * @param values the hexstring to parse into a byte[]
+     * @return a byte[] representing the hexstring
+     * {@link Deprecated} because of inconsistent naming
      */
     @Deprecated
     public static byte[] fromHexString(final String values) throws NumberFormatException {
