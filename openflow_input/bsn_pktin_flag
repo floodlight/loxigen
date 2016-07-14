@@ -53,4 +53,5 @@ enum ofp_bsn_pktin_flag(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_PKTIN_FLAG_VXLAN_SIP_MISS = 0x10000,
     OFP_BSN_PKTIN_FLAG_MC_RESERVED = 0x20000,
     OFP_BSN_PKTIN_FLAG_ANALYTICS = 0x40000,
+    OFP_BSN_PKTIN_FLAG_ICMPV6 = 0x80000,
 };
