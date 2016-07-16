@@ -326,6 +326,9 @@ of_port = JType("OFPort") \
 # the same OFPort, but with a default value of ZERO, only for OF10 match
 of_port_match_v1 = JType("OFPort") \
          .op(version=1, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.ZERO")
+# the same as OFPort, but always 2-bytes and defaults to IN_PORT
+of_port_nicira = JType("OFPort") \
+         .op(version=ANY, read="OFPort.read2Bytes(bb)", write="$name.write2Bytes(bb)", default="OFPort.IN_PORT")
 actions_list = gen_list_jtype("OFAction")
 instructions_list = gen_list_jtype("OFInstruction")
 buckets_list = gen_list_jtype("OFBucket")
@@ -812,6 +815,9 @@ exceptions = {
         'of_bsn_table_set_buckets_size' : { 'table_id' : table_id },
         'of_bsn_gentable_entry_add' : { 'table_id' : gen_table_id },
         'of_bsn_log': { 'data': var_string },
+
+        'of_action_nicira_resubmit': { 'port': of_port_nicira },
+        'of_action_nicira_resubmit_table': { 'port': of_port_nicira },
 
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
 
