@@ -1,0 +1,19 @@
+#version any
+
+// Nicira (OpenVSwitch) Resubmit action.
+//
+// Re-searches this OpenFlow flow table with the in_port field
+// replaced by port (if port is not OFPP_IN_PORT) and executes the
+// actions found, if any, in addition to any other actions in this
+// flow entry.
+//
+// See ovs-ofctl man page for details:
+//    http://openvswitch.org/support/dist-docs/ovs-ofctl.8.txt
+struct of_action_nicira_resubmit : of_action_nicira {
+    uint16_t type == 65535;
+    uint16_t len;
+    uint32_t experimenter == 0x2320;
+    uint16_t subtype == 0x1;
+    uint16_t port; // 16-bit port number for all OF versions, default should be OFPP_IN_PORT
+    pad(4);
+};
