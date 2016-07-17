@@ -22,13 +22,13 @@ public class OFValueTypeWriteableTest {
 
 	final int NUM_BYTES = 256;
 
-	byte [] byteStream;
+	byte[] byteStream;
 	List<OFValueType<?>> values;
 
 	public OFValueTypeWriteableTest() throws OFParseError {
 		byteStream = new byte[NUM_BYTES];
 		for (int i = 0; i < NUM_BYTES; ++i) {
-			byteStream[i] = (byte)i;
+			byteStream[i] = (byte) i;
 		}
 
 		ByteBuf bb = wrappedBuffer(byteStream);
@@ -77,21 +77,23 @@ public class OFValueTypeWriteableTest {
 	/**
 	 * Preconditions: All OFValueType ByteBuf read methods function correctly.
 	 */
-    @Test
-    public void testWriteTo() {
+	@Test
+	public void testWriteTo() {
 		ByteBuf expected_stream = wrappedBuffer(byteStream);
 
 		for (OFValueType<?> value : values) {
-	    	// TODO: Get rid of the instanceof check once PacketType is fixed (Issue #504)
+			// TODO: Get rid of the instanceof check once PacketType is fixed
+			// (Issue #504)
 			final int LEN = (value instanceof PacketType) ? 6 : value.getLength();
-	        byte [] expected = new byte[LEN];
-	        expected_stream.readBytes(expected);
+			byte[] expected = new byte[LEN];
+			expected_stream.readBytes(expected);
 
 			testSingleOFValueType(value, expected);
 		}
 
 		{
-			// OFBooleanValue special case: implements no readByte() method and Reader inner class is private.
+			// OFBooleanValue special case: implements no readByte() method and
+			// Reader inner class is private.
 			// Also squashes byte values to "1" or "0"
 			OFBooleanValue bv = OFBooleanValue.of(true);
 			byte[] expected = new byte[] { 1 };
@@ -99,45 +101,42 @@ public class OFValueTypeWriteableTest {
 			testSingleOFValueType(bv, expected);
 		}
 
-        {
-	        // Masked<V> special case... Constructor will apply the mask to the value before storing, so we
-        	// can't use arbitrary value/mask pairs and expect the result to be the same.
+		{
+			// Masked<V> special case... Constructor will apply the mask to the
+			// value before storing, so we can't use arbitrary value/mask pairs
+			// and expect the result to be the same.
 			Masked<IPv4Address> mv = Masked.of(IPv4Address.of("16.17.0.0"), IPv4Address.of("255.255.0.0"));
-			byte[] expected = new byte[] { 0x10, 0x11, 0, 0, (byte)0xff, (byte) 0xff, 0, 0 };
+			byte[] expected = new byte[] { 0x10, 0x11, 0, 0, (byte) 0xff, (byte) 0xff, 0, 0 };
 
 			testSingleOFValueType(mv, expected);
-        }
-        {
-	        // VxlanNI special case... Must comply with the mask.
+		}
+		{
+			// VxlanNI special case... Must comply with the mask.
 			VxlanNI vni = VxlanNI.ofVni(0x00fedcba);
-			byte[] expected = new byte[] { 0, (byte)0xfe, (byte)0xdc,(byte)0xba };
+			byte[] expected = new byte[] { 0, (byte) 0xfe, (byte) 0xdc, (byte) 0xba };
 
 			testSingleOFValueType(vni, expected);
-        }
-    }
+		}
+	}
 
-    protected void testSingleOFValueType(OFValueType<?> value, final byte [] expected) {
-    	// TODO: Get rid of the instanceof check once PacketType is fixed (Issue #504)
+	protected void testSingleOFValueType(OFValueType<?> value, final byte[] expected) {
+		// TODO: Get rid of the instanceof check once PacketType is fixed (Issue #504)
 		final int LEN = (value instanceof PacketType) ? 6 : value.getLength();
 		byte[] result = new byte[LEN];
-        ByteBuf result_bb = wrappedBuffer(result).setIndex(0, 0);
+		ByteBuf result_bb = wrappedBuffer(result).setIndex(0, 0);
 
-        try {
-        	value.writeTo(result_bb);
-        } catch (IndexOutOfBoundsException ex) {
-        	fail("Wrote more bytes than expected for class "
-        			+ value.getClass().getSimpleName() + ": " + ex.getMessage());
-        }
+		try {
+			value.writeTo(result_bb);
+		} catch (IndexOutOfBoundsException ex) {
+			fail("Wrote more bytes than expected for class " + value.getClass().getSimpleName() + ": "
+					+ ex.getMessage());
+		}
 
-        assertThat(
-        		"Incorrect number of bytes written by "
-        				+ value.getClass().getSimpleName() + ".writeTo(): " + result_bb.readableBytes()
-        				+ " (should be " + LEN + ")",
-        		result_bb.readableBytes(), is(LEN));
-        assertThat(
-        		"Bad result from "
-        				+ value.getClass().getSimpleName() + ".writeTo(): " + Arrays.toString(result)
-        				+ " (should be " + Arrays.toString(expected) + ")",
-        		result, is(expected));
-    }
+		assertThat("Incorrect number of bytes written by " + value.getClass().getSimpleName() + ".writeTo(): "
+				+ result_bb.readableBytes() + " (should be " + LEN + ")",
+				result_bb.readableBytes(), is(LEN));
+		assertThat("Bad result from " + value.getClass().getSimpleName() + ".writeTo(): " + Arrays.toString(result)
+				+ " (should be " + Arrays.toString(expected) + ")",
+				result, is(expected));
+	}
 }
