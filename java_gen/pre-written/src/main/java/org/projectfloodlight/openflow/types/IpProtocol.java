@@ -656,6 +656,10 @@ public class IpProtocol implements OFValueType<IpProtocol> {
         return Shorts.compare(proto, o.proto);
     }
 
+    @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
 
     @Override
     public void putTo(PrimitiveSink sink) {

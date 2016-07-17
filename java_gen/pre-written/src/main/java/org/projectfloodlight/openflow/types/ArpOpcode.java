@@ -187,6 +187,11 @@ public class ArpOpcode implements OFValueType<ArpOpcode> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort((short) this.opcode);
     }

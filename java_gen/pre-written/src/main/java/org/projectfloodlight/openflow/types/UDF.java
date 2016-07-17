@@ -79,6 +79,11 @@ public class UDF implements OFValueType<UDF> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write4Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(rawValue);
     }

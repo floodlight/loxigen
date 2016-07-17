@@ -24,7 +24,7 @@ import com.google.common.primitives.UnsignedInts;
  *
  * @author Andreas Wundsam {@literal <}andreas.wundsam@bigswitch.com{@literal >}
  */
-public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
+public class IPv4Address extends IPAddress<IPv4Address> {
     static final int LENGTH = 4;
     private final int rawValue;
 

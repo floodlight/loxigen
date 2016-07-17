@@ -197,6 +197,13 @@ public class OFVlanVidMatch implements OFValueType<OFVlanVidMatch> {
     public int compareTo(OFVlanVidMatch o) {
         return Shorts.compare(vid, o.vid);
     }
+
+    @Override
+    public void writeTo(ByteBuf bb) {
+    	// NOTE: May not be the right thing to do for OF1.0!
+    	write2Bytes(bb);
+    }
+    
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(vid);

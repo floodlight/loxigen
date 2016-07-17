@@ -86,6 +86,11 @@ import com.google.common.hash.PrimitiveSink;
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(vfi);
     }

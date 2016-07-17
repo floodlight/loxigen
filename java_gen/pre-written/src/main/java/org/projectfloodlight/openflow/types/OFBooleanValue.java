@@ -24,7 +24,7 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
 
-public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
+public class OFBooleanValue implements OFValueType<OFBooleanValue> {
     public final static OFBooleanValue TRUE = new OFBooleanValue(true);
     public final static OFBooleanValue FALSE = new OFBooleanValue(false);
 

@@ -27,7 +27,7 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
-public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
+public class U64 implements OFValueType<U64>, HashValue<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
     private final static long ZERO_VAL = 0;
     public final static U64 ZERO = new U64(ZERO_VAL);

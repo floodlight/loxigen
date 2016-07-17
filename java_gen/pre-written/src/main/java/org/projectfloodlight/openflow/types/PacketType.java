@@ -81,6 +81,13 @@ public class PacketType implements OFValueType<PacketType> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	// TODO: Change to "write6Bytes(bb)" once Issue #504 is resolved
+        bb.writeShort(namespace);
+        bb.writeInt(nsType);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(namespace);
         sink.putInt(nsType);

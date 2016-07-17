@@ -75,6 +75,12 @@ public class VlanPcp implements OFValueType<VlanPcp> {
     public int compareTo(VlanPcp o) {
         return UnsignedBytes.compare(pcp, o.pcp);
     }
+
+    @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
+
     @Override
     public void putTo(PrimitiveSink sink) {
         sink.putByte(pcp);

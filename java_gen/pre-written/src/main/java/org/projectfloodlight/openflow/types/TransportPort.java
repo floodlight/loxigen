@@ -91,6 +91,11 @@ public class TransportPort implements OFValueType<TransportPort> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort((short) port);
     }

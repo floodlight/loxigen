@@ -2,8 +2,11 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.Nonnull;
 
+import io.netty.buffer.ByteBuf;
+
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.util.HexString;
+import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Longs;
@@ -16,7 +19,7 @@ import com.google.common.primitives.UnsignedLongs;
  * @author Rob Vaterlaus {@literal <}rob.vaterlaus@bigswitch.com{@literal >}
  */
 @Immutable
-public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
+public class DatapathId implements Writeable, PrimitiveSinkable, Comparable<DatapathId> {
 
     public static final DatapathId NONE = new DatapathId(0);
 
@@ -94,5 +97,10 @@ public class DatapathId implements PrimitiveSinkable, Comparable<DatapathId> {
     @Override
     public int compareTo(DatapathId o) {
         return UnsignedLongs.compare(rawValue, o.rawValue);
+    }
+
+    @Override
+    public void writeTo(ByteBuf bb) {
+    	bb.writeLong(rawValue);
     }
 }

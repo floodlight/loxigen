@@ -79,6 +79,11 @@ public class IPv6FlowLabel implements OFValueType<IPv6FlowLabel> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write4Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(this.label);
     }

@@ -25,7 +25,7 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Ints;
 
-public class U16 implements Writeable, OFValueType<U16> {
+public class U16 implements OFValueType<U16> {
     private final static short ZERO_VAL = 0;
     public final static U16 ZERO = new U16(ZERO_VAL);
 

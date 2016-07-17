@@ -567,6 +567,12 @@ public class OFPort implements OFValueType<OFPort> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	// NOTE: May not be the right thing to do for OF1.0!
+    	write4Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(portNumber);
     }

@@ -110,6 +110,11 @@ public class VlanVid implements OFValueType<VlanVid> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(vid);
     }

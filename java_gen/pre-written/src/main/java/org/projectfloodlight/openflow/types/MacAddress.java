@@ -234,6 +234,11 @@ public class MacAddress implements OFValueType<MacAddress> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write6Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(rawValue);
     }

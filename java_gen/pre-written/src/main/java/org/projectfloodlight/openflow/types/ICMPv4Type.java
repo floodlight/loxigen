@@ -196,6 +196,11 @@ public class ICMPv4Type implements OFValueType<ICMPv4Type> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(type);
     }

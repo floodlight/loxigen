@@ -67,6 +67,11 @@ public enum IpEcn implements OFValueType<IpEcn> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putByte(ecn);
     }

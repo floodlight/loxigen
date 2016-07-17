@@ -95,6 +95,11 @@ public class OFBitMask128 implements OFValueType<OFBitMask128> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write16Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(raw1);
         sink.putLong(raw2);

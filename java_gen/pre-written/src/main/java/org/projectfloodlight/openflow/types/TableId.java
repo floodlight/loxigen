@@ -93,6 +93,11 @@ public class TableId implements OFValueType<TableId>, Comparable<TableId> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putByte((byte) id);
     }

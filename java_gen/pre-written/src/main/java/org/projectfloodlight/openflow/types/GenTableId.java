@@ -86,6 +86,11 @@ public class GenTableId implements OFValueType<GenTableId>, Comparable<GenTableI
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort((byte) id);
     }

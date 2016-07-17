@@ -97,6 +97,11 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write16Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(raw1);
         sink.putLong(raw2);
