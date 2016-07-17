@@ -91,32 +91,22 @@ public class OFValueTypeWriteableTest {
 			testSingleOFValueType(value, expected);
 		}
 
-		{
-			// OFBooleanValue special case: implements no readByte() method and
-			// Reader inner class is private.
-			// Also squashes byte values to "1" or "0"
-			OFBooleanValue bv = OFBooleanValue.of(true);
-			byte[] expected = new byte[] { 1 };
+		// OFBooleanValue special case: Squashes byte values to "1" or "0"
+		testSingleOFValueType(
+				OFBooleanValue.of(true),
+				new byte[] { 1 });
 
-			testSingleOFValueType(bv, expected);
-		}
+		// Masked<V> special case... Constructor will apply the mask to the
+		// value before storing, so we can't use arbitrary value/mask pairs
+		// and expect the result to be the same.
+		testSingleOFValueType(
+				Masked.of(IPv4Address.of("16.17.0.0"), IPv4Address.of("255.255.0.0")),
+				new byte[] { 0x10, 0x11, 0, 0, (byte) 0xff, (byte) 0xff, 0, 0 });
 
-		{
-			// Masked<V> special case... Constructor will apply the mask to the
-			// value before storing, so we can't use arbitrary value/mask pairs
-			// and expect the result to be the same.
-			Masked<IPv4Address> mv = Masked.of(IPv4Address.of("16.17.0.0"), IPv4Address.of("255.255.0.0"));
-			byte[] expected = new byte[] { 0x10, 0x11, 0, 0, (byte) 0xff, (byte) 0xff, 0, 0 };
-
-			testSingleOFValueType(mv, expected);
-		}
-		{
-			// VxlanNI special case... Must comply with the mask.
-			VxlanNI vni = VxlanNI.ofVni(0x00fedcba);
-			byte[] expected = new byte[] { 0, (byte) 0xfe, (byte) 0xdc, (byte) 0xba };
-
-			testSingleOFValueType(vni, expected);
-		}
+		// VxlanNI special case... Must comply with the mask.
+		testSingleOFValueType(
+				VxlanNI.ofVni(0x00fedcba),
+				new byte[] { 0, (byte) 0xfe, (byte) 0xdc, (byte) 0xba });
 	}
 
 	protected void testSingleOFValueType(OFValueType<?> value, final byte[] expected) {
