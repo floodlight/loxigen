@@ -611,4 +611,9 @@ of_object_truncate(of_object_t *obj)
 {
     of_object_init_map[obj->object_id](obj, obj->version, -1, 0);
     obj->wbuf->current_bytes = obj->length;
+
+    of_wire_length_set_f wire_length_set = loci_class_metadata[obj->object_id].wire_length_set;
+    if (wire_length_set != NULL) {
+        wire_length_set(obj, obj->length);
+    }
 }
