@@ -855,3 +855,9 @@ struct of_bsn_tlv_ipv6_prefix : of_bsn_tlv {
     of_ipv6_t value;
     uint8_t prefix_length;
 };
+
+struct of_bsn_tlv_ndp_offload : of_bsn_tlv {
+    uint16_t type == 123;
+    uint16_t length;
+};
+
