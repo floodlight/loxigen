@@ -262,3 +262,20 @@ def connect(ip, port=6653, daemon=True, ofp=loxi.of14):
         raise Exception("Did not receive HELLO")
 
     return cxn
+
+def connect_unix(path, daemon=True, ofp=loxi.of14):
+    """
+    Connect over a unix domain socket
+    """
+    soc = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    soc.connect(path)
+    cxn = loxi.connection.Connection(soc)
+    cxn.daemon = daemon
+    cxn.logger.debug("Connected to %s", path)
+    cxn.start()
+
+    cxn.send(ofp.message.hello())
+    if not cxn.recv(lambda msg: msg.type == ofp.OFPT_HELLO):
+        raise Exception("Did not receive HELLO")
+
+    return cxn

@@ -158,6 +158,31 @@ test_of_object_new_from_message_preallocated(void)
     return TEST_PASS;
 }
 
+static int
+test_truncate(void)
+{
+    of_object_t *obj = of_port_desc_new(OF_VERSION_1_4);
+    of_object_t *dup = of_object_dup(obj);
+
+    of_object_t props;
+    of_object_t prop;
+    of_port_desc_properties_bind(obj, &props);
+    of_port_desc_prop_bsn_uplink_init(&prop, props.version, -1, 1);
+    if (of_list_port_desc_prop_append_bind(&props, &prop) < 0) {
+        assert(0);
+    }
+
+    of_object_truncate(obj);
+
+    TEST_ASSERT(obj->wbuf->current_bytes == dup->wbuf->current_bytes);
+    TEST_ASSERT(!memcmp(obj->wbuf->buf, dup->wbuf->buf, obj->wbuf->current_bytes));
+
+    of_object_delete(obj);
+    of_object_delete(dup);
+
+    return TEST_PASS;
+}
+
 int
 run_utility_tests(void)
 {
@@ -165,6 +190,7 @@ run_utility_tests(void)
     RUN_TEST(of_object_new_from_message);
     RUN_TEST(of_object_new_from_message_preallocated);
     RUN_TEST(dump_objs);
+    RUN_TEST(truncate);
 
     return TEST_PASS;
 }
