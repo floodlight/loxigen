@@ -861,3 +861,13 @@ struct of_bsn_tlv_ndp_offload : of_bsn_tlv {
     uint16_t length;
 };
 
+struct of_bsn_tlv_ndp_static : of_bsn_tlv {
+    uint16_t type == 124;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_icmpv6_chksum : of_bsn_tlv {
+    uint16_t type == 125;
+    uint16_t length;
+    uint16_t value;
+};
