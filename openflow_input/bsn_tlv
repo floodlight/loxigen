@@ -871,3 +871,15 @@ struct of_bsn_tlv_icmpv6_chksum : of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_ipv6_src : of_bsn_tlv {
+    uint16_t type == 126;
+    uint16_t length;
+    of_ipv6_t value;
+};
+
+struct of_bsn_tlv_ipv6_dst : of_bsn_tlv {
+    uint16_t type == 127;
+    uint16_t length;
+    of_ipv6_t value;
+};
