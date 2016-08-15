@@ -204,6 +204,10 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<U16>("tcp_flags", MatchFields.TCP_FLAGS,
                     new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
 
+    public final static MatchField<U16> OVS_TCP_FLAGS =
+            new MatchField<U16>("ovs_tcp_flags", MatchFields.OVS_TCP_FLAGS,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+
     public final static MatchField<PacketType> PACKET_TYPE =
             new MatchField<PacketType>("packet_type", MatchFields.PACKET_TYPE);
 

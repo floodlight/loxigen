@@ -45,6 +45,7 @@ public enum MatchFields {
     IPV6_EXTHDR,
     PBB_UCA,
     TCP_FLAGS,
+    OVS_TCP_FLAGS,
     ACTSET_OUTPUT,
     TUNNEL_IPV4_SRC,
     TUNNEL_IPV4_DST,
