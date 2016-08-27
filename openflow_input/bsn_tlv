@@ -883,3 +883,8 @@ struct of_bsn_tlv_ipv6_dst : of_bsn_tlv {
     uint16_t length;
     of_ipv6_t value;
 };
+
+struct of_bsn_tlv_push_vlan_on_ingress : of_bsn_tlv {
+    uint16_t type == 128;
+    uint16_t length;
+};
