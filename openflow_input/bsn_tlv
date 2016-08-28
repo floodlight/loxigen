@@ -888,3 +888,15 @@ struct of_bsn_tlv_push_vlan_on_ingress : of_bsn_tlv {
     uint16_t type == 128;
     uint16_t length;
 };
+
+struct of_bsn_tlv_apply_packets : of_bsn_tlv {
+    uint16_t type == 129;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_apply_bytes : of_bsn_tlv {
+    uint16_t type == 130;
+    uint16_t length;
+    uint64_t value;
+};
