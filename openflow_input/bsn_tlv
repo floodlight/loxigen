@@ -889,9 +889,9 @@ struct of_bsn_tlv_push_vlan_on_ingress : of_bsn_tlv {
     uint16_t length;
 };
 
-// apply_packets and apply_bytes is a stat counter, like rx_packet used to
-// identify packets and bytes applied to some action, for example:
-// tcp syn packets, or packets with inet L3/L4 headers for netflow
+// apply_packets and apply_bytes are stat counters, like rx_packet
+// identifies packets and bytes applied to some action, for example:
+// packets with inet L3/L4 headers for netflow
 
 struct of_bsn_tlv_apply_packets : of_bsn_tlv {
     uint16_t type == 129;
