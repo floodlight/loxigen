@@ -940,3 +940,8 @@ struct of_bsn_tlv_l3_dst_class_id : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_egress_only : of_bsn_tlv {
+    uint16_t type == 137;
+    uint16_t length;
+};
