@@ -54,6 +54,8 @@
                 q.text(util.pretty_wildcards(self.${m.name}))
 :: elif m.oftype == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
+:: elif m.oftype == 'of_ipv6_t':
+                q.text(util.pretty_ipv6(self.${m.name}))
 :: elif loxi_utils.lookup_ir_wiretype(m.oftype, version=version).startswith("uint"):
                 q.text("%#x" % self.${m.name})
 :: else:
