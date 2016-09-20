@@ -52,6 +52,9 @@ def pretty_mac(mac):
 def pretty_ipv4(v):
     return "%d.%d.%d.%d" % ((v >> 24) & 0xFF, (v >> 16) & 0xFF, (v >> 8) & 0xFF, v & 0xFF)
 
+def pretty_ipv6(v):
+    return ":".join(["%0.2x%0.2x" % (ord(v[i]), ord(v[i+1])) for i in range(0, len(v), 2)])
+
 def pretty_flags(v, flag_names):
     set_flags = []
     for flag_name in flag_names:
