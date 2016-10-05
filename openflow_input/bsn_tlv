@@ -957,3 +957,9 @@ struct of_bsn_tlv_egress_port_group_id : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_data_mask : of_bsn_tlv {
+    uint16_t type == 140;
+    uint16_t length;
+    of_octets_t value;
+};
