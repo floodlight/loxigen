@@ -1,4 +1,4 @@
-// Copyright 2014, Big Switch Networks, Inc.
+// Copyright 2016, Big Switch Networks, Inc.
 //
 // LoxiGen is licensed under the Eclipse Public License,
 // version 1.0 (EPL), with the following special exception:
@@ -28,7 +28,6 @@
 // express or implied. See the EPL for the specific language
 // governing permissions and limitations under the EPL.
 
-#version 3
 #version 4
 #version 5
 #version 6
@@ -38,7 +37,7 @@
  */
 
 struct of_oxm_bsn_ip_fragmentation : of_oxm {
-    uint32_t type_len == 0x00033402;
+    uint32_t type_len == 0x00033401;
     uint8_t value;
 };
 
