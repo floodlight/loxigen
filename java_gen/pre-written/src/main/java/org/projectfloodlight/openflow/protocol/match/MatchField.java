@@ -300,6 +300,10 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<VFI> BSN_VFI =
             new MatchField<VFI>("bsn_vfi", MatchFields.BSN_VFI);
 
+    public final static MatchField<OFBooleanValue> BSN_IP_FRAGMENTATION =
+            new MatchField<OFBooleanValue>("bsn_ip_fragmentation", MatchFields.BSN_IP_FRAGMENTATION,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
+
     public String getName() {
         return name;
     }

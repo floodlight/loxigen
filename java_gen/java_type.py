@@ -577,7 +577,6 @@ controller_status_entry = JType('OFControllerStatusEntry') \
         .op(read='OFControllerStatusEntryVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
-
 default_mtype_to_jtype_convert_map = {
         'uint8_t' : u8,
         'uint16_t' : u16,
@@ -774,6 +773,8 @@ exceptions = {
 
         'of_oxm_bsn_vfi' : { 'value' : vfi },
         'of_oxm_bsn_vfi_masked' : { 'value' : vfi, 'value_mask' : vfi },
+
+	'of_oxm_bsn_ip_fragmentation' : { 'value' : boolean_value },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
