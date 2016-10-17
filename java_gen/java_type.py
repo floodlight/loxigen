@@ -774,7 +774,7 @@ exceptions = {
         'of_oxm_bsn_vfi' : { 'value' : vfi },
         'of_oxm_bsn_vfi_masked' : { 'value' : vfi, 'value_mask' : vfi },
 
-	'of_oxm_bsn_ip_fragmentation' : { 'value' : boolean_value },
+        'of_oxm_bsn_ip_fragmentation' : { 'value' : boolean_value },
         'of_oxm_bsn_ip_fragmentation_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
