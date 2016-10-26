@@ -963,3 +963,16 @@ struct of_bsn_tlv_data_mask : of_bsn_tlv {
     uint16_t length;
     of_octets_t value;
 };
+
+enum ofp_bsn_port_usage(wire_type=uint16_t) {
+    OFP_BSN_PORT_UNUSED = 0,
+    OFP_BSN_PORT_TRANSMIT_ONLY = 1,
+    OFP_BSN_PORT_RECEIVE_ONLY = 2,
+    OFP_BSN_PORT_BIDIRECTION = 3,
+};
+
+struct of_bsn_tlv_port_usage : of_bsn_tlv {
+    uint16_t type == 141;
+    uint16_t length;
+    enum ofp_bsn_port_usage value;
+};
