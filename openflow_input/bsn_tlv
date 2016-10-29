@@ -976,3 +976,28 @@ struct of_bsn_tlv_port_usage : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_port_usage value;
 };
+
+enum ofp_bsn_tunnel_type(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_TUNNEL_L2GRE = 0x1,
+};
+
+struct of_bsn_tlv_tunnel_capability : of_bsn_tlv {
+    uint16_t type == 142;
+    uint16_t length;
+    enum ofp_bsn_tunnel_type value;
+};
+
+enum ofp_bsn_enhanced_hash_type(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_ENHANCED_HASH_L2 = 0x1,
+    OFP_BSN_ENHANCED_HASH_L3 = 0x2,
+    OFP_BSN_ENHANCED_HASH_L2GRE = 0x4,
+    OFP_BSN_ENHANCED_HASH_MPLS = 0x8,
+    OFP_BSN_ENHANCED_HASH_GTP = 0x10,
+    OFP_BSN_ENHANCED_HASH_SYMMETRIC = 0x20,
+};
+
+struct of_bsn_tlv_enhanced_hash_capability : of_bsn_tlv {
+    uint16_t type == 143;
+    uint16_t length;
+    enum ofp_bsn_enhanced_hash_type value;
+};
