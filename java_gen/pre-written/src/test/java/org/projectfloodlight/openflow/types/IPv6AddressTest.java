@@ -321,6 +321,13 @@ public class IPv6AddressTest {
         assertEquals("0000:0000:0000:0000:0000:0000:0000:0000", IPv6Address.of("::").toString(false, true));
         assertEquals("1::4:5:6:0:8", IPv6Address.of("1:0:0:4:5:6:0:8").toString(true, false));
         assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8").toString(true, false));
+        // Two equal length zero runs; should zero compress the first instance
+        assertEquals("1::4:2:0:0:8", IPv6Address.of("1:0:0:4:2:0:0:8").toString(true, false));
+        // Shouldn't zero compress a single zero
+        assertEquals("1:0:2:4:3:1:0:8", IPv6Address.of("1:0:2:4:3:1:0:8").toString(true, false));
+        // Test zero runs at the end of the address since that's a different code path in toString
+        assertEquals("1::4:2:8:0:0", IPv6Address.of("1:0:0:4:2:8:0:0").toString(true, false));
+        assertEquals("1:3:2:4:3:1:5:0", IPv6Address.of("1:3:2:4:3:1:5:0").toString(true, false));
     }
 
     @Test
