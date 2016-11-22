@@ -578,7 +578,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
                 if (getUnsignedShortWord(i) != 0) {
                     // end of this candidate word
                     int candidateLength = i - candidateStart;
-                    if (candidateLength >= maxLength) {
+                    if ((candidateLength > 1) && (candidateLength > maxLength)) {
                         start = candidateStart;
                         maxLength = candidateLength;
                     }
@@ -594,7 +594,7 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
 
         if (candidateStart >= 0) {
             int candidateLength = 8 - candidateStart;
-            if (candidateLength >= maxLength) {
+            if ((candidateLength > 1) && (candidateLength > maxLength)) {
                 start = candidateStart;
                 maxLength = candidateLength;
             }
