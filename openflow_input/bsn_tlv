@@ -1001,3 +1001,15 @@ struct of_bsn_tlv_enhanced_hash_capability : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_enhanced_hash_type value;
 };
+
+enum ofp_bsn_auto_negotiation_type(wire_type=uint8_t) {
+    OFP_BSN_AUTO_NEGOTIATION_DEFAULT = 0,
+    OFP_BSN_AUTO_NEGOTIATION_ENABLE = 1,
+    OFP_BSN_AUTO_NEGOTIATION_DISABLE = 2,
+};
+
+struct of_bsn_tlv_auto_negotiation : of_bsn_tlv {
+    uint16_t type == 144;
+    uint16_t length;
+    enum ofp_bsn_auto_negotiation_type value;
+};
