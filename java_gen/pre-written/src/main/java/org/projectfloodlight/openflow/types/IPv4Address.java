@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.net.Inet4Address;
@@ -18,6 +16,8 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Wrapper around an IPv4Address address
@@ -115,6 +115,61 @@ public class IPv4Address extends IPAddress<IPv4Address> implements Writeable {
     @Override
     public boolean isMulticast() {
         return ((rawValue >>> 24) & 0xF0) == 0xE0;
+    }
+
+    public enum IPAddressType {
+        THIS_NETWORK,
+        PRIVATE_NETWORK,
+        PUBLIC_DATA_NETWORK,
+        CABLE_TV_NETWORK,
+        INTERNET_HOST_LOOPBACK_NETWORK,
+        LINK_LOCAL_NETWORK,
+        TEST_NET,
+        RELAY_ANYCAST_NETWORK,
+        INTERCONNECT_NETWORK,
+        MULTICAST_NETWORK,
+        RESERVED_NETWORK,
+        HOST_ADDRESS
+    }
+
+    public IPAddressType isHostAddress() {
+        if (IPv4AddressWithMask.THIS_NETWORK.contains(this))
+            return IPAddressType.THIS_NETWORK;
+
+        if ((IPv4AddressWithMask.PRIVATE1_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.PRIVATE2_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.PRIVATE3_NETWORK.contains(this)))
+            return IPAddressType.PRIVATE_NETWORK;
+
+        if (IPv4AddressWithMask.PUBLIC_DATA_NETWORK.contains(this))
+            return IPAddressType.PUBLIC_DATA_NETWORK;
+        if (IPv4AddressWithMask.CABLE_TV_NETWORK.contains(this))
+            return IPAddressType.CABLE_TV_NETWORK;
+
+        if (IPv4AddressWithMask.INTERNET_HOST_LOOPBACK_NETWORK.contains(this))
+            return IPAddressType.INTERNET_HOST_LOOPBACK_NETWORK;
+        if (IPv4AddressWithMask.LINK_LOCAL_NETWORK.contains(this))
+            return IPAddressType.LINK_LOCAL_NETWORK;
+
+        if (IPv4AddressWithMask.TEST_NET.contains(this))
+            return IPAddressType.TEST_NET;
+        if (IPv4AddressWithMask.RELAY_ANYCAST_NETWORK.contains(this))
+            return IPAddressType.RELAY_ANYCAST_NETWORK;
+
+        if (IPv4AddressWithMask.INTERCONNECT_NETWORK.contains(this))
+            return IPAddressType.INTERCONNECT_NETWORK;
+        if (IPv4AddressWithMask.MULTICAST_NETWORK.contains(this))
+            return IPAddressType.MULTICAST_NETWORK;
+
+        if ((IPv4AddressWithMask.RESERVED1_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.RESERVED2_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.RESERVED3_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.RESERVED4_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.RESERVED5_NETWORK.contains(this)) ||
+            (IPv4AddressWithMask.RESERVED_FUTURE.contains(this)))
+            return IPAddressType.RESERVED_NETWORK;
+
+        return IPAddressType.HOST_ADDRESS;
     }
 
     @Override
