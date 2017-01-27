@@ -363,3 +363,31 @@ struct of_action_bsn_gentable : of_action_bsn {
     uint32_t table_id;
     list(of_bsn_tlv_t) key;
 };
+
+// BSN gentable error message
+struct of_bsn_gentable_error : of_bsn_base_error {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype == 2;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t table_id;
+    of_desc_str_t err_msg;
+    of_octets_t data;
+};
+
+// BSN gentable full error message
+struct of_bsn_gentable_full_error : of_bsn_base_error {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype == 3;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t table_id;
+    of_desc_str_t err_msg;
+    of_octets_t data;
+};
