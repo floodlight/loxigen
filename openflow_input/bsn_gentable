@@ -364,6 +364,12 @@ struct of_action_bsn_gentable : of_action_bsn {
     list(of_bsn_tlv_t) key;
 };
 
+enum of_bsn_gentable_error_code(wire_type=uint16_t) {
+    OF_BSN_GENTABLE_ERROR_UNKNOWN = 0,
+    OF_BSN_GENTABLE_ERROR_PARAM = 1,  // invalid parameter
+    OF_BSN_GENTABLE_ERROR_TABLE_FULL = 2,
+};
+
 // BSN gentable error message
 struct of_bsn_gentable_error : of_bsn_base_error {
     uint8_t version;
@@ -373,21 +379,8 @@ struct of_bsn_gentable_error : of_bsn_base_error {
     uint16_t err_type == 0xffff;
     uint16_t subtype == 2;
     uint32_t experimenter == 0x5c16c7;
-    uint32_t table_id;
-    of_desc_str_t err_msg;
-    of_octets_t data;
-};
-
-// BSN gentable full error message
-struct of_bsn_gentable_full_error : of_bsn_base_error {
-    uint8_t version;
-    uint8_t type == 1;
-    uint16_t length;
-    uint32_t xid;
-    uint16_t err_type == 0xffff;
-    uint16_t subtype == 3;
-    uint32_t experimenter == 0x5c16c7;
-    uint32_t table_id;
+    enum of_bsn_gentable_error_code error_code;
+    uint16_t table_id;
     of_desc_str_t err_msg;
     of_octets_t data;
 };
