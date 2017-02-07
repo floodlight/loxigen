@@ -1701,7 +1701,7 @@ struct of_port_stats_prop_experimenter : of_port_stats_prop {
     uint16_t         length;
     uint32_t         experimenter == ?;
     uint32_t         exp_type;
-    of_octets_t      experimenter_data;
+    /* of_octets_t      experimenter_data;  Implementing property defines fields. */
 };
 
 struct of_port_stats_entry {
