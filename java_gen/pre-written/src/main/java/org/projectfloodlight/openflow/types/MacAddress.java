@@ -69,8 +69,8 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     public static MacAddress of(long raw) {
         raw &= BROADCAST_VAL;
-        if(raw == NONE_VAL)
-            return NONE;
+        if(raw == ZERO_VAL)
+            return ZERO;
         if (raw == BROADCAST_VAL)
             return BROADCAST;
         return new MacAddress(raw);
