@@ -1,4 +1,4 @@
-// Copyright 2013, Big Switch Networks, Inc.
+// Copyright 2013-2017, Big Switch Networks, Inc.
 //
 // LoxiGen is licensed under the Eclipse Public License,
 // version 1.0 (EPL), with the following special exception:
@@ -1012,4 +1012,22 @@ struct of_bsn_tlv_auto_negotiation : of_bsn_tlv {
     uint16_t type == 144;
     uint16_t length;
     enum ofp_bsn_auto_negotiation_type value;
+};
+
+enum ofp_bsn_hash_algorithm_type(wire_type=uint16_t) {
+    OFP_BSN_HASH_ALGORITHM_CRC16XOR8 = 0,
+    OFP_BSN_HASH_ALGORITHM_CRC16XOR4 = 1,
+    OFP_BSN_HASH_ALGORITHM_CRC16XOR2 = 2,
+    OFP_BSN_HASH_ALGORITHM_CRC16XOR1 = 3,
+    OFP_BSN_HASH_ALGORITHM_CRC16 = 4,
+    OFP_BSN_HASH_ALGORITHM_XOR16 = 5,
+    OFP_BSN_HASH_ALGORITHM_CRC16CCITT = 6,
+    OFP_BSN_HASH_ALGORITHM_CRC32LO = 7,
+    OFP_BSN_HASH_ALGORITHM_CRC32HI = 8,
+};
+
+struct of_bsn_tlv_hash_algorithm : of_bsn_tlv {
+    uint16_t type == 145;
+    uint16_t length;
+    enum ofp_bsn_hash_algorithm_type value;
 };
