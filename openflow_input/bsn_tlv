@@ -1031,3 +1031,8 @@ struct of_bsn_tlv_hash_algorithm : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_hash_algorithm_type value;
 };
+
+struct of_bsn_tlv_loopback_mode : of_bsn_tlv {
+    uint16_t type == 146;
+    uint16_t length;
+};
