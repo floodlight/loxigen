@@ -1044,3 +1044,13 @@ struct of_bsn_tlv_loopback_mode : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_loopback_mode value;
 };
+
+struct of_bsn_tlv_no_arp_response : of_bsn_tlv {
+    uint16_t type == 147;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_no_ns_response : of_bsn_tlv {
+    uint16_t type == 148;
+    uint16_t length;
+};
