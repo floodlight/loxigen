@@ -1054,3 +1054,20 @@ struct of_bsn_tlv_no_ns_response : of_bsn_tlv {
     uint16_t type == 148;
     uint16_t length;
 };
+
+enum ofp_bsn_forward_error_correction_type(wire_type=uint8_t) {
+    OFP_BSN_FORWARD_ERROR_CORRECTION_DEFAULT = 0,
+    OFP_BSN_FORWARD_ERROR_CORRECTION_ENABLE = 1,
+    OFP_BSN_FORWARD_ERROR_CORRECTION_DISABLE = 2,
+};
+
+struct of_bsn_tlv_forward_error_correction : of_bsn_tlv {
+    uint16_t type == 149;
+    uint16_t length;
+    enum ofp_bsn_forward_error_correction_type value;
+};
+
+struct of_bsn_tlv_optics_always_enabled : of_bsn_tlv {
+    uint16_t type == 150;
+    uint16_t length;
+};
