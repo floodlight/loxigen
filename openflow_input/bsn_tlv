@@ -1071,3 +1071,4 @@ struct of_bsn_tlv_optics_always_enabled : of_bsn_tlv {
     uint16_t type == 150;
     uint16_t length;
 };
+
