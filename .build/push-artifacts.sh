@@ -12,12 +12,14 @@ fi
 ARTIFACT_REPO_BRANCH=${2-master}
 ARTIFACT_TARGET_BRANCH=${3-master}
 
+MAKE=${MAKE-make}
+
 ARTIFACT_REPO=$(mktemp -d --tmpdir "push-artifacts-repo.XXXXXXX")
 
 git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO} -b ${ARTIFACT_REPO_BRANCH}
 
 find ${ARTIFACT_REPO} -mindepth 1 -maxdepth 1 -type d \! -name '.*' -print0 | xargs -0 rm -r
-make LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
+${MAKE} LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
 
 loxi_branch=$(git rev-parse --abbrev-ref HEAD)
 loxi_head=$(git rev-parse HEAD)
