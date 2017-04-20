@@ -295,6 +295,11 @@ u16 = JType('int', 'short') \
 u32 = JType('long', 'int') \
         .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
+u16_list = JType('List<U16>', 'short[]') \
+        .op(read='ChannelUtils.readList(bb, $length, U16.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default="ImmutableList.<U16>of()",
+            funnel="FunnelUtils.putList($name, sink)")
 u32_list = JType('List<U32>', 'int[]') \
         .op(
                 read='ChannelUtils.readList(bb, $length, U32.READER)',
@@ -386,7 +391,7 @@ ipv6 = JType("IPv6Address") \
         .op(read="IPv6Address.read16Bytes(bb)", \
             write="$name.write16Bytes(bb)",
             default='IPv6Address.NONE')
-ipv6_list =  JType('List<IPv46ddress>') \
+ipv6_list =  JType('List<IPv6Address>') \
         .op(read='ChannelUtils.readList(bb, $length, IPv6Address.READER)',
             write='ChannelUtils.writeList(bb, $name)',
             default='ImmutableList.<IPv6Address>of()',
@@ -590,6 +595,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_packet_queue_t)' : packet_queue_list,
         'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
+        'list(of_uint16_t)' : u16_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
         'list(of_oxs_t)' : oxs_list,
@@ -680,6 +686,14 @@ exceptions = {
         'of_oxm_ipv6_exthdr_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
         'of_oxm_pbb_uca' : { 'value' : boolean_value },
         'of_oxm_pbb_uca_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
+
+        'of_oxm_conntrack_state' : { 'value' : u32obj },
+        'of_oxm_conntrack_state_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        'of_oxm_conntrack_zone' : { 'value' : u16obj },
+        'of_oxm_conntrack_mark' : { 'value' : u32obj },
+        'of_oxm_conntrack_mark_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        'of_oxm_conntrack_label' : { 'value' : port_bitmap_128 },
+        'of_oxm_conntrack_label_masked' : { 'value' : port_bitmap_128, 'value_mask' : port_bitmap_128 },
 
         'of_oxm_tcp_flags' : { 'value' : u16obj },
         'of_oxm_tcp_flags_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
