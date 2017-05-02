@@ -1088,7 +1088,11 @@ struct of_bsn_tlv_uri_scheme : of_bsn_tlv {
     of_octets_t value;
 };
 
-/* Type 154 used (TODO) */
+struct of_bsn_tlv_timestamp : of_bsn_tlv {
+    uint16_t type == 154;
+    uint16_t length;
+    uint64_t value;
+};
 
 struct of_bsn_tlv_record_packets : of_bsn_tlv {
     uint16_t type == 155;
