@@ -1099,3 +1099,8 @@ struct of_bsn_tlv_record_packets : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_use_peer_when_empty : of_bsn_tlv {
+    uint16_t type == 156;
+    uint16_t length;
+};
