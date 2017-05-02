@@ -1076,3 +1076,9 @@ struct of_bsn_tlv_force_link_up : of_bsn_tlv {
     uint16_t type == 151;
     uint16_t length;
 };
+
+struct of_bsn_tlv_timestamp : of_bsn_tlv {
+    uint16_t type == 154;
+    uint16_t length;
+    uint64_t value;
+};
