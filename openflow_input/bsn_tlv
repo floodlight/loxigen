@@ -1097,5 +1097,5 @@ struct of_bsn_tlv_timestamp : of_bsn_tlv {
 struct of_bsn_tlv_record_packets : of_bsn_tlv {
     uint16_t type == 155;
     uint16_t length;
-    uint8_t value;
+    uint32_t value;
 };
