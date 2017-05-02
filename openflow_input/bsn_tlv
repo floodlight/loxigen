@@ -1076,3 +1076,22 @@ struct of_bsn_tlv_force_link_up : of_bsn_tlv {
     uint16_t type == 151;
     uint16_t length;
 };
+
+struct of_bsn_tlv_rest_server : of_bsn_tlv {
+    uint16_t type == 152;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_uri_scheme : of_bsn_tlv {
+    uint16_t type == 153;
+    uint16_t length;
+    of_octets_t value;
+};
+
+/* Type 154 used (TODO) */
+
+struct of_bsn_tlv_record_packets : of_bsn_tlv {
+    uint16_t type == 155;
+    uint16_t length;
+    uint8_t value;
+};
