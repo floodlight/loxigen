@@ -1100,7 +1100,16 @@ struct of_bsn_tlv_record_packets : of_bsn_tlv {
     uint32_t value;
 };
 
-struct of_bsn_tlv_use_peer_when_empty : of_bsn_tlv {
+enum ofp_bsn_port_speed_gbps_type(wire_type=uint32_t) {
+    OFP_BSN_PORT_SPEED_GBPS_1 = 1,
+    OFP_BSN_PORT_SPEED_GBPS_10 = 10,
+    OFP_BSN_PORT_SPEED_GBPS_25 = 25,
+    OFP_BSN_PORT_SPEED_GBPS_40 = 40,
+    OFP_BSN_PORT_SPEED_GBPS_50 = 50,
+    OFP_BSN_PORT_SPEED_GBPS_100 = 100,
+};
+struct of_bsn_tlv_port_speed_gbps : of_bsn_tlv {
     uint16_t type == 156;
     uint16_t length;
+    enum ofp_bsn_port_speed_gbps_type value;
 };
