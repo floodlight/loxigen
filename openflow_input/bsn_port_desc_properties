@@ -36,3 +36,24 @@ struct of_port_desc_prop_bsn_breakout : of_port_desc_prop_bsn {
     uint16_t sub_interface_count;        /* Number of sub interfaces */
     uint16_t sub_interface_speed_gbps;   /* Sub interface speed in Gbps */
 };
+
+enum ofp_bsn_speed_capabilities(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_SPEED_CAP_10M = 0x1,
+    OFP_BSN_SPEED_CAP_100M = 0x2,
+    OFP_BSN_SPEED_CAP_1GB = 0x4,
+    OFP_BSN_SPEED_CAP_10GB = 0x8,
+    OFP_BSN_SPEED_CAP_25GB = 0x10,
+    OFP_BSN_SPEED_CAP_40GB = 0x20,
+    OFP_BSN_SPEED_CAP_50GB = 0x40,
+    OFP_BSN_SPEED_CAP_100GB = 0x80,
+};
+
+struct of_port_desc_prop_bsn_speed_capabilities : of_port_desc_prop_bsn {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t exp_type == 4;
+    uint64_t current;       /* Current capabilities of port */
+    uint64_t supported;     /* Supported capabilities of port */
+    uint64_t max;           /* Max capabilities of port */
+};
