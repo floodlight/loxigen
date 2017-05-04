@@ -1111,5 +1111,5 @@ enum ofp_bsn_port_speed_gbps_type(wire_type=uint32_t) {
 struct of_bsn_tlv_port_speed_gbps : of_bsn_tlv {
     uint16_t type == 156;
     uint16_t length;
-    enum ofp_bsn_port_speed_gbps_type value;
+    uint32_t value;
 };
