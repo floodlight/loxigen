@@ -8,6 +8,77 @@ import com.google.common.base.Preconditions;
 public class IPv4AddressWithMask extends IPAddressWithMask<IPv4Address> {
     public final static IPv4AddressWithMask NONE = of(IPv4Address.NONE, IPv4Address.NONE);
 
+    /**
+     * Reserved networks as per RFC 3330
+     * Address Block             Present Use                       Reference
+     ---------------------------------------------------------------------
+     * 0.0.0.0/8            "This" Network                 [RFC1700, page 4]
+     * 10.0.0.0/8           Private-Use Networks                   [RFC1918]
+     * 14.0.0.0/8           Public-Data Networks         [RFC1700, page 181]
+     * 24.0.0.0/8           Cable Television Networks                    --
+     * 39.0.0.0/8           Reserved but subject
+     *                      to allocation                       [RFC1797]
+     * 127.0.0.0/8          Loopback                       [RFC1700, page 5]
+     * 128.0.0.0/16         Reserved but subject
+     *                      to allocation                             --
+     * 169.254.0.0/16       Link Local                                   --
+     * 172.16.0.0/12        Private-Use Networks                   [RFC1918]
+     * 191.255.0.0/16       Reserved but subject
+     *                      to allocation                             --
+     * 192.0.0.0/24         Reserved but subject
+     *                      to allocation                             --
+     * 192.0.2.0/24         Test-Net
+     * 192.88.99.0/24       6to4 Relay Anycast                     [RFC3068]
+     * 192.168.0.0/16       Private-Use Networks                   [RFC1918]
+     * 198.18.0.0/15        Network Interconnect
+     *                      Device Benchmark Testing            [RFC2544]
+     * 223.255.255.0/24     Reserved but subject
+     *                      to allocation                             --
+     * 224.0.0.0/4          Multicast                              [RFC3171]
+     * 240.0.0.0/4          Reserved for Future Use        [RFC1700, page 4]
+
+     */
+    public static final IPAddressWithMask<?> THIS_NETWORK =
+            IPAddressWithMask.of("0.0.0.0/8");
+    public static final IPAddressWithMask<?> PRIVATE1_NETWORK =
+            IPAddressWithMask.of("10.0.0.0/8");
+    public static final IPAddressWithMask<?> PRIVATE2_NETWORK =
+            IPAddressWithMask.of("172.16.0.0/12");
+    public static final IPAddressWithMask<?> PRIVATE3_NETWORK =
+            IPAddressWithMask.of("192.168.0.0/16");
+    public static final IPAddressWithMask<?> PUBLIC_DATA_NETWORK =
+            IPAddressWithMask.of("14.0.0.0/8");
+    public static final IPAddressWithMask<?> CABLE_TV_NETWORK =
+            IPAddressWithMask.of("24.0.0.0/8");
+
+    public static final IPAddressWithMask<?> INTERNET_HOST_LOOPBACK_NETWORK =
+            IPAddressWithMask.of("127.0.0.0/8");
+    public static final IPAddressWithMask<?> LINK_LOCAL_NETWORK =
+            IPAddressWithMask.of("169.254.0.0/16");
+    public static final IPAddressWithMask<?> TEST_NET =
+            IPAddressWithMask.of("192.0.2.0/24");
+    public static final IPAddressWithMask<?> RELAY_ANYCAST_NETWORK =
+            IPAddressWithMask.of("192.88.99.0/24");
+    public static final IPAddressWithMask<?> INTERCONNECT_NETWORK =
+            IPAddressWithMask.of("198.18.0.0/15");
+
+    public static final IPAddressWithMask<?> MULTICAST_NETWORK =
+            IPAddressWithMask.of("224.0.0.0/4");
+
+    public static final IPAddressWithMask<?> RESERVED1_NETWORK =
+            IPAddressWithMask.of("39.0.0.0/8");
+    public static final IPAddressWithMask<?> RESERVED2_NETWORK =
+            IPAddressWithMask.of("128.0.0.0/16");
+    public static final IPAddressWithMask<?> RESERVED3_NETWORK =
+            IPAddressWithMask.of("191.255.0.0/16");
+    public static final IPAddressWithMask<?> RESERVED4_NETWORK =
+            IPAddressWithMask.of("192.0.0.0/24");
+    public static final IPAddressWithMask<?> RESERVED5_NETWORK =
+            IPAddressWithMask.of("223.255.255.0/24");
+    public static final IPAddressWithMask<?> RESERVED_FUTURE =
+            IPAddressWithMask.of("240.0.0.0/4");
+
+
     private IPv4AddressWithMask(int rawValue, int rawMask) {
         super(IPv4Address.of(rawValue), IPv4Address.of(rawMask));
     }
