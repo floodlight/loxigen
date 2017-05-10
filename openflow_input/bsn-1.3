@@ -63,3 +63,16 @@ struct of_bsn_error : of_bsn_base_error {
     of_desc_str_t err_msg;
     of_octets_t data;
 };
+
+// BSN table full error message
+struct of_bsn_table_full_error : of_bsn_base_error {
+    uint8_t version;
+    uint8_t type == 1;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t err_type == 0xffff;
+    uint16_t subtype == 2;
+    uint32_t experimenter == 0x5c16c7;
+    of_desc_str_t err_msg;
+    of_octets_t data;
+};
