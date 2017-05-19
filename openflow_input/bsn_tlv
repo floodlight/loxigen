@@ -1120,7 +1120,7 @@ struct of_bsn_tlv_outer_src_mac : of_bsn_tlv {
     of_mac_addr_t value;
 };
 
-struct of_bsn_tlv_virtual_ip : of_bsn_tlv {
+struct of_bsn_tlv_virtual : of_bsn_tlv {
     uint16_t type == 158;
     uint16_t length;
 };
