@@ -1113,3 +1113,14 @@ struct of_bsn_tlv_port_speed_gbps : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_outer_src_mac : of_bsn_tlv {
+    uint16_t type == 157;
+    uint16_t length;
+    of_mac_addr_t value;
+};
+
+struct of_bsn_tlv_virtual_ip : of_bsn_tlv {
+    uint16_t type == 158;
+    uint16_t length;
+};
