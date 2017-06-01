@@ -482,16 +482,16 @@ struct of_bsn_tlv_vlan_pcp : of_bsn_tlv {
     uint8_t value;
 };
 
-enum ofp_bsn_strip_vlan_mode(wire_type=uint8_t) {
-    OFP_BSN_STRIP_VLAN_NONE = 0,
-    OFP_BSN_STRIP_VLAN_OUTER = 1,
-    OFP_BSN_STRIP_VLAN_OUTER_INNER = 2,
+enum ofp_bsn_strip_vlan(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_STRIP_VLAN_FIRST = 0x01,
+    OFP_BSN_STRIP_VLAN_SECOND = 0x02,
+    OFP_BSN_STRIP_VLAN_THIRD = 0x04,
 };
 
 struct of_bsn_tlv_strip_vlan_on_egress : of_bsn_tlv {
     uint16_t type == 73;
     uint16_t length;
-    enum ofp_bsn_strip_vlan_mode value;
+    enum ofp_bsn_strip_vlan flags;
 };
 
 struct of_bsn_tlv_set_loopback_mode: of_bsn_tlv {
