@@ -49,6 +49,8 @@ public enum MatchFields {
     ACTSET_OUTPUT,
     TUNNEL_IPV4_SRC,
     TUNNEL_IPV4_DST,
+    TUNNEL_IPV6_SRC,
+    TUNNEL_IPV6_DST,
     BSN_IN_PORTS_128,
     BSN_IN_PORTS_512,
     BSN_LAG_ID,

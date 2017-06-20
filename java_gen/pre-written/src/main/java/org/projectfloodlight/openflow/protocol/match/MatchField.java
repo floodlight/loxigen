@@ -222,6 +222,14 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<IPv4Address>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
 
+    public final static MatchField<IPv6Address> TUNNEL_IPV6_SRC =
+            new MatchField<IPv6Address>("tunnel_ipv6_src", MatchFields.TUNNEL_IPV6_SRC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+
+    public final static MatchField<IPv6Address> TUNNEL_IPV6_DST =
+            new MatchField<IPv6Address>("tunnel_ipv6_dst", MatchFields.TUNNEL_IPV6_DST,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
             new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
 
