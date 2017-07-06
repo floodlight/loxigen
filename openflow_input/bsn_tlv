@@ -1131,3 +1131,9 @@ struct of_bsn_tlv_virtual : of_bsn_tlv {
     uint16_t type == 158;
     uint16_t length;
 };
+
+struct of_bsn_tlv_pdua_rx_instance : of_bsn_tlv {
+    uint16_t type == 159;
+    uint16_t length;
+    of_octets_t value;
+};
