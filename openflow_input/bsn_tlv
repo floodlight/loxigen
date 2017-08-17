@@ -1148,12 +1148,13 @@ struct of_bsn_tlv_lag_options : of_bsn_tlv {
     enum ofp_bsn_lag_flag flags;
 };
 
-enum ofp_bsn_routing_proto(wire_type=uint16_t) {
-    OFP_BSN_ROUTING_PROTO_OSPF = 1,
+enum ofp_bsn_routing_param(wire_type=uint16_t) {
+    OFP_BSN_ROUTING_PARAM_OSPF_UCAST = 1,
+    OFP_BSN_ROUTING_PARAM_OSPF_MCAST = 2,
 };
 
-struct of_bsn_tlv_routing_proto : of_bsn_tlv {
+struct of_bsn_tlv_routing_param : of_bsn_tlv {
     uint16_t type == 161;
     uint16_t length;
-    enum ofp_bsn_routing_proto value;
+    enum ofp_bsn_routing_param value;
 };
