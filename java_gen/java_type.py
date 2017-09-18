@@ -777,6 +777,9 @@ exceptions = {
         'of_oxm_bsn_ip_fragmentation' : { 'value' : boolean_value },
         'of_oxm_bsn_ip_fragmentation_masked' : { 'value' : boolean_value, 'value_mask' : boolean_value },
 
+        'of_oxm_bsn_ifp_class_id' : { 'value' : class_id },
+        'of_oxm_bsn_ifp_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
                 'eth_type': eth_type, 'ip_dscp': ip_dscp, 'ip_proto': ip_proto,

@@ -75,5 +75,6 @@ public enum MatchFields {
     BSN_INNER_ETH_SRC,
     BSN_INNER_VLAN_VID,
     BSN_VFI,
-    BSN_IP_FRAGMENTATION
+    BSN_IP_FRAGMENTATION,
+    BSN_IFP_CLASS_ID,
 }
