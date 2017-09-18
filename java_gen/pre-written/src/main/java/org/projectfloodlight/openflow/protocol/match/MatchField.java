@@ -304,6 +304,9 @@ public class MatchField<F extends OFValueType<F>> {
             new MatchField<OFBooleanValue>("bsn_ip_fragmentation", MatchFields.BSN_IP_FRAGMENTATION,
                     new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
+    public final static MatchField<ClassId> BSN_IFP_CLASS_ID =
+            new MatchField<ClassId>("bsn_ifp_class_id", MatchFields.BSN_IFP_CLASS_ID);
+
     public String getName() {
         return name;
     }
