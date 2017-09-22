@@ -1160,8 +1160,8 @@ struct of_bsn_tlv_routing_param : of_bsn_tlv {
 };
 
 enum of_bsn_digest_alg(wire_type=uint8_t) {
-    OF_BSN_DIGEST_ALG_MD5 = 0,
-    OF_BSN_DIGEST_ALG_SHA256 = 1,
+    OF_BSN_DIGEST_ALG_MD5 = 1,
+    OF_BSN_DIGEST_ALG_SHA256 = 2,
 };
 
 struct of_bsn_tlv_digest_alg : of_bsn_tlv {
