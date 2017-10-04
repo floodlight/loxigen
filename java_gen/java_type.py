@@ -292,6 +292,11 @@ u8_list =  JType('List<U8>') \
 u16 = JType('int', 'short') \
         .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
         .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+u16_list = JType('List<U16>', 'short[]') \
+        .op(read='ChannelUtils.readList(bb, $length, U16.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<U16>of()',
+            funnel='FunnelUtils.putList($name, sink)')
 u32 = JType('long', 'int') \
         .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
@@ -590,6 +595,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_packet_queue_t)' : packet_queue_list,
         'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
+        'list(of_uint16_t)' : u16_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
         'list(of_oxs_t)' : oxs_list,
@@ -779,6 +785,11 @@ exceptions = {
 
         'of_oxm_bsn_ifp_class_id' : { 'value' : class_id },
         'of_oxm_bsn_ifp_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+        
+        'of_oxm_conn_tracking_state' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_state_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_conn_tracking_zone' : { 'value' : u16obj },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,

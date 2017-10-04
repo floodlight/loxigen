@@ -306,6 +306,12 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_IFP_CLASS_ID =
             new MatchField<ClassId>("bsn_ifp_class_id", MatchFields.BSN_IFP_CLASS_ID);
+   
+    public final static MatchField<U32> CONN_TRACKING_STATE = 
+            new MatchField<U32>("conn_tracking_state", MatchFields.CONN_TRACKING_STATE);
+
+    public final static MatchField<U16> CONN_TRACKING_ZONE = 
+            new MatchField<U16>("conn_tracking_zone", MatchFields.CONN_TRACKING_ZONE);
 
     public String getName() {
         return name;

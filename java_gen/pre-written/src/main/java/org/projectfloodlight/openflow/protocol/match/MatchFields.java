@@ -77,4 +77,6 @@ public enum MatchFields {
     BSN_VFI,
     BSN_IP_FRAGMENTATION,
     BSN_IFP_CLASS_ID,
+    CONN_TRACKING_STATE,
+    CONN_TRACKING_ZONE,
 }
