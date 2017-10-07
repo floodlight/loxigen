@@ -318,6 +318,15 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<OFBitMask128> CONN_TRACKING_LABEL = 
             new MatchField<OFBitMask128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
+    
+    public final static MatchField<U8> CONN_TRACKING_NW_PROTO = 
+            new MatchField<U8>("conn_tracking_nw_proto", MatchFields.CONN_TRACKING_NW_PROTO);
+
+    public final static MatchField<U32> CONN_TRACKING_NW_SRC = 
+            new MatchField<U32>("conn_tracking_nw_src", MatchFields.CONN_TRACKING_NW_SRC);
+
+    public final static MatchField<U32> CONN_TRACKING_NW_DST =
+            new MatchField<U32>("conn_tracking_nw_dst", MatchFields.CONN_TRACKING_NW_DST);
 
     public String getName() {
         return name;
