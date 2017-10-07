@@ -316,6 +316,9 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U32> CONN_TRACKING_MARK = 
             new MatchField<U32>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
 
+    public final static MatchField<OFBitMask128> CONN_TRACKING_LABEL = 
+            new MatchField<OFBitMask128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
+
     public String getName() {
         return name;
     }

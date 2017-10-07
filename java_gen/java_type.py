@@ -793,6 +793,9 @@ exceptions = {
         
         'of_oxm_conn_tracking_mark' : { 'value' : u32obj },
         'of_oxm_conn_tracking_mark_masked' : { 'value' : u32obj, "value_mask" : u32obj },
+        
+        'of_oxm_conn_tracking_label' : { 'value' : port_bitmap_128 },
+        'of_oxm_conn_tracking_label_masked' : { 'value' : port_bitmap_128, 'value_mask' : port_bitmap_128 },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,

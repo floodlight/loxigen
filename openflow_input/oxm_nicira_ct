@@ -66,16 +66,16 @@ struct of_oxm_conn_tracking_mark_masked : of_oxm {
 
 
 // Nicira extension for Connection Traking Label (108)
-//struct of_oxm_conn_tracking_label : of_oxm {
-//	uint128_t type_len == 0x0001d810;
-//	uint128_t values;
-//};
+struct of_oxm_conn_tracking_label : of_oxm {
+	uint32_t type_len == 0x0001d810;
+	of_bitmap_128_t value;
+};
 
-//struct of_oxm_conn_tracking_label_masked : of_oxm {
-//	uint128_t type_len == 0x0001d920;
-//	uint128_t value;
-//    uint128_t value_mask;
-//};
+struct of_oxm_conn_tracking_label_masked : of_oxm {
+	uint32_t type_len == 0x0001d920;
+	of_bitmap_128_t value;
+    of_bitmap_128_t value_mask;
+};
 
 
 
