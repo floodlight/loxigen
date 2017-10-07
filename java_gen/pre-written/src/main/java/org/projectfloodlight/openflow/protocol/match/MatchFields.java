@@ -79,4 +79,5 @@ public enum MatchFields {
     BSN_IFP_CLASS_ID,
     CONN_TRACKING_STATE,
     CONN_TRACKING_ZONE,
+    CONN_TRACKING_MARK,
 }

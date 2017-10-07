@@ -312,6 +312,9 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<U16> CONN_TRACKING_ZONE = 
             new MatchField<U16>("conn_tracking_zone", MatchFields.CONN_TRACKING_ZONE);
+   
+    public final static MatchField<U32> CONN_TRACKING_MARK = 
+            new MatchField<U32>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
 
     public String getName() {
         return name;

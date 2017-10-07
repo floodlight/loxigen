@@ -45,7 +45,41 @@ struct of_oxm_conn_tracking_state_masked : of_oxm {
 };
 
 
-// Nicira extension Connection Trakcing Zone (106)
+// Nicira extension for Connection Trakcing Zone (106)
+struct of_oxm_conn_tracking_zone : of_oxm {
+	uint32_t type_len == 0x0001d402;
+	uint16_t value;
+};
+
+
+// Nicira extension for Connection Tracking Mark (107)
+struct of_oxm_conn_tracking_mark : of_oxm {
+	uint32_t type_len == 0x0001d604;
+	uint32_t value;
+};
+
+struct of_oxm_conn_tracking_mark_masked : of_oxm {
+	uint32_t type_len == 0x0001d708;
+	uint32_t value;
+	uint32_t value_mask;
+};
+
+
+// Nicira extension for Connection Traking Label (108)
+//struct of_oxm_conn_tracking_label : of_oxm {
+//	uint128_t type_len == 0x0001d810;
+//	uint128_t values;
+//};
+
+//struct of_oxm_conn_tracking_label_masked : of_oxm {
+//	uint128_t type_len == 0x0001d920;
+//	uint128_t value;
+//    uint128_t value_mask;
+//};
+
+
+
+
 
 
 
