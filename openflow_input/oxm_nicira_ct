@@ -74,18 +74,18 @@ struct of_oxm_conn_tracking_label : of_oxm {
 struct of_oxm_conn_tracking_label_masked : of_oxm {
 	uint32_t type_len == 0x0001d920;
 	of_bitmap_128_t value;
-    of_bitmap_128_t value_mask;
+  of_bitmap_128_t value_mask;
 };
 
 
-// Nicira extension for Connection Tracking Network Protocol
+// Nicira extension for Connection Tracking Network Protocol (119)
 struct of_oxm_conn_tracking_nw_proto : of_oxm {
 	uint32_t type_len == 0x0001ee01;
 	uint8_t value;
 };
 
 
-// Nicira extension for Connection Tracking Network Source Address
+// Nicira extension for Connection Tracking Network Source Address (120)
 struct of_oxm_conn_tracking_nw_src : of_oxm {
 	uint32_t type_len == 0x0001f004;
 	uint32_t value;
@@ -98,7 +98,7 @@ struct of_oxm_conn_tracking_nw_src_masked : of_oxm {
 };
 
 
-// Nicira extension for Connection Tracking Network Destination Address
+// Nicira extension for Connection Tracking Network Destination Address (121)
 struct of_oxm_conn_tracking_nw_dst : of_oxm {
 	uint32_t type_len == 0x0001f204;
 	uint32_t value;
@@ -111,6 +111,53 @@ struct of_oxm_conn_tracking_nw_dst_masked : of_oxm {
 };
 
 
+// Nicira extension for Connection Tracking IPv6 Source Address (122)
+struct of_oxm_conn_tracking_ipv6_src : of_oxm {
+  uint32_t type_len == 0x0001f410;
+  of_ipv6_t value;
+};
+
+struct of_oxm_conn_tracking_ipv6_src_masked : of_oxm {
+  uint32_t type_len == 0x0001f520;
+  of_ipv6_t value;
+  of_ipv6_t value_mask;
+};
 
 
+// Nicira extension for Connection Tracking IPv6 Destination Address (123)
+struct of_oxm_conn_tracking_ipv6_dst : of_oxm {
+  uint32_t type_len == 0x0001f610;
+  of_ipv6_t value;
+};
 
+struct of_oxm_conn_tracking_ipv6_dst_masked : of_oxm {
+  uint32_t type_len == 0x0001f720;
+  of_ipv6_t value;
+  of_ipv6_t value_mask;
+};
+
+
+// Nicira extension for Connection Tracking Transport Source Port (124)
+struct of_oxm_conn_tracking_tp_src : of_oxm {
+  uint32_t type_len == 0x0001f802;
+  uint16_t value;
+};
+
+struct of_oxm_conn_tracking_tp_src_masked : of_oxm {
+  uint32_t type_len == 0x0001f904;
+  uint16_t value;
+  uint16_t value_mask;
+};
+
+
+// Nicira extension for Connection Tracking Transport Destination Port (125)
+struct of_oxm_conn_tracking_tp_dst : of_oxm {
+  uint32_t type_len == 0x0001fa02;
+  uint16_t value;
+};
+
+struct of_oxm_conn_tracking_tp_dst_masked : of_oxm {
+  uint32_t type_len == 0x0001fb04;
+  uint16_t value;
+  uint16_t value_mask;
+};
