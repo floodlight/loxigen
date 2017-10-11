@@ -58,3 +58,19 @@ struct of_port_desc_prop_bsn_speed_capabilities : of_port_desc_prop_bsn {
                              * based on what is connected in the port */
     uint64_t supported;     /* All capabilities of port supported by HW platform */
 };
+
+enum ofp_bsn_misc_capabilities(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_MISC_CAP_FEC = 0x1,
+};
+
+struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t exp_type == 5;
+    uint64_t current;       /* Current miscellaneous capabilities of port */
+    uint64_t available;     /* Capabilities available for controller to choose
+                             * from based on what is connected in the port */
+    uint64_t supported;     /* All miscellaneous capabilities of port
+                             * supported by HW */
+};
