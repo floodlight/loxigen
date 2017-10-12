@@ -69,8 +69,9 @@ struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 5;
     uint64_t current;       /* Current miscellaneous capabilities of port */
-    uint64_t available;     /* Capabilities available for controller to choose
-                             * from based on what is connected in the port */
+    uint64_t available;     /* Capabilities available for controller to choose from
+                             * possibly based on what is plugged in the port.
+                             * This will be subset of supported capabilities. */
     uint64_t supported;     /* All miscellaneous capabilities of port
                              * supported by HW */
 };
