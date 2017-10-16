@@ -790,7 +790,8 @@ exceptions = {
         'of_oxm_conn_tracking_state_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
 
         'of_oxm_conn_tracking_zone' : { 'value' : u16obj },
-        
+        'of_oxm_conn_tracking_zone_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+
         'of_oxm_conn_tracking_mark' : { 'value' : u32obj },
         'of_oxm_conn_tracking_mark_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         
@@ -798,6 +799,7 @@ exceptions = {
         'of_oxm_conn_tracking_label_masked' : { 'value' : port_bitmap_128, 'value_mask' : port_bitmap_128 },
         
         'of_oxm_conn_tracking_nw_proto' : { 'value' : u8obj },
+        'of_oxm_conn_tracking_nw_proto_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
 
         'of_oxm_conn_tracking_nw_src' : { 'value' : u32obj },
         'of_oxm_conn_tracking_nw_src_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
