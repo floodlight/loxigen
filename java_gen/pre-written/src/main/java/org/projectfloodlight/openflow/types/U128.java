@@ -10,11 +10,15 @@ import com.google.common.primitives.UnsignedLongs;
 public class U128 implements OFValueType<U128>, HashValue<U128> {
 
     static final int LENGTH = 16;
+    private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
+    private static final long NO_MASK_VAL = 0xFFffFFffFFffFFffL;
 
     private final long raw1; // MSBs
     private final long raw2; // LSBs
 
     public static final U128 ZERO = new U128(0, 0);
+    public static final U128 NO_MASK = new U128(NO_MASK_VAL, NO_MASK_VAL);
+    public static final U128 FULL_MASK = ZERO;
 
     private U128(long raw1, long raw2) {
         this.raw1 = raw1;
@@ -24,6 +28,8 @@ public class U128 implements OFValueType<U128>, HashValue<U128> {
     public static U128 of(long raw1, long raw2) {
         if (raw1 == 0 && raw2 == 0)
             return ZERO;
+        if (raw1 == NO_MASK_VAL && raw2 == NO_MASK_VAL)
+            return NO_MASK;
         return new U128(raw1, raw2);
     }
 

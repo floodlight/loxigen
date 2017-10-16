@@ -25,6 +25,7 @@ import org.projectfloodlight.openflow.types.PacketType;
 import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U64;
+import org.projectfloodlight.openflow.types.U128;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
@@ -316,8 +317,8 @@ public class MatchField<F extends OFValueType<F>> {
     public final static MatchField<U32> CONN_TRACKING_MARK = 
             new MatchField<U32>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
 
-    public final static MatchField<OFBitMask128> CONN_TRACKING_LABEL = 
-            new MatchField<OFBitMask128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
+    public final static MatchField<U128> CONN_TRACKING_LABEL = 
+            new MatchField<U128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
     
     public final static MatchField<U8> CONN_TRACKING_NW_PROTO = 
             new MatchField<U8>("conn_tracking_nw_proto", MatchFields.CONN_TRACKING_NW_PROTO);

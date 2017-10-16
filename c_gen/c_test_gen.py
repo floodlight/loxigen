@@ -83,6 +83,7 @@ def var_name_map(m_type):
         uint16_t="val16",
         uint32_t="val32",
         uint64_t="val64",
+        uint128_t="val128",
         of_ipv4_t="ipv4",
         of_port_no_t="port_no",
         of_fm_cmd_t="fm_cmd",
@@ -118,7 +119,7 @@ def var_name_map(m_type):
 integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
                  "of_port_no_t", "of_fm_cmd_t", "of_wc_bmap_t",
                  "of_match_bmap_t", "of_ipv4_t"]
-string_types = [ "of_port_name_t", "of_table_name_t",
+string_types = [ "of_port_name_t", "of_table_name_t", "uint128_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                 "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
                 "of_str64_t", "of_bitmap_512_t"]

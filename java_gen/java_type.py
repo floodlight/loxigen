@@ -587,6 +587,7 @@ default_mtype_to_jtype_convert_map = {
         'uint16_t' : u16,
         'uint32_t' : u32,
         'uint64_t' : u64,
+        'uint128_t' : u128,
         'of_port_no_t' : of_port,
         'list(of_action_t)' : actions_list,
         'list(of_instruction_t)' : instructions_list,
@@ -795,8 +796,8 @@ exceptions = {
         'of_oxm_conn_tracking_mark' : { 'value' : u32obj },
         'of_oxm_conn_tracking_mark_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
         
-        'of_oxm_conn_tracking_label' : { 'value' : port_bitmap_128 },
-        'of_oxm_conn_tracking_label_masked' : { 'value' : port_bitmap_128, 'value_mask' : port_bitmap_128 },
+        'of_oxm_conn_tracking_label' : { 'value' : u128 },
+        'of_oxm_conn_tracking_label_masked' : { 'value' : u128, 'value_mask' : u128 },
         
         'of_oxm_conn_tracking_nw_proto' : { 'value' : u8obj },
         'of_oxm_conn_tracking_nw_proto_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
@@ -954,6 +955,7 @@ enum_wire_types = {
         "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
         "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
         "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+        "uint128_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
 }
 
 def convert_enum_wire_type_to_jtype(wire_type):
