@@ -1159,3 +1159,8 @@ struct of_bsn_tlv_routing_param : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_routing_param value;
 };
+
+struct of_bsn_tlv_push_vlan_on_egress : of_bsn_tlv {
+    uint16_t type == 162;
+    uint16_t length;
+};
