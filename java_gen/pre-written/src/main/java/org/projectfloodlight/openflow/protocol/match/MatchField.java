@@ -25,6 +25,7 @@ import org.projectfloodlight.openflow.types.PacketType;
 import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U64;
+import org.projectfloodlight.openflow.types.U128;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
 import org.projectfloodlight.openflow.types.VRF;
@@ -306,6 +307,44 @@ public class MatchField<F extends OFValueType<F>> {
 
     public final static MatchField<ClassId> BSN_IFP_CLASS_ID =
             new MatchField<ClassId>("bsn_ifp_class_id", MatchFields.BSN_IFP_CLASS_ID);
+   
+    public final static MatchField<U32> CONN_TRACKING_STATE = 
+            new MatchField<U32>("conn_tracking_state", MatchFields.CONN_TRACKING_STATE);
+
+    public final static MatchField<U16> CONN_TRACKING_ZONE = 
+            new MatchField<U16>("conn_tracking_zone", MatchFields.CONN_TRACKING_ZONE);
+   
+    public final static MatchField<U32> CONN_TRACKING_MARK = 
+            new MatchField<U32>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
+
+    public final static MatchField<U128> CONN_TRACKING_LABEL = 
+            new MatchField<U128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
+    
+    public final static MatchField<U8> CONN_TRACKING_NW_PROTO = 
+            new MatchField<U8>("conn_tracking_nw_proto", MatchFields.CONN_TRACKING_NW_PROTO);
+
+    public final static MatchField<U32> CONN_TRACKING_NW_SRC = 
+            new MatchField<U32>("conn_tracking_nw_src", MatchFields.CONN_TRACKING_NW_SRC);
+
+    public final static MatchField<U32> CONN_TRACKING_NW_DST =
+            new MatchField<U32>("conn_tracking_nw_dst", MatchFields.CONN_TRACKING_NW_DST);
+    
+    public final static MatchField<IPv6Address> CONN_TRACKING_IPV6_SRC =
+            new MatchField<IPv6Address>("conn_tracking_ipv6_src", MatchFields.CONN_TRACKING_IPV6_SRC,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+    
+    public final static MatchField<IPv6Address> CONN_TRACKING_IPV6_DST =
+            new MatchField<IPv6Address>("conn_tracking_ipv6_dst", MatchFields.CONN_TRACKING_IPV6_DST,
+                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+    
+    public final static MatchField<TransportPort> CONN_TRACKING_TP_SRC = 
+            new MatchField<TransportPort>("conn_tracking_tp_src", MatchFields.CONN_TRACKING_TP_SRC,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+    
+    public final static MatchField<TransportPort> CONN_TRACKING_TP_DST =
+            new MatchField<TransportPort>("conn_tracking_tp_dst", MatchFields.CONN_TRACKING_TP_DST,
+                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+
 
     public String getName() {
         return name;

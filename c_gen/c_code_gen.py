@@ -664,6 +664,11 @@ typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
 typedef char of_str64_t[64];
 
+typedef struct uint128_s {
+    uint64_t hi;
+    uint64_t lo;
+} uint128_t;
+
 typedef struct of_bitmap_128_s {
     uint64_t hi;
     uint64_t lo;

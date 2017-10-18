@@ -292,6 +292,11 @@ u8_list =  JType('List<U8>') \
 u16 = JType('int', 'short') \
         .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
         .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
+u16_list = JType('List<U16>', 'short[]') \
+        .op(read='ChannelUtils.readList(bb, $length, U16.READER)',
+            write='ChannelUtils.writeList(bb, $name)',
+            default='ImmutableList.<U16>of()',
+            funnel='FunnelUtils.putList($name, sink)')
 u32 = JType('long', 'int') \
         .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
@@ -582,6 +587,7 @@ default_mtype_to_jtype_convert_map = {
         'uint16_t' : u16,
         'uint32_t' : u32,
         'uint64_t' : u64,
+        'uint128_t' : u128,
         'of_port_no_t' : of_port,
         'list(of_action_t)' : actions_list,
         'list(of_instruction_t)' : instructions_list,
@@ -590,6 +596,7 @@ default_mtype_to_jtype_convert_map = {
         'list(of_packet_queue_t)' : packet_queue_list,
         'list(of_uint64_t)' : u64_list,
         'list(of_uint32_t)' : u32_list,
+        'list(of_uint16_t)' : u16_list,
         'list(of_uint8_t)' : u8_list,
         'list(of_oxm_t)' : oxm_list,
         'list(of_oxs_t)' : oxs_list,
@@ -779,6 +786,39 @@ exceptions = {
 
         'of_oxm_bsn_ifp_class_id' : { 'value' : class_id },
         'of_oxm_bsn_ifp_class_id_masked' : { 'value' : class_id, 'value_mask' : class_id },
+        
+        'of_oxm_conn_tracking_state' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_state_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_conn_tracking_zone' : { 'value' : u16obj },
+        'of_oxm_conn_tracking_zone_masked' : { 'value' : u16obj, 'value_mask' : u16obj },
+
+        'of_oxm_conn_tracking_mark' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_mark_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        
+        'of_oxm_conn_tracking_label' : { 'value' : u128 },
+        'of_oxm_conn_tracking_label_masked' : { 'value' : u128, 'value_mask' : u128 },
+        
+        'of_oxm_conn_tracking_nw_proto' : { 'value' : u8obj },
+        'of_oxm_conn_tracking_nw_proto_masked' : { 'value' : u8obj, 'value_mask' : u8obj },
+
+        'of_oxm_conn_tracking_nw_src' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_nw_src_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+
+        'of_oxm_conn_tracking_nw_dst' : { 'value' : u32obj },
+        'of_oxm_conn_tracking_nw_dst_masked' : { 'value' : u32obj, 'value_mask' : u32obj },
+        
+        'of_oxm_conn_tracking_ipv6_src' : { 'value' : ipv6 },
+        'of_oxm_conn_tracking_ipv6_src_masked' : { 'value' : ipv6, 'value_mask' : ipv6 },
+        
+        'of_oxm_conn_tracking_ipv6_dst' : { 'value' : ipv6 },
+        'of_oxm_conn_tracking_ipv6_dst_masked' : { 'value' : ipv6, 'value_mask' : ipv6 },
+
+        'of_oxm_conn_tracking_tp_src' : { 'value' : transport_port },
+        'of_oxm_conn_tracking_tp_src_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
+
+        'of_oxm_conn_tracking_tp_dst' : { 'value' : transport_port },
+        'of_oxm_conn_tracking_tp_dst_masked' : { 'value' : transport_port, 'value_mask' : transport_port },
 
         'of_table_stats_entry': { 'wildcards': table_stats_wildcards },
         'of_match_v1': { 'vlan_vid' : vlan_vid_match, 'vlan_pcp': vlan_pcp,
@@ -915,6 +955,7 @@ enum_wire_types = {
         "uint16_t": JType("short").op(read="bb.readShort()", write="bb.writeShort($name)"),
         "uint32_t": JType("int").op(read="bb.readInt()", write="bb.writeInt($name)"),
         "uint64_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
+        "uint128_t": JType("long").op(read="bb.readLong()", write="bb.writeLong($name)"),
 }
 
 def convert_enum_wire_type_to_jtype(wire_type):
