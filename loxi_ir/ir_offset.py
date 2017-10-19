@@ -111,6 +111,7 @@ of_base_lengths = dict(
     uint16_t = (2, True),
     uint32_t = (4, True),
     uint64_t = (8, True),
+    uint128_t = (16, True),
     of_mac_addr_t = (6, True),
     of_ipv4_t = (4, True),
     of_ipv6_t = (16, True),
