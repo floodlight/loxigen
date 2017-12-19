@@ -24,9 +24,16 @@ public class MacAddress implements OFValueType<MacAddress> {
     static final int MacAddrLen = 6;
     private final long rawValue;
 
-    private final static long NONE_VAL = 0x0L;
-    public static final MacAddress NONE = new MacAddress(NONE_VAL);
-
+    private final static long ZERO_VAL = 0x0L;
+    /**
+     * Zero value MacAddress constant.
+     *
+     * @deprecated use {@link #ZERO_VAL} instead
+     */
+    @Deprecated
+    public static final MacAddress NONE = new MacAddress(ZERO_VAL);
+    public static final MacAddress ZERO = new MacAddress(ZERO_VAL);
+	
     private final static long BROADCAST_VAL = 0x0000FFFFFFFFFFFFL;
     public static final MacAddress BROADCAST = new MacAddress(BROADCAST_VAL);
 
@@ -62,8 +69,8 @@ public class MacAddress implements OFValueType<MacAddress> {
 
     public static MacAddress of(long raw) {
         raw &= BROADCAST_VAL;
-        if(raw == NONE_VAL)
-            return NONE;
+        if(raw == ZERO_VAL)
+            return ZERO;
         if (raw == BROADCAST_VAL)
             return BROADCAST;
         return new MacAddress(raw);
