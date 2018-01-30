@@ -891,9 +891,16 @@ struct of_bsn_tlv_ipv6_dst : of_bsn_tlv {
     of_ipv6_t value;
 };
 
+enum ofp_bsn_push_vlan(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_PUSH_VLAN_UNTAGGED = 0x01,
+    OFP_BSN_PUSH_VLAN_SINGLE_TAGGED = 0x02,
+    OFP_BSN_PUSH_VLAN_DOUBLE_TAGGED = 0x04,
+};
+
 struct of_bsn_tlv_push_vlan_on_ingress : of_bsn_tlv {
     uint16_t type == 128;
     uint16_t length;
+    enum ofp_bsn_push_vlan flags;
 };
 
 // apply_packets and apply_bytes are stat counters, like rx_packet
