@@ -1171,3 +1171,8 @@ struct of_bsn_tlv_push_vlan_on_egress : of_bsn_tlv {
     uint16_t type == 162;
     uint16_t length;
 };
+
+struct of_bsn_tlv_flood : of_bsn_tlv {
+    uint16_t type == 163;
+    uint16_t length;
+};
