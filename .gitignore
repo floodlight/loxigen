@@ -14,3 +14,4 @@ openflowj-loxi
 /bin
 *,cover
 /.coverage
+*.iml
