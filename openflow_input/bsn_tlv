@@ -1176,3 +1176,14 @@ struct of_bsn_tlv_flood : of_bsn_tlv {
     uint16_t type == 163;
     uint16_t length;
 };
+
+enum ofp_bsn_upgrade(wire_type=uint16_t) {
+    OFP_BSN_UPGRADE_INVALID = 0,
+    OFP_BSN_UPGRADE_IN_PROGRESS = 1,
+};
+
+struct of_bsn_tlv_upgrade : of_bsn_tlv {
+    uint16_t type == 164;
+    uint16_t length;
+    enum ofp_bsn_upgrade value;
+};
