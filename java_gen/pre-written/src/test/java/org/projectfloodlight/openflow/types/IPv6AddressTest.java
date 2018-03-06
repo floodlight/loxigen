@@ -437,6 +437,91 @@ public class IPv6AddressTest {
     }
 
     @Test
+    public void testReservedIp() {
+        IPv6Address addr;
+        /* fec0::/10 Reserved by IETF [RFC3879]. Deprecated by
+         * [RFC3879] in September 2004. Formerly a Site-Local scoped
+         * address prefix
+         */
+        addr = IPv6Address.of("fec0::10");
+        assertTrue(addr.isReserved());
+        addr = IPv6Address.of("fe80::10");
+        assertFalse(addr.isReserved());
+
+        /* fe00::/9 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("fe00::10");
+        assertTrue(addr.isReserved());
+        addr = IPv6Address.of("ff00::10");
+        assertFalse(addr.isReserved());
+
+        /* 0000::/8 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("0000::10");
+        assertTrue(addr.isReserved());
+
+        /* 0100::/8 Reserved by IETF for Discard-Only Address Block
+         * [RFC6666]
+         */
+        addr = IPv6Address.of("0100::10");
+        assertTrue(addr.isReserved());
+
+        /* 0200::/7 Reserved by IETF. Deprecated as of December 2004
+         * [RFC4048]. Formerly an OSI NSAP-mapped prefix set
+         * [RFC4548].
+         */
+        addr = IPv6Address.of("0200::10");
+        assertTrue(addr.isReserved());
+
+        /* 0400::/6 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("0400::10");
+        assertTrue(addr.isReserved());
+
+        /* f800::/6 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("f800::10");
+        assertTrue(addr.isReserved());
+        addr = IPv6Address.of("fc00::10");
+        assertFalse(addr.isReserved());
+
+        /* 0800::/5 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("0800::10");
+        assertTrue(addr.isReserved());
+
+        /* f000::/5 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("f000::10");
+        assertTrue(addr.isReserved());
+
+        /* 1000::/4 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("1000::10");
+        assertTrue(addr.isReserved());
+
+        /* e000::/4 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("e000::10");
+        assertTrue(addr.isReserved());
+
+        /* 4000::/3 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("4000::10");
+        assertTrue(addr.isReserved());
+
+        /* 6000::/3 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("6000::10");
+        assertTrue(addr.isReserved());
+
+        /* 8000::/3 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("8000::10");
+        assertTrue(addr.isReserved());
+
+        /* a000::/3 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("a000::10");
+        assertTrue(addr.isReserved());
+
+        /* c000::/3 Reserved by IETF [RFC4291] */
+        addr = IPv6Address.of("c000::10");
+        assertTrue(addr.isReserved());
+
+        addr = IPv6Address.of("2000::10");
+        assertFalse(addr.isReserved());
+    }
+
+    @Test
     public void testZoneId() throws OFParseError {
         assertEquals("::", IPv6Address.of("::%eth0").toString(true, false));
         assertEquals("1:0:0:4::8", IPv6Address.of("1:0:0:4:0:0:0:8%2").toString(true, false));
