@@ -142,6 +142,90 @@ public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
         return (raw1 >>> 56) == 0xFFL;
     }
 
+    public boolean isReserved() {
+        long msb10 = raw1 >>> 54;
+        if ((msb10 << 2) == 0xFECL) {
+            /* fec0::/10 Reserved by IETF [RFC3879]. Deprecated by
+             * [RFC3879] in September 2004. Formerly a Site-Local scoped
+             * address prefix.
+             */
+            return true;
+        }
+        long msb9 = msb10 >>> 1;
+        if ((msb9 << 3) == 0xFE0L) {
+            /* fe00::/9 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        long msb8 = msb9 >>> 1;
+        if (msb8 == 0x0L) {
+            /* 0000::/8 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if (msb8 == 0x1L) {
+            /* 0100::/8 Reserved by IETF for Discard-Only Address Block
+             * [RFC6666]
+             */
+            return true;
+        }
+        long msb7 = msb8 >>> 1;
+        if ((msb7 << 1) == 0x2L) {
+            /* 0200::/7 Reserved by IETF. Deprecated as of December 2004
+             * [RFC4048]. Formerly an OSI NSAP-mapped prefix set
+             * [RFC4548].
+             */
+            return true;
+        }
+        long msb6 = msb7 >>> 1;
+        if ((msb6 << 2) == 0x4L) {
+            /* 0400::/6 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb6 << 2) == 0xF8L) {
+            /* f800::/6 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        long msb5 = msb6 >>> 1;
+        if ((msb5 << 3) == 0x8L) {
+            /* 0800::/5 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb5 << 3) == 0xF0L) {
+            /* f000::/5 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        long msb4 = msb5 >>> 1;
+        if ((msb4 << 4) == 0x10L) {
+            /* 1000::/4 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb4 << 4) == 0xE0L) {
+            /* e000::/4 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        long msb3 = msb4 >>> 1;
+        if ((msb3 << 5) == 0x40L) {
+            /* 4000::/3 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb3 << 5) == 0x60L) {
+            /* 6000::/3 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb3 << 5) == 0x80L) {
+            /* 8000::/3 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb3 << 5) == 0xA0L) {
+            /* a000::/3 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        if ((msb3 << 5) == 0xC0L) {
+            /* c000::/3 Reserved by IETF [RFC4291] */
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Returns the Modified EUI-64 format interface identifier that
      * corresponds to the specified MAC address.
