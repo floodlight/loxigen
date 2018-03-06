@@ -441,14 +441,18 @@ public class IPv6AddressTest {
         IPv6Address addr;
         /* fec0::/10 Reserved by IETF [RFC3879]. Deprecated by
          * [RFC3879] in September 2004. Formerly a Site-Local scoped
-         * address prefix.
+         * address prefix
          */
         addr = IPv6Address.of("fec0::10");
         assertTrue(addr.isReserved());
+        addr = IPv6Address.of("fe80::10");
+        assertFalse(addr.isReserved());
 
         /* fe00::/9 Reserved by IETF [RFC4291] */
         addr = IPv6Address.of("fe00::10");
         assertTrue(addr.isReserved());
+        addr = IPv6Address.of("ff00::10");
+        assertFalse(addr.isReserved());
 
         /* 0000::/8 Reserved by IETF [RFC4291] */
         addr = IPv6Address.of("0000::10");
@@ -474,6 +478,8 @@ public class IPv6AddressTest {
         /* f800::/6 Reserved by IETF [RFC4291] */
         addr = IPv6Address.of("f800::10");
         assertTrue(addr.isReserved());
+        addr = IPv6Address.of("fc00::10");
+        assertFalse(addr.isReserved());
 
         /* 0800::/5 Reserved by IETF [RFC4291] */
         addr = IPv6Address.of("0800::10");
