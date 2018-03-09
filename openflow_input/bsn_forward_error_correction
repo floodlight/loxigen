@@ -28,11 +28,17 @@
 #version 5
 #version 6
 
+enum ofp_bsn_fec_config_state(wire_type=uint16_t) {
+    OFP_BSN_FEC_CONFIG_STATE_UNSET = 0,
+    OFP_BSN_FEC_CONFIG_STATE_ENABLED = 1,
+    OFP_BSN_FEC_CONFIG_STATE_DISABLED = 2,
+};
+
 struct of_port_desc_prop_bsn_forward_error_correction : of_port_desc_prop_bsn {
     uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 2;
-    uint32_t configured;    /* non-zero if FEC is configured */
-    uint32_t enabled;       /* non-zero if FEC is enabled */
+    enum ofp_bsn_fec_config_state configured; /* non-zero if FEC is configured */
+    uint32_t enabled;                         /* non-zero if FEC is enabled */
 };
