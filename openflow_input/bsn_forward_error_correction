@@ -29,7 +29,7 @@
 #version 6
 
 enum ofp_bsn_fec_config_state(wire_type=uint16_t) {
-    OFP_BSN_FEC_CONFIG_STATE_DEFAULT = 0, /* no FEC CLI issued yet */
+    OFP_BSN_FEC_CONFIG_STATE_UNSET = 0,
     OFP_BSN_FEC_CONFIG_STATE_ENABLED = 1,
     OFP_BSN_FEC_CONFIG_STATE_DISABLED = 2,
 };
