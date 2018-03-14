@@ -10,7 +10,11 @@
 
     <groupId>org.projectfloodlight</groupId>
     <artifactId>openflowj</artifactId>
-    <version>3.5.0-SNAPSHOT</version>
+    <!-- uses maven CI friendly versions, https://maven.apache.org/maven-ci-friendly.html.
+         Note that this only works for a standalone POM as done here; otherwise you need plugins
+         resolve-parent-version-maven-plugin or flatten-maven-plugin (and both bring complexities).
+    -->
+    <version>3.5.${revision}</version>
     <packaging>jar</packaging>
 
     <name>OpenFlowJ-Loxi</name>
@@ -30,6 +34,7 @@
     </scm>
 
     <properties>
+        <release>0-SNAPSHOT</release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <logback.version>1.2.3</logback.version>
     </properties>
