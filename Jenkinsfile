@@ -15,7 +15,7 @@ def getMavenPatchVersion() {
 
 mavenPatchVersion=getMavenPatchVersion()
 artifact_repo="git@github.com:floodlight/loxigen-artifacts.git"
-artifact_base_branch=env.CHANGE_TARGET
+artifact_base_branch=env.CHANGE_TARGET ?: env.JOB_BASE_NAME
 artifact_target_branch= env.CHANGE_ID ? "${env.JOB_BASE_NAME}-b${env.BUILD_NUMBER}" : env.JOB_BASE_NAME
 
 pipeline {
