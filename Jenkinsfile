@@ -18,6 +18,16 @@ artifact_repo="git@github.com:floodlight/loxigen-artifacts.git"
 artifact_base_branch=env.CHANGE_TARGET ?: env.JOB_BASE_NAME
 artifact_target_branch= env.CHANGE_ID ? "${env.JOB_BASE_NAME}-b${env.BUILD_NUMBER}" : env.JOB_BASE_NAME
 
+@Library("github") _
+
+if(env.CHANGE_ID) {
+    withCredentials([string(
+                credentialsId: 'github-auth-token-bsn-abat',
+                variable: 'GITHUB_AUTH_TOKEN') ]) {
+        githubCheckOrgAuthz(env.CHANGE_URL, env.GITHUB_AUTH_TOKEN)
+    }
+}
+
 pipeline {
     agent { dockerfile { dir 'docker' } }
 
