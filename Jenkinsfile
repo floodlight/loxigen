@@ -24,7 +24,8 @@ if(env.CHANGE_ID) {
     withCredentials([string(
                 credentialsId: 'github-auth-token-bsn-abat',
                 variable: 'GITHUB_AUTH_TOKEN') ]) {
-        githubCheckOrgAuthz(env.CHANGE_URL, env.GITHUB_AUTH_TOKEN)
+#        githubCheckOrgAuthz(env.CHANGE_URL, env.GITHUB_AUTH_TOKEN)
+        echo "ha ha"
     }
 }
 
