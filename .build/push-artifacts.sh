@@ -54,6 +54,7 @@ fi
 
     if ! git diff-index --quiet HEAD --; then
         # if changes in the working dir
+        git status
         git add -A
 
         (
