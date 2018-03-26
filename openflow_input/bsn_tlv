@@ -1197,3 +1197,8 @@ struct of_bsn_tlv_fabric_port_role : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_fabric_port_role value;
 };
+
+struct of_bsn_tlv_user_configured : of_bsn_tlv {
+    uint16_t type == 166;
+    uint16_t length;
+};
