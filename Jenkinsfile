@@ -66,22 +66,29 @@ pipeline {
             }
         }
 
-        stage("Artifacts") {
+        stage("Generate Artifacts") {
             steps {
                 sshagent(['ssh_jenkins_master']) {
                     sh """
                         ./.build/push-artifacts.sh ${artifact_repo} ${artifact_base_branch} ${artifact_target_branch}
                     """
-                    withCredentials([string(
-                                credentialsId: 'github-auth-token-bsn-abat',
-                                variable: 'GITHUB_AUTH_TOKEN') ]) {
-                        sh """
-                            ./infrastructure/build/githubtool/gh.py comment "Find artifact changes from this pull request at https://github.com/floodlight/loxigen-artifacts/tree/${artifact_target_branch}"
+                }
+           }
+        }
+
+        stage("Artifact Link") {
+            when { branch 'PR-*' }
+            steps {
+                withCredentials([string(
+                            credentialsId: 'github-auth-token-bsn-abat',
+                            variable: 'GITHUB_AUTH_TOKEN') ]) {
+                    sh """
+                        ./infrastructure/build/githubtool/gh.py comment "Find artifact changes from this pull request at https://github.com/floodlight/loxigen-artifacts/tree/${artifact_target_branch}"
                         """
-                    }
                 }
             }
         }
+
         stage("Deploy OpenflowJ") {
             steps {
                 configFileProvider( [configFile(fileId: 'maven-settings-xml', variable: 'MAVEN_SETTINGS')]) {
