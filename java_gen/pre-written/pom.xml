@@ -267,6 +267,9 @@ i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <quiet>true</quiet>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
