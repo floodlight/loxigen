@@ -52,7 +52,7 @@ fi
     cd $ARTIFACT_REPO
     echo $last_loxi_log >loxi-revision
 
-    if ! git diff-index HEAD --; then
+    if ! git diff-index --exit-code HEAD --; then
         # if changes in the working dir
         git status
         git add -A
