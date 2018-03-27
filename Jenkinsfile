@@ -91,13 +91,17 @@ pipeline {
 
         stage("Deploy OpenflowJ") {
             steps {
+                withCredentials([file(credentialsId: 'maven-code-signing-key', variable: 'MAVEN_SIGNING_KEY_FILE')]) {
+                    sh """ gpg --fast-import <${MAVEN_SIGNING_KEY_FILE} """
+                }
                 configFileProvider( [configFile(fileId: 'maven-settings-xml', variable: 'MAVEN_SETTINGS')]) {
                     sh """
                         make clean java
                         cd loxi_output/openflowj
-                        mvn --batch-mode -s $MAVEN_SETTINGS -Prelease -Drevision=${mavenPatchVersion} package deploy
-                        """
+                        mvn --batch-mode -s $MAVEN_SETTINGS -Prelease -Psign -Drevision=${mavenPatchVersion} package deploy
+                    """
                 }
+                sh """ gpg --delete-secret-key build-admins@bigswitch.com """
             }
         }
     }
