@@ -91,16 +91,16 @@ eclipse-workspace:
 	cd ${OPENFLOWJ_ECLIPSE_WORKSPACE} && perl -pi -e 's{<classpathentry kind="src" path="[^"]*/java_gen/pre-written/src/}{<classpathentry kind="src" path="src/}' .classpath
 
 check-java: java
-	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn compile test-compile test
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn --batch-mode compile test-compile test
 
 package-java: java
-	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn package
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn --batch-mode package
 
 deploy-java: java
-	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn deploy
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn --batch-mode deploy
 
 install-java: java
-	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn install
+	cd ${OPENFLOWJ_OUTPUT_DIR} && mvn --batch-mode install
 
 wireshark: .loxi_ts.wireshark
 
