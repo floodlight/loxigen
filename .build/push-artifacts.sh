@@ -52,11 +52,11 @@ fi
     cd $ARTIFACT_REPO
     echo $last_loxi_log >loxi-revision
 
-    if ! git diff-index --exit-code HEAD --; then
-        # if changes in the working dir
-        git status
-        git add -A
+    # if changes in the working dir
+    git status
+    git add -A
 
+    if ! git diff-index --cached --exit-code HEAD --; then
         (
         echo "Artifacts from ${loxi_github_url} (Branch ${loxi_branch})"
         echo
