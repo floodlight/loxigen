@@ -27,11 +27,38 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+
     <scm>
         <connection>scm:git:git@github.com:floodlight/loxigen.git</connection>
         <developerConnection>scm:git:git@github.com:floodlight/loxigen.git</developerConnection>
         <url>git@github.com:floodlight/loxigen.git</url>
     </scm>
+
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>sonatype-nexus-staging</id>
+            <name>Nexus Release Repository</name>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <release>0-SNAPSHOT</release>
@@ -201,8 +228,8 @@
                                     <ciBuildNumber>${env.BUILD_NUMBER}</ciBuildNumber>
                                     <ciBuildId>${env.BUILD_ID}</ciBuildId>
                                     <ciBuildTag>${env.BUILD_TAG}</ciBuildTag>
-                                   <ciJobName>${env.JOB_NAME}</ciJobName>
-i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
+                                    <ciJobName>${env.JOB_NAME}</ciJobName>
+                                    <ciNodeName>${env.NODE_NAME}</ciNodeName>
                                 </manifestEntries>
                             </manifestSection>
                         </manifestSections>
@@ -210,22 +237,18 @@ i                                  <ciNodeName>${env.NODE_NAME}</ciNodeName>
                 </configuration>
             </plugin>
 
-            <!--
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.7</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <serverId>ossrh</serverId>
+                    <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
+                </configuration>
             </plugin>
-            -->
+
         </plugins>
         <resources>
             <resource>
