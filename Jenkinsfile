@@ -29,7 +29,12 @@ if(env.CHANGE_ID) {
 }
 
 pipeline {
-    agent { dockerfile { dir 'docker' } }
+    agent {
+        dockerfile {
+            dir 'docker'
+            args """--entrypoint ''"""
+        }
+    }
 
     stages {
         stage("Prepare") {
