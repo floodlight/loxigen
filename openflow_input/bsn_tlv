@@ -1205,3 +1205,9 @@ struct of_bsn_tlv_user_configured : of_bsn_tlv {
     uint16_t type == 166;
     uint16_t length;
 };
+
+struct of_bsn_tlv_uint32 : of_bsn_tlv {
+    uint16_t type == 167;
+    uint16_t length;
+    uint32_t value;
+};
