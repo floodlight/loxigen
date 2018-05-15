@@ -1218,6 +1218,7 @@ struct of_bsn_tlv_l3 : of_bsn_tlv {
 };
 
 enum ofp_bsn_ip_tunnel_type(wire_type=uint16_t) {
+    OFP_BSN_IP_TUNNEL_TYPE_NONE = 0,
     OFP_BSN_IP_TUNNEL_TYPE_PIM = 1,
 };
 
