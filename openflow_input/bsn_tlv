@@ -1211,3 +1211,18 @@ struct of_bsn_tlv_uint32 : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_l3 : of_bsn_tlv {
+    uint16_t type == 168;
+    uint16_t length;
+};
+
+enum ofp_bsn_ip_tunnel_type(wire_type=uint16_t) {
+    OFP_BSN_IP_TUNNEL_TYPE_PIM = 1,
+};
+
+struct of_bsn_tlv_ip_tunnel_type : of_bsn_tlv {
+    uint16_t type == 169;
+    uint16_t length;
+    enum ofp_bsn_ip_tunnel_type value;
+};
