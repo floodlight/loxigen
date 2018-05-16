@@ -149,6 +149,10 @@ embedded_structs = {
     'of_meter_features_t': 'ofp.meter_features',
     'of_bsn_vport_t': 'ofp.bsn_vport',
     'of_table_desc_t': 'ofp.table_desc',
+    'of_bsn_unit_t': 'ofp.bsn_unit',
+    'ofp_bsn_module_eeprom_transceiver_t': 'ofp.bsn_module_eeprom_transceiver',
+    'of_port_desc_prop_bsn_alarm_t': 'ofp.port_desc_prop_bsn_alarm',
+    'of_port_desc_prop_bsn_diag_t': 'ofp.port_desc_prop_bsn_diag',
     'of_stat_t': 'ofp.stat',
 }
 

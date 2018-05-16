@@ -108,6 +108,10 @@ def var_name_map(m_type):
         of_bitmap_128_t="bitmap_128",
         of_bitmap_512_t="bitmap_512",
         of_checksum_128_t="checksum_128",
+        of_bsn_unit_t="bsn_unit",
+        ofp_bsn_module_eeprom_transceiver_t="bsn_module_eeprom_transceiver",
+        of_port_desc_prop_bsn_alarm_t="port_desc_prop_bsn_alarm",
+        of_port_desc_prop_bsn_diag_t="port_desc_prop_bsn_diag",
         )
 
     if m_type.find("of_list_") == 0:

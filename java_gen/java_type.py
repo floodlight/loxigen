@@ -578,6 +578,22 @@ table_desc = JType('OFTableDesc') \
         .op(read='OFTableDescVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
+bsn_unit = JType('OFBsnUnit') \
+        .op(read='OFBsnUnitVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+bsn_module_eeprom_transceiver = JType('OFBsnModuleEepromTransceiver') \
+        .op(read='OFBsnModuleEepromTransceiverVer$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+port_desc_prop_bsn_alarm = JType('OFPortDescPropBsnAlarm') \
+        .op(read='OFPortDescPropBsnAlarm$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
+port_desc_prop_bsn_diag = JType('OFPortDescPropBsnDiag') \
+        .op(read='OFPortDescPropBsnDiag$version.READER.readFrom(bb)', \
+            write='$name.writeTo(bb)')
+
 controller_status_entry = JType('OFControllerStatusEntry') \
         .op(read='OFControllerStatusEntryVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
@@ -625,6 +641,10 @@ default_mtype_to_jtype_convert_map = {
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
+        'of_bsn_unit': bsn_unit,
+        'ofp_bsn_module_eeprom_transceiver_t': bsn_module_eeprom_transceiver,
+        'of_port_desc_prop_bsn_alarm_t': port_desc_prop_bsn_alarm,
+        'of_port_desc_prop_bsn_diag_t': port_desc_prop_bsn_diag,
         'of_controller_status_entry_t' : controller_status_entry,
         'of_time_t' : of_time,
         'of_header_t' : of_message,
