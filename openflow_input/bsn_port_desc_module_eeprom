@@ -36,7 +36,12 @@ enum ofp_bsn_unit_type(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_UNIT_S = 0x6,   /* seconds */
     OFP_BSN_UNIT_C = 0x7,   /* Celsius */
     OFP_BSN_UNIT_F = 0x8,    /* Farenheit */
-    OFP_BSN_UNIT_BD = 0x9    /* Baud */
+    OFP_BSN_UNIT_BD = 0x9,   /* Baud */
+    OFP_BSN_UNIT_MBD = 0xa,  /* Mega Baud */
+    OFP_BSN_UNIT_UA = 0xb,   /* Micro Ampere */
+    OFP_BSN_UNIT_UW = 0xc,   /* Micro Watt */
+    OFP_BSN_UNIT_MC = 0xd,   /* millidegree Celsius */
+    OFP_BSN_UNIT_MV = 0xe    /* Milli Volt */
 };
 
 struct of_bsn_unit {
@@ -67,7 +72,8 @@ enum ofp_bsn_module_eeprom_identifier(wire_type=uint8_t, bitmask=False) {
 enum ofp_bsn_module_eeprom_extended_identifier(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_NON_GBIC = 0x00,       /* GBIC not specified / not MOD_DEF compliant */
     OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_SFP = 0x04,       /* GBIC/SFP defined by 2-wire interface ID */
-    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_MOD_DEF = 0x07    /* GBIC compliant */
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_MOD_DEF = 0x07,   /* GBIC compliant */
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_UNKNOWN = 0x08         /* Unknown EXT Identifier */
 };
 
 enum ofp_bsn_module_eeprom_connector(wire_type=uint8_t, bitmask=False) {
