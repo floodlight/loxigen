@@ -29,96 +29,102 @@
 
 enum ofp_bsn_unit_type(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_UNIT_NONE = 0x0,
-    OFP_BSN_UNIT_AMP = 0x2,
-    OFP_BSN_UNIT_VOL = 0x3,
-    OFP_BSN_UNIT_KM = 0x4,
-    OFP_BSN_UNIT_M = 0x5,
-    OFP_BSN_UNIT_S = 0x6,
-    OFP_BSN_UNIT_C = 0x7,
-    OFP_BSN_UNIT_F = 0x8
+    OFP_BSN_UNIT_AMP = 0x2, /* Ampere */
+    OFP_BSN_UNIT_VOL = 0x3, /* Volt */
+    OFP_BSN_UNIT_KM = 0x4,  /* Km */
+    OFP_BSN_UNIT_M = 0x5,   /* m */
+    OFP_BSN_UNIT_S = 0x6,   /* seconds */
+    OFP_BSN_UNIT_C = 0x7,   /* Celsius */
+    OFP_BSN_UNIT_F = 0x8,    /* Farenheit */
+    OFP_BSN_UNIT_BD = 0x9,   /* Baud */
+    OFP_BSN_UNIT_MBD = 0xa,  /* Mega Baud */
+    OFP_BSN_UNIT_UA = 0xb,   /* Micro Ampere */
+    OFP_BSN_UNIT_UW = 0xc,   /* Micro Watt */
+    OFP_BSN_UNIT_MC = 0xd,   /* millidegree Celsius */
+    OFP_BSN_UNIT_MV = 0xe    /* Milli Volt */
 };
 
 struct of_bsn_unit {
     uint32_t value;
-    /* We could probably use an enum to convey the unit */
     enum ofp_bsn_unit_type unit;
 };
 
 enum ofp_bsn_module_eeprom_recv_signal_type(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_RECV_SIGNAL_OMA = 0x0,
-    OFP_BSN_MODULE_EEPROM_RECV_SIGNAL_AVG = 0x1
+    OFP_BSN_MODULE_EEPROM_RECV_SIGNAL_OMA = 0x0,    /* Receiver signal Optical Modulation Amplitude */
+    OFP_BSN_MODULE_EEPROM_RECV_SIGNAL_AVG = 0x1     /* Receiver signal average optical power */
 };
 
 enum ofp_bsn_module_eeprom_diag_type(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_DIAG_CURR = 0x0,
-    OFP_BSN_MODULE_EEPROM_DIAG_VOLT = 0x1,
-    OFP_BSN_MODULE_EEPROM_DIAG_TEMP = 0x2,
-    OFP_BSN_MODULE_EEPROM_DIAG_RECP = 0x3,
-    OFP_BSN_MODULE_EEPROM_DIAG_OUTP = 0x4
+    OFP_BSN_MODULE_EEPROM_DIAG_CURR = 0x0,  /* Diagnostics for Current flowing through module eeprom */
+    OFP_BSN_MODULE_EEPROM_DIAG_VOLT = 0x1,  /* Diagnostics for Voltage across module eeprom */
+    OFP_BSN_MODULE_EEPROM_DIAG_TEMP = 0x2,  /* Diagnostics for Temperature across module eeprom */
+    OFP_BSN_MODULE_EEPROM_DIAG_RECP = 0x3,  /* Diagnostics for Rx Power in module eeprom */
+    OFP_BSN_MODULE_EEPROM_DIAG_OUTP = 0x4   /* Diagnostics for Tx Power in module eeprom */
 };
 
 enum ofp_bsn_module_eeprom_identifier(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_MODULE_EEPROM_IDENTIFIER_NONE = 0x0,
-    OFP_BSN_MODULE_EEPROM_IDENTIFIER_GBIC = 0x1,
-    OFP_BSN_MODULE_EEPROM_IDENTIFIER_ONBOARD = 0x2,
-    OFP_BSN_MODULE_EEPROM_IDENTIFIER_SFP = 0x3
+    OFP_BSN_MODULE_EEPROM_IDENTIFIER_GBIC = 0x1,        /* GBIC */
+    OFP_BSN_MODULE_EEPROM_IDENTIFIER_ONBOARD = 0x2,     /* module soldered to motherboard */
+    OFP_BSN_MODULE_EEPROM_IDENTIFIER_SFP = 0x3          /* SFP */
 };
 
 enum ofp_bsn_module_eeprom_extended_identifier(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_NON_GBIC = 0x00,
-    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_SFP = 0x04,
-    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_MOD_DEF = 0x07
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_NON_GBIC = 0x00,       /* GBIC not specified / not MOD_DEF compliant */
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_SFP = 0x04,       /* GBIC/SFP defined by 2-wire interface ID */
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_GBIC_MOD_DEF = 0x07,   /* GBIC compliant */
+    OFP_BSN_MODULE_EEPROM_EXT_IDENTIFIER_UNKNOWN = 0x08         /* Unknown EXT Identifier */
 };
 
 enum ofp_bsn_module_eeprom_connector(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_MODULE_EEPROM_CONNECTOR_NONE = 0x00,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_SC = 0x01,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_1_COPPER = 0x02,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_2_COPPER = 0x03,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_BNC_TNC = 0x04,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_COAX = 0x05,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_FIBERE_JACK = 0x06,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_LC = 0x07,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_MT_RJ = 0x08,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_MU = 0x09,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_SG = 0x0a,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_OPTICAL_PIGTAIL = 0x0b,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_MPO_PARALLEL_OPTIC = 0x0c,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_HSSDC = 0x20,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_COPPER_PIGTAIL = 0x21,
-    OFP_BSN_MODULE_EEPROM_CONNECTOR_RJ45 = 0x22
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_SC = 0x01,                  /* SC */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_1_COPPER = 0x02,         /* Fibre Channel Style 1 copper */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_2_COPPER = 0x03,         /* Fibre Channel Style 2 copper */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_BNC_TNC = 0x04,             /* BNC/TNC */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_FC_COAX = 0x05,             /* Fibre Channel coaxial headers */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_FIBRE_JACK = 0x06,          /* FibreJack */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_LC = 0x07,                  /* LC */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_MT_RJ = 0x08,               /* MT-RJ */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_MU = 0x09,                  /* MU */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_SG = 0x0a,                  /* SG */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_OPTICAL_PIGTAIL = 0x0b,     /* Optical pigtail */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_MPO_PARALLEL_OPTIC = 0x0c,  /* MPO Parallel Optic */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_HSSDC = 0x20,               /* HSSDC II */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_COPPER_PIGTAIL = 0x21,      /* Copper pigtail */
+    OFP_BSN_MODULE_EEPROM_CONNECTOR_RJ45 = 0x22                 /* RJ45 */
 };
 
 enum ofp_bsn_module_eeprom_encoding(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_ENCODING_UNSPECIFIED = 0x00,
-    OFP_BSN_MODULE_EEPROM_ENCODING_8B_10B = 0x01,
-    OFP_BSN_MODULE_EEPROM_ENCODING_4B_5B = 0x02,
-    OFP_BSN_MODULE_EEPROM_ENCODING_NRZ = 0x03,
-    OFP_BSN_MODULE_EEPROM_ENCODING_MANCHESTER = 0x04,
-    OFP_BSN_MODULE_EEPROM_ENCODING_SONET_SCRAMBLED = 0x05,
-    OFP_BSN_MODULE_EEPROM_ENCODING_64B_66B = 0x06
+    OFP_BSN_MODULE_EEPROM_ENCODING_UNSPECIFIED = 0x00,      /* unspecified */
+    OFP_BSN_MODULE_EEPROM_ENCODING_8B_10B = 0x01,           /* 8B/10B */
+    OFP_BSN_MODULE_EEPROM_ENCODING_4B_5B = 0x02,            /* 4B/5B */
+    OFP_BSN_MODULE_EEPROM_ENCODING_NRZ = 0x03,              /* NRZ */
+    OFP_BSN_MODULE_EEPROM_ENCODING_MANCHESTER = 0x04,       /* Manchester */
+    OFP_BSN_MODULE_EEPROM_ENCODING_SONET_SCRAMBLED = 0x05,  /* SONET Scrambled */
+    OFP_BSN_MODULE_EEPROM_ENCODING_64B_66B = 0x06           /* 64B/66B */
 };
 
 enum ofp_bsn_module_eeprom_rate_identifier(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_UNSPECIFIED = 0x00,
-    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_4G_2G_1G_AS0_AS1 = 0x01,
-    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_RX_RATE_SELECT_ONLY = 0x02,
-    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_INDEPENDENT_RX_TX = 0x03,
-    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_TX_RATE_SELECT_ONLY = 0x04
+    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_UNSPECIFIED = 0x00,                   /* unspecified */
+    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_4G_2G_1G_AS0_AS1 = 0x01,              /* 4/2/1G Rate_Select & AS0/AS1 */
+    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_RX_RATE_SELECT_ONLY = 0x02,  /* 8/4/2G Rx Rate_Select only */
+    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_INDEPENDENT_RX_TX = 0x03,    /* 8/4/2G Independent Rx & Tx Rate_Select */
+    OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_TX_RATE_SELECT_ONLY = 0x04   /* 8/4/2G Tx Rate_Select only */
 };
 
 enum ofp_bsn_module_eeprom_cu_cmplnce(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_UNSPECIFIED = 0x00,
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_APP_E = 0x01,
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_LIMITING = 0x04
+    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_UNSPECIFIED = 0x00,       /* unspecified */
+    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_APP_E = 0x01,    /* SFF-8431 appendix E */
+    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_LIMITING = 0x04  /* SFF-8431 limiting */
 };
 
 enum ofp_bsn_module_eeprom_alarm_set(wire_type=uint8_t, bitmask=True) {
-    OFP_BSN_MODULE_EEPROM_ALARM_NOT_SET = 0x00,
-    OFP_BSN_MODULE_EEPROM_ALARM_HI_SET = 0x01,
-    OFP_BSN_MODULE_EEPROM_ALARM_LOW_SET = 0x02,
-    OFP_BSN_MODULE_EEPROM_ALARM_HI_WARN_SET = 0x04,
-    OFP_BSN_MODULE_EEPROM_ALARM_LOW_WARN_SET = 0x08,
+    OFP_BSN_MODULE_EEPROM_ALARM_NOT_SET = 0x00,         /* alarm not set for property */
+    OFP_BSN_MODULE_EEPROM_ALARM_HI_SET = 0x01,          /* high alarm set */
+    OFP_BSN_MODULE_EEPROM_ALARM_LOW_SET = 0x02,         /* low alarm set */
+    OFP_BSN_MODULE_EEPROM_ALARM_HI_WARN_SET = 0x04,     /* alarm set for high warning */
+    OFP_BSN_MODULE_EEPROM_ALARM_LOW_WARN_SET = 0x08,    /* alarm set for low warning */
 };
 
 struct of_port_desc_prop_bsn_alarm : of_port_desc_prop_bsn {
@@ -126,19 +132,17 @@ struct of_port_desc_prop_bsn_alarm : of_port_desc_prop_bsn {
     uint16_t    length;
     uint32_t    experimenter == 0x5c16c7;
     uint32_t    exp_type == 8;
-    enum ofp_bsn_module_eeprom_alarm_set alarm_set;
-    uint32_t high;
-    uint32_t high_warn;
-    uint32_t low;
-    uint32_t low_warn;
-    enum ofp_bsn_module_eeprom_diag_type alarm_type;
-    /* We could probably use an enum to convey the unit */
-    enum ofp_bsn_unit_type unit;
+    enum ofp_bsn_module_eeprom_alarm_set alarm_set; /* Track all alarms set for this property*/
+    uint32_t high;                                  /* Threshold for high */
+    uint32_t high_warn;                             /* Threshold for high warning */
+    uint32_t low;                                   /* Threshold for low */
+    uint32_t low_warn;                              /* Threshold for low warning */
+    enum ofp_bsn_module_eeprom_diag_type alarm_type;/* Diagnostic property for which the alarm is described */
+    enum ofp_bsn_unit_type unit;                    /* Unit for the high, low, high_warn and low_warn values */
 };
 
 struct ofp_bsn_module_eeprom_transceiver {
     uint64_t    codes; /* The codes are in 8 bytes */
-    //list(of_port_desc_prop_t) info;
 };
 
 struct of_port_desc_prop_bsn_diag : of_port_desc_prop_bsn {
@@ -146,74 +150,35 @@ struct of_port_desc_prop_bsn_diag : of_port_desc_prop_bsn {
     uint16_t    length;
     uint32_t    experimenter == 0x5c16c7;
     uint32_t    exp_type == 7;
-    uint32_t    laser_bias_curr;
-    uint32_t    laser_output_power;
+    of_bsn_unit_t    laser_bias_curr;
+    of_bsn_unit_t    laser_output_power;
     enum ofp_bsn_module_eeprom_recv_signal_type laser_receiver_power_type;
-    uint32_t    laser_receiver_power;
-    uint32_t    module_temp;
-    uint32_t    module_voltage;
+    of_bsn_unit_t    laser_receiver_power;
+    of_bsn_unit_t    module_temp;
+    of_bsn_unit_t    module_voltage;
 };
-/*
-struct ofp_bsn_module_eeprom_passive_cu_cmplnce {
-    uint16_t    type == 0xffff;
-    uint16_t    length;
-    uint32_t    experimenter == 0x5c16c7;
-    uint32_t    exp_type == 13;
-    enum ofp_bsn_module_eeprom_cu_cmplnce cmplnce;
-};
-
-struct ofp_bsn_module_eeprom_active_cu_cmplnce {
-    uint16_t    type == 0xffff;
-    uint16_t    length;
-    uint32_t    experimenter == 0x5c16c7;
-    uint32_t    exp_type == 12;
-    enum ofp_bsn_module_eeprom_cu_cmplnce cmplnce;
-};
-
-struct ofp_bsn_module_eeprom_laser {
-    uint16_t    type == 0xffff;
-    uint16_t    length;
-    uint32_t    experimenter == 0x5c16c7;
-    uint32_t    exp_type == 11;
-    // TODO: could use a type which specifies the uints
-    uint32_t wavelength;
-};
-
-struct of_port_desc_prop_bsn_ethtool_module_optics {
-    uint16_t    type == 0xffff;
-    uint16_t    length;
-    uint32_t    experimenter == 0x5c16c7;
-    uint32_t    exp_type == 10;
-    of_octets_t data;
-};
-*/
 
 struct of_port_desc_prop_bsn_ethtool : of_port_desc_prop_bsn {
     uint16_t    type == 0xffff;
     uint16_t    length;
     uint32_t    experimenter == 0x5c16c7;
     uint32_t    exp_type == 6;
-    uint16_t    key_length == length(compliance);
-    /* Available propertties */
+    /* Available properties from module eeprom */
     enum ofp_bsn_module_eeprom_identifier identifier;
     enum ofp_bsn_module_eeprom_extended_identifier extidentifier;
     enum ofp_bsn_module_eeprom_connector connector;
-    /* TODO: Transceiver */
-    //of_bsn_unit_t transdata;
     ofp_bsn_module_eeprom_transceiver_t transdata;
     enum ofp_bsn_module_eeprom_encoding encoding;
-    /* TODO: BR nominal could be sent with units*/
-    uint32_t    br_nominal;
-    enum ofp_bsn_module_eeprom_rate_identifier rateidentifier;
-    /* The following lengths could be represented as values with units */
-    uint32_t    length_SMF_KM;
-    uint32_t    length_SMF;
-    uint32_t    length_50_um;
-    uint32_t    length_625_um;
-    uint32_t    length_copper;
-    uint32_t    length_OM3;
 
-    //of_port_desc_prop_bsn_ethtool_module_compliance_t cmplnce;
+    of_bsn_unit_t    br_nominal;    /* stored in MBd */
+    enum ofp_bsn_module_eeprom_rate_identifier rateidentifier; /* Rate identifier */
+
+    of_bsn_unit_t    length_SMF_KM; /* Length of SMF cable in Km's */
+    of_bsn_unit_t    length_SMF;    /* Length of SMF cable in m */
+    of_bsn_unit_t    length_50_um;  /* Length of 50_um cable in m */
+    of_bsn_unit_t    length_625_um; /* Length of 625_um cable in m */
+    of_bsn_unit_t    length_copper; /* Length of copper cable in m */
+    of_bsn_unit_t    length_OM3;    /* Length of OM3 cable in m */
 
     uint64_t vendor_name_lo; /* Vendor name as ASCII */
     uint64_t vendor_name_hi; /* Vendor name as ASCII */
@@ -222,7 +187,6 @@ struct of_port_desc_prop_bsn_ethtool : of_port_desc_prop_bsn {
     uint64_t vendor_pn_hi; /* Vendor PN as ASCII */
     uint32_t vendor_rev; /* Vendor revision as ASCII */
 
-    //list(of_port_desc_prop_t) compliance;
     /* module eeprom can have opt diagnostics optionally */
     list(of_port_desc_prop_t) more_properties;
 };

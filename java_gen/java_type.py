@@ -641,7 +641,7 @@ default_mtype_to_jtype_convert_map = {
         'of_checksum_128_t': u128,
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
-        'of_bsn_unit': bsn_unit,
+        'of_bsn_unit_t': bsn_unit,
         'ofp_bsn_module_eeprom_transceiver_t': bsn_module_eeprom_transceiver,
         'of_port_desc_prop_bsn_alarm_t': port_desc_prop_bsn_alarm,
         'of_port_desc_prop_bsn_diag_t': port_desc_prop_bsn_diag,
