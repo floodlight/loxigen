@@ -663,6 +663,10 @@ typedef char of_table_name_t[OF_MAX_TABLE_NAME_LEN];
 typedef char of_desc_str_t[OF_DESC_STR_LEN];
 typedef char of_serial_num_t[OF_SERIAL_NUM_LEN];
 typedef char of_str64_t[64];
+typedef char of_str32_t[32];
+typedef char of_str16_t[16];
+typedef char of_str8_t[8];
+typedef char of_str4_t[4];
 
 typedef struct uint128_s {
     uint64_t hi;

@@ -94,6 +94,10 @@ def var_name_map(m_type):
         of_desc_str_t="desc_str",
         of_serial_num_t="ser_num",
         of_str64_t="str64",
+        of_str32_t="str32",
+        of_str16_t="str16",
+        of_str8_t="str8",
+        of_str4_t="str4",
         of_mac_addr_t="mac_addr",
         of_ipv6_t="ipv6",
         # Non-scalars; more TBD
@@ -109,7 +113,7 @@ def var_name_map(m_type):
         of_bitmap_512_t="bitmap_512",
         of_checksum_128_t="checksum_128",
         of_bsn_unit_t="bsn_unit",
-        ofp_bsn_module_eeprom_transceiver_t="bsn_module_eeprom_transceiver",
+        of_port_desc_prop_compliance_t="port_desc_prop_compliance",
         of_port_desc_prop_bsn_alarm_t="port_desc_prop_bsn_alarm",
         of_port_desc_prop_bsn_diag_t="port_desc_prop_bsn_diag",
         )
@@ -126,7 +130,8 @@ integer_types = ["uint8_t", "uint16_t", "uint32_t", "uint64_t",
 string_types = [ "of_port_name_t", "of_table_name_t", "uint128_t",
                 "of_desc_str_t", "of_serial_num_t", "of_mac_addr_t",
                 "of_ipv6_t", "of_bitmap_128_t", "of_checksum_128_t",
-                "of_str64_t", "of_bitmap_512_t"]
+                "of_str64_t", "of_str32_t", "of_str16_t", "of_str8_t",
+                "of_str4_t", "of_bitmap_512_t"]
 
 scalar_types = integer_types[:]
 scalar_types.extend(string_types)
