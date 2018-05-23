@@ -41,7 +41,8 @@ enum ofp_bsn_unit_type(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_UNIT_UA = 0xb,   /* Micro Ampere */
     OFP_BSN_UNIT_UW = 0xc,   /* Micro Watt */
     OFP_BSN_UNIT_MC = 0xd,   /* millidegree Celsius */
-    OFP_BSN_UNIT_MV = 0xe    /* Milli Volt */
+    OFP_BSN_UNIT_MV = 0xe,    /* Milli Volt */
+    OFP_BSN_UNIT_NM = 0xf    /* Nano m */
 };
 
 struct of_bsn_unit {
@@ -113,10 +114,16 @@ enum ofp_bsn_module_eeprom_rate_identifier(wire_type=uint8_t, bitmask=False) {
     OFP_BSN_MODULE_EEPROM_RATE_IDENTIFIER_8G_4G_2G_TX_RATE_SELECT_ONLY = 0x04   /* 8/4/2G Tx Rate_Select only */
 };
 
+enum ofp_bsn_module_eeprom_cmplnce_type(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_MODULE_EEPROM_COMPLIANCE_TYPE_UNSPECIFIED = 0x00,/* Unspecified Cu cmplnce. */
+    OFP_BSN_MODULE_EEPROM_COMPLIANCE_TYPE_CU_PASSIVE = 0x04, /* Passive Cu cmplnce. */
+    OFP_BSN_MODULE_EEPROM_COMPLIANCE_TYPE_CU_ACTIVE = 0x08,  /* Active Cu cmplnce. */ 
+};
+
 enum ofp_bsn_module_eeprom_cu_cmplnce(wire_type=uint8_t, bitmask=False) {
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_UNSPECIFIED = 0x00,       /* unspecified */
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_APP_E = 0x01,    /* SFF-8431 appendix E */
-    OFP_BSN_MODULE_EEPROM_CU_CMPLLNCE_SFF_8431_LIMITING = 0x04  /* SFF-8431 limiting */
+    OFP_BSN_MODULE_EEPROM_CU_COMPLIANCE_UNSPECIFIED = 0x00,       /* unspecified */
+    OFP_BSN_MODULE_EEPROM_CU_COMPLIANCE_SFF_8431_APP_E = 0x01,    /* SFF-8431 appendix E */
+    OFP_BSN_MODULE_EEPROM_CU_COMPLIANCE_SFF_8431_LIMITING = 0x04  /* SFF-8431 limiting */
 };
 
 enum ofp_bsn_module_eeprom_alarm_set(wire_type=uint8_t, bitmask=True) {
@@ -125,6 +132,12 @@ enum ofp_bsn_module_eeprom_alarm_set(wire_type=uint8_t, bitmask=True) {
     OFP_BSN_MODULE_EEPROM_ALARM_LOW_SET = 0x02,         /* low alarm set */
     OFP_BSN_MODULE_EEPROM_ALARM_HI_WARN_SET = 0x04,     /* alarm set for high warning */
     OFP_BSN_MODULE_EEPROM_ALARM_LOW_WARN_SET = 0x08,    /* alarm set for low warning */
+};
+
+struct of_port_desc_prop_compliance {
+    enum ofp_bsn_module_eeprom_cmplnce_type cmplnce_type;   /* Type of Copper Compliance */
+    enum ofp_bsn_module_eeprom_cu_cmplnce cu_cmplnce;               /* Type of Copper Compliance */
+    of_bsn_unit_t wavelength;                                       /* Wavelength if cu cmplce is not specified */
 };
 
 struct of_port_desc_prop_bsn_alarm : of_port_desc_prop_bsn {
@@ -139,10 +152,6 @@ struct of_port_desc_prop_bsn_alarm : of_port_desc_prop_bsn {
     uint32_t low_warn;                              /* Threshold for low warning */
     enum ofp_bsn_module_eeprom_diag_type alarm_type;/* Diagnostic property for which the alarm is described */
     enum ofp_bsn_unit_type unit;                    /* Unit for the high, low, high_warn and low_warn values */
-};
-
-struct ofp_bsn_module_eeprom_transceiver {
-    uint64_t    codes; /* The codes are in 8 bytes */
 };
 
 struct of_port_desc_prop_bsn_diag : of_port_desc_prop_bsn {
@@ -167,7 +176,7 @@ struct of_port_desc_prop_bsn_ethtool : of_port_desc_prop_bsn {
     enum ofp_bsn_module_eeprom_identifier identifier;
     enum ofp_bsn_module_eeprom_extended_identifier extidentifier;
     enum ofp_bsn_module_eeprom_connector connector;
-    ofp_bsn_module_eeprom_transceiver_t transdata;
+    of_str8_t transdata;            /* set of 8 bytes representing types of transceiver supported */
     enum ofp_bsn_module_eeprom_encoding encoding;
 
     of_bsn_unit_t    br_nominal;    /* stored in MBd */
@@ -180,13 +189,11 @@ struct of_port_desc_prop_bsn_ethtool : of_port_desc_prop_bsn {
     of_bsn_unit_t    length_copper; /* Length of copper cable in m */
     of_bsn_unit_t    length_OM3;    /* Length of OM3 cable in m */
 
-    uint64_t vendor_name_lo; /* Vendor name as ASCII */
-    uint64_t vendor_name_hi; /* Vendor name as ASCII */
-    uint32_t vendor_oui; /* a list of 3 bytes */
-    uint64_t vendor_pn_lo; /* Vendor PN as ASCII */
-    uint64_t vendor_pn_hi; /* Vendor PN as ASCII */
-    uint32_t vendor_rev; /* Vendor revision as ASCII */
-
+    of_str16_t  vendor_name;    /* vendor name */
+    of_str4_t vendor_oui;       /* a list of 3 bytes representing vendor oui*/
+    of_str16_t  vendor_pn;      /* vendor pn */
+    of_str4_t vendor_rev;       /* Vendor revision as ASCII */
+    of_port_desc_prop_compliance_t cmplnce;
     /* module eeprom can have opt diagnostics optionally */
     list(of_port_desc_prop_t) more_properties;
 };

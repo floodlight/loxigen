@@ -378,6 +378,10 @@ desc_str = gen_fixed_length_string_jtype(256)
 serial_num = gen_fixed_length_string_jtype(32)
 table_name = gen_fixed_length_string_jtype(32)
 str64 = gen_fixed_length_string_jtype(64)
+str32 = gen_fixed_length_string_jtype(32)
+str16 = gen_fixed_length_string_jtype(16)
+str8 = gen_fixed_length_string_jtype(8)
+str4 = gen_fixed_length_string_jtype(4)
 ipv4 = JType("IPv4Address") \
         .op(read="IPv4Address.read4Bytes(bb)", \
             write="$name.write4Bytes(bb)",
@@ -582,8 +586,8 @@ bsn_unit = JType('OFBsnUnit') \
         .op(read='OFBsnUnitVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
-bsn_module_eeprom_transceiver = JType('OFBsnModuleEepromTransceiver') \
-        .op(read='OFBsnModuleEepromTransceiverVer$version.READER.readFrom(bb)', \
+port_desc_prop_compliance = JType('OFPortDescPropCompliance') \
+        .op(read='OFPortDescPropComplianceVer$version.READER.readFrom(bb)', \
             write='$name.writeTo(bb)')
 
 port_desc_prop_bsn_alarm = JType('OFPortDescPropBsnAlarm') \
@@ -630,6 +634,10 @@ default_mtype_to_jtype_convert_map = {
         'of_port_name_t': port_name,
         'of_table_name_t': table_name,
         'of_str64_t': str64,
+        'of_str32_t': str32,
+        'of_str16_t': str16,
+        'of_str8_t': str8,
+        'of_str4_t': str4,
         'of_ipv4_t': ipv4,
         'of_ipv6_t': ipv6,
         'of_wc_bmap_t': flow_wildcards,
@@ -642,7 +650,7 @@ default_mtype_to_jtype_convert_map = {
         'of_bsn_vport_t': bsn_vport,
         'of_table_desc_t': table_desc,
         'of_bsn_unit_t': bsn_unit,
-        'ofp_bsn_module_eeprom_transceiver_t': bsn_module_eeprom_transceiver,
+        'of_port_desc_prop_compliance_t': port_desc_prop_compliance,
         'of_port_desc_prop_bsn_alarm_t': port_desc_prop_bsn_alarm,
         'of_port_desc_prop_bsn_diag_t': port_desc_prop_bsn_diag,
         'of_controller_status_entry_t' : controller_status_entry,

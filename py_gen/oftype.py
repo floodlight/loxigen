@@ -132,6 +132,10 @@ fixed_length_strings = {
     'of_serial_num_t': 32,
     'of_desc_str_t': 256,
     'of_str64_t': 64,
+    'of_str32_t': 32,
+    'of_str16_t': 16,
+    'of_str8_t': 8,
+    'of_str4_t': 4
 }
 
 for (cls, length) in fixed_length_strings.items():
@@ -150,7 +154,7 @@ embedded_structs = {
     'of_bsn_vport_t': 'ofp.bsn_vport',
     'of_table_desc_t': 'ofp.table_desc',
     'of_bsn_unit_t': 'ofp.bsn_unit',
-    'ofp_bsn_module_eeprom_transceiver_t': 'ofp.bsn_module_eeprom_transceiver',
+    'of_port_desc_prop_compliance_t': 'ofp.port_desc_prop_compliance',
     'of_port_desc_prop_bsn_alarm_t': 'ofp.port_desc_prop_bsn_alarm',
     'of_port_desc_prop_bsn_diag_t': 'ofp.port_desc_prop_bsn_diag',
     'of_stat_t': 'ofp.stat',

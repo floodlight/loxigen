@@ -821,6 +821,102 @@ _wbuf_octets_get(of_wire_buffer_t *wbuf, int offset, uint8_t *dst, int bytes) {
     _wbuf_octets_set(buf, offset, (uint8_t *)s, 64)
 
 /**
+ * Get a str32 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str32_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 32)
+
+/**
+ * Set a str32 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str32
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str32_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 32)
+
+/**
+ * Get a str16 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str16_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 16)
+
+/**
+ * Set a str16 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str16
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str16_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 16)
+
+/**
+ * Get a str8 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str8_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 8)
+
+/**
+ * Set a str8 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str8
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str8_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 8)
+
+/**
+ * Get a str4 string from a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s The string
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str4_get(buf, offset, s) \
+    _wbuf_octets_get(buf, offset, (uint8_t *)s, 4)
+
+/**
+ * Set a str4 string in a wire buffer
+ * @param wbuf The pointer to the wire buffer structure
+ * @param offset Offset in the wire buffer
+ * @param s Where to store the str4
+ *
+ * Uses the octets function.
+ */
+
+#define of_wire_buffer_str4_set(buf, offset, s) \
+    _wbuf_octets_set(buf, offset, (uint8_t *)s, 4)
+
+/**
  * Get an ipv6 address from a wire buffer
  * @param wbuf The pointer to the wire buffer structure
  * @param offset Offset in the wire buffer
