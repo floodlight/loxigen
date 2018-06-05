@@ -9,3 +9,11 @@ ofp.action.set_field(field=ofp.oxm.tcp_src(50))
 -- java
 OFOxms oxms = OFFactories.getFactory(OFVersion.OF_13).oxms();
 builder.setField(oxms.tcpSrc(TransportPort.of(50)))
+-- c
+obj = of_action_set_field_new(OF_VERSION_1_3);
+
+of_object_t *oxm = of_oxm_tcp_src_new(OF_VERSION_1_3);
+of_oxm_tcp_src_value_set(oxm, 50);
+
+of_action_set_field_field_set(obj, oxm);
+of_object_delete(oxm);
