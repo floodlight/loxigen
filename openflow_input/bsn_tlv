@@ -1249,3 +1249,54 @@ struct of_bsn_tlv_passive : of_bsn_tlv {
     uint16_t type == 172;
     uint16_t length;
 };
+
+struct of_bsn_tlv_identifier : of_bsn_tlv {
+    uint16_t type == 173;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_multiplier : of_bsn_tlv {
+    uint16_t type == 174;
+    uint16_t length;
+    uint32_t value;
+};
+
+enum ofp_bsn_encap(wire_type=uint8_t) {
+    OFP_BSN_ENCAP_UNUSED = 0,
+    OFP_BSN_ENCAP_IPV4_UDP = 1,
+    OFP_BSN_ENCAP_IPV6_UDP = 2,
+};
+
+struct of_bsn_tlv_encap : of_bsn_tlv {
+    uint16_t type == 175;
+    uint16_t length;
+    enum ofp_bsn_encap value;
+};
+
+enum ofp_bsn_bfd_endpoint(wire_type=uint8_t) {
+    OFP_BSN_BFD_UNUSED = 0,
+    OFP_BSN_BFD_MICRO = 1,
+    OFP_BSN_BFD_1_HOP = 2,
+    OFP_BSN_BFD_MULTI_HOP = 3,
+};
+
+struct of_bsn_tlv_bfd_endpoint : of_bsn_tlv {
+    uint16_t type == 176;
+    uint16_t length;
+    enum ofp_bsn_bfd_endpoint value;
+};
+
+enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
+    OFP_BSN_BFD_ENDPOINT_STATE_ADMINDOWN = 0,
+    OFP_BSN_BFD_ENDPOINT_STATE_DOWN = 1,
+    OFP_BSN_BFD_ENDPOINT_STATE_INIT = 2,
+    OFP_BSN_BFD_ENDPOINT_STATE_UP = 3,
+    OFP_BSN_BFD_ENDPOINT_SESSION_ERROR = 4,
+};
+
+struct of_bsn_tlv_bfd_state : of_bsn_tlv {
+    uint16_t type == 177;
+    uint16_t length;
+    enum ofp_bsn_bfd_endpoint_state value;
+};
