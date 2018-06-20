@@ -1250,35 +1250,41 @@ struct of_bsn_tlv_passive : of_bsn_tlv {
     uint16_t length;
 };
 
-struct of_bsn_tlv_bfd_endpoint_id : of_bsn_tlv {
+struct of_bsn_tlv_identifier : of_bsn_tlv {
     uint16_t type == 173;
     uint16_t length;
-    uint16_t value;
+    uint32_t value;
 };
 
-enum ofp_bsn_bfd_endpoint_type(wire_type=uint8_t) {
-    OFP_BSN_BFD_TYPE_UNUSED = 0,
-    OFP_BSN_BFD_TYPE_MICRO = 1,
-    OFP_BSN_BFD_TYPE_1_HOP = 2,
-    OFP_BSN_BFD_TYPE_MULTI_HOP = 3,
-};
-
-struct of_bsn_tlv_bfd_endpoint_type : of_bsn_tlv {
+struct of_bsn_tlv_multiplier : of_bsn_tlv {
     uint16_t type == 174;
     uint16_t length;
-    enum ofp_bsn_bfd_endpoint_type value;
+    uint8_t value;
 };
 
-enum ofp_bsn_bfd_encap_type(wire_type=uint8_t) {
-    OFP_BSN_BFD_ENCAP_TYPE_UNUSED = 0,
-    OFP_BSN_BFD_ENCAP_TYPE_V4_UDP = 1,
-    OFP_BSN_BFD_ENCAP_TYPE_V6_UDP = 2,
+enum ofp_bsn_encap(wire_type=uint8_t) {
+    OFP_BSN_ENCAP_UNUSED = 0,
+    OFP_BSN_ENCAP_IPV4_UDP = 1,
+    OFP_BSN_ENCAP_IPV6_UDP = 2,
 };
 
-struct of_bsn_tlv_bfd_encap_type : of_bsn_tlv {
+struct of_bsn_tlv_encap : of_bsn_tlv {
     uint16_t type == 175;
     uint16_t length;
-    enum ofp_bsn_bfd_encap_type value;
+    enum ofp_bsn_encap value;
+};
+
+enum ofp_bsn_bfd_endpoint(wire_type=uint8_t) {
+    OFP_BSN_BFD_UNUSED = 0,
+    OFP_BSN_BFD_MICRO = 1,
+    OFP_BSN_BFD_1_HOP = 2,
+    OFP_BSN_BFD_MULTI_HOP = 3,
+};
+
+struct of_bsn_tlv_bfd_endpoint : of_bsn_tlv {
+    uint16_t type == 176;
+    uint16_t length;
+    enum ofp_bsn_bfd_endpoint value;
 };
 
 enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
@@ -1286,90 +1292,11 @@ enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
     OFP_BSN_BFD_ENDPOINT_STATE_DOWN = 1,
     OFP_BSN_BFD_ENDPOINT_STATE_INIT = 2,
     OFP_BSN_BFD_ENDPOINT_STATE_UP = 3,
+    OFP_BSN_BFD_ENDPOINT_SESSION_ERROR = 4,
 };
 
-struct of_bsn_tlv_bfd_local_state : of_bsn_tlv {
-    uint16_t type == 176;
-    uint16_t length;
-    enum ofp_bsn_bfd_endpoint_state value;
-};
-
-struct of_bsn_tlv_bfd_remote_state : of_bsn_tlv {
+struct of_bsn_tlv_bfd_state : of_bsn_tlv {
     uint16_t type == 177;
     uint16_t length;
     enum ofp_bsn_bfd_endpoint_state value;
-};
-
-struct of_bsn_tlv_bfd_local_discriminator : of_bsn_tlv {
-    uint16_t type == 178;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_remote_discriminator : of_bsn_tlv {
-    uint16_t type == 179;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_local_min_tx_interval : of_bsn_tlv {
-    uint16_t type == 180;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_local_min_rx_interval : of_bsn_tlv {
-    uint16_t type == 181;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_local_min_echo_interval : of_bsn_tlv {
-    uint16_t type == 182;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_local_multiplier : of_bsn_tlv {
-    uint16_t type == 183;
-    uint16_t length;
-    uint8_t value;
-};
-
-struct of_bsn_tlv_bfd_remote_min_tx_interval : of_bsn_tlv {
-    uint16_t type == 184;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_remote_min_rx_interval : of_bsn_tlv {
-    uint16_t type == 185;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_remote_min_echo_interval : of_bsn_tlv {
-    uint16_t type == 186;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_bfd_remote_multiplier : of_bsn_tlv {
-    uint16_t type == 187;
-    uint16_t length;
-    uint8_t value;
-};
-
-enum ofp_bsn_bfd_endpoint_event(wire_type=uint16_t) {
-    OF_BSN_BFD_ENDPOINT_EVENT_UNUSED = 0,
-    OF_BSN_BFD_ENDPOINT_EVENT_STATE_DOWN = 1,
-    OF_BSN_BFD_ENDPOINT_EVENT_STATE_INIT = 2,
-    OF_BSN_BFD_ENDPOINT_EVENT_STATE_UP = 3,
-    OF_BSN_BFD_ENDPOINT_EVENT_SESSION_ERROR = 4,
-};
-
-struct of_bsn_tlv_bfd_endpoint_event : of_bsn_tlv {
-    uint16_t type == 188;
-    uint16_t length;
-    enum ofp_bsn_bfd_endpoint_event value;
 };
