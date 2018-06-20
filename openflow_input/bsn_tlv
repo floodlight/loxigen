@@ -1259,7 +1259,7 @@ struct of_bsn_tlv_identifier : of_bsn_tlv {
 struct of_bsn_tlv_multiplier : of_bsn_tlv {
     uint16_t type == 174;
     uint16_t length;
-    uint8_t value;
+    uint32_t value;
 };
 
 enum ofp_bsn_encap(wire_type=uint8_t) {
