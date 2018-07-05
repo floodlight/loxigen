@@ -1300,3 +1300,8 @@ struct of_bsn_tlv_bfd_state : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_bfd_endpoint_state value;
 };
+
+struct of_bsn_tlv_lr_all_enabled : of_bsn_tlv {
+    uint16_t type == 178;
+    uint16_t length;
+};
