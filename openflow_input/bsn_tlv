@@ -1305,3 +1305,23 @@ struct of_bsn_tlv_lr_all_enabled : of_bsn_tlv {
     uint16_t type == 178;
     uint16_t length;
 };
+
+enum ofp_bsn_port_mode(wire_type=uint16_t) {
+    OFP_BSN_PORT_MODE_NONE = 0,
+    OFP_BSN_PORT_MODE_4XX = 1,
+    OFP_BSN_PORT_MODE_4X1 = 2,
+    OFP_BSN_PORT_MODE_4X10 = 3,
+    OFP_BSN_PORT_MODE_4X25 = 4,
+    OFP_BSN_PORT_MODE_2X50 = 5,
+    OFP_BSN_PORT_MODE_1X1 = 6,
+    OFP_BSN_PORT_MODE_1X10 = 7,
+    OFP_BSN_PORT_MODE_1X25 = 8,
+    OFP_BSN_PORT_MODE_1X40 = 9,
+    OFP_BSN_PORT_MODE_1X100 = 10,
+};
+
+struct of_bsn_tlv_port_mode : of_bsn_tlv {
+    uint16_t type == 179;
+    uint16_t length;
+    enum ofp_bsn_port_mode value;
+};
