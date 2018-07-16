@@ -1325,3 +1325,13 @@ struct of_bsn_tlv_port_mode : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_port_mode value;
 };
+
+enum ofp_bsn_udf_mode(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_UDF_8X2_BYTES = 0x1,
+};
+
+struct of_bsn_tlv_udf_capability : of_bsn_tlv {
+    uint16_t type == 180;
+    uint16_t length;
+    enum ofp_bsn_udf_mode value;
+};
