@@ -1336,3 +1336,8 @@ struct of_bsn_tlv_udf_capability : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_udf_mode value;
 };
+
+struct of_bsn_tlv_pim_hello_flood : of_bsn_tlv {
+    uint16_t type == 181;
+    uint16_t length;
+};
