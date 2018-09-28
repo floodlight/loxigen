@@ -1193,10 +1193,6 @@ struct of_bsn_tlv_upgrade : of_bsn_tlv {
 
 enum ofp_bsn_fabric_port_role(wire_type=uint16_t) {
     OFP_BSN_FABRIC_PORT_ROLE_PARTITIONED_SPINE = 1,
-    OFP_BSN_FABRIC_PORT_ROLE_SPINE = 2,
-    OFP_BSN_FABRIC_PORT_ROLE_PEER = 3,
-    OFP_BSN_FABRIC_PORT_ROLE_EDGE = 4,
-    OFP_BSN_FABRIC_PORT_ROLE_CONTROLLER = 5,
 };
 
 struct of_bsn_tlv_fabric_port_role : of_bsn_tlv {
