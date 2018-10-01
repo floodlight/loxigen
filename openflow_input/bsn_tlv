@@ -1298,6 +1298,7 @@ enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
     OFP_BSN_BFD_ENDPOINT_STATE_UP = 3,
     OFP_BSN_BFD_ENDPOINT_SESSION_ERROR = 4,
     OFP_BSN_BFD_ENDPOINT_REMOTE_ADMINDOWN = 5,
+    OFP_BSN_BFD_ENDPOINT_REMOTE_PARAMS_CHANGE = 6,
 };
 
 struct of_bsn_tlv_bfd_state : of_bsn_tlv {
