@@ -1232,6 +1232,7 @@ enum ofp_bsn_multicast_packet(wire_type=uint16_t) {
     OFP_BSN_MULTICAST_PACKET_NONE = 0,
     OFP_BSN_MULTICAST_PACKET_PIM_HELLO = 1,
     OFP_BSN_MULTICAST_PACKET_PIM_JOIN_PRUNE = 2,
+    OFP_BSN_MULTICAST_PACKET_PIM_ASSERT = 3,
 };
 
 struct of_bsn_tlv_multicast_packet : of_bsn_tlv {
@@ -1293,6 +1294,8 @@ enum ofp_bsn_bfd_endpoint_state(wire_type=uint8_t) {
     OFP_BSN_BFD_ENDPOINT_STATE_INIT = 2,
     OFP_BSN_BFD_ENDPOINT_STATE_UP = 3,
     OFP_BSN_BFD_ENDPOINT_SESSION_ERROR = 4,
+    OFP_BSN_BFD_ENDPOINT_REMOTE_ADMINDOWN = 5,
+    OFP_BSN_BFD_ENDPOINT_PARAMS_CHANGE = 6,
 };
 
 struct of_bsn_tlv_bfd_state : of_bsn_tlv {
@@ -1334,4 +1337,9 @@ struct of_bsn_tlv_udf_capability : of_bsn_tlv {
     uint16_t type == 180;
     uint16_t length;
     enum ofp_bsn_udf_mode value;
+};
+
+struct of_bsn_tlv_pim_hello_flood : of_bsn_tlv {
+    uint16_t type == 181;
+    uint16_t length;
 };
