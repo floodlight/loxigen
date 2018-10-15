@@ -27,18 +27,10 @@
 #version 5
 #version 6
 
-struct of_port_desc_prop_bsn_driver_info : of_port_desc_prop_bsn {
+struct of_port_desc_prop_bsn_driver_info_json : of_port_desc_prop_bsn {
     uint16_t    type == 0xffff;
     uint16_t    length;
     uint32_t    experimenter == 0x5c16c7;
     uint32_t    exp_type == 7;
-    of_octets_t driver;
-};
-
-struct of_port_desc_prop_bsn_firmware_info : of_port_desc_prop_bsn {
-    uint16_t    type == 0xffff;
-    uint16_t    length;
-    uint32_t    experimenter == 0x5c16c7;
-    uint32_t    exp_type == 8;
-    of_octets_t firmware;
+    of_octets_t driver_info_json;
 };
