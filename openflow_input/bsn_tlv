@@ -1162,6 +1162,7 @@ enum ofp_bsn_routing_param(wire_type=uint16_t) {
     OFP_BSN_ROUTING_PARAM_IPV6_OSPF_UCAST = 4,
     OFP_BSN_ROUTING_PARAM_IPV6_OSPF_MCAST = 5,
     OFP_BSN_ROUTING_PARAM_IPV6_NDP_FRR = 6,
+    OFP_BSN_ROUTING_PARAM_BFD_AGENT = 7,
 };
 
 struct of_bsn_tlv_routing_param : of_bsn_tlv {
@@ -1342,4 +1343,20 @@ struct of_bsn_tlv_udf_capability : of_bsn_tlv {
 struct of_bsn_tlv_pim_hello_flood : of_bsn_tlv {
     uint16_t type == 181;
     uint16_t length;
+};
+
+struct of_bsn_tlv_bum_packet : of_bsn_tlv {
+    uint16_t type == 182;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flow_classify_enable : of_bsn_tlv {
+    uint16_t type == 183;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flow_class_id : of_bsn_tlv {
+    uint16_t type == 184;
+    uint16_t length;
+    uint16_t value;
 };
