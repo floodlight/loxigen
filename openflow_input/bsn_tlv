@@ -1357,5 +1357,5 @@ struct of_bsn_tlv_flow_classify_enable : of_bsn_tlv {
 struct of_bsn_tlv_flow_class_id : of_bsn_tlv {
     uint16_t type == 184;
     uint16_t length;
-    uint16_t value;
+    uint32_t value;
 };
