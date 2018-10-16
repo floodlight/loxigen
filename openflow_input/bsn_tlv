@@ -1343,3 +1343,33 @@ struct of_bsn_tlv_pim_hello_flood : of_bsn_tlv {
     uint16_t type == 181;
     uint16_t length;
 };
+
+struct of_bsn_tlv_flow_classify : of_bsn_tlv {
+    uint16_t type == 182;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_flow_identifier : of_bsn_tlv {
+    uint16_t type == 183;
+    uint16_t length;
+    uint32_t value;
+};
+
+enum ofp_bsn_flow_classifier(wire_type=uint16_t) {
+    OFP_BSN_FLOW_CLASSIFIER_NONE = 0,
+    OFP_BSN_FLOW_CLASSIFIER_L2BC = 1,
+    OFP_BSN_FLOW_CLASSIFIER_L2UC = 2,
+    OFP_BSN_FLOW_CLASSIFIER_L2UNKNOWN = 3,
+    OFP_BSN_FLOW_CLASSIFIER_L2MCKNOWN = 4,
+    OFP_BSN_FLOW_CLASSIFIER_L2MCUNKNOWN = 5,
+    OFP_BSN_FLOW_CLASSIFIER_L3MCUNKNOWN = 6,
+    OFP_BSN_FLOW_CLASSIFIER_L3MCKNOWN = 7,
+    OFP_BSN_FLOW_CLASSIFIER_L3UCKNOWN = 8,
+    OFP_BSN_FLOW_CLASSIFIER_L3UCUNKNOWN = 9,
+};
+   
+struct of_bsn_tlv_flow_classifier : of_bsn_tlv {
+    uint16_t type == 184;
+    uint16_t length;
+    enum ofp_bsn_flow_classifier value;
+};
