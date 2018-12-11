@@ -2671,7 +2671,5 @@ struct of_requestforward : of_header {
     uint8_t type == 32;
     uint16_t length;
     uint32_t xid;
-    uint32_t role;
-    // TODO support embedding of_header
-    of_octets_t data;
+    of_header_t request;
 };
