@@ -240,6 +240,16 @@ enum ofp_instruction_type(wire_type=uint16_t, bitmask=True) {
     OFPIT_EXPERIMENTER = 0xffff,
 };
 
+enum ofp_flow_monitor_flags (wire_type=uint16_t, bitmask=True){
+    OFPFMF_INITIAL = 0x1,
+    OFPFMF_ADD = 0x2,
+    OFPFMF_REMOVED = 0x4,
+    OFPFMF_MODIFY = 0x8,
+    OFPFMF_INSTRUCTIONS = 0x10,
+    OFPFMF_NO_ABBREV = 0x20,
+    OFPFMF_ONLY_OWN = 0x40,
+};
+
 enum ofp_flow_mod_command(wire_type=uint8_t) {
     OFPFC_ADD = 0,
     OFPFC_MODIFY = 1,
@@ -2128,6 +2138,62 @@ struct of_group_stats_reply : of_stats_reply {
     enum ofp_stats_reply_flags flags;
     pad(4);
     list(of_group_stats_entry_t) entries;
+};
+
+/* Flow monitor commands */
+enum ofp_flow_monitor_command(wire_type=uint8_t) {
+    OFPFMC_ADD = 0,
+    OFPFMC_MODIFY = 1,
+    OFPFMC_DELETE = 2,
+};
+
+struct of_flow_monitor_entry {
+    uint32_t monitor_id;
+    uint32_t out_port;
+    uint32_t out_group;
+    enum ofp_flow_monitor_flags flags;
+    uint8_t table_id;
+    enum ofp_flow_monitor_command command;
+    of_match_t match;
+};
+
+/* Body of OFPMP_FLOW_MONITOR request */
+struct of_flow_monitor_request : of_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 16;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    list(of_flow_monitor_entry_t) entries;
+};
+
+enum ofp_flow_update_event(wire_type=uint16_t) {
+    OFPFME_INITIAL = 0,
+    OFPFME_ADDED = 1,
+    OFPFME_REMOVED = 2,
+    OFPFME_MODIFIED = 3,
+    OFPFME_ABBREV = 4,
+    OFPFME_PAUSED = 5,
+    OFPFME_RESUMED = 6,
+};
+
+struct of_flow_monitor_reply_entry {
+    uint16_t length;
+    enum ofp_flow_update_event event == ?;
+};
+
+/* Body of OFPMP_FLOW_MONITOR reply */
+struct of_flow_monitor_reply : of_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 16;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    list(of_flow_monitor_reply_entry_t) entries;
 };
 
 struct of_group_desc_stats_request : of_stats_request {
