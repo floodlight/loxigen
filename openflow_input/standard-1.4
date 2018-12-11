@@ -2196,6 +2196,62 @@ struct of_flow_monitor_reply : of_stats_reply {
     list(of_flow_monitor_reply_entry_t) entries;
 };
 
+struct of_flow_update_full_initial : of_flow_monitor_reply_entry {
+    uint16_t length;
+    enum ofp_flow_update_event event == 0;
+    uint8_t table_id;
+    uint8_t reason;
+    uint16_t idle_timeout;
+    uint16_t hard_timeout;
+    uint16_t priority;
+    pad(4);
+    uint64_t cookie;
+    of_match_t match;
+    list(of_instruction_t) instructions;
+};
+
+struct of_flow_update_full_added : of_flow_monitor_reply_entry {
+    uint16_t length;
+    enum ofp_flow_update_event event == 1;
+    uint8_t table_id;
+    uint8_t reason;
+    uint16_t idle_timeout;
+    uint16_t hard_timeout;
+    uint16_t priority;
+    pad(4);
+    uint64_t cookie;
+    of_match_t match;
+    list(of_instruction_t) instructions;
+};
+
+struct of_flow_update_full_removed : of_flow_monitor_reply_entry {
+    uint16_t length;
+    enum ofp_flow_update_event event == 2;
+    uint8_t table_id;
+    uint8_t reason;
+    uint16_t idle_timeout;
+    uint16_t hard_timeout;
+    uint16_t priority;
+    pad(4);
+    uint64_t cookie;
+    of_match_t match;
+    list(of_instruction_t) instructions;
+};
+
+struct of_flow_update_full_modified : of_flow_monitor_reply_entry {
+    uint16_t length;
+    enum ofp_flow_update_event event == 3;
+    uint8_t table_id;
+    uint8_t reason;
+    uint16_t idle_timeout;
+    uint16_t hard_timeout;
+    uint16_t priority;
+    pad(4);
+    uint64_t cookie;
+    of_match_t match;
+    list(of_instruction_t) instructions;
+};
+
 struct of_group_desc_stats_request : of_stats_request {
     uint8_t version;
     uint8_t type == 18;
