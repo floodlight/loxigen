@@ -70,7 +70,7 @@ enum ofp_port(wire_type=uint32_t) {
     OFPP_ANY = 0xffffffff,
 };
 
-enum ofp_type(wire_type=uint8_t) {
+enum ofp_type(wire_type=uint8_t, complete=True) {
     OFPT_HELLO = 0,
     OFPT_ERROR = 1,
     OFPT_ECHO_REQUEST = 2,
