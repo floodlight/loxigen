@@ -22,14 +22,7 @@ struct of_oxm_actset_output_masked : of_oxm {
     of_port_no_t value_mask;
 };
 
-
 struct of_oxm_packet_type : of_oxm {
     uint32_t type_len == 0x80005804;
-    uint8_t value;
-};
-
-struct of_oxm_packet_type_masked : of_oxm {
-    uint32_t type_len == 0x80005908;
-    uint8_t value;
-    uint8_t value_mask;
+    enum ofp_packet_type value;
 };
