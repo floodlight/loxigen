@@ -257,7 +257,7 @@ enum ofp_group(wire_type=uint32_t, complete=False) {
     OFPG_ANY = 0xffffffff,
 };
 
-enum ofp_group_type(wire_type=uint8_t) {
+enum ofp_group_type(wire_type=uint8_t, complete=True) {
     OFPGT_ALL = 0,
     OFPGT_SELECT = 1,
     OFPGT_INDIRECT = 2,

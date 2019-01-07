@@ -244,7 +244,7 @@ enum ofp_group_mod_command(wire_type=uint16_t) {
     OFPGC_DELETE = 2,
 };
 
-enum ofp_group_type(wire_type=uint8_t) {
+enum ofp_group_type(wire_type=uint8_t, complete=True) {
     OFPGT_ALL = 0,
     OFPGT_SELECT = 1,
     OFPGT_INDIRECT = 2,
