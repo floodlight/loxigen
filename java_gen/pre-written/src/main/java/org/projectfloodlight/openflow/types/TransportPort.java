@@ -1,10 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Ints;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Represents L4 (Transport Layer) port (TCP, UDP, etc.)
@@ -20,7 +21,7 @@ public class TransportPort implements OFValueType<TransportPort> {
     private final static int NONE_VAL = 0;
     public final static TransportPort NONE = new TransportPort(NONE_VAL);
 
-    public static final TransportPort NO_MASK = new TransportPort(0xFFFFFFFF);
+    public static final TransportPort NO_MASK = new TransportPort(MAX_PORT);
     public static final TransportPort FULL_MASK = TransportPort.of(0x0);
 
     private final int port;
@@ -30,12 +31,13 @@ public class TransportPort implements OFValueType<TransportPort> {
     }
 
     public static TransportPort of(int port) {
-        if(port == NONE_VAL)
+        if (port == NONE_VAL)
             return NONE;
-        else if (port == NO_MASK.port)
+        else if ((port & NO_MASK.port) == NO_MASK.port)
             return NO_MASK;
         else if (port < MIN_PORT || port > MAX_PORT) {
-            throw new IllegalArgumentException("Illegal transport layer port number: " + port);
+            throw new IllegalArgumentException(
+                    "Illegal transport layer port number: " + port);
         }
         return new TransportPort(port);
     }
@@ -53,7 +55,7 @@ public class TransportPort implements OFValueType<TransportPort> {
     public boolean equals(Object obj) {
         if (!(obj instanceof TransportPort))
             return false;
-        TransportPort other = (TransportPort)obj;
+        TransportPort other = (TransportPort) obj;
         if (other.port != this.port)
             return false;
         return true;
@@ -87,7 +89,7 @@ public class TransportPort implements OFValueType<TransportPort> {
 
     @Override
     public int compareTo(TransportPort o) {
-        return Ints.compare(port,  o.port);
+        return Ints.compare(port, o.port);
     }
 
     @Override
