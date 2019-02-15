@@ -16,7 +16,29 @@ MAKE=${MAKE-make}
 
 ARTIFACT_REPO=$(mktemp -d --tmpdir "push-artifacts-repo.XXXXXXX")
 
-git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO} -b ${ARTIFACT_REPO_BRANCH}
+git clone ${ARTIFACT_REPO_URL} ${ARTIFACT_REPO}
+
+rv=0
+( cd $ARTIFACT_REPO; git checkout ${ARTIFACT_REPO_BRANCH} ) || rv=1
+
+if [[ $rv -gt 0 ]]; then
+    # all loxigen commit hashes written to this file
+    echo "Could not find current branch ${ARTIFACT_REPO_BRANCH} in loxigen-artifacts."
+    echo "Trying to find a matching commit to start a branch"
+    loxigen_commits=$(mktemp --tmpdir "loxigen-commits.XXXXXXX")
+    git rev-list HEAD >${loxigen_commits}
+    while true; do
+        last_loxi_revision=$(cat "${ARTIFACT_REPO}/loxi-revision" |  cut -d ' ' -f 1)
+        # check if last_loxigen_revision as of the current HEAD of loxigen-artifacts is any commit on this branch
+        if grep -q ${last_loxi_revision} ${loxigen_commits}; then
+            echo "Found a match at loxi revision ${last_loxi_revision} - will create branch there"
+            ( cd $ARTIFACT_REPO && git checkout -b ${ARTIFACT_REPO_BRANCH} )  # create branch at current head
+            break
+        else
+            ( cd $ARTIFACT_REPO && git checkout HEAD~ )
+        fi
+    done
+fi
 
 find ${ARTIFACT_REPO} -mindepth 1 -maxdepth 1 -type d \! -name '.*' -print0 | xargs -0 rm -r
 ${MAKE} LOXI_OUTPUT_DIR=${ARTIFACT_REPO} clean all
