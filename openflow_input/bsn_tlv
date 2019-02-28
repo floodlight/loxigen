@@ -1373,3 +1373,8 @@ struct of_bsn_tlv_flow_classifier : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_flow_classifier value;
 };
+
+struct of_bsn_tlv_disable_xmit : of_bsn_tlv {
+    uint16_t type == 185;
+    uint16_t length;
+};
