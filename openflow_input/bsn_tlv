@@ -1367,9 +1367,14 @@ enum ofp_bsn_flow_classifier(wire_type=uint16_t) {
     OFP_BSN_FLOW_CLASSIFIER_L3UCKNOWN = 8,
     OFP_BSN_FLOW_CLASSIFIER_L3UCUNKNOWN = 9,
 };
-   
+
 struct of_bsn_tlv_flow_classifier : of_bsn_tlv {
     uint16_t type == 184;
     uint16_t length;
     enum ofp_bsn_flow_classifier value;
+};
+
+struct of_bsn_tlv_preserve_vlan : of_bsn_tlv {
+    uint16_t type == 185;
+    uint16_t length;
 };
