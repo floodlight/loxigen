@@ -1383,3 +1383,8 @@ struct of_bsn_tlv_preserve_vlan : of_bsn_tlv {
     uint16_t type == 186;
     uint16_t length;
 };
+
+struct of_bsn_tlv_drop_control : of_bsn_tlv {
+    uint16_t type == 187;
+    uint16_t length;
+};
