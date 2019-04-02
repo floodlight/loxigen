@@ -1388,3 +1388,8 @@ struct of_bsn_tlv_drop_control : of_bsn_tlv {
     uint16_t type == 187;
     uint16_t length;
 };
+
+struct of_bsn_tlv_lossless : of_bsn_tlv {
+    uint16_t type == 188;
+    uint16_t length;
+};
