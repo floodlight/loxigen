@@ -1393,3 +1393,8 @@ struct of_bsn_tlv_lossless : of_bsn_tlv {
     uint16_t type == 188;
     uint16_t length;
 };
+
+struct of_bsn_tlv_redundant_mgmt : of_bsn_tlv {
+    uint16_t type == 189;
+    uint16_t length;
+};
