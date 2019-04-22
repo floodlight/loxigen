@@ -1398,3 +1398,8 @@ struct of_bsn_tlv_redundant_mgmt : of_bsn_tlv {
     uint16_t type == 189;
     uint16_t length;
 };
+
+struct of_bsn_tlv_dns_analytics : of_bsn_tlv {
+    uint16_t type == 190;
+    uint16_t length;
+};
