@@ -993,6 +993,7 @@ struct of_bsn_tlv_port_usage : of_bsn_tlv {
 
 enum ofp_bsn_tunnel_type(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_TUNNEL_L2GRE = 0x1,
+    OFP_BSN_TUNNEL_VXLAN = 0x2,
 };
 
 struct of_bsn_tlv_tunnel_capability : of_bsn_tlv {
