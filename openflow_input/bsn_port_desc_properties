@@ -75,3 +75,17 @@ struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
     uint64_t supported;     /* All miscellaneous capabilities of port
                              * supported by HW */
 };
+
+struct of_port_desc_prop_bsn_extended_capabilities : of_port_desc_prop_bsn {
+    uint16_t type == 0xffff;
+    uint16_t length;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t exp_type == 8;
+    uint8_t an_configurable;   /* AN Configurablity in HW */
+    uint8_t fec_configurable;  /* FEC Configurablity in HW */
+    uint8_t an_conflict;       /* AN Conflict with HW */
+    uint8_t fec_conflict;      /* FEC Conflict with HW */
+    uint64_t reserve1;         /* reserved for future */
+    uint64_t reserve2;         /* reserved for future */
+    uint64_t reserve3;         /* reserved for future */
+};
