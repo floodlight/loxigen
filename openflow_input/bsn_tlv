@@ -1404,3 +1404,16 @@ struct of_bsn_tlv_dns_analytics : of_bsn_tlv {
     uint16_t type == 190;
     uint16_t length;
 };
+
+enum ofp_bsn_cml(wire_type=uint16_t) {
+    OFP_BSN_CML_NONE = 0,
+    OFP_BSN_CML_CPU_DROP = 1,
+    OFP_BSN_CML_FORWARD = 2,
+    OFP_BSN_CML_CPU_FORWARD = 3,
+};
+
+struct of_bsn_tlv_src_mac_cml : of_bsn_tlv {
+    uint16_t type == 191;
+    uint16_t length;
+    enum ofp_bsn_cml value;
+};
