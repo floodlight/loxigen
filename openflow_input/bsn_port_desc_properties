@@ -76,16 +76,27 @@ struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
                              * supported by HW */
 };
 
+enum ofp_bsn_extended_capabilities_configurability(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_DEFAULT = 0x1,
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_ENABLED = 0x2,
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_DISABLED = 0x4,
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_DEFAULT = 0x8,
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_ENABLED = 0x10,
+    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_DISABLED = 0x20,
+};
+
+enum ofp_bsn_extended_capabilities_conflict(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_EXT_CAP_CONFLICT_AN = 0x1,
+    OFP_BSN_EXT_CAP_CONFLICT_FEC = 0x2,
+};
+
 struct of_port_desc_prop_bsn_extended_capabilities : of_port_desc_prop_bsn {
     uint16_t type == 0xffff;
     uint16_t length;
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 8;
-    uint8_t an_configurable;   /* AN Configurablity in HW */
-    uint8_t fec_configurable;  /* FEC Configurablity in HW */
-    uint8_t an_conflict;       /* AN Conflict with HW */
-    uint8_t fec_conflict;      /* FEC Conflict with HW */
-    uint64_t reserve1;         /* reserved for future */
-    uint64_t reserve2;         /* reserved for future */
-    uint64_t reserve3;         /* reserved for future */
+    uint64_t configurability;   /* Bitmap of ofp_bsn_extended_capabilities_configurability in HW */
+    uint64_t conflict;          /* Bitmap of ofp_bsn_extended_capabilities_conflict with HW state*/
+    uint64_t reserved1;         /* reserved for future */
+    uint64_t reserved2;         /* reserved for future */
 };
