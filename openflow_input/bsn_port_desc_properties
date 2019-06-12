@@ -86,8 +86,8 @@ struct of_port_desc_prop_bsn_extended_capabilities : of_port_desc_prop_bsn {
     uint16_t length;
     uint32_t experimenter == 0x5c16c7;
     uint32_t exp_type == 8;
-    uint64_t configurability;   /* Bitmap of ofp_bsn_extended_capabilities_configurability in HW */
-    uint64_t conflict;          /* Bitmap of ofp_bsn_extended_capabilities_conflict with HW state*/
+    uint64_t configurability;   /* Bitmap of ofp_bsn_extended_capabilities */
+    uint64_t conflict;          /* Bitmap of ofp_bsn_extended_capabilities */
     uint64_t reserved1;         /* reserved for future */
     uint64_t reserved2;         /* reserved for future */
 };
