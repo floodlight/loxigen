@@ -76,18 +76,9 @@ struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
                              * supported by HW */
 };
 
-enum ofp_bsn_extended_capabilities_configurability(wire_type=uint64_t, bitmask=True) {
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_DEFAULT = 0x1,
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_ENABLED = 0x2,
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_AN_DISABLED = 0x4,
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_DEFAULT = 0x8,
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_ENABLED = 0x10,
-    OFP_BSN_EXT_CAP_CONFIGURABILITY_FEC_DISABLED = 0x20,
-};
-
-enum ofp_bsn_extended_capabilities_conflict(wire_type=uint64_t, bitmask=True) {
-    OFP_BSN_EXT_CAP_CONFLICT_AN = 0x1,
-    OFP_BSN_EXT_CAP_CONFLICT_FEC = 0x2,
+enum ofp_bsn_extended_capabilities(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_EXT_CAP_AN = 0x1,
+    OFP_BSN_EXT_CAP_FEC = 0x2,
 };
 
 struct of_port_desc_prop_bsn_extended_capabilities : of_port_desc_prop_bsn {
