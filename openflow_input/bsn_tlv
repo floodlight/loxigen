@@ -1417,3 +1417,19 @@ struct of_bsn_tlv_src_mac_cml : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_cml value;
 };
+
+struct of_bsn_tlv_active : of_bsn_tlv {
+    uint16_t type == 192;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_link_up : of_bsn_tlv {
+    uint16_t type == 193;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_fail_count : of_bsn_tlv {
+    uint16_t type == 194;
+    uint16_t length;
+    uint64_t value;
+};
