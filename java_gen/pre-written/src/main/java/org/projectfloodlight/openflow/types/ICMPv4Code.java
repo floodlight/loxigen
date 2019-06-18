@@ -87,6 +87,11 @@ public class ICMPv4Code implements OFValueType<ICMPv4Code> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	writeByte(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putShort(code);
     }

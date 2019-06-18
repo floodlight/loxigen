@@ -27,7 +27,7 @@ import com.google.common.primitives.UnsignedLongs;
  *
  * @author Andreas Wundsam {@literal <}andreas.wundsam@teleteach.de{@literal >}
  */
-public class IPv6Address extends IPAddress<IPv6Address> implements Writeable {
+public class IPv6Address extends IPAddress<IPv6Address> {
     public static final int LENGTH = 16;
     private final long raw1;
     private final long raw2;

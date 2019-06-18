@@ -266,6 +266,11 @@ public class EthType implements OFValueType<EthType> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write2Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putInt(rawValue);
     }

@@ -191,6 +191,11 @@ public class OFBitMask512 implements OFValueType<OFBitMask512> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write64Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         sink.putLong(raw1);
         sink.putLong(raw2);

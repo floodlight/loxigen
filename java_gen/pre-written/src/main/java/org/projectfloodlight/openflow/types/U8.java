@@ -25,7 +25,7 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
 
-public class U8 implements Writeable, OFValueType<U8> {
+public class U8 implements OFValueType<U8> {
     private final static byte ZERO_VAL = 0;
     public final static U8 ZERO = new U8(ZERO_VAL);
 

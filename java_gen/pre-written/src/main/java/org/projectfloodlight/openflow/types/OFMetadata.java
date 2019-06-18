@@ -75,6 +75,11 @@ public class OFMetadata implements OFValueType<OFMetadata> {
     }
 
     @Override
+    public void writeTo(ByteBuf bb) {
+    	write8Bytes(bb);
+    }
+
+    @Override
     public void putTo(PrimitiveSink sink) {
         u64.putTo(sink);
     }

@@ -1,6 +1,8 @@
 package org.projectfloodlight.openflow.types;
 
 import java.util.Arrays;
+import io.netty.buffer.ByteBuf;
+import static io.netty.buffer.Unpooled.*;
 
 import org.junit.Test;
 
@@ -66,5 +68,18 @@ public class DatapathIdTest {
 
             assertThat(candidateDpid.equals(actualDpid), is(true));
         }
+    }
+    
+    @Test
+    public void testWriteTo() {
+        DatapathId dpid = DatapathId.of(testDpids[0]);
+        byte [] result = new byte[8];
+        ByteBuf bb = wrappedBuffer(result);
+        bb.setIndex(0,0);
+        dpid.writeTo(bb);
+        assertThat(bb.readableBytes(), is(8));
+        assertThat("result of writeTo() " + Arrays.toString(result)
+        			+ "(should be " + Arrays.toString(testDpids[0]) +")",
+        	result, is(testDpids[0]));
     }
 }

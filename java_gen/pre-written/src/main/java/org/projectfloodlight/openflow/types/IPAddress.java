@@ -4,6 +4,8 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 
+import io.netty.buffer.ByteBuf;
+
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Preconditions;
@@ -169,6 +171,9 @@ public abstract class IPAddress<F extends IPAddress<F>> implements OFValueType<F
 
     @Override
     public abstract int hashCode();
+
+    @Override
+    public abstract void writeTo(ByteBuf bb);
 
     /** parse an IPv4Address or IPv6Address from their conventional string representation.
      *  For details on supported representations,  refer to {@link IPv4Address#of(String)}
