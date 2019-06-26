@@ -81,7 +81,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //::   #endif
 //:: #endfor
 //:: for prop in msg.data_members:
-        this.${prop.name} = ${prop.name};
+        this.${prop.name} = ${prop.java_type.normalize_op(version, prop.name, pub_type=True)};
 //:: #endfor
     }
     //:: else:

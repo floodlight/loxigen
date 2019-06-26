@@ -17,13 +17,14 @@
 
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Ints;
+
+import io.netty.buffer.ByteBuf;
 
 public class U16 implements Writeable, OFValueType<U16> {
     private final static short ZERO_VAL = 0;
@@ -39,6 +40,10 @@ public class U16 implements Writeable, OFValueType<U16> {
 
     public static short t(final int l) {
         return (short) l;
+    }
+
+    public static int normalize(int value) {
+        return (short) (value & 0xFFFF);
     }
 
     private final short raw;
