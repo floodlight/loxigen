@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM ubuntu:18.04
 
 ADD etc/ssh/ssh_known_hosts /etc/ssh/ssh_known_hosts
 ADD etc/apt/apt.conf.d/02-proxy /etc/apt/apt.conf.available/02-proxy
