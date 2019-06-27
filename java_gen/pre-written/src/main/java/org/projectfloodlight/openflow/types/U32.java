@@ -26,7 +26,7 @@ import com.google.common.primitives.UnsignedInts;
 
 import io.netty.buffer.ByteBuf;
 
-public class U32 implements Writeable, OFValueType<U32> {
+public final class U32 implements Writeable, OFValueType<U32> {
     private final static int ZERO_VAL = 0;
     public final static U32 ZERO = new U32(ZERO_VAL);
 
