@@ -8,6 +8,7 @@ RUN apt-get update \
   && apt-get upgrade -y --no-install-recommends \
         build-essential \
         git \
+        gnupg \
         maven \
         openjdk-8-jdk \
         openssh-client \
