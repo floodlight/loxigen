@@ -74,15 +74,17 @@ def format_primitive_literal(t, value):
 ANY = 0xFFFFFFFFFFFFFFFF
 
 class VersionOp:
-    def __init__(self, version=ANY, read=None, write=None, default=None, funnel=None):
+    def __init__(self, version=ANY, read=None, write=None, default=None, funnel=None, normalize=None):
         self.version = version
         self.read = read
         self.write = write
         self.default = default
         self.funnel = funnel
+        self.normalize = normalize
 
     def __str__(self):
-        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s', Funnel: '%s' ]" % (self.version, self.read, self.write, self.default, self.funnel )
+        return "[Version: %d, Read: '%s', Write: '%s', Default: '%s', Funnel: '%s', Normalize: '%s' ]" % \
+            (self.version, self.read, self.write, self.default, self.funnel, self.normalize )
 
 ### FIXME: This class should really be cleaned up
 class JType(object):
@@ -102,7 +104,7 @@ class JType(object):
         self.priv_type = priv_type
         return self
 
-    def op(self, version=ANY, read=None, write=None, default=None, funnel=None, pub_type=ANY):
+    def op(self, version=ANY, read=None, write=None, default=None, funnel=None, normalize=None, pub_type=ANY):
         """
         define operations to be performed for reading and writing this type
         (when read_op, write_op is called). The operations 'read' and 'write'
@@ -118,7 +120,7 @@ class JType(object):
 
         pub_types = [ pub_type ] if pub_type is not ANY else [ False, True ]
         for pub_type in pub_types:
-            self.ops[(version, pub_type)] = VersionOp(version, read, write, default, funnel)
+            self.ops[(version, pub_type)] = VersionOp(version, read, write, default, funnel, normalize)
         return self
 
     def format_value(self, value, pub_type=True):
@@ -207,6 +209,16 @@ class JType(object):
             default_value = self.format_value(0) if self.is_primitive else "null"
         )
 
+    def normalize_op(self, version=None, name=None, pub_type=True):
+        """ return a Java stanza that returns a default value of this JType.
+        @param version JavaOFVersion
+        @return string containing generated Java expression.
+        """
+        return self.get_op("normalize", version, pub_type,
+            arguments = dict(name=name),
+            default_value = name
+        )
+
     def skip_op(self, version=None, length=None):
         """ return a java stanza that skips an instance of JType in the input ByteBuf 'bb'.
             This is used in the Reader implementations for virtual classes (because after the
@@ -281,7 +293,7 @@ def gen_fixed_length_string_jtype(length):
 # FIXME: This list needs to be pruned / cleaned up. Most of these are schematic.
 
 u8 =  JType('short', 'byte') \
-        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', pub_type=True) \
+        .op(read='U8.f(bb.readByte())', write='bb.writeByte(U8.t($name))', normalize="U8.normalize($name)", pub_type=True) \
         .op(read='bb.readByte()', write='bb.writeByte($name)', pub_type=False)
 u8_list =  JType('List<U8>') \
         .op(read='ChannelUtils.readList(bb, $length, U8.READER)',
@@ -290,7 +302,7 @@ u8_list =  JType('List<U8>') \
             funnel='FunnelUtils.putList($name, sink)'
            )
 u16 = JType('int', 'short') \
-        .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', pub_type=True) \
+        .op(read='U16.f(bb.readShort())', write='bb.writeShort(U16.t($name))', normalize="U16.normalize($name)", pub_type=True) \
         .op(read='bb.readShort()', write='bb.writeShort($name)', pub_type=False)
 u16_list = JType('List<U16>', 'short[]') \
         .op(read='ChannelUtils.readList(bb, $length, U16.READER)',
@@ -298,7 +310,7 @@ u16_list = JType('List<U16>', 'short[]') \
             default='ImmutableList.<U16>of()',
             funnel='FunnelUtils.putList($name, sink)')
 u32 = JType('long', 'int') \
-        .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', pub_type=True) \
+        .op(read='U32.f(bb.readInt())', write='bb.writeInt(U32.t($name))', normalize="U32.normalize($name)", pub_type=True) \
         .op(read='bb.readInt()', write='bb.writeInt($name)', pub_type=False)
 u32_list = JType('List<U32>', 'int[]') \
         .op(

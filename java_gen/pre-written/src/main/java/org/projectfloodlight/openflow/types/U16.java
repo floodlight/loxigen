@@ -17,7 +17,6 @@
 
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -25,7 +24,9 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Ints;
 
-public class U16 implements Writeable, OFValueType<U16> {
+import io.netty.buffer.ByteBuf;
+
+public final class U16 implements Writeable, OFValueType<U16> {
     private final static short ZERO_VAL = 0;
     public final static U16 ZERO = new U16(ZERO_VAL);
 
@@ -41,17 +42,21 @@ public class U16 implements Writeable, OFValueType<U16> {
         return (short) l;
     }
 
+    public static int normalize(int value) {
+        return (short) (value & 0xFFFF);
+    }
+
     private final short raw;
 
     private U16(short raw) {
         this.raw = raw;
     }
 
-    public static final U16 of(int value) {
+    public static U16 of(int value) {
         return ofRaw(t(value));
     }
 
-    public static final U16 ofRaw(short raw) {
+    public static U16 ofRaw(short raw) {
         if(raw == ZERO_VAL)
             return ZERO;
         return new U16(raw);

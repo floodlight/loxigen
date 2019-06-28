@@ -17,7 +17,6 @@
 
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -25,7 +24,9 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
 
-public class U8 implements Writeable, OFValueType<U8> {
+import io.netty.buffer.ByteBuf;
+
+public final class U8 implements Writeable, OFValueType<U8> {
     private final static byte ZERO_VAL = 0;
     public final static U8 ZERO = new U8(ZERO_VAL);
 
@@ -39,7 +40,7 @@ public class U8 implements Writeable, OFValueType<U8> {
         this.raw = raw;
     }
 
-    public static final U8 of(short value) {
+    public static U8 of(short value) {
         if(value == ZERO_VAL)
             return ZERO;
         if(value == NO_MASK_VAL)
@@ -48,8 +49,12 @@ public class U8 implements Writeable, OFValueType<U8> {
         return new U8(t(value));
     }
 
-    public static final U8 ofRaw(byte value) {
+    public static U8 ofRaw(byte value) {
         return new U8(value);
+    }
+
+    public static short normalize(short value) {
+        return (short) (value & 0xFF);
     }
 
     public short getValue() {

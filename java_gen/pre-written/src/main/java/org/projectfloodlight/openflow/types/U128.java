@@ -2,12 +2,12 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.Nonnull;
 
-import io.netty.buffer.ByteBuf;
-
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
-public class U128 implements OFValueType<U128>, HashValue<U128> {
+import io.netty.buffer.ByteBuf;
+
+public final class U128 implements OFValueType<U128>, HashValue<U128> {
 
     static final int LENGTH = 16;
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;

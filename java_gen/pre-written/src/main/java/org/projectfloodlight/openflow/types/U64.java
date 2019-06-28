@@ -19,7 +19,6 @@ package org.projectfloodlight.openflow.types;
 
 import java.math.BigInteger;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -27,7 +26,9 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
 
-public class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
+import io.netty.buffer.ByteBuf;
+
+public  final class U64 implements Writeable, OFValueType<U64>, HashValue<U64> {
     private static final long UNSIGNED_MASK = 0x7fffffffffffffffL;
     private final static long ZERO_VAL = 0;
     public final static U64 ZERO = new U64(ZERO_VAL);
