@@ -107,8 +107,7 @@ pipeline {
                     """
                 }
                 sh """
-                    export GPG_TTY=\$(tty)
-                    gpg --batch --delete-secret-key 'EF31 1B74 EE63 3982 2335  F1B2 68B8 8023 E9F9 33D3'
+                    gpg --no-tty --batch --delete-secret-key 'EF31 1B74 EE63 3982 2335  F1B2 68B8 8023 E9F9 33D3'
                 """
             }
         }
