@@ -43,7 +43,7 @@ public final class U16 implements Writeable, OFValueType<U16> {
     }
 
     public static int normalize(int value) {
-        return (short) (value & 0xFFFF);
+        return value & 0xFFFF;
     }
 
     private final short raw;
