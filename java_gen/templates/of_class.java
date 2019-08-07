@@ -46,9 +46,9 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
     final static int LENGTH = ${msg.length};
 //:: else:
     final static int MINIMUM_LENGTH = ${msg.min_length};
-//:: #endif
     // maximum OF message length: 16 bit, unsigned
     final static int MAXIMUM_LENGTH = 0xFFFF;
+//:: #endif
 
 //:: for prop in msg.data_members:
     //:: if prop.java_type.public_type != msg.interface.member_by_name(prop.name).java_type.public_type:
