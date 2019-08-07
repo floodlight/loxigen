@@ -47,6 +47,8 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
 //:: else:
     final static int MINIMUM_LENGTH = ${msg.min_length};
 //:: #endif
+    // maximum OF message length: 16 bit, unsigned
+    final static int MAXIMUM_LENGTH = 0xFFFF;
 
 //:: for prop in msg.data_members:
     //:: if prop.java_type.public_type != msg.interface.member_by_name(prop.name).java_type.public_type:
@@ -362,7 +364,11 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
             //:: if msg.align:
             int alignedLength = ((length + ${msg.align-1})/${msg.align} * ${msg.align});
             //:: #endif
-            bb.setShort(lengthIndex, ${"alignedLength" if msg.length_includes_align else "length"});
+            //:: length_var_name = "alignedLength" if msg.length_includes_align else "length"
+            if (${length_var_name} > MAXIMUM_LENGTH) {
+                throw new IllegalArgumentException("${msg.name}: message length (" + ${length_var_name} + ") exceeds maximum (0xFFFF)");
+            }
+            bb.setShort(lengthIndex, ${length_var_name});
             //:: if msg.align:
             // align message to ${msg.align} bytes
             bb.writeZero(alignedLength - length);
