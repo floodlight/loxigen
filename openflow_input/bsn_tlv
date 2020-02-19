@@ -1433,3 +1433,10 @@ struct of_bsn_tlv_fail_count : of_bsn_tlv {
     uint16_t length;
     uint64_t value;
 };
+
+struct of_bsn_tlv_egress_sampling_rate : of_bsn_tlv {
+    uint16_t type == 195;
+    uint16_t length;
+    uint32_t value; //Every 1/value egressing packets will be sampled;
+                    //0 indicates no sampling; 1 indicates sampling all packets
+};
