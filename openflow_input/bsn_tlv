@@ -1504,3 +1504,9 @@ struct of_bsn_tlv_icmpv6_code : of_bsn_tlv {
     uint16_t length;
     uint8_t value;
 };
+
+struct of_bsn_tlv_analytics : of_bsn_tlv {
+    uint16_t type == 207;
+    uint16_t length;
+};
+
