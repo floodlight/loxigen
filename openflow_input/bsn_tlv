@@ -1441,72 +1441,66 @@ struct of_bsn_tlv_egress_sampling_rate : of_bsn_tlv {
                     //0 indicates no sampling; 1 indicates sampling all packets
 };
 
-struct of_bsn_tlv_in_ports_512 : of_bsn_tlv {
-    uint16_t type == 196;
-    uint16_t length;
-    of_bitmap_512_t value;
-};
-
 struct of_bsn_tlv_l2_cache_hit : of_bsn_tlv {
-    uint16_t type == 197;
+    uint16_t type == 196;
     uint16_t length;
 };
 
 struct of_bsn_tlv_inner_vlan_vid : of_bsn_tlv {
-    uint16_t type == 198;
+    uint16_t type == 197;
     uint16_t length;
     uint16_t value;
 };
 
 struct of_bsn_tlv_arp_tpa : of_bsn_tlv {
-    uint16_t type == 199;
+    uint16_t type == 198;
     uint16_t length;
     of_ipv4_t value;
 };
 
 struct of_bsn_tlv_arp_spa : of_bsn_tlv {
-    uint16_t type == 200;
+    uint16_t type == 199;
     uint16_t length;
     of_ipv4_t value;
 };
 
 struct of_bsn_tlv_ifp_class_id : of_bsn_tlv {
-    uint16_t type == 201;
+    uint16_t type == 200;
     uint16_t length;
     uint32_t value;
 };
 
 struct of_bsn_tlv_ip_fragmentation : of_bsn_tlv {
-    uint16_t type == 202;
+    uint16_t type == 201;
     uint16_t length;
 };
 
 struct of_bsn_tlv_sctp_src : of_bsn_tlv {
-    uint16_t type == 203;
+    uint16_t type == 202;
     uint16_t length;
     uint16_t value;
 };
 
 struct of_bsn_tlv_sctp_dst : of_bsn_tlv {
-    uint16_t type == 204;
+    uint16_t type == 203;
     uint16_t length;
     uint16_t value;
 };
 
 struct of_bsn_tlv_icmpv6_type : of_bsn_tlv {
-    uint16_t type == 205;
+    uint16_t type == 204;
     uint16_t length;
     uint8_t value;
 };
 
 struct of_bsn_tlv_icmpv6_code : of_bsn_tlv {
-    uint16_t type == 206;
+    uint16_t type == 205;
     uint16_t length;
     uint8_t value;
 };
 
 struct of_bsn_tlv_analytics : of_bsn_tlv {
-    uint16_t type == 207;
+    uint16_t type == 206;
     uint16_t length;
 };
 
