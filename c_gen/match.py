@@ -191,7 +191,7 @@ def match_sanity_check():
             if key == "wildcards":
                 continue
             if not key in of_match_members:
-                print "Key %s not found in match struct, v %s" % (key, match_v)
+                print("Key %s not found in match struct, v %s" % (key, match_v))
                 sys.exit(1)
 
     # Generate list of OXM names from the unified classes

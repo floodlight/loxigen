@@ -37,7 +37,7 @@ from generic_utils import *
 UNDEFINED_IDENT_VALUE = 0
 
 def add_identifier(name, ofp_name, ofp_group, value, version, all_idents, idents_by_group):
-    assert(isinstance(value, (int,long)))
+    assert(isinstance(value, int))
     if name in all_idents:
         all_idents[name]["values_by_version"][version] = value
         if ((all_idents[name]["ofp_name"] != ofp_name or

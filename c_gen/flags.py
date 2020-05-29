@@ -35,7 +35,7 @@ them to OF versions.
 
 import sys
 import copy
-import type_maps
+from . import type_maps
 import c_gen.of_g_legacy as of_g
 import re
 

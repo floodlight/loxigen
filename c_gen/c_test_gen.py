@@ -66,7 +66,7 @@ from generic_utils import *
 import c_gen.type_maps as type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 import c_gen.identifiers as identifiers
-import util
+from . import util
 import test_data
 import loxi_globals
 from loxi_ir import *
