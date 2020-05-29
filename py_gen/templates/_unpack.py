@@ -33,14 +33,14 @@
 ::     if type(m) == OFPadMember:
         reader.skip(${m.length})
 ::     elif type(m) == OFLengthMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version, pyversion=pyversion)}
         orig_reader = reader
         reader = orig_reader.slice(_${m.name}, ${m.offset + m.length})
 ::     elif type(m) == OFFieldLengthMember:
 ::         field_length_members[m.field_name] = m
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version, pyversion=pyversion)}
 ::     elif type(m) == OFTypeMember:
-        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version)}
+        _${m.name} = ${gen_unpack_expr(m.oftype, 'reader', version=version, pyversion=pyversion)}
         assert(_${m.name} == ${m.value})
 ::     elif type(m) == OFDataMember or type(m) == OFDiscriminatorMember:
 ::         if m.name in field_length_members:
@@ -48,7 +48,7 @@
 ::         else:
 ::             reader_expr = 'reader'
 ::         #endif
-        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version)}
+        obj.${m.name} = ${gen_unpack_expr(m.oftype, reader_expr, version=version, pyversion=pyversion)}
 ::     #endif
 :: #endfor
 :: if ofclass.has_external_alignment:

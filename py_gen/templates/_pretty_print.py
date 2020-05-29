@@ -32,7 +32,12 @@
             with q.indent(2):
                 q.breakable()
 :: from loxi_ir import *
-:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember]
+:: normal_members = []
+:: for m in ofclass.members:
+::   if isinstance(m, OFDataMember):
+::     normal_members.append(m)
+::   #endif
+:: #endfor
 :: first = True
 :: for m in normal_members:
 :: if not first:

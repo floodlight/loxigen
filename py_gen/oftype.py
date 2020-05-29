@@ -31,7 +31,8 @@ import loxi_utils.loxi_utils as loxi_utils
 import py_gen.codegen
 import loxi_globals
 
-OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack"])
+OFTypeData = namedtuple("OFTypeData", ["init", "pack", "unpack",
+                                       "init3", "pack3", "unpack3"])
 
 # Map from LOXI type name to an object with templates for init, pack, and unpack
 # Most types are defined using the convenience code below. This dict should
@@ -40,87 +41,155 @@ type_data_map = {
     'char': OFTypeData(
         init='0',
         pack='struct.pack("!B", %s)',
-        unpack='%s.read("!B")[0]'),
+        unpack='%s.read("!B")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'uint8_t': OFTypeData(
         init='0',
         pack='struct.pack("!B", %s)',
-        unpack='%s.read("!B")[0]'),
+        unpack='%s.read("!B")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'uint16_t': OFTypeData(
         init='0',
         pack='struct.pack("!H", %s)',
-        unpack='%s.read("!H")[0]'),
+        unpack='%s.read("!H")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'uint32_t': OFTypeData(
         init='0',
         pack='struct.pack("!L", %s)',
-        unpack='%s.read("!L")[0]'),
+        unpack='%s.read("!L")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'uint64_t': OFTypeData(
         init='0',
         pack='struct.pack("!Q", %s)',
-        unpack='%s.read("!Q")[0]'),
+        unpack='%s.read("!Q")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_port_no_t': OFTypeData(
         init='0',
         pack='util.pack_port_no(%s)',
-        unpack='util.unpack_port_no(%s)'),
+        unpack='util.unpack_port_no(%s)',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_fm_cmd_t': OFTypeData(
         init='0',
         pack='util.pack_fm_cmd(%s)',
-        unpack='util.unpack_fm_cmd(%s)'),
+        unpack='util.unpack_fm_cmd(%s)',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_wc_bmap_t': OFTypeData(
         init='util.init_wc_bmap()',
         pack='util.pack_wc_bmap(%s)',
-        unpack='util.unpack_wc_bmap(%s)'),
+        unpack='util.unpack_wc_bmap(%s)',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_match_bmap_t': OFTypeData(
         init='util.init_match_bmap()',
         pack='util.pack_match_bmap(%s)',
-        unpack='util.unpack_match_bmap(%s)'),
+        unpack='util.unpack_match_bmap(%s)',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_ipv4_t': OFTypeData(
         init='0',
         pack='struct.pack("!L", %s)',
-        unpack='%s.read("!L")[0]'),
+        unpack='%s.read("!L")[0]',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_ipv6_t': OFTypeData(
         init="'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'",
         pack='struct.pack("!16s", %s)',
-        unpack="%s.read('!16s')[0]"),
+        unpack="%s.read('!16s')[0]",
+        init3="b'\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00\\x00'",
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_mac_addr_t': OFTypeData(
         init='[0,0,0,0,0,0]',
         pack='struct.pack("!6B", *%s)',
-        unpack="list(%s.read('!6B'))"),
+        unpack="list(%s.read('!6B'))",
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_octets_t': OFTypeData(
         init="''",
         pack='%s',
-        unpack='str(%s.read_all())'),
+        unpack='str(%s.read_all())',
+        init3="b''",
+        pack3=None,
+        unpack3='%s.read_all()',
+    ),
 
     'of_bitmap_128_t': OFTypeData(
         init='set()',
         pack='util.pack_bitmap_128(%s)',
-        unpack="util.unpack_bitmap_128(%s)"),
+        unpack="util.unpack_bitmap_128(%s)",
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_oxm_t': OFTypeData(
         init='None',
         pack='%s.pack()',
-        unpack='ofp.oxm.oxm.unpack(%s)'),
+        unpack='ofp.oxm.oxm.unpack(%s)',
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_checksum_128_t': OFTypeData(
         init='0',
         pack='util.pack_checksum_128(%s)',
-        unpack="util.unpack_checksum_128(%s)"),
+        unpack="util.unpack_checksum_128(%s)",
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 
     'of_bitmap_512_t': OFTypeData(
         init='set()',
         pack='util.pack_bitmap_512(%s)',
-        unpack="util.unpack_bitmap_512(%s)"),
+        unpack="util.unpack_bitmap_512(%s)",
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    ),
 }
 
 ## Fixed length strings
@@ -138,7 +207,10 @@ for (cls, length) in fixed_length_strings.items():
     type_data_map[cls] = OFTypeData(
         init='""',
         pack='struct.pack("!%ds", %%s)' % length,
-        unpack='%%s.read("!%ds")[0].rstrip("\\x00")' % length)
+        unpack='%%s.read("!%ds")[0].rstrip("\\x00")' % length,
+        init3=None,
+        pack3='struct.pack("!%ds", %%s.encode())' % length,
+        unpack3='%%s.read("!%ds")[0].decode().rstrip("\\x00")' % length)
 
 ## Embedded structs
 
@@ -160,7 +232,11 @@ for (cls, pyclass) in embedded_structs.items():
     type_data_map[cls] = OFTypeData(
         init='%s()' % pyclass,
         pack='%s.pack()',
-        unpack='%s.unpack(%%s)' % pyclass)
+        unpack='%s.unpack(%%s)' % pyclass,
+        init3=None,
+        pack3=None,
+        unpack3=None,
+    )
 
 ## Public interface
 
@@ -168,10 +244,15 @@ def lookup_type_data(oftype, version):
     return type_data_map.get(loxi_utils.lookup_ir_wiretype(oftype, version))
 
 # Return an initializer expression for the given oftype
-def gen_init_expr(oftype, version):
+def gen_init_expr(oftype, version, pyversion):
     type_data = lookup_type_data(oftype, version)
-    if type_data and type_data.init:
-        return type_data.init
+    if type_data:
+        if pyversion == 3:
+            return type_data.init3 or type_data.init or \
+                ("loxi.unimplemented('init %s')" % oftype)
+        else:
+            return type_data.init or \
+                ("loxi.unimplemented('init %s')" % oftype)
     elif oftype_is_list(oftype):
         return "[]"
     else:
@@ -181,10 +262,17 @@ def gen_init_expr(oftype, version):
 #
 # 'value_expr' is a string of Python code which will evaluate to
 # the value to be packed.
-def gen_pack_expr(oftype, value_expr, version):
+def gen_pack_expr(oftype, value_expr, version, pyversion):
     type_data = lookup_type_data(oftype, version)
-    if type_data and type_data.pack:
-        return type_data.pack % value_expr
+    if type_data:
+        if pyversion == 3:
+            fmt = type_data.pack3 or type_data.pack or None
+            return (fmt % value_expr) if fmt else \
+                ("loxi.unimplemented('pack %s')" % oftype)
+        else:
+            fmt = type_data.pack or None
+            return (fmt % value_expr) if fmt else \
+                ("loxi.unimplemented('pack %s')" % oftype)
     elif oftype_is_list(oftype):
         return "loxi.generic_util.pack_list(%s)" % value_expr
     else:
@@ -194,10 +282,17 @@ def gen_pack_expr(oftype, value_expr, version):
 #
 # 'reader_expr' is a string of Python code which will evaluate to
 # the OFReader instance used for deserialization.
-def gen_unpack_expr(oftype, reader_expr, version):
+def gen_unpack_expr(oftype, reader_expr, version, pyversion):
     type_data = lookup_type_data(oftype, version)
-    if type_data and type_data.unpack:
-        return type_data.unpack % reader_expr
+    if type_data:
+        if pyversion == 3:
+            fmt = type_data.unpack3 or type_data.unpack or None
+            return (fmt % reader_expr) if fmt else \
+                ("loxi.unimplemented('unpack %s')" % oftype)
+        else:
+            fmt = type_data.unpack or None
+            return (fmt % reader_expr) if fmt else \
+                ("loxi.unimplemented('unpack %s')" % oftype)
     elif oftype_is_list(oftype):
         ofproto = loxi_globals.ir[version]
         ofclass = ofproto.class_by_name(oftype_list_elem(oftype))
