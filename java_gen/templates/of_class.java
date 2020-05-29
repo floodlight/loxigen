@@ -425,7 +425,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return true;
     }
 
-    //:: if filter(lambda m: m.name == 'xid', msg.data_members):
+    //:: if list(filter(lambda m: m.name == 'xid', msg.data_members)):
     @Override
     public boolean equalsIgnoreXid(Object obj) {
         if (this == obj)
@@ -482,7 +482,7 @@ class ${impl_class} implements ${msg.interface.inherited_declaration()} {
         return result;
     }
 
-    //:: if filter(lambda m: m.name == 'xid', msg.data_members):
+    //:: if list(filter(lambda m: m.name == 'xid', msg.data_members)):
     @Override
     public int hashCodeIgnoreXid() {
         //:: if len(msg.data_members) > 0:

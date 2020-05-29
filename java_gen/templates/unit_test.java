@@ -52,7 +52,7 @@ public class ${test.name} {
     ${factory.name if factory.name is not None else "OFFactory"} factory;
 
     final static byte[] ${msg.constant_name}_SERIALIZED =
-        new byte[] { ${", ".join("%s0x%x" % (("" if ord(c)<128 else "(byte) "),  ord(c)) for c in test_data["binary"] ) } };
+        new byte[] { ${", ".join("%s0x%x" % (("" if byt<128 else "(byte) "), byt) for byt in test_data["binary"] ) } };
 
     @Before
     public void setup() {
