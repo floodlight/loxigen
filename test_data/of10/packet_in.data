@@ -16,6 +16,14 @@ ofp.message.packet_in(
     in_port=ofp.OFPP_LOCAL,
     reason=ofp.OFPR_ACTION,
     data='abc')
+-- python3
+ofp.message.packet_in(
+    xid=0x12345678,
+    buffer_id=0xabcdef01,
+    total_len=9,
+    in_port=ofp.OFPP_LOCAL,
+    reason=ofp.OFPR_ACTION,
+    data=b'abc')
 -- c
 obj = of_packet_in_new(OF_VERSION_1_0);
 of_packet_in_buffer_id_set(obj, 0xabcdef01);

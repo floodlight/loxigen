@@ -30,6 +30,19 @@ ofp.message.packet_in(
         ofp.oxm.arp_op(value=1)
         ]),
     data="abc")
+-- python3
+ofp.message.packet_in(
+    xid=0x12345678,
+    buffer_id=100,
+    total_len=17000,
+    reason=ofp.OFPR_ACTION,
+    table_id=20,
+    cookie=0xFEDCBA9876543210,
+    match=ofp.match(oxm_list=[
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
+        ofp.oxm.arp_op(value=1)
+        ]),
+    data=b"abc")
 -- java
 builder
    .setXid(0x12345678)

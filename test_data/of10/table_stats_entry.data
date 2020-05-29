@@ -19,6 +19,15 @@ ofp.table_stats_entry(
     active_count=2,
     lookup_count=1099511627775,
     matched_count=9300233470495232273L)
+-- python3
+ofp.table_stats_entry(
+    table_id=3,
+    name="foo",
+    wildcards=ofp.OFPFW_ALL,
+    max_entries=5,
+    active_count=2,
+    lookup_count=1099511627775,
+    matched_count=9300233470495232273)
 -- c
 obj = of_table_stats_entry_new(OF_VERSION_1_0);
 of_table_stats_entry_active_count_set(obj, 2);
