@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -39,10 +39,10 @@ class DataFileTests(unittest.TestCase):
     def test_example(self):
         self.assertTrue('./example.data' in test_data.list_files())
         data = test_data.read('example.data')
-        self.assertEquals(sorted(['section1', 'section2', 'binary']), sorted(data.keys()))
-        self.assertEquals(' abc def\nghi', data['section1'])
-        self.assertEquals('123\n456\n789', data['section2'])
-        self.assertEquals('\x00\x01\x02\x03\x04\x05\x06\x07\x77\x66\x55\x44\x33\x22\x11\x00',
+        self.assertEqual(sorted(['section1', 'section2', 'binary']), sorted(data.keys()))
+        self.assertEqual(' abc def\nghi', data['section1'])
+        self.assertEqual('123\n456\n789', data['section2'])
+        self.assertEqual(b'\x00\x01\x02\x03\x04\x05\x06\x07\x77\x66\x55\x44\x33\x22\x11\x00',
                           data['binary'])
 
     # Just make sure all included data files parse without exceptions

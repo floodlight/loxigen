@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -107,10 +107,10 @@ struct of_packet_queue {
                 ['pad', 2],
                 ['data', ['list', 'list(of_queue_prop_t)'], 'properties']]],
         ]
-        self.assertEquals(expected_ast, ast)
+        self.assertEqual(expected_ast, ast)
 
         ofinput = frontend.create_ofinput("standard-1.0", ast)
-        self.assertEquals(set([1, 2]), ofinput.wire_versions)
+        self.assertEqual(set([1, 2]), ofinput.wire_versions)
         expected_classes = [
             OFClass(name='of_echo_reply', superclass=None, members=[
                 OFDataMember('version', 'uint8_t'), # XXX
@@ -125,7 +125,7 @@ struct of_packet_queue {
                 OFPadMember(2),
                 OFDataMember('properties', 'list(of_queue_prop_t)')], virtual=False, params={}),
         ]
-        self.assertEquals(expected_classes, ofinput.classes)
+        self.assertEqual(expected_classes, ofinput.classes)
         expected_enums = [
             OFEnum(name='ofp_port_config', entries=[
                 OFEnumEntry('OFPPC_PORT_DOWN', 1, {}),
@@ -141,7 +141,7 @@ struct of_packet_queue {
                 OFEnumEntry('OFPQOFC_EPERM', 2, {})],
                 params={'wire_type': 'uint32', 'bitmask': 'False', 'complete': 'True'}),
         ]
-        self.assertEquals(expected_enums, ofinput.enums)
+        self.assertEqual(expected_enums, ofinput.enums)
 
     def test_inheritance(self):
         ast = parser.parse("""
@@ -178,7 +178,7 @@ struct of_queue_prop_min_rate : of_queue_prop {
                 ['data', ['scalar', 'uint16_t'], 'rate'],
                 ['pad', 6]]],
         ]
-        self.assertEquals(expected_ast, ast)
+        self.assertEqual(expected_ast, ast)
 
         ofinput = frontend.create_ofinput("standard-1.0", ast)
         expected_classes = [
@@ -193,7 +193,7 @@ struct of_queue_prop_min_rate : of_queue_prop {
                 OFDataMember('rate', 'uint16_t'),
                 OFPadMember(6)], virtual=False, params= {}),
         ]
-        self.assertEquals(expected_classes, ofinput.classes)
+        self.assertEqual(expected_classes, ofinput.classes)
 
     def test_field_length(self):
         ast = parser.parse("""
@@ -220,7 +220,7 @@ struct of_test {
                 ['field_length', ['scalar', 'uint16_t'], 'list_len', 'list'],
                 ['data', ['list', 'list(of_test_entry_t)'], 'list']]]
         ]
-        self.assertEquals(expected_ast, ast)
+        self.assertEqual(expected_ast, ast)
 
         ofinput = frontend.create_ofinput("standard-1.0", ast)
         expected_classes = [
@@ -232,7 +232,7 @@ struct of_test {
                     OFFieldLengthMember('list_len', 'uint16_t', 'list'),
                     OFDataMember('list', 'list(of_test_entry_t)')])
         ]
-        self.assertEquals(expected_classes, ofinput.classes)
+        self.assertEqual(expected_classes, ofinput.classes)
 
 if __name__ == '__main__':
     unittest.main()
