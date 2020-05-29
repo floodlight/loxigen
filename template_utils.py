@@ -82,7 +82,7 @@ def open_output(install_dir, name):
 
     'name' may include slashes. Subdirectories will be automatically created.
     """
-    print "Writing %s" % name
+    print(("Writing %s to %s" % (name, install_dir)))
     path = os.path.join(install_dir, name)
     dirpath = os.path.dirname(path)
     if not os.path.exists(dirpath):
