@@ -30,7 +30,7 @@
 :: include('_autogen.py')
 
 import const
-:: for module in modules:
+:: for module in sorted(modules):
 import ${module}
 :: #endfor
 from const import *

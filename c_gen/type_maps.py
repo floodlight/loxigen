@@ -66,7 +66,7 @@ def sub_class_map(base_type, version):
     if base_type not in inheritance_map:
         return rv
 
-    for subcls in inheritance_map[base_type]:
+    for subcls in sorted(inheritance_map[base_type]):
         if not loxi_utils.class_in_version(subcls, version):
             continue
         instance = loxi_utils.class_to_instance(subcls, base_type)

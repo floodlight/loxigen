@@ -99,7 +99,7 @@ def base_h_gen(out, name):
  ****************************************************************/
 
 """)
-    for name, val in of_g.experimenter_name_to_id.items():
+    for name, val in sorted(of_g.experimenter_name_to_id.items()):
         out.write("#define OF_EXPERIMENTER_ID_%s 0x%08x\n" %
                   (name.upper(), val))
 

@@ -37,7 +37,7 @@ package ${msg.package};
 //:: include("_imports.java", msg=msg)
 
 public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} extends ${", ".join(msg.all_parent_interfaces)} {
-//:: for prop in msg.members:
+//:: for prop in sorted(msg.members):
     ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: #endfor
 //:: if os.path.exists("%s/custom/interface/%s.java" % (template_dir, msg.name)):
@@ -50,7 +50,7 @@ public interface ${msg.name}${ "<%s>" % msg.type_annotation if msg.type_annotati
     //:: simple_type, annotation = re.match(r'(\w+)(<.*>)?', msg.parent_interface).groups() if msg.parent_interface else ("", "")
     public interface Builder${ "<%s>" % msg.type_annotation if msg.type_annotation else ""} ${"extends %s.Builder" % simple_type if msg.parent_interface else ""}${annotation if annotation else ""} {
         ${msg.name}${msg.type_variable} build();
-//:: for prop in msg.members:
+//:: for prop in sorted(msg.members):
         ${prop.java_type.public_type} ${prop.getter_name}()${ "" if prop.is_universal else " throws UnsupportedOperationException"};
 //:: if prop.needs_setter:
         Builder${msg.type_variable} ${prop.setter_name}(${prop.java_type.public_type} ${prop.name})${ "" if prop.is_universal else " throws UnsupportedOperationException"};
