@@ -1504,3 +1504,9 @@ struct of_bsn_tlv_analytics : of_bsn_tlv {
     uint16_t length;
 };
 
+struct of_bsn_tlv_udf_data : of_bsn_tlv {
+    uint16_t type == 207;
+    uint16_t length;
+    uint32_t value;
+};
+
