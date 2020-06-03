@@ -38,9 +38,9 @@ class TestImports(unittest.TestCase):
     def test_toplevel(self):
         import loxi
         self.assertTrue(hasattr(loxi, "ProtocolError"))
-        self.assertEquals(loxi.version_names[2], "1.1")
+        self.assertEqual(loxi.version_names[2], "1.1")
         ofp = loxi.protocol(2)
-        self.assertEquals(ofp.OFP_VERSION, 2)
+        self.assertEqual(ofp.OFP_VERSION, 2)
         self.assertTrue(hasattr(ofp, "action"))
         self.assertTrue(hasattr(ofp, "common"))
         self.assertTrue(hasattr(ofp, "const"))
@@ -50,7 +50,7 @@ class TestImports(unittest.TestCase):
         import loxi
         self.assertTrue(hasattr(loxi.of11, "ProtocolError"))
         self.assertTrue(hasattr(loxi.of11, "OFP_VERSION"))
-        self.assertEquals(loxi.of11.OFP_VERSION, 2)
+        self.assertEqual(loxi.of11.OFP_VERSION, 2)
         self.assertTrue(hasattr(loxi.of11, "action"))
         self.assertTrue(hasattr(loxi.of11, "common"))
         self.assertTrue(hasattr(loxi.of11, "const"))
@@ -80,7 +80,7 @@ class TestAllOF11(unittest.TestCase):
                 if hasattr(obj, "xid"): obj.xid = 42
                 buf = obj.pack()
                 obj2 = klass.unpack(OFReader(buf))
-                self.assertEquals(obj, obj2)
+                self.assertEqual(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
             else:
@@ -95,7 +95,7 @@ class TestAllOF11(unittest.TestCase):
                 obj = klass(xid=42)
                 buf = obj.pack()
                 obj2 = ofp.message.parse_message(buf)
-                self.assertEquals(obj, obj2)
+                self.assertEqual(obj, obj2)
             if klass in expected_failures:
                 self.assertRaises(Exception, fn)
             else:
