@@ -1913,7 +1913,7 @@ test_ident_macros(void)
 
 """)
 
-    for ident, info in sorted(of_g.identifiers.items()):
+    for ident, info in of_g.identifiers.items():
         if not identifiers.defined_versions_agree(of_g.identifiers,
                                                   of_g.target_version_list,
                                                   ident):

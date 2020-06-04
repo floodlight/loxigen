@@ -167,7 +167,7 @@ class JavaModel(object):
     @property
     @memoize
     def interfaces(self):
-        interfaces = [ JavaOFInterface(ir_class) for ir_class in sorted(loxi_globals.unified.classes) ]
+        interfaces = [ JavaOFInterface(ir_class) for ir_class in loxi_globals.unified.classes ]
         interfaces = [ i for i in interfaces if i.name not in self.interface_blacklist ]
 
         return interfaces
@@ -396,7 +396,7 @@ class JavaOFInterface(object):
         """
         self.ir_class = ir_class
         self.c_name = ir_class.name
-        self.version_map = { JavaOFVersion(v): c for v,c in ir_class.version_classes.items() }
+        self.version_map = OrderedDict( (JavaOFVersion(v), c) for v,c in ir_class.version_classes.items() )
         # name: the Java Type name, e.g., OFFlowAdd
         self.name = java_class_name(self.c_name)
         # variable_name name to use for variables of this type. i.e., flowAdd
@@ -1010,11 +1010,6 @@ class JavaMember(object):
         if other is None or type(self) != type(other):
             return False
         return (self.name,) == (other.name,)
-
-    def __lt__(self, other):
-        if other is None or type(self) != type(other):
-            return False
-        return (self.name,) < (other.name,)
 
     @property
     def is_nullable(self):

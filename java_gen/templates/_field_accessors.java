@@ -1,5 +1,5 @@
 //:: import os
-//:: for prop in sorted(msg.interface.members):
+//:: for prop in msg.interface.members:
 //::    if hasattr(prop, "custom_template") and prop.custom_template != None:
 //::        getter_template_file_name = "%s/custom/%s" % (template_dir, prop.custom_template(builder=builder))
 //::    else:
