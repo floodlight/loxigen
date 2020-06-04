@@ -396,7 +396,7 @@ class JavaOFInterface(object):
         """
         self.ir_class = ir_class
         self.c_name = ir_class.name
-        self.version_map = { JavaOFVersion(v): c for v,c in ir_class.version_classes.items() }
+        self.version_map = OrderedDict( (JavaOFVersion(v), c) for v,c in ir_class.version_classes.items() )
         # name: the Java Type name, e.g., OFFlowAdd
         self.name = java_class_name(self.c_name)
         # variable_name name to use for variables of this type. i.e., flowAdd

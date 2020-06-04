@@ -31,6 +31,7 @@
 # @fixme This needs to be refactored and brought into the 21st century.
 #
 
+from collections import OrderedDict
 import loxi_globals
 
 ################################################################
@@ -237,7 +238,7 @@ of_scalar_types = ["char", "uint8_t", "uint16_t", "uint32_t", "uint64_t", "uint1
 # ofp_name: The original name for the identifier
 # ofp_group: The ofp enumerated type if defined
 
-identifiers = {}
+identifiers = OrderedDict()
 
 ##
 # Identifiers by original group
@@ -322,8 +323,10 @@ for version in loxi_globals.OFVersions.all_supported:
 ################################################################
 
 # The map of known experimenters to their experimenter IDs
-experimenter_name_to_id = dict(
-    bsn = 0x005c16c7,
-    nicira = 0x00002320,
-    openflow = 0x000026e1
-    )
+experimenter_name_to_id = OrderedDict(
+    [
+        ('bsn', 0x005c16c7),
+        ('nicira', 0x00002320),
+        ('openflow', 0x000026e1)
+    ]
+)

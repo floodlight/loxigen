@@ -30,6 +30,7 @@
 # @fixme This still has lots of C specific code that should be moved into c_gen
 
 import sys
+import collections
 import c_gen.of_g_legacy as of_g
 from generic_utils import *
 import c_gen.loxi_utils_legacy as loxi_utils
@@ -54,7 +55,7 @@ import loxi_globals
 #
 # We use the 1.2 names and alias older names
 
-of_match_members = dict()
+of_match_members = collections.OrderedDict()
 
 of_v1_keys = [
     "eth_dst",
