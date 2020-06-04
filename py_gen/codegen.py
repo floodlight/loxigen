@@ -25,9 +25,9 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-from collections import OrderedDict
 import os
 import loxi_globals
+import generic_utils
 import template_utils
 import loxi_utils.loxi_utils as utils
 import util
@@ -72,11 +72,9 @@ def generate_pyname(ofclass):
 
 # Create intermediate representation, extended from the LOXI IR
 def build_ofclasses(version):
-    modules = OrderedDict()
+    modules = generic_utils.OrderedDefaultDict(list)
     for ofclass in loxi_globals.ir[version].classes:
         module_name, ofclass.pyname = generate_pyname(ofclass)
-        if module_name not in modules:
-            modules[module_name] = []
         modules[module_name].append(ofclass)
     return modules
 
