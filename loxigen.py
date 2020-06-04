@@ -104,7 +104,7 @@ def process_input_file(filename):
     # Parse the input file
     try:
         # handle other encodings without throwing UnicodeDecodeError
-        with open(filename, encoding='ascii', errors='surrogateescape') as f:
+        with open(filename, encoding='utf-8', errors='replace') as f:
             ast = parser.parse(f.read())
     except pyparsing.ParseBaseException as e:
         print("Parse error in %s: %s" % (os.path.basename(filename), str(e)))

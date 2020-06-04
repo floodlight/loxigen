@@ -77,7 +77,7 @@ def read(name):
             elif line.startswith('--'):
                 cur_section = line[2:].strip()
                 if cur_section in section_lines:
-                    raise Exception("section %s already exists in test data file %s", cur_section, name)
+                    raise Exception("section %s already exists in test data file %s" % (cur_section, name))
                 section_lines[cur_section] = []
             elif cur_section:
                 section_lines[cur_section].append(line)

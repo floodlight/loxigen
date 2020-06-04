@@ -99,7 +99,8 @@ def codegen(install_dir, pyversion):
         render(os.path.join(subdir, '__init__.py'), template_name='init.py',
                version=version, modules=modules.keys())
 
-        render(os.path.join(subdir, 'util.py'), version=version)
+        render(os.path.join(subdir, 'util.py'), version=version,
+               pyversion=pyversion)
 
         render(os.path.join(subdir, 'const.py'), version=version,
                enums=loxi_globals.ir[version].enums)

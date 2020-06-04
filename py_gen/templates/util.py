@@ -145,7 +145,11 @@ def unpack_match_bmap(reader):
 MASK64 = (1 << 64) - 1
 
 def pack_bitmap_128(value):
+:: if pyversion == 3:
     x = 0
+:: else:
+    x = 0l
+:: #endif
     for y in value:
         x |= 1 << y
     return struct.pack("!QQ", (x >> 64) & MASK64, x & MASK64)
@@ -171,7 +175,11 @@ def pack_bitmap_512(value):
 
 def unpack_bitmap_512(reader):
     words = reader.read("!8Q")
+:: if pyversion == 3:
     x = 0
+:: else:
+    x = 0l
+:: #endif
     for word in words:
         x <<= 64
         x |= word
