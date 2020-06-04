@@ -373,7 +373,7 @@ def build_protocol(version, ofinputs):
             else:
                 name_frontend_enums[name] = (e, ofinput)
 
-    name_enums = {}
+    name_enums = OrderedDict()
     for fe, _ in name_frontend_enums.values():
         entries = tuple(OFEnumEntry(name=e.name, value=e.value,
                         params=e.params) for e in fe.entries)
