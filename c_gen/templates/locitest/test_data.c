@@ -18,7 +18,7 @@ def hexarray(data, indent):
     text = []
     text.append(" " * indent)
     for byte in data:
-        text.append("0x%02x, " % ord(byte))
+        text.append("0x%02x, " % byte)
         i += 1
         if i == 8:
             text.append("\n" + " " * indent)

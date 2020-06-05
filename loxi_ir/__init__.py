@@ -26,6 +26,6 @@
 # under the EPL.
 
 # Import the model
-from ir import *
-from ir import build_protocol
-from unified import build_unified_ir
+from .ir import *
+from .ir import build_protocol
+from .unified import build_unified_ir

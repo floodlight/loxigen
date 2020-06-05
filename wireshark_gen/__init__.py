@@ -31,7 +31,7 @@ import loxi_utils.loxi_utils as utils
 import loxi_front_end
 import loxi_globals
 from loxi_ir import *
-import field_info
+from wireshark_gen import field_info
 import template_utils
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
@@ -78,7 +78,7 @@ def get_field_info(version, cls, name, oftype):
     elif oftype in field_info.oftype_to_wireshark_type:
         field_type = field_info.oftype_to_wireshark_type[oftype]
     else:
-        print "WARN missing oftype_to_wireshark_type for", oftype
+        print("WARN missing oftype_to_wireshark_type for", oftype)
         field_type = "bytes"
 
     if enum:
@@ -91,7 +91,7 @@ def get_field_info(version, cls, name, oftype):
     elif oftype in field_info.oftype_to_base:
         field_base = field_info.oftype_to_base[oftype]
     else:
-        print "WARN missing oftype_to_base for", oftype
+        print("WARN missing oftype_to_base for", oftype)
         field_base = "NONE"
 
     if enum:

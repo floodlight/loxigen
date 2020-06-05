@@ -2,9 +2,18 @@
 :: from loxi_ir import *
 :: import py_gen.oftype
 :: import py_gen.util as util
-:: type_members = [m for m in ofclass.members if type(m) == OFTypeMember]
-:: normal_members = [m for m in ofclass.members if type(m) == OFDataMember or
-::                                                 type(m) == OFDiscriminatorMember]
+:: type_members = []
+:: for m in ofclass.members:
+::   if isinstance(m, OFTypeMember):
+::     type_members.append(m)
+::   #endif
+:: #endfor
+:: normal_members = []
+:: for m in ofclass.members:
+::   if isinstance(m, OFDataMember) or isinstance(m, OFDiscriminatorMember):
+::     normal_members.append(m)
+::   #endif
+:: #endfor
 :: if ofclass.virtual:
 :: discriminator_fmts = { 1: "B", 2: "!H", 4: "!L" }
 :: discriminator_fmt = discriminator_fmts[ofclass.discriminator.length]
@@ -27,7 +36,7 @@ class ${ofclass.pyname}(${superclass_pyname}):
 :: # HACK for message xid
             self.${m.name} = None
 :: else:
-            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype, version=version)}
+            self.${m.name} = ${py_gen.oftype.gen_init_expr(m.oftype, version=version, pyversion=pyversion)}
 :: #endif
 :: #endfor
         return
@@ -35,7 +44,11 @@ class ${ofclass.pyname}(${superclass_pyname}):
     def pack(self):
         packed = []
 :: include("_pack.py", ofclass=ofclass)
+:: if pyversion == 2:
         return ''.join(packed)
+:: else:
+        return functools.reduce(lambda x,y: x+y, packed)
+:: #endif
 
     @staticmethod
     def unpack(reader):

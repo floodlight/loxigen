@@ -10,6 +10,11 @@ ofp.message.bad_request_error_msg(
     xid=0x12345678,
     code=ofp.OFPBRC_BUFFER_UNKNOWN,
     data="abc")
+-- python3
+ofp.message.bad_request_error_msg(
+    xid=0x12345678,
+    code=ofp.OFPBRC_BUFFER_UNKNOWN,
+    data=b"abc")
 -- c
 obj = of_bad_request_error_msg_new(OF_VERSION_1_3);
 of_bad_request_error_msg_xid_set(obj, 0x12345678);

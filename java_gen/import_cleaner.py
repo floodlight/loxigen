@@ -94,11 +94,11 @@ class ImportCleaner:
 
 def main(argv):
     if len(argv) != 2:
-        print 'Usage: ImportCleaner <java file>'
+        print('Usage: ImportCleaner <java file>')
         return
 
     filename = argv[1]
-    print 'Cleaning imports from file %s' % (filename)
+    print('Cleaning imports from file %s' % (filename))
     cleaner = ImportCleaner(filename)
     cleaner.find_used_imports()
     cleaner.rewrite_file(filename)

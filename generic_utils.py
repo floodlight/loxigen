@@ -189,7 +189,7 @@ class OrderedDefaultDict(collections.OrderedDict):
     def __deepcopy__(self, memo):
         import copy
         return type(self)(self.default_factory,
-                          copy.deepcopy(self.items()))
+                          copy.deepcopy(list(self.items())))
     def __repr__(self):
         return 'OrderedDefaultDict(%s, %s)' % (self.default_factory,
                                         collections.OrderedDict.__repr__(self))
@@ -220,5 +220,5 @@ def chunks(l, n):
     Yield successive n-sized chunks from l.
     From http://stackoverflow.com/questions/312443/how-do-you-split-a-list-into-evenly-sized-chunks-in-python
     """
-    for i in xrange(0, len(l), n):
+    for i in range(0, len(l), n):
         yield l[i:i+n]

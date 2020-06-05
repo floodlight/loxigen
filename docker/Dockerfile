@@ -16,6 +16,10 @@ RUN apt-get update \
         python-nose \
         python-pip \
         python-setuptools \
+        python3 \
+        python3-nose \
+        python3-pip \
+        python3-setuptools \
         rsync
 
 RUN pip install PyGithub==1.35

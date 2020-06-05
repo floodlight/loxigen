@@ -76,7 +76,7 @@ def process_commandline(default_vals=options_default):
                       help="List output files generated")
     parser.add_option("-l", "--lang", "--language",
                       default=default_vals["lang"],
-                      help="Select the target language: c, python")
+                      help="Select the target language: c, python, python3")
     parser.add_option("-i", "--install-dir",
                       default=default_vals["install-dir"],
                       help="Directory to install generated files to (default %s)" % default_vals["install-dir"])

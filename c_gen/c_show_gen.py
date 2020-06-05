@@ -41,7 +41,7 @@ import c_gen.type_maps as type_maps
 import loxi_utils.loxi_utils as loxi_utils
 import c_gen.loxi_utils_legacy as loxi_utils
 import c_gen.identifiers as identifiers
-from c_test_gen import var_name_map
+from .c_test_gen import var_name_map
 
 show_override = {
     ('uint32_t', 'arp_tpa'): 'ipv4',

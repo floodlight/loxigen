@@ -40,7 +40,7 @@ from generic_utils import *
 import c_gen.type_maps as type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 import c_gen.identifiers as identifiers
-from c_test_gen import var_name_map
+from .c_test_gen import var_name_map
 
 def gen_obj_dump_h(out, name):
     loxi_utils.gen_c_copy_license(out)

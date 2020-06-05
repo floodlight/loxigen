@@ -39,7 +39,7 @@ from loxi_ir import *
 import lang_java
 import test_data
 from collections import namedtuple
-from import_cleaner import ImportCleaner
+from .import_cleaner import ImportCleaner
 
 import template_utils
 import loxi_utils.loxi_utils as loxi_utils

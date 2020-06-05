@@ -33,13 +33,13 @@ These functions extract data from the IR and render templates with it.
 
 from collections import namedtuple
 from itertools import groupby
-from StringIO import StringIO
+from io import StringIO
 import template_utils
 from generic_utils import chunks
 import loxi_globals
 import loxi_ir.ir as ir
-import util
-import c_code_gen
+from c_gen import util
+from c_gen import c_code_gen
 import c_gen.of_g_legacy as of_g
 import c_gen.type_maps as type_maps
 import c_gen.c_type_maps as c_type_maps

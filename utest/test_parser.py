@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -42,7 +42,7 @@ class StructTests(unittest.TestCase):
 struct foo { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['struct', 'foo', [], None, []]])
+        self.assertEqual(ast, [['struct', 'foo', [], None, []]])
 
     def test_one_field(self):
         src = """\
@@ -51,7 +51,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['data', ['scalar', 'uint32_t'], 'bar']]]])
 
     def test_struct_align_arg(self):
@@ -61,7 +61,7 @@ struct foo(align=8) {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [['align', '8']], None, [['data', ['scalar', 'uint32_t'], 'bar']]]])
 
     def test_multiple_fields(self):
@@ -73,7 +73,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None,
                 [['data', ['scalar', 'uint32_t'], 'bar'],
                  ['data', ['scalar', 'uint8_t'], 'baz'],
@@ -86,7 +86,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['data', ['array', 'uint32_t[4]'], 'bar']]]])
 
     def test_list_type(self):
@@ -96,7 +96,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['data', ['list', 'list(of_action_t)'], 'bar']]]])
 
     def test_pad_member(self):
@@ -106,7 +106,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['pad', 1]]]])
 
     def test_type_member(self):
@@ -116,7 +116,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['type', ['scalar', 'uint16_t'], 'foo', 0x10]]]])
 
     def test_inheritance(self):
@@ -126,7 +126,7 @@ struct foo : bar {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], 'bar', [['type', ['scalar', 'uint16_t'], 'foo', 0x10]]]])
 
     def test_discriminator(self):
@@ -136,7 +136,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['discriminator', ['scalar', 'uint16_t'], 'foo']]]])
 
     def test_field_length(self):
@@ -147,7 +147,7 @@ struct foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [
                 ['field_length', ['scalar', 'uint16_t'], 'list_len', 'list'],
                 ['data', ['list', 'list(of_uint32_t)'], 'list']]]])
@@ -159,7 +159,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['enum', 'foo', [], []]])
+        self.assertEqual(ast, [['enum', 'foo', [], []]])
 
     def test_one(self):
         src = """\
@@ -168,7 +168,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['enum', 'foo', [], [['BAR', [], 1]]]])
+        self.assertEqual(ast, [['enum', 'foo', [], [['BAR', [], 1]]]])
 
     def test_params(self):
         src = """\
@@ -177,7 +177,7 @@ enum foo(wire_type=uint32, bitmask=False, complete=False) {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['enum', 'foo',
+        self.assertEqual(ast, [['enum', 'foo',
             [ ['wire_type', 'uint32'], ['bitmask','False'], ['complete', 'False']],
             [['BAR', [], 1]]]])
 
@@ -190,7 +190,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
+        self.assertEqual(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
 
     def test_trailing_comma(self):
         src = """\
@@ -201,7 +201,7 @@ enum foo {
 };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
+        self.assertEqual(ast, [['enum', 'foo', [], [['OFP_A', [], 1], ['OFP_B', [], 2], ['OFP_C', [], 3]]]])
 
 class TestMetadata(unittest.TestCase):
     def test_version(self):
@@ -209,7 +209,7 @@ class TestMetadata(unittest.TestCase):
 #version 1
 """
         ast = parser.parse(src)
-        self.assertEquals(ast, [['metadata', 'version', '1']])
+        self.assertEqual(ast, [['metadata', 'version', '1']])
 
 class TestToplevel(unittest.TestCase):
     def test_multiple_structs(self):
@@ -218,7 +218,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, []], ['struct', 'bar', [], None, []]])
 
     def test_comments(self):
@@ -232,7 +232,7 @@ struct foo { //comment 2
 // comment 4
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['struct', 'foo', [], None, [['data', ['scalar', 'uint32_t'], 'a']]]])
 
     def test_mixed(self):
@@ -243,7 +243,7 @@ struct foo { };
 struct bar { };
 """
         ast = parser.parse(src)
-        self.assertEquals(ast,
+        self.assertEqual(ast,
             [['metadata', 'version', '1'],
              ['struct', 'foo', [], None, []],
              ['metadata', 'version', '2'],
@@ -251,30 +251,30 @@ struct bar { };
 
 class TestErrors(unittest.TestCase):
     def syntax_error(self, src, regex):
-        with self.assertRaisesRegexp(pyparsing.ParseSyntaxException, regex):
+        with self.assertRaisesRegex(pyparsing.ParseSyntaxException, regex):
             parser.parse(src)
 
     def test_missing_struct_syntax(self):
         self.syntax_error('struct { uint32_t bar; };',
-                          'Expected identifier \(at char 7\)')
+                          'Expected identifier')
         self.syntax_error('struct foo uint32_t bar; };',
-                          'Expected "{" \(at char 11\)')
+                          'Expected "{"')
         self.syntax_error('struct foo { uint32_t bar; ;',
-                          'Expected "}" \(at char 27\)')
+                          'Expected "}"')
         self.syntax_error('struct foo { uint32_t bar; }',
-                          'Expected ";" \(at char 28\)')
+                          'Expected ";"')
 
     def test_invalid_type_name(self):
         self.syntax_error('struct foo { list<of_action_t> bar; }',
-                          'Expected "\(" \(at char 17\)')
+                          'Expected "\("')
         self.syntax_error('struct foo { uint32_t[10 bar; }',
-                          'Expected "\]" \(at char 24\)')
+                          'Expected "\]"')
 
     def test_invalid_member_syntax(self):
         self.syntax_error('struct foo { bar; }',
-                          'Expected identifier \(at char 16\)')
+                          'Expected identifier')
         self.syntax_error('struct foo { uint32_t bar baz; }',
-                          'Expected ";" \(at char 26\)')
+                          'Expected ";"')
 
 
 if __name__ == '__main__':

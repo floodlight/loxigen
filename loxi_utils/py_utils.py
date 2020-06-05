@@ -25,14 +25,12 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-import types
-
 class DotDict(dict):
     """ Access keys in a nested dictionary using dot notation """
 
     def __getattr__(self, attr):
         item = self.get(attr, None)
-        if type(item) == types.DictType:
+        if isinstance(item, dict):
             item = DotDict(item)
         return item
 
