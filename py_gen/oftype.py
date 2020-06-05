@@ -248,11 +248,16 @@ def gen_init_expr(oftype, version, pyversion):
     type_data = lookup_type_data(oftype, version)
     if type_data:
         if pyversion == 3:
-            return type_data.init3 or type_data.init or \
-                ("loxi.unimplemented('init %s')" % oftype)
+            return (
+                type_data.init3
+                or type_data.init
+                or ("loxi.unimplemented('init %s')" % oftype)
+                )
         else:
-            return type_data.init or \
-                ("loxi.unimplemented('init %s')" % oftype)
+            return (
+                type_data.init
+                or ("loxi.unimplemented('init %s')" % oftype)
+                )
     elif oftype_is_list(oftype):
         return "[]"
     else:
