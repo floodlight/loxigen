@@ -65,8 +65,8 @@ enum ofp_type(wire_type=uint8_t) {
     OFPT_GROUP_MOD = 15,
     OFPT_PORT_MOD = 16,
     OFPT_TABLE_MOD = 17,
-    OFPT_STATS_REQUEST = 18, /* Tüm sürümler için ayný olsun diye multipart yerine stats */
-    OFPT_STATS_REPLY = 19, /* Tüm sürümler için ayný olsun diye multipart yerine stats */
+    OFPT_STATS_REQUEST = 18, /* Stats instead of multipart to be the same for all versions */
+    OFPT_STATS_REPLY = 19, /* Stats instead of multipart to be the same for all versions */
     OFPT_BARRIER_REQUEST = 20,
     OFPT_BARRIER_REPLY = 21,
     OFPT_ROLE_REQUEST = 24,
@@ -120,7 +120,7 @@ struct of_header_type {
 /* --------------------------------------------------- PORT -------------------------------------------------- */
 
 /* Port numbering */
-/* Tüm sürümler için ayný olsun diye ofp_port_no yerine port */
+/* Port instead of ofp_port_no to be the same for all versions */
 enum ofp_port(wire_type=uint32_t) {
     OFPP_MAX = 0xffffff00,
     OFPP_UNSET = 0xfffffff7,
@@ -141,7 +141,7 @@ enum ofp_port_config(wire_type=uint32_t, bitmask=True) {
     OFPPC_NO_RECV = 0x4,
     OFPPC_NO_FWD = 0x20,
     OFPPC_NO_PACKET_IN = 0x40,
-    OFPPC_BSN_MIRROR_DEST = 0x80000000, /* header dosyalarýnda bulunmuyor */
+    OFPPC_BSN_MIRROR_DEST = 0x80000000, /* not found in header files */
 };
 
 /* Current state of the physical port */
@@ -195,7 +195,7 @@ enum ofp_optical_port_features(wire_type=uint32_t, bitmask=True) {
 };
 
 /* Description of a port */
-/* Tüm sürümler için ayný olsun diye ofp_port yerine of_port_desc */
+/* Of_port_desc instead of ofp_port to be the same for all versions */
 struct of_port_desc {
     of_port_no_t port_no;
     uint16_t length;
@@ -278,7 +278,7 @@ struct of_port_desc_prop_experimenter : of_port_desc_prop {
 /* ----------------------------------------------- FLOW MATCH -------------------------------------- */
 
 /* Match Type */
-/* Standard deprecated olmuþ */
+/* Standard deprecated */
 enum ofp_match_type(wire_type=uint16_t) {
     OFPMT_STANDARD = 0,
     OFPMT_OXM = 1,
@@ -315,9 +315,9 @@ enum ofp_ipv6exthdr_flags(wire_type=uint16_t, bitmask=True) {
 };
 
 /* Flow Match */
-/* standard-1.0 içinde v1 olarak var */
-/* standard-1.1 içinde v2 olarak var */
-/* standard-1.2 den itibaren v3 olarak deðiþmiþ ve oxm classlarý oluþturulmuþ */
+/* standard-1.0 includes v1 */
+/* standard-1.1 includes v2 */
+/* standard-1.2 changed to v3 with oxm classes */
 struct of_match_v3(align=8, length_includes_align=False) {
     uint16_t type == 1;
     uint16_t length;
@@ -1118,7 +1118,7 @@ enum ofp_hello_elem_type(wire_type=uint16_t) {
     OFPHET_VERSIONBITMAP = 1,
 };
 
-/* Values for ’type’ in ofp_error_message */
+/* Values for "type" in ofp_error_message */
 enum ofp_error_type(wire_type=uint16_t) {
     OFPET_HELLO_FAILED = 0,
     OFPET_BAD_REQUEST = 1,
@@ -1141,13 +1141,13 @@ enum ofp_error_type(wire_type=uint16_t) {
     OFPET_EXPERIMENTER = 0xffff,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_HELLO_FAILED */
+/* ofp_error_msg "code" values for OFPET_HELLO_FAILED */
 enum ofp_hello_failed_code(wire_type=uint16_t) {
     OFPHFC_INCOMPATIBLE = 0,
     OFPHFC_EPERM = 1,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BAD_REQUEST. */
+/* ofp_error_msg "code" values for OFPET_BAD_REQUEST. */
 enum ofp_bad_request_code(wire_type=uint16_t) {
     OFPBRC_BAD_VERSION = 0,
     OFPBRC_BAD_TYPE = 1,
@@ -1170,7 +1170,7 @@ enum ofp_bad_request_code(wire_type=uint16_t) {
     OFPBRC_UNKNOWN = 18,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BAD_ACTION. */
+/* ofp_error_msg "code" values for OFPET_BAD_ACTION. */
 enum ofp_bad_action_code(wire_type=uint16_t) {
     OFPBAC_BAD_TYPE = 0,
     OFPBAC_BAD_LEN = 1,
@@ -1192,7 +1192,7 @@ enum ofp_bad_action_code(wire_type=uint16_t) {
     OFPBAC_BAD_METER = 17,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BAD_INSTRUCTION. */
+/* ofp_error_msg "code" values for OFPET_BAD_INSTRUCTION. */
 enum ofp_bad_instruction_code(wire_type=uint16_t) {
     OFPBIC_UNKNOWN_INST = 0,
     OFPBIC_UNSUP_INST = 1,
@@ -1206,7 +1206,7 @@ enum ofp_bad_instruction_code(wire_type=uint16_t) {
     OFPBIC_DUP_INST = 9,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BAD_MATCH. */
+/* ofp_error_msg "code" values for OFPET_BAD_MATCH. */
 enum ofp_bad_match_code(wire_type=uint16_t) {
     OFPBMC_BAD_TYPE = 0,
     OFPBMC_BAD_LEN = 1,
@@ -1222,7 +1222,7 @@ enum ofp_bad_match_code(wire_type=uint16_t) {
     OFPBMC_EPERM = 11,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_FLOW_MOD_FAILED. */
+/* ofp_error_msg "code" values for OFPET_FLOW_MOD_FAILED. */
 enum ofp_flow_mod_failed_code(wire_type=uint16_t) {
     OFPFMFC_UNKNOWN = 0,
     OFPFMFC_TABLE_FULL = 1,
@@ -1237,7 +1237,7 @@ enum ofp_flow_mod_failed_code(wire_type=uint16_t) {
     OFPFMFC_IS_SYNC = 10,
 };
 
-/* ’flags’ bits in struct of_flow_monitor_request. */
+/* "flags" bits in struct of_flow_monitor_request. */
 enum ofp_flow_monitor_flags (wire_type=uint16_t, bitmask=True){
     OFPFMF_INITIAL = 0x1,
     OFPFMF_ADD = 0x2,
@@ -1248,7 +1248,7 @@ enum ofp_flow_monitor_flags (wire_type=uint16_t, bitmask=True){
     OFPFMF_ONLY_OWN = 0x40,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_GROUP_MOD_FAILED. */
+/* ofp_error_msg "code" values for OFPET_GROUP_MOD_FAILED. */
 enum ofp_group_mod_failed_code(wire_type=uint16_t) {
     OFPGMFC_GROUP_EXISTS = 0,
     OFPGMFC_INVALID_GROUP = 1,
@@ -1269,7 +1269,7 @@ enum ofp_group_mod_failed_code(wire_type=uint16_t) {
     OFPGMFC_BUCKET_EXISTS = 16,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_PORT_MOD_FAILED. */
+/* ofp_error_msg "code" values for OFPET_PORT_MOD_FAILED. */
 enum ofp_port_mod_failed_code(wire_type=uint16_t) {
     OFPPMFC_BAD_PORT = 0,
     OFPPMFC_BAD_HW_ADDR = 1,
@@ -1278,21 +1278,21 @@ enum ofp_port_mod_failed_code(wire_type=uint16_t) {
     OFPPMFC_EPERM = 4,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_TABLE_MOD_FAILED. */
+/* ofp_error_msg "code" values for OFPET_TABLE_MOD_FAILED. */
 enum ofp_table_mod_failed_code(wire_type=uint16_t) {
     OFPTMFC_BAD_TABLE = 0,
     OFPTMFC_BAD_CONFIG = 1,
     OFPTMFC_EPERM = 2,
 };
 
-/* ofp_error msg ’code’ values for OFPET_QUEUE_OP_FAILED */
+/* ofp_error msg "code" values for OFPET_QUEUE_OP_FAILED */
 enum ofp_queue_op_failed_code(wire_type=uint16_t) {
     OFPQOFC_BAD_PORT = 0,
     OFPQOFC_BAD_QUEUE = 1,
     OFPQOFC_EPERM = 2,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_SWITCH_CONFIG_FAILED */
+/* ofp_error_msg "code" values for OFPET_SWITCH_CONFIG_FAILED */
 enum ofp_switch_config_failed_code(wire_type=uint16_t) {
     OFPSCFC_BAD_FLAGS = 0,
     OFPSCFC_BAD_LEN = 1,
@@ -1301,14 +1301,14 @@ enum ofp_switch_config_failed_code(wire_type=uint16_t) {
     OFPRRFC_ID_IN_USE = 4,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_ROLE_REQUEST_FAILED. */
+/* ofp_error_msg "code" values for OFPET_ROLE_REQUEST_FAILED. */
 enum ofp_role_request_failed_code(wire_type=uint16_t){
     OFPRRFC_STALE = 0,
     OFPRRFC_UNSUP = 1,
     OFPRRFC_BAD_ROLE = 2,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_METER_MOD_FAILED */
+/* ofp_error_msg "code" values for OFPET_METER_MOD_FAILED */
 enum ofp_meter_mod_failed_code(wire_type=uint16_t) {
     OFPMMFC_UNKNOWN = 0,
     OFPMMFC_METER_EXISTS = 1,
@@ -1324,7 +1324,7 @@ enum ofp_meter_mod_failed_code(wire_type=uint16_t) {
     OFPMMFC_OUT_OF_BANDS = 11,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_TABLE_FEATURES_FAILED */
+/* ofp_error_msg "code" values for OFPET_TABLE_FEATURES_FAILED */
 enum ofp_table_features_failed_code(wire_type=uint16_t) {
     OFPTFFC_BAD_TABLE = 0,
     OFPTFFC_BAD_METADATA = 1,
@@ -1336,7 +1336,7 @@ enum ofp_table_features_failed_code(wire_type=uint16_t) {
     OFPTFFC_TOO_MANY = 10,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BAD_PROPERTY. */
+/* ofp_error_msg "code" values for OFPET_BAD_PROPERTY. */
 enum ofp_bad_property_code(wire_type=uint16_t) {
     OFPBPC_BAD_TYPE = 0,
     OFPBPC_BAD_LEN = 1,
@@ -1349,14 +1349,14 @@ enum ofp_bad_property_code(wire_type=uint16_t) {
     OFPBPC_EPERM = 8,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_ASYNC_CONFIG_FAILED. */
+/* ofp_error_msg "code" values for OFPET_ASYNC_CONFIG_FAILED. */
 enum ofp_async_config_failed_code(wire_type=uint16_t) {
     OFPACFC_INVALID = 0,
     OFPACFC_UNSUPPORTED = 1,
     OFPACFC_EPERM = 2,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_FLOW_MONITOR_FAILED. */
+/* ofp_error_msg "code" values for OFPET_FLOW_MONITOR_FAILED. */
 enum ofp_flow_monitor_failed_code(wire_type=uint16_t) {
     OFPMOFC_UNKNOWN = 0,
     OFPMOFC_MONITOR_EXISTS = 1,
@@ -1368,7 +1368,7 @@ enum ofp_flow_monitor_failed_code(wire_type=uint16_t) {
     OFPMOFC_BAD_OUT = 7,
 };
 
-/* ofp_error_msg ’code’ values for OFPET_BUNDLE_FAILED. */
+/* ofp_error_msg "code" values for OFPET_BUNDLE_FAILED. */
 enum ofp_bundle_failed_code(wire_type=uint16_t) {
     OFPBFC_UNKNOWN = 0,
     OFPBFC_EPERM = 1,
