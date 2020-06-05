@@ -32,9 +32,8 @@ Code generation functions for LOCI
 
 import sys
 import c_gen.of_g_legacy as of_g
-from . import c_match
 from generic_utils import *
-from c_gen import flags, type_maps, c_type_maps
+from c_gen import flags, type_maps, c_match, c_type_maps
 import c_gen.loxi_utils_legacy as loxi_utils
 import loxi_globals
 

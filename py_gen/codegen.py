@@ -30,7 +30,7 @@ import loxi_globals
 import generic_utils
 import template_utils
 import loxi_utils.loxi_utils as utils
-from . import util
+from py_gen import util
 from loxi_ir import *
 
 # Map from inheritance root to module name

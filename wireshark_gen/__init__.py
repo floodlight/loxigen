@@ -31,7 +31,7 @@ import loxi_utils.loxi_utils as utils
 import loxi_front_end
 import loxi_globals
 from loxi_ir import *
-from . import field_info
+from wireshark_gen import field_info
 import template_utils
 
 templates_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'templates')
