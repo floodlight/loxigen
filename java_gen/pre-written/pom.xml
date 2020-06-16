@@ -14,7 +14,7 @@
          Note that this only works for a standalone POM as done here; otherwise you need plugins
          resolve-parent-version-maven-plugin or flatten-maven-plugin (and both bring complexities).
     -->
-    <version>3.5.${revision}</version>
+    <version>3.6.${revision}</version>
     <packaging>jar</packaging>
 
     <name>OpenFlowJ-Loxi</name>
