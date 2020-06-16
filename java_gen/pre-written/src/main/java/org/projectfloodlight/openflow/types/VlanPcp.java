@@ -1,10 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedBytes;
+
+import io.netty.buffer.ByteBuf;
 
 public class VlanPcp implements OFValueType<VlanPcp> {
 

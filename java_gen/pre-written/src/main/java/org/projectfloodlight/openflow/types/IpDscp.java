@@ -1,9 +1,10 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
 
 public enum IpDscp implements OFValueType<IpDscp> {
     DSCP_0((byte)0),

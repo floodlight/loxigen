@@ -1,5 +1,7 @@
 package org.projectfloodlight.openflow.protocol.match;
 
+import java.util.Set;
+
 import org.projectfloodlight.openflow.types.ArpOpcode;
 import org.projectfloodlight.openflow.types.ClassId;
 import org.projectfloodlight.openflow.types.EthType;
@@ -20,20 +22,19 @@ import org.projectfloodlight.openflow.types.OFMetadata;
 import org.projectfloodlight.openflow.types.OFPort;
 import org.projectfloodlight.openflow.types.OFValueType;
 import org.projectfloodlight.openflow.types.OFVlanVidMatch;
-import org.projectfloodlight.openflow.types.TransportPort;
 import org.projectfloodlight.openflow.types.PacketType;
+import org.projectfloodlight.openflow.types.TransportPort;
+import org.projectfloodlight.openflow.types.U128;
 import org.projectfloodlight.openflow.types.U16;
 import org.projectfloodlight.openflow.types.U32;
 import org.projectfloodlight.openflow.types.U64;
-import org.projectfloodlight.openflow.types.U128;
 import org.projectfloodlight.openflow.types.U8;
 import org.projectfloodlight.openflow.types.UDF;
+import org.projectfloodlight.openflow.types.VFI;
 import org.projectfloodlight.openflow.types.VRF;
 import org.projectfloodlight.openflow.types.VlanPcp;
 import org.projectfloodlight.openflow.types.VxlanNI;
-import org.projectfloodlight.openflow.types.VFI;
 
-import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 
 public class MatchField<F extends OFValueType<F>> {
@@ -49,301 +50,301 @@ public class MatchField<F extends OFValueType<F>> {
     }
 
     public final static MatchField<OFPort> IN_PORT =
-            new MatchField<OFPort>("in_port", MatchFields.IN_PORT);
+            new MatchField<>("in_port", MatchFields.IN_PORT);
 
     public final static MatchField<OFPort> IN_PHY_PORT =
-            new MatchField<OFPort>("in_phy_port", MatchFields.IN_PHY_PORT,
-                    new Prerequisite<OFPort>(MatchField.IN_PORT));
+            new MatchField<>("in_phy_port", MatchFields.IN_PHY_PORT,
+                    new Prerequisite<>(MatchField.IN_PORT));
 
     public final static MatchField<OFMetadata> METADATA =
-            new MatchField<OFMetadata>("metadata", MatchFields.METADATA);
+            new MatchField<>("metadata", MatchFields.METADATA);
 
     public final static MatchField<MacAddress> ETH_DST =
-            new MatchField<MacAddress>("eth_dst", MatchFields.ETH_DST);
+            new MatchField<>("eth_dst", MatchFields.ETH_DST);
 
     public final static MatchField<MacAddress> ETH_SRC =
-            new MatchField<MacAddress>("eth_src", MatchFields.ETH_SRC);
+            new MatchField<>("eth_src", MatchFields.ETH_SRC);
 
     public final static MatchField<EthType> ETH_TYPE =
-            new MatchField<EthType>("eth_type", MatchFields.ETH_TYPE);
+            new MatchField<>("eth_type", MatchFields.ETH_TYPE);
 
     public final static MatchField<OFVlanVidMatch> VLAN_VID =
-            new MatchField<OFVlanVidMatch>("vlan_vid", MatchFields.VLAN_VID);
+            new MatchField<>("vlan_vid", MatchFields.VLAN_VID);
 
     public final static MatchField<VlanPcp> VLAN_PCP =
-            new MatchField<VlanPcp>("vlan_pcp", MatchFields.VLAN_PCP,
-                    new Prerequisite<OFVlanVidMatch>(MatchField.VLAN_VID));
+            new MatchField<>("vlan_pcp", MatchFields.VLAN_PCP,
+                    new Prerequisite<>(MatchField.VLAN_VID));
 
     public final static MatchField<IpDscp> IP_DSCP =
-            new MatchField<IpDscp>("ip_dscp", MatchFields.IP_DSCP,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
+            new MatchField<>("ip_dscp", MatchFields.IP_DSCP,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpEcn> IP_ECN =
-            new MatchField<IpEcn>("ip_ecn", MatchFields.IP_ECN,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
+            new MatchField<>("ip_ecn", MatchFields.IP_ECN,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IpProtocol> IP_PROTO =
-            new MatchField<IpProtocol>("ip_proto", MatchFields.IP_PROTO,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
+            new MatchField<>("ip_proto", MatchFields.IP_PROTO,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<IPv4Address> IPV4_SRC =
-            new MatchField<IPv4Address>("ipv4_src", MatchFields.IPV4_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+            new MatchField<>("ipv4_src", MatchFields.IPV4_SRC,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<IPv4Address> IPV4_DST =
-            new MatchField<IPv4Address>("ipv4_dst", MatchFields.IPV4_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+            new MatchField<>("ipv4_dst", MatchFields.IPV4_DST,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4));
 
-    public final static MatchField<TransportPort> TCP_SRC = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> TCP_SRC = new MatchField<>(
             "tcp_src", MatchFields.TCP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
 
-    public final static MatchField<TransportPort> TCP_DST = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> TCP_DST = new MatchField<>(
             "tcp_dst", MatchFields.TCP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
 
-    public final static MatchField<TransportPort> UDP_SRC = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> UDP_SRC = new MatchField<>(
             "udp_src", MatchFields.UDP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.UDP));
 
-    public final static MatchField<TransportPort> UDP_DST = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> UDP_DST = new MatchField<>(
             "udp_dst", MatchFields.UDP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.UDP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.UDP));
 
-    public final static MatchField<TransportPort> SCTP_SRC = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> SCTP_SRC = new MatchField<>(
             "sctp_src", MatchFields.SCTP_SRC,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
-    public final static MatchField<TransportPort> SCTP_DST = new MatchField<TransportPort>(
+    public final static MatchField<TransportPort> SCTP_DST = new MatchField<>(
             "sctp_dst", MatchFields.SCTP_DST,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.SCTP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.SCTP));
 
-    public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<ICMPv4Type>(
+    public final static MatchField<ICMPv4Type> ICMPV4_TYPE = new MatchField<>(
             "icmpv4_type", MatchFields.ICMPV4_TYPE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
-    public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<ICMPv4Code>(
+    public final static MatchField<ICMPv4Code> ICMPV4_CODE = new MatchField<>(
             "icmpv4_code", MatchFields.ICMPV4_CODE,
-            new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.ICMP));
+            new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.ICMP));
 
-    public final static MatchField<ArpOpcode> ARP_OP = new MatchField<ArpOpcode>(
+    public final static MatchField<ArpOpcode> ARP_OP = new MatchField<>(
             "arp_op", MatchFields.ARP_OP,
-            new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
+            new Prerequisite<>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv4Address> ARP_SPA =
-            new MatchField<IPv4Address>("arp_spa", MatchFields.ARP_SPA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
+            new MatchField<>("arp_spa", MatchFields.ARP_SPA,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv4Address> ARP_TPA =
-            new MatchField<IPv4Address>("arp_tpa", MatchFields.ARP_TPA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
+            new MatchField<>("arp_tpa", MatchFields.ARP_TPA,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<MacAddress> ARP_SHA =
-            new MatchField<MacAddress>("arp_sha", MatchFields.ARP_SHA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
+            new MatchField<>("arp_sha", MatchFields.ARP_SHA,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<MacAddress> ARP_THA =
-            new MatchField<MacAddress>("arp_tha", MatchFields.ARP_THA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.ARP));
+            new MatchField<>("arp_tha", MatchFields.ARP_THA,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.ARP));
 
     public final static MatchField<IPv6Address> IPV6_SRC =
-            new MatchField<IPv6Address>("ipv6_src", MatchFields.IPV6_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("ipv6_src", MatchFields.IPV6_SRC,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<IPv6Address> IPV6_DST =
-            new MatchField<IPv6Address>("ipv6_dst", MatchFields.IPV6_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("ipv6_dst", MatchFields.IPV6_DST,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<IPv6FlowLabel> IPV6_FLABEL =
-            new MatchField<IPv6FlowLabel>("ipv6_flabel", MatchFields.IPV6_FLABEL,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("ipv6_flabel", MatchFields.IPV6_FLABEL,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<U8> ICMPV6_TYPE =
-            new MatchField<U8>("icmpv6_type", MatchFields.ICMPV6_TYPE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
+            new MatchField<>("icmpv6_type", MatchFields.ICMPV6_TYPE,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<U8> ICMPV6_CODE =
-            new MatchField<U8>("icmpv6_code", MatchFields.ICMPV6_CODE,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
+            new MatchField<>("icmpv6_code", MatchFields.ICMPV6_CODE,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.IPv6_ICMP));
 
     public final static MatchField<IPv6Address> IPV6_ND_TARGET =
-            new MatchField<IPv6Address>("ipv6_nd_target", MatchFields.IPV6_ND_TARGET,
-                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)135), U8.of((short)136)));
+            new MatchField<>("ipv6_nd_target", MatchFields.IPV6_ND_TARGET,
+                    new Prerequisite<>(MatchField.ICMPV6_TYPE, U8.of((short) 135), U8.of((short) 136)));
 
     public final static MatchField<MacAddress> IPV6_ND_SLL =
-            new MatchField<MacAddress>("ipv6_nd_sll", MatchFields.IPV6_ND_SLL,
-                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)135)));
+            new MatchField<>("ipv6_nd_sll", MatchFields.IPV6_ND_SLL,
+                    new Prerequisite<>(MatchField.ICMPV6_TYPE, U8.of((short) 135)));
 
     public final static MatchField<MacAddress> IPV6_ND_TLL =
-            new MatchField<MacAddress>("ipv6_nd_tll", MatchFields.IPV6_ND_TLL,
-                    new Prerequisite<U8>(MatchField.ICMPV6_TYPE, U8.of((short)136)));
+            new MatchField<>("ipv6_nd_tll", MatchFields.IPV6_ND_TLL,
+                    new Prerequisite<>(MatchField.ICMPV6_TYPE, U8.of((short) 136)));
 
     public final static MatchField<U32> MPLS_LABEL =
-            new MatchField<U32>("mpls_label", MatchFields.MPLS_LABEL,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+            new MatchField<>("mpls_label", MatchFields.MPLS_LABEL,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<U8> MPLS_TC =
-            new MatchField<U8>("mpls_tc", MatchFields.MPLS_TC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+            new MatchField<>("mpls_tc", MatchFields.MPLS_TC,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<OFBooleanValue> MPLS_BOS =
-            new MatchField<OFBooleanValue>("mpls_bos", MatchFields.MPLS_BOS,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
+            new MatchField<>("mpls_bos", MatchFields.MPLS_BOS,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.MPLS_UNICAST, EthType.MPLS_MULTICAST));
 
     public final static MatchField<U64> TUNNEL_ID =
-            new MatchField<U64>("tunnel_id", MatchFields.TUNNEL_ID);
+            new MatchField<>("tunnel_id", MatchFields.TUNNEL_ID);
 
     public final static MatchField<U16> IPV6_EXTHDR =
-            new MatchField<U16>("ipv6_exthdr", MatchFields.IPV6_EXTHDR,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("ipv6_exthdr", MatchFields.IPV6_EXTHDR,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
 
     public final static MatchField<OFBooleanValue> PBB_UCA =
-            new MatchField<OFBooleanValue>("pbb_uca", MatchFields.PBB_UCA,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.PBB));
+            new MatchField<>("pbb_uca", MatchFields.PBB_UCA,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.PBB));
 
     public final static MatchField<U16> TCP_FLAGS =
-            new MatchField<U16>("tcp_flags", MatchFields.TCP_FLAGS,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+            new MatchField<>("tcp_flags", MatchFields.TCP_FLAGS,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<U16> OVS_TCP_FLAGS =
-            new MatchField<U16>("ovs_tcp_flags", MatchFields.OVS_TCP_FLAGS,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+            new MatchField<>("ovs_tcp_flags", MatchFields.OVS_TCP_FLAGS,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
 
     public final static MatchField<PacketType> PACKET_TYPE =
-            new MatchField<PacketType>("packet_type", MatchFields.PACKET_TYPE);
+            new MatchField<>("packet_type", MatchFields.PACKET_TYPE);
 
     public final static MatchField<OFPort> ACTSET_OUTPUT =
-            new MatchField<OFPort>("actset_output", MatchFields.ACTSET_OUTPUT);
+            new MatchField<>("actset_output", MatchFields.ACTSET_OUTPUT);
 
     public final static MatchField<IPv4Address> TUNNEL_IPV4_SRC =
-            new MatchField<IPv4Address>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+            new MatchField<>("tunnel_ipv4_src", MatchFields.TUNNEL_IPV4_SRC,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<IPv4Address> TUNNEL_IPV4_DST =
-            new MatchField<IPv4Address>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4));
+            new MatchField<>("tunnel_ipv4_dst", MatchFields.TUNNEL_IPV4_DST,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4));
 
     public final static MatchField<OFBitMask128> BSN_IN_PORTS_128 =
-            new MatchField<OFBitMask128>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
+            new MatchField<>("bsn_in_ports_128", MatchFields.BSN_IN_PORTS_128);
 
     public final static MatchField<OFBitMask512> BSN_IN_PORTS_512 =
-            new MatchField<OFBitMask512>("bsn_in_ports_512", MatchFields.BSN_IN_PORTS_512);
+            new MatchField<>("bsn_in_ports_512", MatchFields.BSN_IN_PORTS_512);
 
     public final static MatchField<LagId> BSN_LAG_ID =
-            new MatchField<LagId>("bsn_lag_id", MatchFields.BSN_LAG_ID);
+            new MatchField<>("bsn_lag_id", MatchFields.BSN_LAG_ID);
 
     public final static MatchField<VRF> BSN_VRF =
-            new MatchField<VRF>("bsn_vrf", MatchFields.BSN_VRF);
+            new MatchField<>("bsn_vrf", MatchFields.BSN_VRF);
 
     public final static MatchField<OFBooleanValue> BSN_GLOBAL_VRF_ALLOWED =
-            new MatchField<OFBooleanValue>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
+            new MatchField<>("bsn_global_vrf_allowed", MatchFields.BSN_GLOBAL_VRF_ALLOWED);
 
     public final static MatchField<ClassId> BSN_L3_INTERFACE_CLASS_ID =
-            new MatchField<ClassId>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);
+            new MatchField<>("bsn_l3_interface_class_id", MatchFields.BSN_L3_INTERFACE_CLASS_ID);
 
     public final static MatchField<ClassId> BSN_L3_SRC_CLASS_ID =
-            new MatchField<ClassId>("bsn_l3_src_class_id", MatchFields.BSN_L3_SRC_CLASS_ID);
+            new MatchField<>("bsn_l3_src_class_id", MatchFields.BSN_L3_SRC_CLASS_ID);
 
     public final static MatchField<ClassId> BSN_L3_DST_CLASS_ID =
-            new MatchField<ClassId>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
+            new MatchField<>("bsn_l3_dst_class_id", MatchFields.BSN_L3_DST_CLASS_ID);
 
     public final static MatchField<ClassId> BSN_EGR_PORT_GROUP_ID =
-            new MatchField<ClassId>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
+            new MatchField<>("bsn_egr_port_group_id", MatchFields.BSN_EGR_PORT_GROUP_ID);
 
     public final static MatchField<ClassId> BSN_INGRESS_PORT_GROUP_ID =
-            new MatchField<ClassId>("bsn_ingress_port_group_id", MatchFields.BSN_INGRESS_PORT_GROUP_ID);
+            new MatchField<>("bsn_ingress_port_group_id", MatchFields.BSN_INGRESS_PORT_GROUP_ID);
 
     public final static MatchField<UDF> BSN_UDF0 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF0);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF0);
 
     public final static MatchField<UDF> BSN_UDF1 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF1);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF1);
 
     public final static MatchField<UDF> BSN_UDF2 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF2);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF2);
 
     public final static MatchField<UDF> BSN_UDF3 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF3);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF3);
 
     public final static MatchField<UDF> BSN_UDF4 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF4);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF4);
 
     public final static MatchField<UDF> BSN_UDF5 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF5);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF5);
 
     public final static MatchField<UDF> BSN_UDF6 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF6);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF6);
 
     public final static MatchField<UDF> BSN_UDF7 =
-            new MatchField<UDF>("bsn_udf", MatchFields.BSN_UDF7);
+            new MatchField<>("bsn_udf", MatchFields.BSN_UDF7);
 
     public final static MatchField<U16> BSN_TCP_FLAGS =
-            new MatchField<U16>("bsn_tcp_flags", MatchFields.BSN_TCP_FLAGS);
+            new MatchField<>("bsn_tcp_flags", MatchFields.BSN_TCP_FLAGS);
 
     public final static MatchField<ClassId> BSN_VLAN_XLATE_PORT_GROUP_ID =
-            new MatchField<ClassId>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
+            new MatchField<>("bsn_vlan_xlate_port_group_id", MatchFields.BSN_VLAN_XLATE_PORT_GROUP_ID);
 
     public final static MatchField<OFBooleanValue> BSN_L2_CACHE_HIT =
-            new MatchField<OFBooleanValue>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
+            new MatchField<>("bsn_l2_cache_hit", MatchFields.BSN_L2_CACHE_HIT);
 
     public final static MatchField<VxlanNI> BSN_VXLAN_NETWORK_ID =
-            new MatchField<VxlanNI>("bsn_vxlan_network_id", MatchFields.BSN_VXLAN_NETWORK_ID);
+            new MatchField<>("bsn_vxlan_network_id", MatchFields.BSN_VXLAN_NETWORK_ID);
 
     public final static MatchField<MacAddress> BSN_INNER_ETH_DST =
-            new MatchField<MacAddress>("bsn_inner_eth_dst", MatchFields.BSN_INNER_ETH_DST);
+            new MatchField<>("bsn_inner_eth_dst", MatchFields.BSN_INNER_ETH_DST);
 
     public final static MatchField<MacAddress> BSN_INNER_ETH_SRC =
-            new MatchField<MacAddress>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
+            new MatchField<>("bsn_inner_eth_src", MatchFields.BSN_INNER_ETH_SRC);
 
     public final static MatchField<OFVlanVidMatch> BSN_INNER_VLAN_VID =
-            new MatchField<OFVlanVidMatch>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
+            new MatchField<>("bsn_inner_vlan_vid", MatchFields.BSN_INNER_VLAN_VID);
 
     public final static MatchField<VFI> BSN_VFI =
-            new MatchField<VFI>("bsn_vfi", MatchFields.BSN_VFI);
+            new MatchField<>("bsn_vfi", MatchFields.BSN_VFI);
 
     public final static MatchField<OFBooleanValue> BSN_IP_FRAGMENTATION =
-            new MatchField<OFBooleanValue>("bsn_ip_fragmentation", MatchFields.BSN_IP_FRAGMENTATION,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
+            new MatchField<>("bsn_ip_fragmentation", MatchFields.BSN_IP_FRAGMENTATION,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv4, EthType.IPv6));
 
     public final static MatchField<ClassId> BSN_IFP_CLASS_ID =
-            new MatchField<ClassId>("bsn_ifp_class_id", MatchFields.BSN_IFP_CLASS_ID);
+            new MatchField<>("bsn_ifp_class_id", MatchFields.BSN_IFP_CLASS_ID);
    
-    public final static MatchField<U32> CONN_TRACKING_STATE = 
-            new MatchField<U32>("conn_tracking_state", MatchFields.CONN_TRACKING_STATE);
+    public final static MatchField<U32> CONN_TRACKING_STATE =
+            new MatchField<>("conn_tracking_state", MatchFields.CONN_TRACKING_STATE);
 
-    public final static MatchField<U16> CONN_TRACKING_ZONE = 
-            new MatchField<U16>("conn_tracking_zone", MatchFields.CONN_TRACKING_ZONE);
+    public final static MatchField<U16> CONN_TRACKING_ZONE =
+            new MatchField<>("conn_tracking_zone", MatchFields.CONN_TRACKING_ZONE);
    
-    public final static MatchField<U32> CONN_TRACKING_MARK = 
-            new MatchField<U32>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
+    public final static MatchField<U32> CONN_TRACKING_MARK =
+            new MatchField<>("conn_tracking_mark", MatchFields.CONN_TRACKING_MARK);
 
-    public final static MatchField<U128> CONN_TRACKING_LABEL = 
-            new MatchField<U128>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
+    public final static MatchField<U128> CONN_TRACKING_LABEL =
+            new MatchField<>("conn_tracking_label", MatchFields.CONN_TRACKING_LABEL);
     
-    public final static MatchField<U8> CONN_TRACKING_NW_PROTO = 
-            new MatchField<U8>("conn_tracking_nw_proto", MatchFields.CONN_TRACKING_NW_PROTO);
+    public final static MatchField<U8> CONN_TRACKING_NW_PROTO =
+            new MatchField<>("conn_tracking_nw_proto", MatchFields.CONN_TRACKING_NW_PROTO);
 
-    public final static MatchField<U32> CONN_TRACKING_NW_SRC = 
-            new MatchField<U32>("conn_tracking_nw_src", MatchFields.CONN_TRACKING_NW_SRC);
+    public final static MatchField<U32> CONN_TRACKING_NW_SRC =
+            new MatchField<>("conn_tracking_nw_src", MatchFields.CONN_TRACKING_NW_SRC);
 
     public final static MatchField<U32> CONN_TRACKING_NW_DST =
-            new MatchField<U32>("conn_tracking_nw_dst", MatchFields.CONN_TRACKING_NW_DST);
+            new MatchField<>("conn_tracking_nw_dst", MatchFields.CONN_TRACKING_NW_DST);
     
     public final static MatchField<IPv6Address> CONN_TRACKING_IPV6_SRC =
-            new MatchField<IPv6Address>("conn_tracking_ipv6_src", MatchFields.CONN_TRACKING_IPV6_SRC,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("conn_tracking_ipv6_src", MatchFields.CONN_TRACKING_IPV6_SRC,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
     
     public final static MatchField<IPv6Address> CONN_TRACKING_IPV6_DST =
-            new MatchField<IPv6Address>("conn_tracking_ipv6_dst", MatchFields.CONN_TRACKING_IPV6_DST,
-                    new Prerequisite<EthType>(MatchField.ETH_TYPE, EthType.IPv6));
+            new MatchField<>("conn_tracking_ipv6_dst", MatchFields.CONN_TRACKING_IPV6_DST,
+                    new Prerequisite<>(MatchField.ETH_TYPE, EthType.IPv6));
     
-    public final static MatchField<TransportPort> CONN_TRACKING_TP_SRC = 
-            new MatchField<TransportPort>("conn_tracking_tp_src", MatchFields.CONN_TRACKING_TP_SRC,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+    public final static MatchField<TransportPort> CONN_TRACKING_TP_SRC =
+            new MatchField<>("conn_tracking_tp_src", MatchFields.CONN_TRACKING_TP_SRC,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
     
     public final static MatchField<TransportPort> CONN_TRACKING_TP_DST =
-            new MatchField<TransportPort>("conn_tracking_tp_dst", MatchFields.CONN_TRACKING_TP_DST,
-                    new Prerequisite<IpProtocol>(MatchField.IP_PROTO, IpProtocol.TCP));
+            new MatchField<>("conn_tracking_tp_dst", MatchFields.CONN_TRACKING_TP_DST,
+                    new Prerequisite<>(MatchField.IP_PROTO, IpProtocol.TCP));
 
 
     public String getName() {

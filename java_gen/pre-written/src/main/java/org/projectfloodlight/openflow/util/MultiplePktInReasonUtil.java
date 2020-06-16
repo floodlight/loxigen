@@ -2,16 +2,16 @@ package org.projectfloodlight.openflow.util;
 
 import java.util.Set;
 
-import com.google.common.collect.ImmutableSet;
-
-import org.projectfloodlight.openflow.types.U64;
 import org.projectfloodlight.openflow.protocol.OFBsnPktinFlag;
 import org.projectfloodlight.openflow.protocol.OFPacketIn;
 import org.projectfloodlight.openflow.protocol.OFVersion;
-import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.match.Match;
+import org.projectfloodlight.openflow.protocol.match.MatchField;
 import org.projectfloodlight.openflow.protocol.ver13.OFBsnPktinFlagSerializerVer13;
 import org.projectfloodlight.openflow.types.OFMetadata;
+import org.projectfloodlight.openflow.types.U64;
+
+import com.google.common.collect.ImmutableSet;
 
 
 public class MultiplePktInReasonUtil {

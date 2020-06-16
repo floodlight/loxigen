@@ -2,7 +2,6 @@ package org.projectfloodlight.openflow.util;
 
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
@@ -12,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Collection of helper functions for reading and writing into Unpooled

@@ -1,8 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-
 import java.util.Arrays;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
@@ -18,6 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 /** A special-purpose wrapper for the 'data' field in an {@link OFErrorMsg} message
  *  that contains a byte serialization of the offending message.

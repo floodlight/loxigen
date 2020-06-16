@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.net.Inet4Address;
@@ -18,6 +16,8 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Wrapper around an IPv4Address address
