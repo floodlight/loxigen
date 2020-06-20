@@ -1,8 +1,8 @@
 package org.projectfloodlight.protocol;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,14 +44,14 @@ public class OFPortDescTest {
 
         // Partially disabled
         desc = factory.buildPortDesc()
-                .setConfig(new HashSet<OFPortConfig>(Arrays.asList(OFPortConfig.PORT_DOWN)))
+                .setConfig(new HashSet<>(Arrays.asList(OFPortConfig.PORT_DOWN)))
                 .build();
         assertThat(desc.isEnabled(), is(false));
 
         // Fully disabled
         desc = factory.buildPortDesc()
-                .setConfig(new HashSet<OFPortConfig>(Arrays.asList(OFPortConfig.PORT_DOWN)))
-                .setState(new HashSet<OFPortState>(Arrays.asList(OFPortState.LINK_DOWN)))
+                .setConfig(new HashSet<>(Arrays.asList(OFPortConfig.PORT_DOWN)))
+                .setState(new HashSet<>(Arrays.asList(OFPortState.LINK_DOWN)))
                 .build();
         assertThat(desc.isEnabled(), is(false));
     }

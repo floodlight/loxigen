@@ -1,11 +1,12 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.annotations.Immutable;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * Abstraction of an logical / OpenFlow switch port (ofp_port_no) in OpenFlow.

@@ -1,7 +1,5 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -20,6 +18,8 @@ import org.projectfloodlight.openflow.protocol.Writeable;
 import com.google.common.base.Preconditions;
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedLongs;
+
+import io.netty.buffer.ByteBuf;
 
 /**
  * IPv6 address object. Instance controlled, immutable. Internal representation:

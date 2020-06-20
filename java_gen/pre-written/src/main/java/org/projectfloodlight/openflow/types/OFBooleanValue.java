@@ -17,12 +17,13 @@
 
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.projectfloodlight.openflow.protocol.OFMessageReader;
 import org.projectfloodlight.openflow.protocol.Writeable;
 
 import com.google.common.hash.PrimitiveSink;
+
+import io.netty.buffer.ByteBuf;
 
 public class OFBooleanValue implements Writeable, OFValueType<OFBooleanValue> {
     public final static OFBooleanValue TRUE = new OFBooleanValue(true);

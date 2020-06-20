@@ -1,10 +1,11 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
+
+import io.netty.buffer.ByteBuf;
 
 public class TableId implements OFValueType<TableId>, Comparable<TableId> {
 

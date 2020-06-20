@@ -2,7 +2,7 @@ package org.projectfloodlight.protocol.match;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.projectfloodlight.openflow.protocol.match.MatchField.ETH_TYPE;
 import static org.projectfloodlight.openflow.protocol.match.MatchField.IPV4_SRC;
 

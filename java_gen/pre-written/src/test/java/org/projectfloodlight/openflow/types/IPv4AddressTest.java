@@ -1,14 +1,13 @@
 package org.projectfloodlight.openflow.types;
 
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import io.netty.buffer.Unpooled;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -20,6 +19,8 @@ import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
+
+import io.netty.buffer.Unpooled;
 
 public class IPv4AddressTest {
     byte[][] testAddresses = new byte[][] {

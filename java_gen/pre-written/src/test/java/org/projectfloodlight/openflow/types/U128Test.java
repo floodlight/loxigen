@@ -2,14 +2,12 @@ package org.projectfloodlight.openflow.types;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 
 import java.text.MessageFormat;
 
@@ -20,6 +18,9 @@ import org.junit.Test;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 public class U128Test {
     private Triple[] triples;

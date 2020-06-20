@@ -2,7 +2,7 @@ package org.projectfloodlight.protocol.match;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.junit.Test;
 import org.projectfloodlight.openflow.protocol.OFFactories;
