@@ -1510,3 +1510,7 @@ struct of_bsn_tlv_udf_data : of_bsn_tlv {
     uint32_t value;
 };
 
+struct of_bsn_tlv_mgmt_reselect_on_failure : of_bsn_tlv {
+    uint16_t type == 208;
+    uint16_t length;
+};
