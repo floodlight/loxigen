@@ -218,7 +218,7 @@ of_test_str_check(uint8_t *buf, int value, int len)
  * to call populate with a max parameter for length
  */
 int octets_pop_style = -1;
-#define OCTETS_MAX_VALUE (128) /* 16K was too big */
+#define OCTETS_MAX_VALUE (64) /* 16K was too big */
 #define OCTETS_MULTIPLIER 6367 /* A prime */
 
 int
@@ -743,13 +743,12 @@ def setup_instance(out, cls, subcls, instance, v_name, version):
     TEST_ASSERT(list->length == cur_len);
 """
     out.write("""
-    /* Append two instances of type %s */
+    /* Append an instance of type %s */
 """ % subcls)
-    for i in range(2):
-        out.write(setup_template %
-                  dict(inst=instance, subcls=subcls, v_name=v_name,
-                       base_type=base_type, cls=cls,
-                       version=version))
+    out.write(setup_template %
+              dict(inst=instance, subcls=subcls, v_name=v_name,
+                   base_type=base_type, cls=cls,
+                   version=version))
 
 def check_instance(out, cls, subcls, instance, v_name, version, last):
     check_template = """
@@ -758,15 +757,7 @@ def check_instance(out, cls, subcls, instance, v_name, version, last):
         %(inst)s, value);
     TEST_ASSERT(value != 0);
 """
-    out.write("\n    /* Check two instances of type %s */" % instance)
-
-    out.write(check_template %
-              dict(elt_name=loxi_utils.enum_name(subcls),
-                   inst=instance, subcls=subcls,
-                   v_name=loxi_utils.version_to_name(version)))
-    out.write("""\
-    TEST_OK(%(cls)s_next(list, &elt));
-""" % dict(cls=cls))
+    out.write("\n    /* Check an instance of type %s */" % instance)
 
     out.write(check_template %
               dict(elt_name=loxi_utils.enum_name(subcls),
@@ -1169,12 +1160,12 @@ int
     v_name = loxi_utils.version_to_name(version)
 
     if not type_maps.class_is_virtual(base_type):
-        entry_count = 2
+        entry_count = 1
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
         out.write("\n    elt_p = &elt;\n")
     else:
-        entry_count = 2 * len(sub_classes) # Two of each type appended
+        entry_count = len(sub_classes)
         out.write("    /* Declare pointers for each subclass */\n")
         for instance, subcls in sub_classes:
             out.write("    %s_t *%s;\n" % (subcls, instance))
