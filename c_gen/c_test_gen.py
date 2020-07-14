@@ -218,7 +218,7 @@ of_test_str_check(uint8_t *buf, int value, int len)
  * to call populate with a max parameter for length
  */
 int octets_pop_style = -1;
-#define OCTETS_MAX_VALUE (128) /* 16K was too big */
+#define OCTETS_MAX_VALUE (64) /* 16K was too big */
 #define OCTETS_MULTIPLIER 6367 /* A prime */
 
 int
@@ -401,6 +401,35 @@ extern int %(cls)s_%(v_name)s_check_scalars(
 
     out.write("\n#endif /* _TEST_COMMON_H_ */\n")
 
+
+def gen_common_macros(out):
+    out.write("""
+/**
+ * Macros for initializing and checking scalar types
+ *
+ * @param var The variable being initialized or checked
+ * @param val The integer value to set/check against, see below
+ *
+ * Note that equality means something special for strings.  Each byte
+ * is initialized to an incrementing value.  So check is done against that.
+ *
+ */
+
+""")
+    for t in scalar_types:
+        if t in integer_types:
+            out.write("""
+#define VAR_%s_INIT(var, val) var = (%s)(val)
+#define VAR_%s_CHECK(var, val) ((var) == (%s)(val))
+""" % (t.upper(), t, t.upper(), t))
+        else:
+            out.write("""
+#define VAR_%s_INIT(var, val) \\
+    of_test_str_fill((uint8_t *)&(var), val, sizeof(var))
+#define VAR_%s_CHECK(var, val) \\
+    of_test_str_check((uint8_t *)&(var), val, sizeof(var))
+""" % (t.upper(), t.upper()))
+
 def gen_common_test(out, name):
     """
     Generate common test content including main
@@ -437,44 +466,9 @@ int exit_on_error = 1;
  */
 int global_error = 0;
 
-extern int run_unified_accessor_tests(void);
-extern int run_match_tests(void);
-extern int run_utility_tests(void);
-
-extern int run_scalar_acc_tests(void);
-extern int run_list_tests(void);
-extern int run_message_tests(void);
-
-/**
- * Macros for initializing and checking scalar types
- *
- * @param var The variable being initialized or checked
- * @param val The integer value to set/check against, see below
- *
- * Note that equality means something special for strings.  Each byte
- * is initialized to an incrementing value.  So check is done against that.
- *
- */
-
 """)
-    for t in scalar_types:
-        if t in integer_types:
-            out.write("""
-#define VAR_%s_INIT(var, val) var = (%s)(val)
-#define VAR_%s_CHECK(var, val) ((var) == (%s)(val))
-""" % (t.upper(), t, t.upper(), t))
-        else:
-            out.write("""
-#define VAR_%s_INIT(var, val) \\
-    of_test_str_fill((uint8_t *)&(var), val, sizeof(var))
-#define VAR_%s_CHECK(var, val) \\
-    of_test_str_check((uint8_t *)&(var), val, sizeof(var))
-""" % (t.upper(), t.upper()))
-
+    gen_common_macros(out)
     gen_fill_string(out)
-    gen_scalar_set_check_funs(out)
-    gen_unified_accessor_funs(out)
-
     gen_ident_tests(out)
     gen_log_test(out)
 
@@ -507,20 +501,36 @@ def gen_message_scalar_test(out, name):
             if version in of_g.unified[cls]:
                 message_scalar_test(out, version, cls)
 
-    out.write("""
-int
-run_scalar_acc_tests(void)
-{
-""")
+    # generate run_VERSION_scalar_acc_tests first
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
+        out.write("""
+int
+run_%s_scalar_acc_tests(void)
+{
+""" % v_name)
         for cls in of_g.standard_class_order:
             if type_maps.class_is_virtual(cls):
                 continue
             if version in of_g.unified[cls]:
                 test_name = "%s_%s" % (cls, v_name)
                 out.write("    RUN_TEST(%s_scalar);\n" % test_name)
+        out.write("    return TEST_PASS;\n}\n");
 
+    # then generate run_scalar_acc_tests, calling per-version tests
+    out.write("""
+int
+run_scalar_acc_tests(void)
+{
+    int rv;
+""")
+    for version in of_g.of_version_range:
+        v_name = loxi_utils.version_to_name(version)
+        out.write("""    rv = run_%s_scalar_acc_tests();
+    if (rv != TEST_PASS) {
+        return TEST_FAIL;
+    }
+""" % v_name)
     out.write("    return TEST_PASS;\n}\n");
 
 def message_scalar_test(out, version, cls):
@@ -693,6 +703,33 @@ def gen_scalar_set_check_funs(out):
             (members, member_types) = scalar_member_types_get(cls, version)
             scalar_funs_instance(out, cls, version, members, member_types)
 
+def gen_scalar_set_check(out, name):
+    loxi_utils.gen_c_copy_license(out)
+    out.write("""
+/*
+ * Common test code for LOCI
+ *
+ * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
+ */
+
+#define DISABLE_WARN_UNUSED_RESULT
+#include "loci_log.h"
+#include <loci/loci_obj_dump.h>
+#include <locitest/unittest.h>
+#include <locitest/test_common.h>
+
+/* mcheck is a glibc extension */
+#if defined(__linux__)
+#include <mcheck.h>
+#define MCHECK_INIT mcheck(NULL)
+#else
+#define MCHECK_INIT do { } while (0)
+#endif
+
+""")
+    gen_common_macros(out)
+    gen_scalar_set_check_funs(out)
+
 
 # Helper function to set up a subclass instance for a test
 def setup_instance(out, cls, subcls, instance, v_name, version):
@@ -706,13 +743,12 @@ def setup_instance(out, cls, subcls, instance, v_name, version):
     TEST_ASSERT(list->length == cur_len);
 """
     out.write("""
-    /* Append two instances of type %s */
+    /* Append an instance of type %s */
 """ % subcls)
-    for i in range(2):
-        out.write(setup_template %
-                  dict(inst=instance, subcls=subcls, v_name=v_name,
-                       base_type=base_type, cls=cls,
-                       version=version))
+    out.write(setup_template %
+              dict(inst=instance, subcls=subcls, v_name=v_name,
+                   base_type=base_type, cls=cls,
+                   version=version))
 
 def check_instance(out, cls, subcls, instance, v_name, version, last):
     check_template = """
@@ -721,15 +757,7 @@ def check_instance(out, cls, subcls, instance, v_name, version, last):
         %(inst)s, value);
     TEST_ASSERT(value != 0);
 """
-    out.write("\n    /* Check two instances of type %s */" % instance)
-
-    out.write(check_template %
-              dict(elt_name=loxi_utils.enum_name(subcls),
-                   inst=instance, subcls=subcls,
-                   v_name=loxi_utils.version_to_name(version)))
-    out.write("""\
-    TEST_OK(%(cls)s_next(list, &elt));
-""" % dict(cls=cls))
+    out.write("\n    /* Check an instance of type %s */" % instance)
 
     out.write(check_template %
               dict(elt_name=loxi_utils.enum_name(subcls),
@@ -1132,12 +1160,12 @@ int
     v_name = loxi_utils.version_to_name(version)
 
     if not type_maps.class_is_virtual(base_type):
-        entry_count = 2
+        entry_count = 1
         out.write("    /* No subclasses for %s */\n"% base_type)
         out.write("    %s_t *elt_p;\n" % base_type)
         out.write("\n    elt_p = &elt;\n")
     else:
-        entry_count = 2 * len(sub_classes) # Two of each type appended
+        entry_count = len(sub_classes)
         out.write("    /* Declare pointers for each subclass */\n")
         for instance, subcls in sub_classes:
             out.write("    %s_t *%s;\n" % (subcls, instance))
@@ -1487,6 +1515,32 @@ def gen_unified_accessor_funs(out):
             elif not type_maps.class_is_virtual(cls):
                 gen_class_setup_check(out, cls, version)
 
+def gen_unified_set_check(out, name):
+    loxi_utils.gen_c_copy_license(out)
+    out.write("""
+/*
+ * Common test code for LOCI
+ *
+ * AUTOMATICALLY GENERATED FILE.  Edits will be lost on regen.
+ */
+
+#define DISABLE_WARN_UNUSED_RESULT
+#include "loci_log.h"
+#include <loci/loci_obj_dump.h>
+#include <locitest/unittest.h>
+#include <locitest/test_common.h>
+
+/* mcheck is a glibc extension */
+#if defined(__linux__)
+#include <mcheck.h>
+#define MCHECK_INIT mcheck(NULL)
+#else
+#define MCHECK_INIT do { } while (0)
+#endif
+
+""")
+    gen_unified_accessor_funs(out)
+
 def gen_unified_accessor_tests(out, name):
     loxi_utils.gen_c_copy_license(out)
     out.write("""
@@ -1507,13 +1561,14 @@ def gen_unified_accessor_tests(out, name):
                 continue
             unified_accessor_test_case(out, cls, version)
 
-    out.write("""
-int
-run_unified_accessor_tests(void)
-{
-""")
+    # generate run_VERSION_unified_accessor_tests first
     for version in of_g.of_version_range:
         v_name = loxi_utils.version_to_name(version)
+        out.write("""
+int
+run_%s_unified_accessor_tests(void)
+{
+""" % v_name)
         for cls in of_g.standard_class_order:
             if not loxi_utils.class_in_version(cls, version):
                 continue
@@ -1521,9 +1576,23 @@ run_unified_accessor_tests(void)
                 continue
             test_name = "%s_%s" % (cls, v_name)
             out.write("    RUN_TEST(%s);\n" % test_name)
+        out.write("    return TEST_PASS;\n}\n");
 
+    # then generate run_unified_accessor_tests, calling per-version tests
+    out.write("""
+int
+run_unified_accessor_tests(void)
+{
+    int rv;
+""")
+    for version in of_g.of_version_range:
+        v_name = loxi_utils.version_to_name(version)
+        out.write("""    rv = run_%s_unified_accessor_tests();
+    if (rv != TEST_PASS) {
+        return TEST_FAIL;
+    }
+""" % v_name)
     out.write("    return TEST_PASS;\n}\n");
-
 
 
 ################################################################
