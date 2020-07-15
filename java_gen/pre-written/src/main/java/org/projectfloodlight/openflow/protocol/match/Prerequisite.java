@@ -1,14 +1,15 @@
 package org.projectfloodlight.openflow.protocol.match;
 
 import java.util.Set;
-import com.google.common.collect.ImmutableSet;
 
 import org.projectfloodlight.openflow.types.OFValueType;
+
+import com.google.common.collect.ImmutableSet;
 
 public class Prerequisite<T extends OFValueType<T>> {
     private final MatchField<T> field;
     private final Set<OFValueType<T>> values;
-    private boolean any;
+    private final boolean any;
 
     @SafeVarargs
     public Prerequisite(MatchField<T> field, OFValueType<T>... values) {

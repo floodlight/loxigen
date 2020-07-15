@@ -23,3 +23,10 @@ ofp.match([
     ofp.oxm.eth_src([1,2,3,4,5,6]),
     ofp.oxm.ipv6_dst("\x12" * 16),
 ])
+-- python3
+ofp.match([
+    ofp.oxm.udp_dst(53),
+    ofp.oxm.metadata_masked(0xFEDCBA9876543210, 0xFFFFFFFF12345678),
+    ofp.oxm.eth_src([1,2,3,4,5,6]),
+    ofp.oxm.ipv6_dst(b"\x12" * 16),
+])

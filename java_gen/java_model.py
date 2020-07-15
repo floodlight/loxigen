@@ -253,7 +253,7 @@ class JavaModel(object):
                     if i.is_instance_of(super_class):
                         factory.members.append(i)
                         break
-        return factories.values()
+        return list(factories.values())
 
     @memoize
     def factory_of(self, interface):
@@ -396,7 +396,7 @@ class JavaOFInterface(object):
         """
         self.ir_class = ir_class
         self.c_name = ir_class.name
-        self.version_map = { JavaOFVersion(v): c for v,c in ir_class.version_classes.items() }
+        self.version_map = OrderedDict( (JavaOFVersion(v), c) for v,c in ir_class.version_classes.items() )
         # name: the Java Type name, e.g., OFFlowAdd
         self.name = java_class_name(self.c_name)
         # variable_name name to use for variables of this type. i.e., flowAdd
@@ -657,7 +657,7 @@ class JavaOFInterface(object):
     @memoize
     def all_versions(self):
         """ return list of all versions that this interface exists in """
-        return self.version_map.keys()
+        return list(self.version_map.keys())
 
     def has_version(self, version):
         return version in self.version_map
@@ -890,7 +890,7 @@ class JavaMember(object):
             enum = model.enum_by_name(java_type)
             entry = enum.entry_by_version_value(self.msg.version, self.value)
             return "%s.%s" % ( enum.name, entry.name)
-        except KeyError, e:
+        except KeyError as e:
             logger.debug("No enum found for type %s version %s value %s", java_type, self.msg.version, self.value)
             return self.value
 
@@ -1152,7 +1152,7 @@ class JavaEnum(object):
         static_metadata = model.enum_metadata_map[self.name]
         if self.stable:
             # need this to look up wire_type, which does not matter
-            any_version = version_enum_map.keys()[0]
+            any_version = list(version_enum_map.keys())[0]
             # if this is a 'stable' enum, i.e., its value won't change, add
             # a "Metadata" (virtual) field "StableValue" to it that returns
             # its wirevalue.
@@ -1181,7 +1181,7 @@ class JavaEnum(object):
 
     @property
     def versions(self):
-        return self.version_enums.keys()
+        return list(self.version_enums.keys())
 
     @memoize
     def entry_by_name(self, name):
@@ -1234,7 +1234,7 @@ class JavaEnumEntry(object):
     @property
     def stable_value(self):
         if self.enum.stable:
-            return self.values.values()[0]
+            return list(self.values.values())[0]
         else:
             raise Exception("Enum {} not stable".format(self.enum.name))
 

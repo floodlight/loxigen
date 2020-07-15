@@ -1,11 +1,12 @@
 package org.projectfloodlight.openflow.types;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertThat;
-import junit.framework.TestCase;
 
 import org.junit.Test;
+
+import junit.framework.TestCase;
 
 public class OFPortBitMapTest extends TestCase {
 

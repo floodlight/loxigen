@@ -287,7 +287,7 @@ def unify_input():
 
     # Add classes to unified in wire-format order so that it is easier
     # to generate things later
-    keys = versions.keys()
+    keys = list(versions.keys())
     keys.sort(reverse=True)
     for version in keys:
         wire_version = versions[version]["wire_version"]

@@ -2,10 +2,10 @@ package org.projectfloodlight.openflow.types;
 
 import javax.annotation.concurrent.Immutable;
 
-import io.netty.buffer.ByteBuf;
-
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.UnsignedInts;
+
+import io.netty.buffer.ByteBuf;
 
 @Immutable
 public class UDF implements OFValueType<UDF> {

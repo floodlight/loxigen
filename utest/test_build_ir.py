@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -214,19 +214,18 @@ class BuildIRTest(unittest.TestCase):
         p = ir.build_protocol(version, [ input ])
         eq_(0, len(p.classes))
         eq_(2, len(p.enums))
-        e = p.enums[0]
-        eq_("ofp_flow_wildcards", e.name)
-        eq_(True, e.is_bitmask)
-        eq_("uint32_t", e.wire_type)
-        eq_(ir.OFEnumEntry(name="OFPFW_IN_PORT", value=0x01, params={}), e.entries[0])
-        eq_(ir.OFEnumEntry(name="OFPFW_DL_VLAN", value=0x02, params={}), e.entries[1])
 
-        e = p.enums[1]
-        eq_("ofp_queue_properties", e.name)
-        eq_(False, e.is_bitmask)
-        eq_("uint32_t", e.wire_type)
-        eq_(ir.OFEnumEntry(name="OFPQT_NONE", value=0x00, params={}), e.entries[0])
-        eq_(ir.OFEnumEntry(name="OFPQT_MIN_RATE", value=0x01, params={}), e.entries[1])
+        for e in p.enums:
+            if e.name == "ofp_flow_wildcards":
+                eq_(True, e.is_bitmask)
+                eq_("uint32_t", e.wire_type)
+                eq_(ir.OFEnumEntry(name="OFPFW_IN_PORT", value=0x01, params={}), e.entries[0])
+                eq_(ir.OFEnumEntry(name="OFPFW_DL_VLAN", value=0x02, params={}), e.entries[1])
+            if e.name == "ofp_queue_properties":
+                eq_(False, e.is_bitmask)
+                eq_("uint32_t", e.wire_type)
+                eq_(ir.OFEnumEntry(name="OFPQT_NONE", value=0x00, params={}), e.entries[0])
+                eq_(ir.OFEnumEntry(name="OFPQT_MIN_RATE", value=0x01, params={}), e.entries[1])
 
 if __name__ == '__main__':
     unittest.main()

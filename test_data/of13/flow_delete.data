@@ -72,6 +72,30 @@ ofp.message.flow_delete(
     instructions=[
         ofp.instruction.goto_table(table_id=4),
         ofp.instruction.goto_table(table_id=7)])
+-- python3
+ofp.message.flow_delete(
+    xid=0x12345678,
+    cookie=0xFEDCBA9876543210,
+    cookie_mask=0xFF00FF00FF00FF00,
+    table_id=3,
+    idle_timeout=5,
+    hard_timeout=10,
+    priority=6000,
+    buffer_id=50,
+    out_port=6,
+    out_group=8,
+    flags=0,
+    match=ofp.match(oxm_list=[
+        ofp.oxm.in_port_masked(value=4, value_mask=5),
+        ofp.oxm.eth_type(value=0x86dd),
+        ofp.oxm.ip_proto(value=6),
+        ofp.oxm.ipv6_src_masked(
+            value     =b'\x1C\xCA\xFE\x1C\xB1\x10\x1C\x00\x00\x28\x00\x00\x00\x00\x00\x00',
+            value_mask=b'\xFF\xFF\xFF\xFF\xFF\xF0\xFF\xFF\x1C\x2C\x3C\x00\x00\x00\x00\x00')
+        ]),
+    instructions=[
+        ofp.instruction.goto_table(table_id=4),
+        ofp.instruction.goto_table(table_id=7)])
 -- java
 builder.setXid(0x12345678)
     .setCookie(U64.parseHex("FEDCBA9876543210"))

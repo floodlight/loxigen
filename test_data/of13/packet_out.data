@@ -24,3 +24,12 @@ ofp.message.packet_out(
         ofp.action.output(port=2, max_len=0xffff),
         ofp.action.dec_nw_ttl()],
     data="abc")
+-- python3
+ofp.message.packet_out(
+    xid=0x12345678,
+    buffer_id=100,
+    in_port=4,
+    actions=[
+        ofp.action.output(port=2, max_len=0xffff),
+        ofp.action.dec_nw_ttl()],
+    data=b"abc")

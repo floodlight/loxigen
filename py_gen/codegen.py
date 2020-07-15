@@ -25,12 +25,12 @@
 # EPL for the specific language governing permissions and limitations
 # under the EPL.
 
-from collections import defaultdict
 import os
 import loxi_globals
+import generic_utils
 import template_utils
 import loxi_utils.loxi_utils as utils
-import util
+from py_gen import util
 from loxi_ir import *
 
 # Map from inheritance root to module name
@@ -72,13 +72,15 @@ def generate_pyname(ofclass):
 
 # Create intermediate representation, extended from the LOXI IR
 def build_ofclasses(version):
-    modules = defaultdict(list)
+    modules = generic_utils.OrderedDefaultDict(list)
     for ofclass in loxi_globals.ir[version].classes:
         module_name, ofclass.pyname = generate_pyname(ofclass)
         modules[module_name].append(ofclass)
     return modules
 
-def codegen(install_dir):
+# pyversion determines if python2 or python3 is to be generated
+# 2 for python2, 3 for python3
+def codegen(install_dir, pyversion):
     def render(name, template_name=None, **ctx):
         if template_name is None:
             template_name = os.path.basename(name)
@@ -87,7 +89,7 @@ def codegen(install_dir):
 
     render('__init__.py', template_name='toplevel_init.py')
     render('pp.py')
-    render('generic_util.py')
+    render('generic_util.py', pyversion=pyversion)
     render('connection.py')
 
     for version in loxi_globals.OFVersions.all_supported:
@@ -97,7 +99,8 @@ def codegen(install_dir):
         render(os.path.join(subdir, '__init__.py'), template_name='init.py',
                version=version, modules=modules.keys())
 
-        render(os.path.join(subdir, 'util.py'), version=version)
+        render(os.path.join(subdir, 'util.py'), version=version,
+               pyversion=pyversion)
 
         render(os.path.join(subdir, 'const.py'), version=version,
                enums=loxi_globals.ir[version].enums)
@@ -111,4 +114,5 @@ def codegen(install_dir):
             args = args_by_module.get(name, {})
             render(os.path.join(subdir, name + '.py'), template_name='module.py',
                    version=version, ofclasses=ofclasses, subdir=subdir,
+                   pyversion=pyversion,
                    **args)

@@ -41,7 +41,7 @@ def protocol(ver):
     """
 :: for v in loxi_globals.OFVersions.all_supported:
     if ver == ${v.wire_version}:
-        import of${v.version.replace('.', '')}
+        from . import of${v.version.replace('.', '')}
         return of${v.version.replace('.', '')}
 
 :: #endfor

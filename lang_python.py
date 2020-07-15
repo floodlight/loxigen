@@ -63,4 +63,4 @@ import py_gen.codegen
 PREFIX = 'pyloxi/loxi'
 
 def generate(install_dir):
-    py_gen.codegen.codegen(os.path.join(install_dir, PREFIX))
+    py_gen.codegen.codegen(os.path.join(install_dir, PREFIX), pyversion=2)

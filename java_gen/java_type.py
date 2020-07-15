@@ -7,6 +7,7 @@ import time
 import loxi_globals
 from generic_utils import memoize
 import loxi_utils.loxi_utils as loxi_utils
+from functools import reduce
 
 def erase_type_annotation(class_name):
     m=re.match(r'(.*)<.*>', class_name)
@@ -976,7 +977,7 @@ def convert_to_jtype(obj_name, field_name, c_type):
     elif c_type in enum_java_types():
         return enum_java_types()[c_type]
     else:
-        print "WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name)
+        print("WARN: Couldn't find java type conversion for '%s' in %s:%s" % (c_type, obj_name, field_name))
         jtype = name_c_to_caps_camel(re.sub(r'_t$', "", c_type))
         return JType(jtype)
 

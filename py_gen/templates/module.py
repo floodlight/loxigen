@@ -33,7 +33,10 @@
 
 import struct
 import loxi
-import util
+from . import util
+:: if pyversion == 3:
+import functools
+:: #endif
 import loxi.generic_util
 
 import sys

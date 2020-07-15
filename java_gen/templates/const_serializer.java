@@ -38,7 +38,13 @@ import ${enum.package}.${enum.name};
 public class ${class_name} {
     //:: wire_type = enum.wire_type(version)
     //:: int_wire_type = enum.wire_type(version).pub_type
-    //:: entries = sorted([ (entry, entry.value(version)) for entry in enum.entries if entry.has_value(version) ], lambda (_,va), (_2,vb): va.__cmp__(vb))
+    //:: unsorted_entries = []
+    //:: for entry in enum.entries:
+    //::   if entry.has_value(version):
+    //::     unsorted_entries.append( (entry, entry.value(version)) )
+    //::   #endif
+    //:: #endfor
+    //:: entries = sorted(unsorted_entries, key=lambda tup: tup[1])
 
     //:: for entry, _ in entries:
     public final static ${int_wire_type} ${entry.name}_VAL = ${entry.format_value(version)};

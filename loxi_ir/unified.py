@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -31,7 +31,7 @@ from collections import OrderedDict
 from itertools import chain
 import logging
 
-import ir
+from . import ir
 
 def build_unified_ir(name_protocol_map):
     class UnifiedClassSpec(object):
@@ -146,7 +146,7 @@ def build_unified_ir(name_protocol_map):
                 name = spec.name,
                 version_classes=spec.version_class,
                 superclass=None if not spec.superclass_name else unified_classes[spec.superclass_name],
-                members=spec.members.values(),
+                members=list(spec.members.values()),
                 virtual=spec.virtual,
                 params=spec.params,
                 base_length=spec.base_length,

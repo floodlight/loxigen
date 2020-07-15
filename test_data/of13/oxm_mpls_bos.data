@@ -4,4 +4,4 @@
 01 # length
 01 # value
 -- python
-ofp.oxm.mpls_bos(value=01)
+ofp.oxm.mpls_bos(value=1)

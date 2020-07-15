@@ -99,7 +99,8 @@ Combination of multiple OFInput objects.
 """
 class OFProtocol(namedtuple('OFProtocol', ['version', 'classes', 'enums'])):
     def __init__(self, version, classes, enums):
-        super(OFProtocol, self).__init__(self, version, classes, enums)
+        # comment out; TypeError: object.__init__() takes no parameters
+        #super(OFProtocol, self).__init__(self, version, classes, enums)
         assert version is None or isinstance(version, OFVersion)
 
     def class_by_name(self, name):
@@ -123,7 +124,8 @@ The members are in the same order as on the wire.
 """
 class OFClass(namedtuple('OFClass', ['name', 'superclass', 'members', 'virtual', 'params', 'is_fixed_length', 'base_length'])):
     def __init__(self, *a, **kw):
-        super(OFClass, self).__init__(self, *a, **kw)
+        # comment out; TypeError: object.__init__() takes no parameters
+        #super(OFClass, self).__init__(self, *a, **kw)
         # Back reference will be added by assignment
         self.protocol = None
 
@@ -222,7 +224,8 @@ class OFUnifiedClass(OFClass):
     build_protocol, and additional methods shared across Members. """
 class MemberMixin(object):
     def __init__(self, *a, **kw):
-        super(MemberMixin, self).__init__(*a, **kw)
+        # comment out; TypeError: object.__init__() takes no parameters
+        #super(MemberMixin, self).__init__(*a, **kw)
         # Back reference will be added by assignment in build_protocol below
         self.of_class = None
 
@@ -315,7 +318,8 @@ All values are Python ints.
 """
 class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
     def __init__(self, *a, **kw):
-        super(OFEnum, self).__init__(*a, **kw)
+        # comment out; TypeError: object.__init__() takes no parameters
+        #super(OFEnum, self).__init__(*a, **kw)
         # Back reference will be added by assignment
         self.protocol = None
 
@@ -333,7 +337,8 @@ class OFEnum(namedtuple('OFEnum', ['name', 'entries', 'params'])):
 
 class OFEnumEntry(namedtuple('OFEnumEntry', ['name', 'value', 'params'])):
     def __init__(self, *a, **kw):
-        super(OFEnumEntry, self).__init__(*a, **kw)
+        # comment out; TypeError: object.__init__() takes no parameters
+        #super(OFEnumEntry, self).__init__(*a, **kw)
         # Back reference will be added by assignment
         self.enum = None
 
@@ -368,7 +373,7 @@ def build_protocol(version, ofinputs):
             else:
                 name_frontend_enums[name] = (e, ofinput)
 
-    name_enums = {}
+    name_enums = OrderedDict()
     for fe, _ in name_frontend_enums.values():
         entries = tuple(OFEnumEntry(name=e.name, value=e.value,
                         params=e.params) for e in fe.entries)

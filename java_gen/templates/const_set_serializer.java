@@ -39,7 +39,12 @@ import ${enum.package}.${enum.name};
 public class ${class_name} {
     //:: wire_type = enum.wire_type(version)
     //:: int_wire_type = enum.wire_type(version).pub_type
-    //:: entries = [entry for entry in enum.entries if entry.has_value(version) ]
+    //:: entries = []
+    //:: for entry in enum.entries:
+    //::   if entry.has_value(version):
+    //::     entries.append(entry)
+    //::   #endif
+    //:: #endfor
 
     //:: for entry in entries:
     public final static ${int_wire_type} ${entry.name}_VAL = ${entry.format_value(version)};

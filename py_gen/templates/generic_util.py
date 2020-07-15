@@ -34,9 +34,14 @@ Utility functions independent of the protocol version
 
 import loxi
 import struct
+import functools
 
 def pack_list(values):
+:: if pyversion == 2:
     return "".join([x.pack() for x in values])
+:: else:
+    return functools.reduce(lambda x,y: x+y, [x.pack() for x in values], b'')
+:: #endif
 
 def unpack_list(reader, deserializer):
     """
@@ -52,7 +57,11 @@ def pad_to(alignment, length):
     Return a string of zero bytes that will pad a string of length 'length' to
     a multiple of 'alignment'.
     """
+:: if pyversion == 2:
     return "\x00" * ((length + alignment - 1)/alignment*alignment - length)
+:: else:
+    return b"\x00" * (int((length + alignment - 1)/alignment)*alignment - length)
+:: #endif
 
 class OFReader(object):
     """
@@ -105,7 +114,7 @@ class OFReader(object):
         self.offset += length
 
     def skip_align(self):
-        new_offset = (self.offset + 7) / 8 * 8
+        new_offset = int((self.offset + 7) / 8) * 8
         if new_offset > self.length:
             raise loxi.ProtocolError("Buffer too short")
         self.offset = new_offset

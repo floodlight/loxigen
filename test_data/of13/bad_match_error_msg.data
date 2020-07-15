@@ -10,6 +10,11 @@ ofp.message.bad_match_error_msg(
     xid=0x12345678,
     code=ofp.OFPBMC_BAD_MASK,
     data="abc")
+-- python3
+ofp.message.bad_match_error_msg(
+    xid=0x12345678,
+    code=ofp.OFPBMC_BAD_MASK,
+    data=b"abc")
 -- c
 obj = of_bad_match_error_msg_new(OF_VERSION_1_3);
 of_bad_match_error_msg_xid_set(obj, 0x12345678);

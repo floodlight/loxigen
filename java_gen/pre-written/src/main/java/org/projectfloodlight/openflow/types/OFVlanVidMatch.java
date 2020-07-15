@@ -4,13 +4,14 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
-import io.netty.buffer.ByteBuf;
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
+
+import io.netty.buffer.ByteBuf;
 
 /** Represents an OpenFlow Vlan VID for use in Matches, as specified by the OpenFlow 1.3 spec.
  *

@@ -94,11 +94,13 @@ targets = {
     'locitest/inc/locitest/test_common.h': c_test_gen.gen_common_test_header,
     'locitest/src/of_dup.c': c_test_gen.dup_c_gen,
     'locitest/src/test_common.c': c_test_gen.gen_common_test,
+    'locitest/src/test_scalar_setcheck.c': c_test_gen.gen_scalar_set_check,
+    'locitest/src/test_unified_setcheck.c': c_test_gen.gen_unified_set_check,
     'locitest/src/test_list.c': c_test_gen.gen_list_test,
     'locitest/src/test_match.c': c_test_gen.gen_match_test,
     'locitest/src/test_msg.c': c_test_gen.gen_msg_test,
-    'locitest/src/test_scalar_acc.c': c_test_gen.gen_message_scalar_test,
-    'locitest/src/test_uni_acc.c': c_test_gen.gen_unified_accessor_tests,
+    'locitest/src/test_scalar_accessor.c': c_test_gen.gen_message_scalar_test,
+    'locitest/src/test_unified_accessor.c': c_test_gen.gen_unified_accessor_tests,
     'locitest/src/test_data.c': c_test_gen.gen_datafiles_tests,
 
     # Static locitest code

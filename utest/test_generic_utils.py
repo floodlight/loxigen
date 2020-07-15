@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # Copyright 2013, Big Switch Networks, Inc.
 #
 # LoxiGen is licensed under the Eclipse Public License, version 1.0 (EPL), with
@@ -57,11 +57,11 @@ class GenericTest(unittest.TestCase):
             self.count += 1
             return "Foo"
 
-        self.assertEquals(0, self.count)
-        self.assertEquals("Foo", function())
-        self.assertEquals(1, self.count)
-        self.assertEquals("Foo", function())
-        self.assertEquals(1, self.count)
+        self.assertEqual(0, self.count)
+        self.assertEqual("Foo", function())
+        self.assertEqual(1, self.count)
+        self.assertEqual("Foo", function())
+        self.assertEqual(1, self.count)
 
     def test_memoize_string_args(self):
         self.count = 0
@@ -71,13 +71,13 @@ class GenericTest(unittest.TestCase):
             self.count += 1
             return "%s:%s" % (a,b)
 
-        self.assertEquals(0, self.count)
-        self.assertEquals("a:b", function('a', 'b'))
-        self.assertEquals(1, self.count)
-        self.assertEquals("ab:", function('ab', ''))
-        self.assertEquals(2, self.count)
-        self.assertEquals("ab:", function('ab', ''))
-        self.assertEquals(2, self.count)
+        self.assertEqual(0, self.count)
+        self.assertEqual("a:b", function('a', 'b'))
+        self.assertEqual(1, self.count)
+        self.assertEqual("ab:", function('ab', ''))
+        self.assertEqual(2, self.count)
+        self.assertEqual("ab:", function('ab', ''))
+        self.assertEqual(2, self.count)
 
     def test_memoize_kw_args(self):
         self.count = 0
@@ -85,17 +85,17 @@ class GenericTest(unittest.TestCase):
         @memoize
         def function(**kw):
             self.count += 1
-            return ",".join("{k}={v}".format(k=k,v=v) for k,v in kw.items())
+            return ",".join("{k}={v}".format(k=k,v=v) for k,v in sorted(kw.items()))
 
-        self.assertEquals(0, self.count)
-        self.assertEquals("a=1", function(a=1))
-        self.assertEquals(1, self.count)
-        self.assertEquals("a=1,b=2", function(a=1, b=2))
-        self.assertEquals(2, self.count)
-        self.assertEquals("a=1", function(a=1))
-        self.assertEquals(2, self.count)
-        self.assertEquals("a=1,b=BoringConstantString", function(a=1, b=MyHash('1')))
-        self.assertEquals(3, self.count)
+        self.assertEqual(0, self.count)
+        self.assertEqual("a=1", function(a=1))
+        self.assertEqual(1, self.count)
+        self.assertEqual("a=1,b=2", function(a=1, b=2))
+        self.assertEqual(2, self.count)
+        self.assertEqual("a=1", function(a=1))
+        self.assertEqual(2, self.count)
+        self.assertEqual("a=1,b=BoringConstantString", function(a=1, b=MyHash('1')))
+        self.assertEqual(3, self.count)
 
     def test_memoize_with_hashable_object(self):
         self.count = 0
@@ -105,13 +105,13 @@ class GenericTest(unittest.TestCase):
             self.count += 1
             return a.val
 
-        self.assertEquals(0, self.count)
-        self.assertEquals("a", function(MyHash('a')))
-        self.assertEquals(1, self.count)
-        self.assertEquals("b", function(MyHash('b')))
-        self.assertEquals(2, self.count)
-        self.assertEquals("a", function(MyHash('a')))
-        self.assertEquals(2, self.count)
+        self.assertEqual(0, self.count)
+        self.assertEqual("a", function(MyHash('a')))
+        self.assertEqual(1, self.count)
+        self.assertEqual("b", function(MyHash('b')))
+        self.assertEqual(2, self.count)
+        self.assertEqual("a", function(MyHash('a')))
+        self.assertEqual(2, self.count)
 
 if __name__ == '__main__':
     unittest.main()

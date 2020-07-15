@@ -1,13 +1,13 @@
 package org.projectfloodlight.openflow.types;
 
-import io.netty.buffer.ByteBuf;
-
 import java.util.Arrays;
 
 import org.projectfloodlight.openflow.exceptions.OFParseError;
 
 import com.google.common.hash.PrimitiveSink;
 import com.google.common.primitives.Shorts;
+
+import io.netty.buffer.ByteBuf;
 
 /** Represents an 802.1Q Vlan VID (12 bits).
  *
