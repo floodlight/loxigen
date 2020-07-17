@@ -1515,6 +1515,36 @@ struct of_bsn_tlv_mgmt_reselect_on_failure : of_bsn_tlv {
     uint16_t length;
 };
 
+struct of_bsn_tlv_lcore : of_bsn_tlv {
+    uint16_t type == 209;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_thread : of_bsn_tlv {
+    uint16_t type == 210;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_mgmt : of_bsn_tlv {
+    uint16_t type == 211;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_socket : of_bsn_tlv {
+    uint16_t type == 212;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_load : of_bsn_tlv {
+    uint16_t type == 213;
+    uint16_t length;
+    uint32_t value;
+};
+
 struct of_bsn_tlv_max_count : of_bsn_tlv {
     uint16_t type == 214;
     uint16_t length;
