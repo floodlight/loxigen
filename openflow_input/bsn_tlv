@@ -1544,3 +1544,15 @@ struct of_bsn_tlv_load : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+struct of_bsn_tlv_max_count : of_bsn_tlv {
+    uint16_t type == 214;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_free_count : of_bsn_tlv {
+    uint16_t type == 215;
+    uint16_t length;
+    uint32_t value;
+};
