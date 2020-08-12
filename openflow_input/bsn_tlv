@@ -1556,3 +1556,14 @@ struct of_bsn_tlv_free_count : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+enum ofp_bsn_admin_state(wire_type=uint8_t) {
+    OFP_BSN_ADMIN_STATE_DISABLED = 0,
+    OFP_BSN_ADMIN_STATE_ENABLED = 1,
+};
+
+struct of_bsn_tlv_admin_state : of_bsn_tlv {
+    uint16_t type == 216;
+    uint16_t length;
+    enum ofp_bsn_admin_state value;
+};
