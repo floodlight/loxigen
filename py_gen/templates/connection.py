@@ -233,7 +233,11 @@ class Connection(Thread):
         assert not self.finished
         self.logger.debug("Stopping connection")
         self.finished = True
+:: if pyversion == 3:
+        os.write(self.wakeup_wr, b"x")
+:: else:
         os.write(self.wakeup_wr, "x")
+:: #endif
         self.join()
         self.sock.close()
         os.close(self.wakeup_rd)
