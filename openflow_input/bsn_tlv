@@ -1567,3 +1567,16 @@ struct of_bsn_tlv_admin_state : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_admin_state value;
 };
+
+struct of_bsn_tlv_matched_count : of_bsn_tlv {
+    uint16_t type == 217;
+    uint16_t length;
+    uint64_t value;
+};
+
+struct of_bsn_tlv_lookup_count : of_bsn_tlv {
+    uint16_t type == 218;
+    uint16_t length;
+    uint64_t value;
+};
+
