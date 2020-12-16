@@ -500,25 +500,6 @@ def base_h_content(out):
 #include <loci/loci_idents.h>
 
 /**
- * Macro to enable debugging for LOCI.
- *
- * This enables debug output to stdout.
- */
-#define OF_DEBUG_ENABLE
-
-#if defined(OF_DEBUG_ENABLE)
-#include <stdio.h> /* Currently for debugging */
-#define FIXME(str) do {                 \\
-        fprintf(stderr, "%s\\n", str);  \\
-        exit(1);                        \\
-    } while (0)
-#define debug printf
-#else
-#define FIXME(str)
-#define debug(str, ...)
-#endif /* OF_DEBUG_ENABLE */
-
-/**
  * The type of a function used by the LOCI dump/show functions to
  * output text. Essentially the same signature as fprintf. May
  * be called many times per invocation of e.g. of_object_show().
