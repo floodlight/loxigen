@@ -1599,3 +1599,13 @@ struct of_bsn_tlv_lookup_count : of_bsn_tlv {
     uint64_t value;
 };
 
+enum ofp_bsn_push_two_tags_mode(wire_type=uint8_t, bitmask=True) {
+    OFP_BSN_PUSH_TWO_TAGS_NOT_SUPPORTED = 0x0,
+    OFP_BSN_PUSH_TWO_TAGS_SUPPORTED = 0x1,
+};
+
+struct of_bsn_tlv_push_two_tags_capability : of_bsn_tlv {
+    uint16_t type == 219;
+    uint16_t length;
+    enum ofp_bsn_push_two_tags_mode value;
+};
