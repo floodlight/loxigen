@@ -1609,3 +1609,8 @@ struct of_bsn_tlv_push_two_tags_capability : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_push_two_tags_mode value;
 };
+
+struct of_bsn_tlv_push_two_per_policy : of_bsn_tlv {
+    uint16_t type == 220;
+    uint16_t length;
+};
