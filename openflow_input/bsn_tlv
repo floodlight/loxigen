@@ -1619,3 +1619,27 @@ struct of_bsn_tlv_push_two_per_policy : of_bsn_tlv {
     uint16_t type == 220;
     uint16_t length;
 };
+
+enum ofp_bsn_metadata(wire_type=uint16_t) {
+    OFP_BSN_METADATA_UNKNOWN = 0,
+    OFP_BSN_METADATA_POLICY_ID = 1,
+    OFP_BSN_METADATA_FILTER_ID = 2,
+};
+
+struct of_bsn_tlv_metadata : of_bsn_tlv {
+    uint16_t type == 221;
+    uint16_t length;
+    enum ofp_bsn_metadata value;
+};
+
+enum ofp_bsn_packet_field(wire_type=uint16_t) {
+    OFP_BSN_PACKET_FIELD_UNKNOWN = 0,
+    OFP_BSN_PACKET_FIELD_OUTER_VLAN_TAG_1 = 1,  /* outermost vlan tag */
+    OFP_BSN_PACKET_FIELD_OUTER_VLAN_TAG_2 = 2,  /* next outermost vlan tag */
+};
+
+struct of_bsn_tlv_packet_field : of_bsn_tlv {
+    uint16_t type == 222;
+    uint16_t length;
+    enum ofp_bsn_packet_field value;
+};
