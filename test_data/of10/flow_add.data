@@ -78,7 +78,7 @@ flow_add {
   priority = 0x0,
   buffer_id = 0x0,
   out_port = 0,
-  flags = 0x2,
+  flags = OFPFF_CHECK_OVERLAP,
   actions = [
     output { port = OFPP_FLOOD, max_len = 0x0 },
     nicira_dec_ttl {  },

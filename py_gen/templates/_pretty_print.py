@@ -40,32 +40,47 @@
 :: #endfor
 :: first = True
 :: for m in normal_members:
-:: if not first:
+::   if not first:
                 q.text(","); q.breakable()
-:: else:
-:: first = False
-:: #endif
+::   else:
+::     first = False
+::   #endif
                 q.text("${m.name} = ");
-:: if m.name == "xid":
+::   if m.name == "xid":
                 if self.${m.name} != None:
                     q.text("%#x" % self.${m.name})
                 else:
                     q.text('None')
-:: elif m.oftype == 'of_mac_addr_t':
+::   elif m.oftype == 'of_mac_addr_t':
                 q.text(util.pretty_mac(self.${m.name}))
-:: elif m.oftype == 'of_ipv4_t':
+::   elif m.oftype == 'of_ipv4_t':
                 q.text(util.pretty_ipv4(self.${m.name}))
-:: elif m.oftype == 'of_wc_bmap_t' and version in OFVersions.from_strings("1.0", "1.1"):
+::   elif m.oftype == 'of_wc_bmap_t' and version in OFVersions.from_strings("1.0", "1.1"):
                 q.text(util.pretty_wildcards(self.${m.name}))
-:: elif m.oftype == 'of_port_no_t':
+::   elif m.oftype == 'of_port_no_t':
                 q.text(util.pretty_port(self.${m.name}))
-:: elif m.oftype == 'of_ipv6_t':
+::   elif m.oftype == 'of_ipv6_t':
                 q.text(util.pretty_ipv6(self.${m.name}))
-:: elif loxi_utils.lookup_ir_wiretype(m.oftype, version=version).startswith("uint"):
+::   elif loxi_utils.lookup_ir_wiretype(m.oftype, version=version).startswith("uint"):
+::     enum = loxi_utils.lookup_ir_enum(m.oftype, version=version)
+::     if enum:
+::       value_name_map = { entry.value:entry.name for entry in enum.entries }
+::       if 'bitmask' in enum.params and enum.params['bitmask']:
+                value_name_map = ${value_name_map}
+                q.text(util.pretty_flags(self.${m.name}, value_name_map.values()))
+::       else:
+                value_name_map = ${value_name_map}
+                if self.${m.name} in value_name_map:
+                    q.text("%s(%d)" % (value_name_map[self.${m.name}], self.${m.name}))
+                else:
+                    q.text("%#x" % self.${m.name})
+::       #endif
+::     else:
                 q.text("%#x" % self.${m.name})
-:: else:
+::     #endif
+::   else:
                 q.pp(self.${m.name})
-:: #endif
+::   #endif
 :: #endfor
             q.breakable()
         q.text('}')

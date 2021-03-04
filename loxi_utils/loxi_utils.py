@@ -187,6 +187,13 @@ def lookup_ir_wiretype(oftype, version):
     else:
         return oftype
 
+@memoize
+def lookup_ir_enum(oftype, version):
+    """ if oftype is a reference to an enum in ir,
+        return the value-name mapping; otherwise return None """
+    enums = loxi_globals.ir[version].enums
+    return find(lambda e: e.name == oftype, enums)
+
 def oftype_is_list(oftype):
     return (oftype.find("list(") == 0)
 
