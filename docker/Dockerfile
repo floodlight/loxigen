@@ -5,7 +5,7 @@ ADD etc/apt/apt.conf.d/02-proxy /etc/apt/apt.conf.available/02-proxy
 RUN nc -z -w 2 apt-proxy.eng.bigswitch.com 3142 >/dev/null 2>&1 && ln -s ../apt.conf.available/02-proxy /etc/apt/apt.conf.d || true
 
 RUN apt-get update \
-  && apt-get upgrade -y --no-install-recommends \
+  && DEBIAN_FRONTEND=noninteractive apt-get upgrade -y --no-install-recommends \
         build-essential \
         git \
         gnupg \
