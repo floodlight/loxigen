@@ -17,6 +17,7 @@ RUN apt-get update \
         python-pip \
         python-setuptools \
         python3 \
+        python3-arrow \
         python3-nose \
         python3-pip \
         python3-setuptools \
