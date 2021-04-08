@@ -1643,3 +1643,8 @@ struct of_bsn_tlv_packet_field : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_packet_field value;
 };
+
+struct of_bsn_tlv_no_drop : of_bsn_tlv {
+    uint16_t type == 223;
+    uint16_t length;
+};
