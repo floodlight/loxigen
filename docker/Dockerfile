@@ -24,6 +24,7 @@ RUN apt-get update \
         rsync
 
 RUN pip install PyGithub==1.35
+RUN pip3 install PyGithub==1.35
 
 RUN useradd -m -d /loxi -c 'loxi build user' -u 1000 -s /bin/bash loxi
 COPY run-as-loxi /
