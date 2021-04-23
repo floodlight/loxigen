@@ -1649,20 +1649,13 @@ struct of_bsn_tlv_no_drop : of_bsn_tlv {
     uint16_t length;
 };
 
-struct of_bsn_tlv_dhcpv6_option : of_bsn_tlv {
+struct of_bsn_tlv_remote_id : of_bsn_tlv {
     uint16_t type == 224;
     uint16_t length;
-    uint16_t opt_code;
+    of_octets_t value;
 };
 
-enum ofp_bsn_dhcpv6_opt_fmt(wire_type=uint16_t) {
-    OFP_BSN_DHCPV6_OPT_FMT_OPAQUE_DATA = 1,
-    OFP_BSN_DHCPV6_OPT_FMT_AGENT_DATA = 2,
-    OFP_BSN_DHCPV6_OPT_FMT_PREFIX_OPAQUE_AND_AGENT_DATA = 3,
-};
-
-struct of_bsn_tlv_dhcpv6_opt_fmt : of_bsn_tlv {
+struct of_bsn_tlv_client_ll_addr : of_bsn_tlv {
     uint16_t type == 225;
     uint16_t length;
-    enum ofp_bsn_dhcpv6_opt_fmt fmt;
 };
