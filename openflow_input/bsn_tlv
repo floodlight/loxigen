@@ -1649,14 +1649,13 @@ struct of_bsn_tlv_no_drop : of_bsn_tlv {
     uint16_t length;
 };
 
-struct of_bsn_tlv_dhcpv6_opt_remote_id : of_bsn_tlv {
+struct of_bsn_tlv_remote_id : of_bsn_tlv {
     uint16_t type == 224;
     uint16_t length;
     of_octets_t value;
 };
 
-struct of_bsn_tlv_dhcpv6_opt_client_ll_addr : of_bsn_tlv {
+struct of_bsn_tlv_client_ll_addr : of_bsn_tlv {
     uint16_t type == 225;
     uint16_t length;
 };
-
