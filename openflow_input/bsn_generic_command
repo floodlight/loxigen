@@ -44,3 +44,14 @@ struct of_bsn_generic_command : of_bsn_header {
     of_str64_t name;
     list(of_bsn_tlv_t) tlvs;
 };
+
+struct of_bsn_generic_command_reply : of_bsn_header {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0x5c16c7;
+    uint32_t subtype == 72;
+    uint32_t status;           // 0 means success
+    list(of_bsn_tlv_t) tlvs;
+};
