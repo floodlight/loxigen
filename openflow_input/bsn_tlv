@@ -1659,3 +1659,15 @@ struct of_bsn_tlv_client_ll_addr : of_bsn_tlv {
     uint16_t type == 225;
     uint16_t length;
 };
+
+enum ofp_bsn_action_state(wire_type=uint16_t) {
+    OFP_BSN_ACTION_STATE_COMPLETED = 0,
+    OFP_BSN_ACTION_STATE_ACTIVE = 1,
+    OFP_BSN_ACTION_STATE_WAITING = 2,
+};
+
+struct of_bsn_tlv_action_state : of_bsn_tlv {
+    uint16_t type == 226;
+    uint16_t length;
+    enum ofp_bsn_action_state value;
+};
