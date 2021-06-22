@@ -1154,6 +1154,7 @@ struct of_bsn_tlv_pdua_rx_instance : of_bsn_tlv {
 
 enum ofp_bsn_lag_flag(wire_type=uint16_t, bitmask=True) {
     OFP_BSN_LAG_FLAG_AUTO_RECOVERY = 0x01,
+    OFP_BSN_LAG_FLAG_ADD_PEER_ON_EMPTY = 0x02,
 };
 
 struct of_bsn_tlv_lag_options : of_bsn_tlv {
@@ -1670,4 +1671,16 @@ struct of_bsn_tlv_action_state : of_bsn_tlv {
     uint16_t type == 226;
     uint16_t length;
     enum ofp_bsn_action_state value;
+};
+
+enum ofp_bsn_lag_type(wire_type=uint16_t) {
+    OFP_BSN_LAG_TYPE_OTHER = 0,
+    OFP_BSN_LAG_TYPE_PEER = 1,
+    OFP_BSN_LAG_TYPE_SPINE = 2,
+};
+
+struct of_bsn_tlv_lag_type : of_bsn_tlv {
+    uint16_t type == 227;
+    uint16_t length;
+    enum ofp_bsn_lag_type value;
 };
