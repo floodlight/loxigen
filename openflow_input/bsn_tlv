@@ -1686,7 +1686,7 @@ struct of_bsn_tlv_lag_type : of_bsn_tlv {
 };
 
 enum ofp_bsn_ccf_feature(wire_type=uint16_t) {
-    OFP_BSN_CCF_FEATURE_ADD_PEER_ON_EMPTY = 0,
+    OFP_BSN_CCF_FEATURE_ALLOW_PEER_TO_EDGE_UNICAST = 0,
     OFP_BSN_CCF_FEATURE_DROP_DUPLICATE_L3CPU = 1,
 
     /* Add features before this and increment the count */
