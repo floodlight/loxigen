@@ -64,8 +64,9 @@ struct of_port_desc_prop_bsn_speed_capabilities : of_port_desc_prop_bsn {
 enum ofp_bsn_misc_capabilities(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_MISC_CAP_FEC = 0x1,
     OFP_BSN_MISC_CAP_FEC_FIRE_CODE = 0x2,
-    OFP_BSN_MISC_CAP_FEC_REED_SOLOMAN = 0x4,
-    OFP_BSN_MISC_CAP_FEC_REED_SOLOMAN544 = 0x8,
+    OFP_BSN_MISC_CAP_FEC_REED_SOLOMON = 0x4,
+    OFP_BSN_MISC_CAP_FEC_REED_SOLOMON544 = 0x8,
+    OFP_BSN_MISC_CAP_FEC_DISABLE = 0x10,
 };
 
 struct of_port_desc_prop_bsn_misc_capabilities : of_port_desc_prop_bsn {
@@ -85,8 +86,9 @@ enum ofp_bsn_extended_capabilities(wire_type=uint64_t, bitmask=True) {
     OFP_BSN_EXT_CAP_AN = 0x1,
     OFP_BSN_EXT_CAP_FEC = 0x2,
     OFP_BSN_EXT_CAP_FEC_FIRE_CODE = 0x4,
-    OFP_BSN_EXT_CAP_FEC_REED_SOLOMAN = 0x8,
-    OFP_BSN_EXT_CAP_FEC_REED_SOLOMAN544 = 0x10,
+    OFP_BSN_EXT_CAP_FEC_REED_SOLOMON = 0x8,
+    OFP_BSN_EXT_CAP_FEC_REED_SOLOMON544 = 0x10,
+    OFP_BSN_EXT_CAP_FEC_DISABLE = 0x20,
 };
 
 struct of_port_desc_prop_bsn_extended_capabilities : of_port_desc_prop_bsn {
