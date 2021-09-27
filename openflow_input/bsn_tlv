@@ -1700,15 +1700,3 @@ struct of_bsn_tlv_swl_feature : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_swl_feature value;
 };
-
-struct of_bsn_tlv_max_multicast_replication_groups : of_bsn_tlv {
-    uint16_t type == 229;
-    uint16_t length;
-    uint32_t value;
-};
-
-struct of_bsn_tlv_max_multicast_replications : of_bsn_tlv {
-    uint16_t type == 230;
-    uint16_t length;
-    uint32_t value;
-};
