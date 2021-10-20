@@ -39,11 +39,11 @@ fi
 if [[ $last_loxi_revision ]]; then
     echo "Last loxi revision committed: $last_loxi_revision"
     git log $last_loxi_revision..${loxi_head} >>$git_log_file
-    loxi_github_url="https://github.com/floodlight/loxigen/compare/${last_loxi_revision}...${loxi_head}"
+    loxi_github_url="https://github.com/bigswitch/loxigen/compare/${last_loxi_revision}...${loxi_head}"
 else
     echo "No Previous loxi revision info found"
     git log -1 HEAD >>$git_log_file
-    loxi_github_url="https://github.com/floodlight/loxigen/commit/${loxi_head}"
+    loxi_github_url="https://github.com/bigswitch/loxigen/commit/${loxi_head}"
 fi
 
 
@@ -60,7 +60,7 @@ fi
         (
         echo "Artifacts from ${loxi_github_url} (Branch ${loxi_branch})"
         echo
-        echo "Loxigen Head commit floodlight/loxigen@${loxi_head}"
+        echo "Loxigen Head commit bigswitch/loxigen@${loxi_head}"
         cat $git_log_file
         ) | git commit --file=-
 
