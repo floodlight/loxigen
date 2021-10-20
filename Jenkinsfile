@@ -14,7 +14,7 @@ def getMavenPatchVersion() {
 }
 
 mavenPatchVersion=getMavenPatchVersion()
-artifact_repo="git@github.com:floodlight/loxigen-artifacts.git"
+artifact_repo="git@github.com:bigswitch/loxigen-artifacts.git"
 artifact_base_branch=env.CHANGE_TARGET ?: env.JOB_BASE_NAME
 artifact_target_branch= env.CHANGE_ID ? "${env.JOB_BASE_NAME}-b${env.BUILD_NUMBER}" : env.JOB_BASE_NAME
 
@@ -88,7 +88,7 @@ pipeline {
                             credentialsId: 'github-auth-token-bsn-abat',
                             variable: 'GITHUB_AUTH_TOKEN') ]) {
                     sh """
-                        ./infrastructure/build/githubtool/gh.py comment "Find artifact changes from this pull request at https://github.com/floodlight/loxigen-artifacts/tree/${artifact_target_branch}"
+                        ./infrastructure/build/githubtool/gh.py comment "Find artifact changes from this pull request at https://github.com/bigswitch/loxigen-artifacts/tree/${artifact_target_branch}"
                         """
                 }
             }
