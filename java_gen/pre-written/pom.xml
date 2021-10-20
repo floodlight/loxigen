@@ -9,7 +9,7 @@
     </parent>
 
     <groupId>org.projectfloodlight</groupId>
-    <artifactId>openflowj</artifactId>
+    <artifactId>openflowj-internal</artifactId>
     <!-- uses maven CI friendly versions, https://maven.apache.org/maven-ci-friendly.html.
          Note that this only works for a standalone POM as done here; otherwise you need plugins
          resolve-parent-version-maven-plugin or flatten-maven-plugin (and both bring complexities).
@@ -29,35 +29,20 @@
     </licenses>
 
     <scm>
-        <connection>scm:git:git@github.com:floodlight/loxigen.git</connection>
-        <developerConnection>scm:git:git@github.com:floodlight/loxigen.git</developerConnection>
-        <url>git@github.com:floodlight/loxigen.git</url>
+        <connection>scm:git:git@github.com:bigswitch/loxigen.git</connection>
+        <developerConnection>scm:git:git@github.com:bigswitch/loxigen.git</developerConnection>
+        <url>git@github.com:bigswitch/loxigen.git</url>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus Snapshots</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
         <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Nexus Release Repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+            <id>internal</id>
+            <url>http://mvn.eng.bigswitch.com/repository/internal/</url>
         </repository>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <url>http://mvn.eng.bigswitch.com/repository/snapshots/</url>
+        </snapshotRepository>
     </distributionManagement>
 
     <properties>
