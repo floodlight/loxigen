@@ -46,6 +46,9 @@ import os
 import select
 from threading import Condition, Lock, Thread
 
+# uncomment to log to screen
+#logging.basicConfig(level=logging.DEBUG)
+
 DEFAULT_TIMEOUT = 1
 
 class TransactionError(Exception):
@@ -79,7 +82,20 @@ class Connection(Thread):
         self.logger.debug("Exited event loop")
 
     def process_read(self):
-        recvd = self.sock.recv(4096)
+        try:
+            recvd = self.sock.recv(4096)
+:: if pyversion == 3:
+        except ConnectionResetError as e:
+            print('Connection reset:', e.strerror)
+            return
+:: else:
+        except IOError as e:
+            if e.errno == errno.ECONNRESET:
+                print('Connection reset:', e.strerror)
+                return
+            else:
+                raise e
+:: #endif
 
         self.logger.debug("Received %d bytes", len(recvd))
 
@@ -96,17 +112,17 @@ class Connection(Thread):
                 break
 
             # Parse the header to get type
-            hdr_version, hdr_type, hdr_msglen, hdr_xid = loxi.of14.message.parse_header(buf[offset:])
+            hdr_version, hdr_type, hdr_length, hdr_xid = loxi.of14.message.parse_header(buf[offset:])
 
             # Use loxi to resolve ofp of matching version
             ofp = loxi.protocol(hdr_version)
 
             # Extract the raw message bytes
-            if (offset + hdr_msglen) > len(buf):
+            if (offset + hdr_length) > len(buf):
                 # Not enough data for the body
                 break
-            rawmsg = buf[offset : offset + hdr_msglen]
-            offset += hdr_msglen
+            rawmsg = buf[offset : offset + hdr_length]
+            offset += hdr_length
 
             msg = ofp.message.parse_message(rawmsg)
             if not msg:
@@ -114,7 +130,7 @@ class Connection(Thread):
                 continue
 
             self.logger.debug("Received message %s.%s xid %d length %d",
-                              type(msg).__module__, type(msg).__name__, hdr_xid, hdr_msglen)
+                              type(msg).__module__, type(msg).__name__, hdr_xid, hdr_length)
 
             with self.rx_cv:
                 self.rx.append(msg)
@@ -172,7 +188,7 @@ class Connection(Thread):
         self.logger.debug("Sending raw message length %d", len(buf))
         with self.tx_lock:
             if self.sock.sendall(buf) is not None:
-                raise RuntimeError("failed to send message to switch")
+                raise RuntimeError("Failed to send message to switch")
 
     def send(self, msg):
         """
@@ -187,7 +203,24 @@ class Connection(Thread):
                           type(msg).__module__, type(msg).__name__, msg.xid, len(buf))
         with self.tx_lock:
             if self.sock.sendall(buf) is not None:
-                raise RuntimeError("failed to send message to switch")
+                raise RuntimeError("Failed to send message to switch")
+
+    def hello(self):
+        reply = self.recv(lambda msg: True, timeout=DEFAULT_TIMEOUT)
+
+    def request_stats_generator(self, request):
+        ofp = loxi.protocol(request.version)
+        self.send(request)
+        while True:
+            reply = self.recv(lambda msg: True, timeout=DEFAULT_TIMEOUT)
+            if reply is None:
+                raise TransactionError("No reply for %s" % type(request).__name__, None)
+            if not isinstance(reply, ofp.message.stats_reply):
+                raise TransactionError("Expected stats_reply, received %s" % type(reply).__name__, reply)
+            for entry in reply.entries:
+                yield entry
+            if reply.flags & ofp.const.OFPSF_REPLY_MORE == 0:
+                break
 
     def transact(self, msg, timeout=DEFAULT_TIMEOUT):
         """
@@ -196,9 +229,9 @@ class Connection(Thread):
         self.send(msg)
         reply = self.recv_xid(msg.xid, timeout)
         if reply is None:
-            raise TransactionError("no reply for %s" % type(msg).__name__, None)
+            raise TransactionError("No reply for %s" % type(msg).__name__, None)
         elif isinstance(reply, loxi.protocol(reply.version).message.error_msg):
-            raise TransactionError("received %s in response to %s" % (type(reply).__name__, type(msg).__name__), reply)
+            raise TransactionError("Received %s in response to %s" % (type(reply).__name__, type(msg).__name__), reply)
         return reply
 
     def transact_multipart_generator(self, msg, timeout=DEFAULT_TIMEOUT):
@@ -210,9 +243,9 @@ class Connection(Thread):
         while not finished:
             reply = self.recv_xid(msg.xid, timeout)
             if reply is None:
-                raise TransactionError("no reply for %s" % type(msg).__name__, None)
+                raise TransactionError("No reply for %s" % type(msg).__name__, None)
             elif not isinstance(reply, loxi.protocol(reply.version).message.stats_reply):
-                raise TransactionError("received %s in response to %s" % (type(reply).__name__, type(msg).__name__), reply)
+                raise TransactionError("Received %s in response to %s" % (type(reply).__name__, type(msg).__name__), reply)
             for entry in reply.entries:
                 yield entry
             finished = reply.flags & loxi.protocol(reply.version).OFPSF_REPLY_MORE == 0
@@ -262,8 +295,9 @@ def connect(ip, port=6653, daemon=True, ofp=loxi.of14):
     cxn.start()
 
     cxn.send(ofp.message.hello())
-    if not cxn.recv(lambda msg: msg.type == ofp.OFPT_HELLO):
-        raise Exception("Did not receive HELLO")
+    hello = cxn.recv_any()
+    if hello is None or hello.type != ofp.OFPT_HELLO:
+        cxn.logger.debug('Did not receive hello message')
 
     return cxn
 
@@ -273,13 +307,45 @@ def connect_unix(path, daemon=True, ofp=loxi.of14):
     """
     soc = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
     soc.connect(path)
-    cxn = loxi.connection.Connection(soc)
+    cxn = Connection(soc)
     cxn.daemon = daemon
     cxn.logger.debug("Connected to %s", path)
     cxn.start()
 
     cxn.send(ofp.message.hello())
-    if not cxn.recv(lambda msg: msg.type == ofp.OFPT_HELLO):
-        raise Exception("Did not receive HELLO")
+    hello = cxn.recv_any()
+    if hello is None or hello.type != ofp.OFPT_HELLO:
+        cxn.logger.debug('Did not receive hello message')
 
     return cxn
+
+class ConnectionManager(object):
+    def __init__(self, target='localhost', port=6634, ofp=loxi.of14,
+                 immediate=False):
+        self.cxn = None
+        self.target = target
+        self.port = port
+        self.ofp = ofp
+        self.immediate = immediate
+    def __enter__(self):
+        interval = 1
+        while self.cxn == None:
+            try:
+                self.cxn = connect(self.target, self.port, self.ofp)
+            except socket.error as e:
+                if self.immediate:
+                    raise TransactionError('Connection: %s' % e, None)
+                print('%s: Retrying...' % e.strerror)
+                time.sleep(interval)
+                # exponential backoff, 16s max
+                interval = min(2*interval, 16)
+        return self
+    def __exit__(self, exception_type, exception_value, traceback):
+        if self.cxn:
+            self.cxn.stop()
+        if exception_type is not None:
+            if exception_type == TransactionError:
+                print("Received transaction error")
+                self.cxn.logger.debug("Received transaction error: %s",
+                                      exception_value)
+                return True
