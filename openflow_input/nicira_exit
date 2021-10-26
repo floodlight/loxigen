@@ -1,0 +1,16 @@
+#version any
+
+// Nicira (OpenVSwitch) Exit action.
+//
+// Causes the datapath to immediately halt execution of further apply-actions.
+//
+// See ovs-ofctl man page for details:
+//    http://openvswitch.org/support/dist-docs/ovs-ofctl.8.txt
+struct of_action_nicira_exit : of_action_nicira {
+    uint16_t type == 65535;
+    uint16_t len;
+    uint32_t experimenter == 0x2320;
+    uint16_t subtype == 0x11;
+    pad(2);
+    pad(4);
+};
