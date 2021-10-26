@@ -727,7 +727,7 @@ struct of_hello_elem {
     uint16_t length;
 };
 
-struct of_hello_elem_versionbitmap : of_hello_elem {
+struct of_hello_elem_versionbitmap(align=8) : of_hello_elem {
     uint16_t type == 1;
     uint16_t length;
     list(of_uint32_t) bitmaps;
