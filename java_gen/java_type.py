@@ -896,7 +896,6 @@ exceptions = {
         'of_features_reply' : { 'auxiliary_id' : of_aux_id},
 
         'of_bundle_add_msg' : { 'data' : of_message },
-        'of_flow_stats_request' : { 'out_group' : of_group },
         'of_flow_lightweight_stats_request' : { 'out_group' : of_group }
 }
 
