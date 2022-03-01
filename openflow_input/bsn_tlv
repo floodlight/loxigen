@@ -1700,3 +1700,15 @@ struct of_bsn_tlv_swl_feature : of_bsn_tlv {
     uint16_t length;
     enum ofp_bsn_swl_feature value;
 };
+
+struct of_bsn_tlv_potential : of_bsn_tlv {
+    uint16_t type == 229;
+    uint16_t length;
+    uint32_t value;
+};
+
+struct of_bsn_tlv_guaranteed : of_bsn_tlv {
+    uint16_t type == 230;
+    uint16_t length;
+    uint32_t value;
+};
