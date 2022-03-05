@@ -79,7 +79,7 @@ def memoize(obj):
 #
 ################################################################
 
-class OrderedSet(collections.MutableSet):
+class OrderedSet(collections.abc.MutableSet):
     """
     A set implementations that retains insertion order.  From the receipe
     http://code.activestate.com/recipes/576694/
