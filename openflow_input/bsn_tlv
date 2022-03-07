@@ -1712,3 +1712,19 @@ struct of_bsn_tlv_guaranteed : of_bsn_tlv {
     uint16_t length;
     uint32_t value;
 };
+
+enum ofp_bsn_to_cpu(wire_type=uint32_t) {
+    OFP_BSN_TO_CPU_CONTROLLER = 1,
+    OFP_BSN_TO_CPU_LOCAL = 2,
+};
+
+struct of_bsn_tlv_to_cpu : of_bsn_tlv {
+    uint16_t type == 231;
+    uint16_t length;
+    enum ofp_bsn_to_cpu value;
+};
+
+struct of_bsn_tlv_is_deny : of_bsn_tlv {
+    uint16_t type == 232;
+    uint16_t length;
+};
