@@ -1171,6 +1171,8 @@ enum ofp_bsn_routing_param(wire_type=uint16_t) {
     OFP_BSN_ROUTING_PARAM_IPV6_OSPF_UCAST = 4,
     OFP_BSN_ROUTING_PARAM_IPV6_OSPF_MCAST = 5,
     OFP_BSN_ROUTING_PARAM_IPV6_NDP_FRR = 6,
+    OFP_BSN_ROUTING_PARAM_BGP_UCAST = 7,
+    OFP_BSN_ROUTING_PARAM_IPV6_BGP_UCAST = 8,
 };
 
 struct of_bsn_tlv_routing_param : of_bsn_tlv {
