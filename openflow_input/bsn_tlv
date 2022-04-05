@@ -1759,13 +1759,13 @@ struct of_bsn_tlv_ptp_domain : of_bsn_tlv {
     uint8_t value;
 };
 
-struct of_bsn_tlv_ptp_source_ip : of_bsn_tlv {
+struct of_bsn_tlv_ptp_src_ip : of_bsn_tlv {
     uint16_t type == 237;
     uint16_t length;
     of_ipv4_t value;
 };
 
-struct of_bsn_tlv_ptp_source_ipv6 : of_bsn_tlv {
+struct of_bsn_tlv_ptp_src_ipv6 : of_bsn_tlv {
     uint16_t type == 238;
     uint16_t length;
     of_ipv6_t value;
@@ -1782,7 +1782,7 @@ struct of_bsn_tlv_timestamp_mode : of_bsn_tlv {
     enum ofp_bsn_timestamp_mode value;
 };
 
-enum ofp_bsn_timestamp_caps(wire_type=uint64_t, bitmask=True) {
+enum ofp_bsn_timestamp_caps(wire_type=uint16_t, bitmask=True) {
     OFP_BSN_TIMESTAMP_CAPS_REPLACE_SMAC = 0x1,
     OFP_BSN_TIMESTAMP_CAPS_ADD_HEADER = 0x2,
     OFP_BSN_TIMESTAMP_CAPS_HEADER_64BIT = 0x4,
