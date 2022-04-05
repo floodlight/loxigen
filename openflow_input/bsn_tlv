@@ -1730,3 +1730,124 @@ struct of_bsn_tlv_is_deny : of_bsn_tlv {
     uint16_t type == 232;
     uint16_t length;
 };
+
+enum ofp_bsn_ptp_mode(wire_type=uint8_t) {
+    OFP_BSN_PTP_MODE_BOUNDARY = 0,
+};
+
+struct of_bsn_tlv_ptp_mode : of_bsn_tlv {
+    uint16_t type == 233;
+    uint16_t length;
+    enum ofp_bsn_ptp_mode value;
+};
+
+struct of_bsn_tlv_ptp_priority1 : of_bsn_tlv {
+    uint16_t type == 234;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_ptp_priority2 : of_bsn_tlv {
+    uint16_t type == 235;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_ptp_domain : of_bsn_tlv {
+    uint16_t type == 236;
+    uint16_t length;
+    uint8_t value;
+};
+
+struct of_bsn_tlv_ptp_source_ip : of_bsn_tlv {
+    uint16_t type == 237;
+    uint16_t length;
+    of_ipv4_t value;
+};
+
+struct of_bsn_tlv_ptp_source_ipv6 : of_bsn_tlv {
+    uint16_t type == 238;
+    uint16_t length;
+    of_ipv6_t value;
+};
+
+enum ofp_bsn_timestamp_mode(wire_type=uint8_t) {
+    OFP_BSN_TIMESTAMP_MODE_REPLACE_SMAC = 0,
+    OFP_BSN_TIMESTAMP_MODE_ADD_HEADER = 1,
+};
+
+struct of_bsn_tlv_timestamp_mode : of_bsn_tlv {
+    uint16_t type == 239;
+    uint16_t length;
+    enum ofp_bsn_timestamp_mode value;
+};
+
+enum ofp_bsn_timestamp_caps(wire_type=uint64_t, bitmask=True) {
+    OFP_BSN_TIMESTAMP_CAPS_REPLACE_SMAC = 0x1,
+    OFP_BSN_TIMESTAMP_CAPS_ADD_HEADER = 0x2,
+    OFP_BSN_TIMESTAMP_CAPS_HEADER_64BIT = 0x4,
+    OFP_BSN_TIMESTAMP_CAPS_HEADER_48BIT = 0x8,
+    OFP_BSN_TIMESTAMP_CAPS_PORT_BASED = 0x10,
+    OFP_BSN_TIMESTAMP_CAPS_FLOW_BASED = 0x20,
+};
+
+struct of_bsn_tlv_timestamp_capability : of_bsn_tlv {
+    uint16_t type == 240;
+    uint16_t length;
+    enum ofp_bsn_timestamp_caps value;
+};
+
+enum ofp_bsn_timestamp_header_format(wire_type=uint8_t) {
+    OFP_BSN_TIMESTAMP_HEADER_FORMAT_64BIT = 0,
+    OFP_BSN_TIMESTAMP_HEADER_FORMAT_48BIT = 1,
+};
+
+struct of_bsn_tlv_timestamp_header_format : of_bsn_tlv {
+    uint16_t type == 241;
+    uint16_t length;
+    enum ofp_bsn_timestamp_header_format value;
+};
+
+struct of_bsn_tlv_ptp_announce_interval : of_bsn_tlv {
+    uint16_t type == 242;
+    uint16_t length;
+    uint8_t value;
+    uint8_t is_negative;
+};
+
+struct of_bsn_tlv_ptp_delay_request_interval : of_bsn_tlv {
+    uint16_t type == 243;
+    uint16_t length;
+    uint8_t value;
+    uint8_t is_negative;
+};
+
+struct of_bsn_tlv_ptp_sync_message_interval : of_bsn_tlv {
+    uint16_t type == 244;
+    uint16_t length;
+    uint8_t value;
+    uint8_t is_negative;
+};
+
+enum ofp_bsn_switchport_mode(wire_type=uint8_t) {
+    OFP_BSN_SWITCHPORT_MODE_ACCESS = 0,
+    OFP_BSN_SWITCHPORT_MODE_ROUTED = 1,
+    OFP_BSN_SWITCHPORT_MODE_TRUNK = 2,
+};
+
+struct of_bsn_tlv_switchport_mode : of_bsn_tlv {
+    uint16_t type == 245;
+    uint16_t length;
+    enum ofp_bsn_switchport_mode value;
+};
+
+struct of_bsn_tlv_ptp_vlan : of_bsn_tlv {
+    uint16_t type == 246;
+    uint16_t length;
+    uint16_t value;
+};
+
+struct of_bsn_tlv_timestamp_header_enabled : of_bsn_tlv {
+    uint16_t type == 247;
+    uint16_t length;
+};
