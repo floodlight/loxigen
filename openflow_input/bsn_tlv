@@ -1851,3 +1851,8 @@ struct of_bsn_tlv_timestamp_header_enabled : of_bsn_tlv {
     uint16_t type == 247;
     uint16_t length;
 };
+
+struct of_bsn_tlv_timestamp_action : of_bsn_tlv {
+    uint16_t type == 248;
+    uint16_t length;
+};
