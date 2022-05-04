@@ -1856,3 +1856,13 @@ struct of_bsn_tlv_timestamp_action : of_bsn_tlv {
     uint16_t type == 248;
     uint16_t length;
 };
+
+struct of_bsn_tlv_base : of_bsn_tlv {
+    uint16_t type == 249;
+    uint16_t length;
+};
+
+struct of_bsn_tlv_extended : of_bsn_tlv {
+    uint16_t type == 250;
+    uint16_t length;
+};
