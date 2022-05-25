@@ -1630,6 +1630,7 @@ enum ofp_bsn_metadata(wire_type=uint16_t) {
     OFP_BSN_METADATA_UNKNOWN = 0,
     OFP_BSN_METADATA_POLICY_ID = 1,
     OFP_BSN_METADATA_FILTER_ID = 2,
+    OFP_BSN_METADATA_LAST = 3,                  /* last enum value  */
 };
 
 struct of_bsn_tlv_metadata : of_bsn_tlv {
@@ -1643,6 +1644,7 @@ enum ofp_bsn_packet_field(wire_type=uint16_t) {
     OFP_BSN_PACKET_FIELD_OUTER_VLAN_TAG_1 = 1,  /* outermost vlan tag */
     OFP_BSN_PACKET_FIELD_OUTER_VLAN_TAG_2 = 2,  /* next outermost vlan tag */
     OFP_BSN_PACKET_FIELD_SRC_MAC = 3,           /* source mac */
+    OFP_BSN_PACKET_FIELD_LAST = 4,              /* last enum value */
 };
 
 struct of_bsn_tlv_packet_field : of_bsn_tlv {
