@@ -1870,3 +1870,9 @@ struct of_bsn_tlv_extended : of_bsn_tlv {
     uint16_t type == 250;
     uint16_t length;
 };
+
+struct of_bsn_tlv_inner_eth_type : of_bsn_tlv {
+    uint16_t type == 251;
+    uint16_t length;
+    uint16_t value;
+};
