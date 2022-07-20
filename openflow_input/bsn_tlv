@@ -1876,3 +1876,9 @@ struct of_bsn_tlv_inner_eth_type : of_bsn_tlv {
     uint16_t length;
     uint16_t value;
 };
+
+struct of_bsn_tlv_current : of_bsn_tlv {
+    uint16_t type == 252;
+    uint16_t length;
+    uint32_t value;
+};
